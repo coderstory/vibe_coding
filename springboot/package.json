@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@ckeditor/ckeditor5-vue": "^7.4.0",
+    "ckeditor5": "^48.0.0"
+  }
+}
