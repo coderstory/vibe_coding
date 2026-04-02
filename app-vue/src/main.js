@@ -1,20 +1,21 @@
 import './assets/main.css'
+import './assets/glass.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
-// 引入 Element Plus
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
-// 引入图标
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+
+import { createVuestic } from 'vuestic-ui'
+import 'vuestic-ui/dist/vuestic-ui.css'
 
 const app = createApp(App)
 const pinia = createPinia()
 
-// 注册所有图标组件
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
@@ -22,5 +23,6 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 app.use(pinia)
 app.use(router)
 app.use(ElementPlus)
+app.use(createVuestic({}))
 
 app.mount('#app')
