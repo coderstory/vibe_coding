@@ -29,5 +29,5 @@ public class KnowledgeArticle {
     private LocalDateTime createTime;
     
     @TableField(exist = false)
-    private List<String> tags;
+    private List<Long> tags;
 }
