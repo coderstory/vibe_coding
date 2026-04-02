@@ -186,9 +186,10 @@ onBeforeUnmount(() => {
         </el-col>
       </el-row>
       <el-form-item label="内容">
-        <div class="editor-container">
-          <editor-content :editor="editor" class="tiptap-editor" />
+        <div v-if="editor" class="editor-container">
+          <editor-content :editor="editor" />
         </div>
+        <div v-else class="editor-loading">加载中...</div>
       </el-form-item>
       <el-form-item label="附件">
         <el-upload
@@ -211,52 +212,26 @@ onBeforeUnmount(() => {
 .editor-container {
   border: 1px solid #dcdfe6;
   border-radius: 4px;
-  height: calc(100vh - 300px);
-  overflow: auto;
+  height: 500px;
+  overflow-y: auto;
+}
+
+.editor-loading {
+  height: 500px;
+  line-height: 500px;
+  text-align: center;
+  color: #999;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
 }
 
 :deep(.ProseMirror) {
-  height: 100%;
+  min-height: 400px;
   padding: 16px;
+  box-sizing: border-box;
+}
+
+:deep(.ProseMirror:focus) {
   outline: none;
-}
-
-:deep(.ProseMirror p) {
-  margin: 0;
-}
-
-:deep(.ProseMirror h1) {
-  font-size: 2em;
-  margin-top: 1em;
-}
-
-:deep(.ProseMirror h2) {
-  font-size: 1.5em;
-  margin-top: 1em;
-}
-
-:deep(.ProseMirror h3) {
-  font-size: 1.25em;
-  margin-top: 1em;
-}
-
-:deep(.ProseMirror code) {
-  background: #f0f0f0;
-  padding: 2px 6px;
-  border-radius: 3px;
-  font-family: monospace;
-}
-
-:deep(.ProseMirror pre) {
-  background: #1e1e1e;
-  color: #d4d4d4;
-  padding: 12px;
-  border-radius: 6px;
-  overflow-x: auto;
-}
-
-:deep(.ProseMirror pre code) {
-  background: none;
-  padding: 0;
 }
 </style>
