@@ -10,7 +10,7 @@
 - Integer phases (1, 2, 3): Planned milestone work
 
 - [ ] **Phase 1: 认证与基础框架** - 用户登录登出 + 管理后台基础布局
-- [ ] **Phase 2: 用户与权限管理** - 用户 CRUD、角色管理、审计日志查询
+- [x] **Phase 2: 用户与权限管理** - 用户 CRUD、角色管理、审计日志查询 (completed 2026-04-02)
 - [ ] **Phase 3: 业务数据管理** - 业务数据 CRUD + 响应式布局`n- [ ] **Phase 4: UI 增强与主题系统** - 动态效果、液态玻璃、主题切换
 
 ## Phase Details
@@ -81,5 +81,5 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. 认证与基础框架 | 2/2 | Planned | - |
-| 2. 用户与权限管理 | 0/3 | Planned | - |
+| 2. 用户与权限管理 | 0/3 | Complete    | 2026-04-02 |
 | 3. 业务数据管理 | 0/? | Not started | - |
