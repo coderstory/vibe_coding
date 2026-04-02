@@ -30,9 +30,9 @@ export const useThemeStore = defineStore('theme', () => {
   async function loadTheme() {
     try {
       isLoading.value = true
-      const response = await getTheme()
-      if (response.data.code === 200) {
-        setTheme(response.data.data.theme)
+      const res = await getTheme()
+      if (res.code === 200) {
+        setTheme(res.data.theme)
       }
     } catch (error) {
       console.error('加载主题失败:', error)

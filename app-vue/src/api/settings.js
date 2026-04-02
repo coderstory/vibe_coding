@@ -1,9 +1,9 @@
-import axios from 'axios'
+import request from './user'
 
 export function getTheme() {
-  return axios.get('/api/settings/theme')
+  return request.get('/settings/theme')
 }
 
 export function saveTheme(theme) {
-  return axios.put('/api/settings/theme', { theme })
+  return request.put('/settings/theme', { theme })
 }
