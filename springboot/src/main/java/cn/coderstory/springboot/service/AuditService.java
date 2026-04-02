@@ -2,10 +2,14 @@ package cn.coderstory.springboot.service;
 
 import cn.coderstory.springboot.entity.AuditLog;
 import cn.coderstory.springboot.mapper.AuditLogMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -32,5 +36,10 @@ public class AuditService {
         } catch (Exception e) {
             log.error("审计日志记录失败: {}", e.getMessage());
         }
+    }
+    
+    public IPage<AuditLog> getAuditLogPage(Page<AuditLog> page, String operator, 
+            String operationType, LocalDateTime startTime, LocalDateTime endTime) {
+        return auditLogMapper.selectPage(page, operator, operationType, startTime, endTime);
     }
 }
