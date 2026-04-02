@@ -97,7 +97,7 @@ INSERT INTO sys_menu (id, parent_id, name, path, icon, sort_order) VALUES
 (3, 1, '角色管理', '/system/role', 'Key', 2),
 (4, 1, '审计日志', '/system/audit', 'Document', 3),
 (5, 0, '业务数据', '', 'Goods', 2),
-(6, 5, '数据列表', 'business', 'List', 1),
+(6, 5, '数据列表', '/business/data', 'List', 1),
 (7, 0, '首页', '/dashboard', 'HomeFilled', 0);
 
 -- 初始角色分配所有菜单权限
