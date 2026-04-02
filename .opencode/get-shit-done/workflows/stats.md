@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Display comprehensive project statistics including phases, plans, requirements, git metrics, and timeline.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -12,7 +12,7 @@ Read all files referenced by the invoking prompt's execution_context before star
 Gather project statistics:
 
 ```bash
-STATS=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" stats json)
+STATS=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" stats json)
 if [[ "$STATS" == @file:* ]]; then STATS=$(cat "${STATS#@file:}"); fi
 ```
 

@@ -1,13 +1,13 @@
-<purpose>
+<objective>
 Retroactive 6-pillar visual audit of implemented frontend code. Standalone command that works on any project — GSD-managed or not. Produces scored UI-REVIEW.md with actionable findings.
-</purpose>
+</objective>
 
 <required_reading>
-@D:/Data/桌面/vibe coding/.opencode/get-shit-done/references/ui-brand.md
+@./.opencode/get-shit-done/references/ui-brand.md
 </required_reading>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-ui-auditor — Audits UI against design requirements
 </available_agent_types>
 
@@ -16,15 +16,15 @@ Valid GSD subagent types (use exact names — do not fall back to 'general-purpo
 ## 0. Initialize
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${PHASE_ARG}")
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${PHASE_ARG}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_UI_REVIEWER=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-ui-reviewer 2>/dev/null)
+AGENT_SKILLS_UI_REVIEWER=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-ui-reviewer 2>/dev/null)
 ```
 
 Parse: `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded_phase`, `commit_docs`.
 
 ```bash
-UI_AUDITOR_MODEL=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" resolve-model gsd-ui-auditor --raw)
+UI_AUDITOR_MODEL=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" resolve-model gsd-ui-auditor --raw)
 ```
 
 Display banner:
@@ -71,7 +71,7 @@ Build file list for auditor:
 Build prompt:
 
 ```markdown
-Read D:/Data/桌面/vibe coding/.opencode/agents/gsd-ui-auditor.md for instructions.
+read ./.opencode/agents/gsd-ui-auditor.md for instructions.
 
 <objective>
 Conduct 6-pillar visual audit of Phase {phase_number}: {phase_name}
@@ -97,7 +97,7 @@ padded_phase: {padded_phase}
 Omit null file paths.
 
 ```
-Task(
+task(
   prompt=ui_audit_prompt,
   subagent_type="gsd-ui-auditor",
   model="{UI_AUDITOR_MODEL}",
@@ -141,7 +141,7 @@ Full review: {path to UI-REVIEW.md}
 - `/gsd-verify-work {N}` — UAT testing
 - `/gsd-plan-phase {N+1}` — plan next phase
 
-<sub>/clear first → fresh context window</sub>
+*/new first → fresh context window*
 
 ───────────────────────────────────────────────────────────────
 ```
@@ -149,7 +149,7 @@ Full review: {path to UI-REVIEW.md}
 ## 5. Commit (if configured)
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(${padded_phase}): UI audit review" --files "${PHASE_DIR}/${PADDED_PHASE}-UI-REVIEW.md"
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(${padded_phase}): UI audit review" --files "${PHASE_DIR}/${PADDED_PHASE}-UI-REVIEW.md"
 ```
 
 </process>

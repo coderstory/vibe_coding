@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Create structured `.planning/HANDOFF.json` and `.continue-here.md` handoff files to preserve complete work state across sessions. The JSON provides machine-readable state for `/gsd-resume-work`; the markdown provides human-readable context.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -42,10 +42,10 @@ Report any summaries with placeholder content as incomplete items.
 </step>
 
 <step name="write_structured">
-**Write structured handoff to `.planning/HANDOFF.json`:**
+**write structured handoff to `.planning/HANDOFF.json`:**
 
 ```bash
-timestamp=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" current-timestamp full --raw)
+timestamp=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" current-timestamp full --raw)
 ```
 
 ```json
@@ -85,7 +85,7 @@ timestamp=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-too
 </step>
 
 <step name="write">
-**Write handoff to `.planning/phases/XX-name/.continue-here.md`:**
+**write handoff to `.planning/phases/XX-name/.continue-here.md`:**
 
 ```markdown
 ---
@@ -102,16 +102,16 @@ last_updated: [timestamp from current-timestamp]
 
 <completed_work>
 
-- Task 1: [name] - Done
-- Task 2: [name] - Done
-- Task 3: [name] - In progress, [what's done]
+- task 1: [name] - Done
+- task 2: [name] - Done
+- task 3: [name] - In progress, [what's done]
 </completed_work>
 
 <remaining_work>
 
-- Task 3: [what's left]
-- Task 4: Not started
-- Task 5: Not started
+- task 3: [what's left]
+- task 4: Not started
+- task 5: Not started
 </remaining_work>
 
 <decisions_made>
@@ -133,17 +133,17 @@ Start with: [specific first action when resuming]
 </next_action>
 ```
 
-Be specific enough for a fresh the agent to understand immediately.
+Be specific enough for a fresh OpenCode to understand immediately.
 
 Use `current-timestamp` for last_updated field. You can use init todos (which provides timestamps) or call directly:
 ```bash
-timestamp=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" current-timestamp full --raw)
+timestamp=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" current-timestamp full --raw)
 ```
 </step>
 
 <step name="commit">
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "wip: [phase-name] paused at task [X]/[Y]" --files .planning/phases/*/.continue-here.md .planning/HANDOFF.json
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "wip: [phase-name] paused at task [X]/[Y]" --files .planning/phases/*/.continue-here.md .planning/HANDOFF.json
 ```
 </step>
 
@@ -156,7 +156,7 @@ node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" comm
 Current state:
 
 - Phase: [XX-name]
-- Task: [X] of [Y]
+- task: [X] of [Y]
 - Status: [in_progress/blocked]
 - Blockers: [count] ({human_actions_pending count} need human action)
 - Committed as WIP

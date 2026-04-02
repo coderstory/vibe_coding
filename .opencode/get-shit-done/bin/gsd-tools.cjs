@@ -15,7 +15,7 @@
  *   state get [section]                Get STATE.md content or section
  *   state patch --field val ...        Batch update STATE.md fields
  *   state begin-phase --phase N --name S --plans C  Update STATE.md for new phase start
- *   state signal-waiting --type T --question Q --options "A|B" --phase P  Write WAITING.json signal
+ *   state signal-waiting --type T --question Q --options "A|B" --phase P  write WAITING.json signal
  *   state signal-resume                Remove WAITING.json signal
  *   resolve-model <agent-type>         Get model for agent based on profile
  *   find-phase <phase>                 Find phase directory by number
@@ -864,7 +864,7 @@ async function runCommand(command, args, cwd, raw) {
       break;
     }
 
-    case 'generate-claude-profile': {
+    case 'generate-OpenCode-profile': {
       const analysisIdx = args.indexOf('--analysis');
       const analysisPath = analysisIdx !== -1 ? args[analysisIdx + 1] : null;
       const outputIdx = args.indexOf('--output');
@@ -874,7 +874,7 @@ async function runCommand(command, args, cwd, raw) {
       break;
     }
 
-    case 'generate-claude-md': {
+    case 'generate-OpenCode-md': {
       const outputIdx = args.indexOf('--output');
       const outputPath = outputIdx !== -1 ? args[outputIdx + 1] : null;
       const autoFlag = args.includes('--auto');

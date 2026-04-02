@@ -1,12 +1,12 @@
-<purpose>
+<objective>
 
 Interactive command center for managing a milestone from a single terminal. Shows a dashboard of all phases with visual status, dispatches discuss inline and plan/execute as background agents, and loops back to the dashboard after each action. Enables parallel phase work from one terminal.
 
-</purpose>
+</objective>
 
 <required_reading>
 
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 
 </required_reading>
 
@@ -19,7 +19,7 @@ Read all files referenced by the invoking prompt's execution_context before star
 Bootstrap via manager init:
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init manager)
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init manager)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -53,7 +53,7 @@ Proceed to dashboard step.
 **Every time this step is reached**, re-read state from disk to pick up changes from background agents:
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init manager)
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init manager)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -115,8 +115,8 @@ Ask user via question:
 - **options:** "Verify work" / "Complete milestone" / "Exit manager"
 
 Handle responses:
-- "Verify work": `Skill(skill="gsd:verify-work")`  then loop to dashboard.
-- "Complete milestone": `Skill(skill="gsd:complete-milestone")` then exit.
+- "Verify work": `skill(skill="gsd-verify-work")`  then loop to dashboard.
+- "Complete milestone": `skill(skill="gsd-complete-milestone")` then exit.
 - "Exit manager": Go to exit step.
 
 **If NOT all_complete**, build compound options from `recommended_actions`:
@@ -193,7 +193,7 @@ When the user selects a compound option:
 2. **Then run the inline discuss:**
 
 ```
-Skill(skill="gsd:discuss-phase", args="{PHASE_NUM}")
+skill(skill="gsd-discuss-phase", args="{PHASE_NUM}")
 ```
 
 After discuss completes, loop back to dashboard step (background agents continue running).
@@ -203,7 +203,7 @@ After discuss completes, loop back to dashboard step (background agents continue
 Discussion is interactive — needs user input. Run inline:
 
 ```
-Skill(skill="gsd:discuss-phase", args="{PHASE_NUM}")
+skill(skill="gsd-discuss-phase", args="{PHASE_NUM}")
 ```
 
 After discuss completes, loop back to dashboard step.
@@ -213,7 +213,7 @@ After discuss completes, loop back to dashboard step.
 Planning runs autonomously. Spawn a background agent:
 
 ```
-Task(
+task(
   description="Plan phase {N}: {phase_name}",
   run_in_background=true,
   prompt="You are running the GSD plan-phase workflow for phase {N} of the project.
@@ -223,11 +223,11 @@ Phase: {N} — {phase_name}
 Goal: {goal}
 
 Steps:
-1. Read the plan-phase workflow: cat D:/Data/桌面/vibe coding/.opencode/get-shit-done/workflows/plan-phase.md
-2. Run: node \"D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs\" init plan-phase {N}
+1. read the plan-phase workflow: cat ./.opencode/get-shit-done/workflows/plan-phase.md
+2. Run: node \"./.opencode/get-shit-done/bin/gsd-tools.cjs\" init plan-phase {N}
 3. Follow the workflow steps to produce PLAN.md files for this phase.
 4. If research is enabled in config, run the research step first.
-5. Spawn a gsd-planner subagent via Task() to create the plans.
+5. Spawn a gsd-planner subagent via task() to create the plans.
 6. If plan-checker is enabled, spawn a gsd-plan-checker subagent to verify.
 7. Commit plan files when complete.
 
@@ -248,7 +248,7 @@ Loop back to dashboard step.
 Execution runs autonomously. Spawn a background agent:
 
 ```
-Task(
+task(
   description="Execute phase {N}: {phase_name}",
   run_in_background=true,
   prompt="You are running the GSD execute-phase workflow for phase {N} of the project.
@@ -258,10 +258,10 @@ Phase: {N} — {phase_name}
 Goal: {goal}
 
 Steps:
-1. Read the execute-phase workflow: cat D:/Data/桌面/vibe coding/.opencode/get-shit-done/workflows/execute-phase.md
-2. Run: node \"D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs\" init execute-phase {N}
+1. read the execute-phase workflow: cat ./.opencode/get-shit-done/workflows/execute-phase.md
+2. Run: node \"./.opencode/get-shit-done/bin/gsd-tools.cjs\" init execute-phase {N}
 3. Follow the workflow steps: discover plans, analyze dependencies, group into waves.
-4. For each wave, spawn gsd-executor subagents via Task() to execute plans in parallel.
+4. For each wave, spawn gsd-executor subagents via task() to execute plans in parallel.
 5. After all waves complete, spawn a gsd-verifier subagent if verifier is enabled.
 6. Update ROADMAP.md and STATE.md with progress.
 7. Commit all changes.
@@ -286,7 +286,7 @@ Loop back to dashboard step.
 
 When notified that a background agent completed:
 
-1. Read the result message from the agent.
+1. read the result message from the agent.
 2. Display a brief notification:
 
 ```
@@ -305,8 +305,8 @@ Classify the error:
 - Display the error clearly, then offer to fix it:
   - **question:** "Phase {N} failed — permission denied for `{tool_or_command}`. Want me to add it to settings.local.json so it's allowed?"
   - **options:** "Add permission and retry" / "Run this phase inline instead" / "Skip and continue"
-  - "Add permission and retry": Use `Skill(skill="update-config")` to add the permission to `settings.local.json`, then re-spawn the background agent. Loop to dashboard.
-  - "Run this phase inline instead": Dispatch the same action (plan/execute) inline via `Skill()` instead of a background Task. Loop to dashboard after.
+  - "Add permission and retry": Use `skill(skill="update-config")` to add the permission to `settings.local.json`, then re-spawn the background agent. Loop to dashboard.
+  - "Run this phase inline instead": Dispatch the same action (plan/execute) inline via `skill()` instead of a background task. Loop to dashboard after.
   - "Skip and continue": Loop to dashboard (phase stays in current state).
 
 **Other errors** (git lock, file conflict, logic error, etc.):
@@ -314,9 +314,9 @@ Classify the error:
   - **question:** "Background agent for Phase {N} encountered an issue: {error}. What next?"
   - **options:** "Retry" / "Run inline instead" / "Skip and continue" / "View details"
   - "Retry": Re-spawn the same background agent. Loop to dashboard.
-  - "Run inline instead": Dispatch the action inline via `Skill()`. Loop to dashboard after.
+  - "Run inline instead": Dispatch the action inline via `skill()`. Loop to dashboard after.
   - "Skip and continue": Loop to dashboard (phase stays in current state).
-  - "View details": Read STATE.md blockers section, display, then re-present options.
+  - "View details": read STATE.md blockers section, display, then re-present options.
 
 </step>
 
@@ -349,9 +349,9 @@ Display final status with progress bar:
 - [ ] Progress bar shows accurate completion percentage
 - [ ] Dependency resolution: blocked phases show which deps are missing
 - [ ] Recommendations prioritize: execute > plan > discuss
-- [ ] Discuss phases run inline via Skill() — interactive questions work
-- [ ] Plan phases spawn background Task agents — return to dashboard immediately
-- [ ] Execute phases spawn background Task agents — return to dashboard immediately
+- [ ] Discuss phases run inline via skill() — interactive questions work
+- [ ] Plan phases spawn background task agents — return to dashboard immediately
+- [ ] Execute phases spawn background task agents — return to dashboard immediately
 - [ ] Dashboard refreshes pick up changes from background agents via disk state
 - [ ] Background agent completion triggers notification and dashboard refresh
 - [ ] Background agent errors present retry/skip options

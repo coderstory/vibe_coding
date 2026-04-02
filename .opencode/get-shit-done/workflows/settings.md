@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Interactive configuration of GSD workflow agents (research, plan_check, verifier) and model profile selection via multi-question prompt. Updates .planning/config.json with user preferences. Optionally saves settings as global defaults (~/.gsd/defaults.json) for future projects.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -12,8 +12,8 @@ Read all files referenced by the invoking prompt's execution_context before star
 Ensure config exists and load current state:
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-ensure-section
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" state load)
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-ensure-section
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" state load)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -32,7 +32,7 @@ Parse current values (default to `true` if not present):
 - `workflow.nyquist_validation` — validation architecture research during plan-phase (default: true if absent)
 - `workflow.ui_phase` — generate UI-SPEC.md design contracts for frontend phases (default: true if absent)
 - `workflow.ui_safety_gate` — prompt to run /gsd-ui-phase before planning frontend phases (default: true if absent)
-- `model_profile` — which model each agent uses (default: `balanced`)
+- `model_profile` — which model each agent uses (default: `simple`)
 - `git.branching_strategy` — branching approach (default: `"none"`)
 </step>
 
@@ -46,9 +46,9 @@ question([
     header: "Model",
     multiSelect: false,
     options: [
-      { label: "Quality", description: "Opus everywhere except verification (highest cost)" },
-      { label: "Balanced (Recommended)", description: "Opus for planning, Sonnet for research/execution/verification" },
-      { label: "Budget", description: "Sonnet for writing, Haiku for research/verification (lowest cost)" },
+      { label: "Simple", description: "One model for all agents (not flexible)" },
+      { label: "Smart (Recommended)", description: "Opus for planning, Sonnet for research/execution/verification" },
+      { label: "Genius (most flexible)", description: "Three models: different for every stage" },
       { label: "Inherit", description: "Use current session model for all agents (best for OpenRouter, local models, or runtime model switching)" }
     ]
   },
@@ -84,8 +84,8 @@ question([
     header: "Auto",
     multiSelect: false,
     options: [
-      { label: "No (Recommended)", description: "Manual /clear + paste between stages" },
-      { label: "Yes", description: "Chain stages via Task() subagents (same isolation)" }
+      { label: "No (Recommended)", description: "Manual /new + paste between stages" },
+      { label: "Yes", description: "Chain stages via task() subagents (same isolation)" }
     ]
   },
   {
@@ -133,7 +133,7 @@ question([
     multiSelect: false,
     options: [
       { label: "Yes (Recommended)", description: "Warn when context usage exceeds 65%. Helps avoid losing work." },
-      { label: "No", description: "Disable warnings. Allows the agent to reach auto-compact naturally. Good for long unattended runs." }
+      { label: "No", description: "Disable warnings. Allows OpenCode to reach auto-compact naturally. Good for long unattended runs." }
     ]
   },
   {
@@ -164,7 +164,7 @@ Merge new settings into existing config.json:
 ```json
 {
   ...existing_config,
-  "model_profile": "quality" | "balanced" | "budget" | "inherit",
+  "model_profile": "simple" | "smart" | "genius" | "inherit",
   "workflow": {
     "research": true/false,
     "plan_check": true/false,
@@ -189,7 +189,7 @@ Merge new settings into existing config.json:
 }
 ```
 
-Write updated config to `.planning/config.json`.
+write updated config to `.planning/config.json`.
 </step>
 
 <step name="save_as_defaults">
@@ -215,7 +215,7 @@ If "Yes": write the same config object (minus project-specific fields like `brav
 mkdir -p ~/.gsd
 ```
 
-Write `~/.gsd/defaults.json` with:
+write `~/.gsd/defaults.json` with:
 ```json
 {
   "mode": <current>,
@@ -249,7 +249,7 @@ Display:
 
 | Setting              | Value |
 |----------------------|-------|
-| Model Profile        | {quality/balanced/budget/inherit} |
+| Model Profile        | {simple/smart/genius/inherit} |
 | Plan Researcher      | {On/Off} |
 | Plan Checker         | {On/Off} |
 | Execution Verifier   | {On/Off} |
@@ -265,7 +265,7 @@ Display:
 These settings apply to future /gsd-plan-phase and /gsd-execute-phase runs.
 
 Quick commands:
-- /gsd-set-profile <profile> — switch model profile
+- /gsd-set-profile <profile> — switch model profile/choose models
 - /gsd-plan-phase --research — force research
 - /gsd-plan-phase --skip-research — skip research
 - /gsd-plan-phase --skip-verify — skip plan check

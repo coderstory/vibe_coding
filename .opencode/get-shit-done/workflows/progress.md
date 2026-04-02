@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Check project progress, summarize recent work and what's ahead, then intelligently route to the next action — either executing an existing plan or creating the next one. Provides situational awareness before continuing work.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -12,14 +12,14 @@ Read all files referenced by the invoking prompt's execution_context before star
 **Load progress context (paths only):**
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init progress)
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init progress)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
 Extract from init JSON: `project_exists`, `roadmap_exists`, `state_exists`, `phases`, `current_phase`, `next_phase`, `milestone_version`, `completed_count`, `phase_count`, `paused_at`, `state_path`, `roadmap_path`, `project_path`, `config_path`.
 
 ```bash
-DISCUSS_MODE=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.discuss_mode 2>/dev/null || echo "discuss")
+DISCUSS_MODE=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.discuss_mode 2>/dev/null || echo "discuss")
 ```
 
 If `project_exists` is false (no `.planning/` directory):
@@ -45,8 +45,8 @@ If missing both ROADMAP.md and PROJECT.md: suggest `/gsd-new-project`.
 **Use structured extraction from gsd-tools:**
 
 Instead of reading full files, use targeted tools to get only the data needed for the report:
-- `ROADMAP=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap analyze)`
-- `STATE=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" state-snapshot)`
+- `ROADMAP=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap analyze)`
+- `STATE=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" state-snapshot)`
 
 This minimizes orchestrator context usage.
 </step>
@@ -55,7 +55,7 @@ This minimizes orchestrator context usage.
 **Get comprehensive roadmap analysis (replaces manual parsing):**
 
 ```bash
-ROADMAP=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap analyze)
+ROADMAP=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap analyze)
 ```
 
 This returns structured JSON with:
@@ -74,7 +74,7 @@ Use this instead of manually reading/parsing ROADMAP.md.
 - Find the 2-3 most recent SUMMARY.md files
 - Use `summary-extract` for efficient parsing:
   ```bash
-  node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" summary-extract <path> --fields one_liner
+  node "./.opencode/get-shit-done/bin/gsd-tools.cjs" summary-extract <path> --fields one_liner
   ```
 - This shows "what we've been working on"
   </step>
@@ -93,7 +93,7 @@ Use this instead of manually reading/parsing ROADMAP.md.
 
 ```bash
 # Get formatted progress bar
-PROGRESS_BAR=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" progress bar --raw)
+PROGRESS_BAR=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" progress bar --raw)
 ```
 
 Present:
@@ -102,7 +102,7 @@ Present:
 # [Project Name]
 
 **Progress:** {PROGRESS_BAR}
-**Profile:** [quality/balanced/budget/inherit]
+**Profile:** [simple/smart/genius/inherit]
 **Discuss mode:** {DISCUSS_MODE}
 
 ## Recent Work
@@ -168,7 +168,7 @@ Track:
 Scan ALL phases in the current milestone for outstanding verification debt using the CLI (which respects milestone boundaries via `getMilestonePhaseFilter`):
 
 ```bash
-DEBT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" audit-uat --raw 2>/dev/null)
+DEBT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" audit-uat --raw 2>/dev/null)
 ```
 
 Parse JSON for `summary.total_items` and `summary.total_files`.
@@ -206,7 +206,7 @@ This is a WARNING, not a blocker — routing proceeds normally. The debt is visi
 **Route A: Unexecuted plan exists**
 
 Find the first PLAN.md without matching SUMMARY.md.
-Read its `<objective>` section.
+read its `<objective>` section.
 
 ```
 ---
@@ -217,7 +217,7 @@ Read its `<objective>` section.
 
 `/gsd-execute-phase {phase} ${GSD_WS}`
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 ```
@@ -231,7 +231,7 @@ Check if `{phase_num}-CONTEXT.md` exists in phase directory.
 Check if current phase has UI indicators:
 
 ```bash
-PHASE_SECTION=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase "${CURRENT_PHASE}" 2>/dev/null)
+PHASE_SECTION=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase "${CURRENT_PHASE}" 2>/dev/null)
 PHASE_HAS_UI=$(echo "$PHASE_SECTION" | grep -qi "UI hint.*yes" && echo "true" || echo "false")
 ```
 
@@ -243,11 +243,11 @@ PHASE_HAS_UI=$(echo "$PHASE_SECTION" | grep -qi "UI hint.*yes" && echo "true" ||
 ## ▶ Next Up
 
 **Phase {N}: {Name}** — {Goal from ROADMAP.md}
-<sub>✓ Context gathered, ready to plan</sub>
+*✓ Context gathered, ready to plan*
 
 `/gsd-plan-phase {phase-number} ${GSD_WS}`
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 ```
@@ -263,14 +263,14 @@ PHASE_HAS_UI=$(echo "$PHASE_SECTION" | grep -qi "UI hint.*yes" && echo "true" ||
 
 `/gsd-discuss-phase {phase}` — gather context and clarify approach
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 
 **Also available:**
 - `/gsd-ui-phase {phase}` — generate UI design contract (recommended for frontend phases)
 - `/gsd-plan-phase {phase}` — skip discussion, plan directly
-- `/gsd-list-phase-assumptions {phase}` — see the agent's assumptions
+- `/gsd-list-phase-assumptions {phase}` — see OpenCode's assumptions
 
 ---
 ```
@@ -286,13 +286,13 @@ PHASE_HAS_UI=$(echo "$PHASE_SECTION" | grep -qi "UI hint.*yes" && echo "true" ||
 
 `/gsd-discuss-phase {phase} ${GSD_WS}` — gather context and clarify approach
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 
 **Also available:**
 - `/gsd-plan-phase {phase} ${GSD_WS}` — skip discussion, plan directly
-- `/gsd-list-phase-assumptions {phase} ${GSD_WS}` — see the agent's assumptions
+- `/gsd-list-phase-assumptions {phase} ${GSD_WS}` — see OpenCode's assumptions
 
 ---
 ```
@@ -312,7 +312,7 @@ UAT.md exists with gaps (diagnosed issues). User needs to plan fixes.
 
 `/gsd-plan-phase {phase} --gaps ${GSD_WS}`
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 
@@ -338,7 +338,7 @@ UAT.md exists with `status: partial` — testing session ended before all items 
 
 `/gsd-verify-work {phase} ${GSD_WS}` — resume testing from where you left off
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 
@@ -353,7 +353,7 @@ UAT.md exists with `status: partial` — testing session ended before all items 
 
 **Step 3: Check milestone status (only when phase complete)**
 
-Read ROADMAP.md and identify:
+read ROADMAP.md and identify:
 1. Current phase number
 2. All phase numbers in the current milestone section
 
@@ -372,12 +372,12 @@ State: "Current phase is {X}. Milestone has {N} phases (highest: {Y})."
 
 **Route C: Phase complete, more phases remain**
 
-Read ROADMAP.md to get the next phase's name and goal.
+read ROADMAP.md to get the next phase's name and goal.
 
 Check if next phase has UI indicators:
 
 ```bash
-NEXT_PHASE_SECTION=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase "$((Z+1))" 2>/dev/null)
+NEXT_PHASE_SECTION=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase "$((Z+1))" 2>/dev/null)
 NEXT_HAS_UI=$(echo "$NEXT_PHASE_SECTION" | grep -qi "UI hint.*yes" && echo "true" || echo "false")
 ```
 
@@ -394,7 +394,7 @@ NEXT_HAS_UI=$(echo "$NEXT_PHASE_SECTION" | grep -qi "UI hint.*yes" && echo "true
 
 `/gsd-discuss-phase {Z+1}` — gather context and clarify approach
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 
@@ -419,7 +419,7 @@ NEXT_HAS_UI=$(echo "$NEXT_PHASE_SECTION" | grep -qi "UI hint.*yes" && echo "true
 
 `/gsd-discuss-phase {Z+1} ${GSD_WS}` — gather context and clarify approach
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 
@@ -447,7 +447,7 @@ All {N} phases finished!
 
 `/gsd-complete-milestone ${GSD_WS}`
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 
@@ -463,7 +463,7 @@ All {N} phases finished!
 
 A milestone was completed and archived. Ready to start the next milestone cycle.
 
-Read MILESTONES.md to find the last completed milestone version.
+read MILESTONES.md to find the last completed milestone version.
 
 ```
 ---
@@ -478,7 +478,7 @@ Ready to plan the next milestone.
 
 `/gsd-new-milestone ${GSD_WS}`
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 ```

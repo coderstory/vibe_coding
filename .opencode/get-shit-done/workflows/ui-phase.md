@@ -1,15 +1,15 @@
-<purpose>
+<objective>
 Generate a UI design contract (UI-SPEC.md) for frontend phases. Orchestrates gsd-ui-researcher and gsd-ui-checker with a revision loop. Inserts between discuss-phase and plan-phase in the lifecycle.
 
 UI-SPEC.md locks spacing, typography, color, copywriting, and design system decisions before the planner creates tasks. This prevents design debt caused by ad-hoc styling decisions during execution.
-</purpose>
+</objective>
 
 <required_reading>
-@D:/Data/桌面/vibe coding/.opencode/get-shit-done/references/ui-brand.md
+@./.opencode/get-shit-done/references/ui-brand.md
 </required_reading>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-ui-researcher — Researches UI/UX approaches
 - gsd-ui-checker — Reviews UI implementation quality
 </available_agent_types>
@@ -19,10 +19,10 @@ Valid GSD subagent types (use exact names — do not fall back to 'general-purpo
 ## 1. Initialize
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init plan-phase "$PHASE")
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init plan-phase "$PHASE")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_UI=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-ui-researcher 2>/dev/null)
-AGENT_SKILLS_UI_CHECKER=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-ui-checker 2>/dev/null)
+AGENT_SKILLS_UI=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-ui-researcher 2>/dev/null)
+AGENT_SKILLS_UI_CHECKER=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-ui-checker 2>/dev/null)
 ```
 
 Parse JSON for: `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded_phase`, `has_context`, `has_research`, `commit_docs`.
@@ -32,14 +32,14 @@ Parse JSON for: `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded
 Resolve UI agent models:
 
 ```bash
-UI_RESEARCHER_MODEL=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" resolve-model gsd-ui-researcher --raw)
-UI_CHECKER_MODEL=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" resolve-model gsd-ui-checker --raw)
+UI_RESEARCHER_MODEL=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" resolve-model gsd-ui-researcher --raw)
+UI_CHECKER_MODEL=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" resolve-model gsd-ui-checker --raw)
 ```
 
 Check config:
 
 ```bash
-UI_ENABLED=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.ui_phase 2>/dev/null || echo "true")
+UI_ENABLED=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.ui_phase 2>/dev/null || echo "true")
 ```
 
 **If `UI_ENABLED` is `false`:**
@@ -55,7 +55,7 @@ Exit workflow.
 Extract phase number from $ARGUMENTS. If not provided, detect next unplanned phase.
 
 ```bash
-PHASE_INFO=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase "${PHASE}")
+PHASE_INFO=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase "${PHASE}")
 ```
 
 **If `found` is false:** Error with available phases.
@@ -109,7 +109,7 @@ Display:
 Build prompt:
 
 ```markdown
-Read D:/Data/桌面/vibe coding/.opencode/agents/gsd-ui-researcher.md for instructions.
+read ./.opencode/agents/gsd-ui-researcher.md for instructions.
 
 <objective>
 Create UI design contract for Phase {phase_number}: {phase_name}
@@ -127,8 +127,8 @@ Answer: "What visual and interaction contracts does this phase need?"
 ${AGENT_SKILLS_UI}
 
 <output>
-Write to: {phase_dir}/{padded_phase}-UI-SPEC.md
-Template: D:/Data/桌面/vibe coding/.opencode/get-shit-done/templates/UI-SPEC.md
+write to: {phase_dir}/{padded_phase}-UI-SPEC.md
+Template: ./.opencode/get-shit-done/templates/UI-SPEC.md
 </output>
 
 <config>
@@ -141,7 +141,7 @@ padded_phase: {padded_phase}
 Omit null file paths from `<files_to_read>`.
 
 ```
-Task(
+task(
   prompt=ui_research_prompt,
   subagent_type="gsd-ui-researcher",
   model="{UI_RESEARCHER_MODEL}",
@@ -171,7 +171,7 @@ Display:
 Build prompt:
 
 ```markdown
-Read D:/Data/桌面/vibe coding/.opencode/agents/gsd-ui-checker.md for instructions.
+read ./.opencode/agents/gsd-ui-checker.md for instructions.
 
 <objective>
 Validate UI design contract for Phase {phase_number}: {phase_name}
@@ -192,7 +192,7 @@ ui_safety_gate: {ui_safety_gate config value}
 ```
 
 ```
-Task(
+task(
   prompt=ui_checker_prompt,
   subagent_type="gsd-ui-checker",
   model="{UI_CHECKER_MODEL}",
@@ -223,7 +223,7 @@ The UI checker found issues with the current UI-SPEC.md.
 ### Issues to Fix
 {paste blocking issues from checker return}
 
-Read the existing UI-SPEC.md, fix ONLY the listed issues, re-write the file.
+read the existing UI-SPEC.md, fix ONLY the listed issues, re-write the file.
 Do NOT re-ask the user questions that are already answered.
 </revision>
 ```
@@ -238,7 +238,7 @@ Max revision iterations reached. Remaining issues:
 
 Options:
 1. Force approve — proceed with current UI-SPEC (FLAGs become accepted)
-2. Edit manually — open UI-SPEC.md in editor, re-run /gsd-ui-phase
+2. edit manually — open UI-SPEC.md in editor, re-run /gsd-ui-phase
 3. Abandon — exit without approving
 ```
 
@@ -265,7 +265,7 @@ Dimensions: 6/6 passed
 
 `/gsd-plan-phase {N}`
 
-<sub>/clear first → fresh context window</sub>
+*/new first → fresh context window*
 
 ───────────────────────────────────────────────────────────────
 ```
@@ -273,13 +273,13 @@ Dimensions: 6/6 passed
 ## 11. Commit (if configured)
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(${padded_phase}): UI design contract" --files "${PHASE_DIR}/${PADDED_PHASE}-UI-SPEC.md"
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(${padded_phase}): UI design contract" --files "${PHASE_DIR}/${PADDED_PHASE}-UI-SPEC.md"
 ```
 
 ## 12. Update State
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" state record-session \
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" state record-session \
   --stopped-at "Phase ${PHASE} UI-SPEC approved" \
   --resume-file "${PHASE_DIR}/${PADDED_PHASE}-UI-SPEC.md"
 ```

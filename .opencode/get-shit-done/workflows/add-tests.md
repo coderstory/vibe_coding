@@ -1,11 +1,11 @@
-<purpose>
+<objective>
 Generate unit and E2E tests for a completed phase based on its SUMMARY.md, CONTEXT.md, and implementation. Classifies each changed file into TDD (unit), E2E (browser), or Skip categories, presents a test plan for user approval, then generates tests following RED-GREEN conventions.
 
 Users currently hand-craft `/gsd-quick` prompts for test generation after each phase. This workflow standardizes the process with proper classification, quality gates, and gap reporting.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -33,7 +33,7 @@ Exit.
 Load phase operation context:
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${PHASE_ARG}")
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${PHASE_ARG}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -46,7 +46,7 @@ Ensure the phase exists in .planning/phases/
 ```
 Exit.
 
-Read the phase artifacts (in order of priority):
+read the phase artifacts (in order of priority):
 1. `${phase_dir}/*-SUMMARY.md` — what was implemented, files changed
 2. `${phase_dir}/CONTEXT.md` — acceptance criteria, decisions
 3. `${phase_dir}/*-VERIFICATION.md` — user-verified scenarios (if UAT was done)
@@ -102,7 +102,7 @@ For each file, classify into one of three categories:
 - Simple CRUD: basic create/read/update/delete with no business logic
 - Type definitions: records, DTOs, interfaces with no logic
 
-Read each file to verify classification. Don't classify based on filename alone.
+read each file to verify classification. Don't classify based on filename alone.
 </step>
 
 <step name="present_classification">
@@ -213,7 +213,7 @@ For each approved TDD test:
 
 1. **Create test file** following discovered project conventions (directory, naming, imports)
 
-2. **Write test** with clear arrange/act/assert structure:
+2. **write test** with clear arrange/act/assert structure:
    ```
    // Arrange — set up inputs and expected outputs
    // Act — call the function under test
@@ -297,7 +297,7 @@ Create a test coverage report and present to user:
 
 Record test generation in project state:
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" state-snapshot
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" state-snapshot
 ```
 
 If there are passing tests to commit:

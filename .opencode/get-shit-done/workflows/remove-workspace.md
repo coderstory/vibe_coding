@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Remove a GSD workspace, cleaning up git worktrees and deleting the workspace directory.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -13,7 +13,7 @@ Read all files referenced by the invoking prompt's execution_context before star
 Extract workspace name from $ARGUMENTS.
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init remove-workspace "$WORKSPACE_NAME")
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init remove-workspace "$WORKSPACE_NAME")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 

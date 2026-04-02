@@ -127,7 +127,7 @@ get-shit-done/
 ├── bin/                # Executable entry points
 ├── commands/           # Slash command definitions
 │   └── gsd/           # GSD-specific commands
-├── get-shit-done/     # Skill resources
+├── get-shit-done/     # skill resources
 │   ├── references/    # Principle documents
 │   ├── templates/     # File templates
 │   └── workflows/     # Multi-step procedures
@@ -146,7 +146,7 @@ get-shit-done/
 - Subdirectories: None
 
 **commands/gsd/**
-- Purpose: Slash command definitions for Claude Code
+- Purpose: Slash command definitions for OpenCode
 - Contains: *.md files (one per command)
 - Key files: new-project.md, plan-phase.md, execute-plan.md
 - Subdirectories: None (flat structure)
@@ -186,14 +186,14 @@ get-shit-done/
 
 **Documentation:**
 - `README.md` - User-facing installation and usage guide
-- `AGENTS.md` - Instructions for Claude Code when working in this repo
+- `AGENTS.md` - Instructions for OpenCode when working in this repo
 
 ## Naming Conventions
 
 **Files:**
 - kebab-case.md: Markdown documents
 - kebab-case.js: JavaScript source files
-- UPPERCASE.md: Important project files (README, CLAUDE, CHANGELOG)
+- UPPERCASE.md: Important project files (README, OPENCODE, CHANGELOG)
 
 **Directories:**
 - kebab-case: All directories
@@ -216,7 +216,7 @@ get-shit-done/
 
 **New Workflow:**
 - Implementation: `get-shit-done/workflows/{name}.md`
-- Usage: Reference from command with `@D:/Data/桌面/vibe coding/.opencode/get-shit-done/workflows/{name}.md`
+- Usage: Reference from command with `@./.opencode/get-shit-done/workflows/{name}.md`
 
 **New Reference Document:**
 - Implementation: `get-shit-done/references/{name}.md`
@@ -229,12 +229,12 @@ get-shit-done/
 ## Special Directories
 
 **get-shit-done/**
-- Purpose: Resources installed to D:/Data/桌面/vibe coding/.opencode/
+- Purpose: Resources installed to ./.opencode/
 - Source: Copied by bin/install.js during installation
 - Committed: Yes (source of truth)
 
 **commands/**
-- Purpose: Slash commands installed to D:/Data/桌面/vibe coding/.opencode/commands/
+- Purpose: Slash commands installed to ./.opencode/commands/
 - Source: Copied by bin/install.js during installation
 - Committed: Yes (source of truth)
 

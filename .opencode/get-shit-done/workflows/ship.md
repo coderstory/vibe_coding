@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Create a pull request from completed phase/milestone work, generate a rich PR body from planning artifacts, optionally run code review, and prepare for merge. Closes the plan → execute → verify → ship loop.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -12,7 +12,7 @@ Read all files referenced by the invoking prompt's execution_context before star
 Parse arguments and load project state:
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${PHASE_ARG}")
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${PHASE_ARG}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -20,7 +20,7 @@ Parse from init JSON: `phase_found`, `phase_dir`, `phase_number`, `phase_name`, 
 
 Also load config for branching strategy:
 ```bash
-CONFIG=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" state load)
+CONFIG=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" state load)
 ```
 
 Extract: `branching_strategy`, `branch_name`.
@@ -87,7 +87,7 @@ Phase {phase_number}: {phase_name}
 Or for milestone: `Milestone {version}: {name}`
 
 **2. Summary section:**
-Read ROADMAP.md for phase goal. Read VERIFICATION.md for verification status.
+read ROADMAP.md for phase goal. read VERIFICATION.md for verification status.
 
 ```markdown
 ## Summary
@@ -177,13 +177,13 @@ Report the PR URL and suggest: "Review the diff at {url}/files"
 Update STATE.md to reflect the shipping action:
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" state update "Last Activity" "$(date +%Y-%m-%d)"
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" state update "Status" "Phase ${PHASE_NUMBER} shipped — PR #${PR_NUMBER}"
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" state update "Last Activity" "$(date +%Y-%m-%d)"
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" state update "Status" "Phase ${PHASE_NUMBER} shipped — PR #${PR_NUMBER}"
 ```
 
 If `commit_docs` is true:
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(${padded_phase}): ship phase ${PHASE_NUMBER} — PR #${PR_NUMBER}" --files .planning/STATE.md
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(${padded_phase}): ship phase ${PHASE_NUMBER} — PR #${PR_NUMBER}" --files .planning/STATE.md
 ```
 </step>
 

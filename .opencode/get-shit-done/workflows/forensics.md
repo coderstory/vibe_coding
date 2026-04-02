@@ -49,7 +49,7 @@ Record:
 
 ### 2b. Planning State
 
-Read these files if they exist:
+read these files if they exist:
 - `.planning/STATE.md` — current milestone, phase, progress, blockers, last session
 - `.planning/ROADMAP.md` — phase list with status
 - `.planning/config.json` — workflow configuration
@@ -78,7 +78,7 @@ Track: which phases have complete artifact sets vs gaps.
 
 ### 2d. Session Reports
 
-Read `.planning/reports/SESSION_REPORT.md` if it exists — extract last session outcomes,
+read `.planning/reports/SESSION_REPORT.md` if it exists — extract last session outcomes,
 work completed, token estimates.
 
 ### 2e. Git Worktree State
@@ -140,7 +140,7 @@ Combine:
 
 **Signal:** Recent commits touch files outside the current phase's expected scope.
 
-Read the current phase PLAN.md to determine expected file paths. Compare against
+read the current phase PLAN.md to determine expected file paths. Compare against
 files actually modified in recent commits. Flag any files that are clearly outside
 the phase's domain.
 
@@ -159,7 +159,7 @@ Create the forensics directory if needed:
 mkdir -p .planning/forensics
 ```
 
-Write to `.planning/forensics/report-$(date +%Y%m%d-%H%M%S).md`:
+write to `.planning/forensics/report-$(date +%Y%m%d-%H%M%S).md`:
 
 ```markdown
 # Forensic Report
@@ -229,11 +229,11 @@ Display the full forensic report inline.
 >
 > I can dig deeper into any finding. Want me to:
 > - Trace a specific anomaly to its root cause?
-> - Read specific files referenced in the evidence?
+> - read specific files referenced in the evidence?
 > - Check if a similar issue has been reported before?"
 
 If the user asks follow-up questions, answer from the evidence already gathered.
-Read additional files only if specifically needed.
+read additional files only if specifically needed.
 
 ## Step 7: Offer Issue Creation
 

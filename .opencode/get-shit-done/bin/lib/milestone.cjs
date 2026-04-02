@@ -136,13 +136,13 @@ function cmdMilestoneComplete(cwd, version, options, raw) {
             accomplishments.push(oneLiner);
           }
           // Count tasks: prefer **Tasks:** N from Performance section,
-          // then <task XML tags, then ## Task N markdown headers
+          // then <task XML tags, then ## task N markdown headers
           const tasksFieldMatch = content.match(/\*\*Tasks:\*\*\s*(\d+)/);
           if (tasksFieldMatch) {
             totalTasks += parseInt(tasksFieldMatch[1], 10);
           } else {
             const xmlTaskMatches = content.match(/<task[\s>]/gi) || [];
-            const mdTaskMatches = content.match(/##\s*Task\s*\d+/gi) || [];
+            const mdTaskMatches = content.match(/##\s*task\s*\d+/gi) || [];
             totalTasks += xmlTaskMatches.length || mdTaskMatches.length;
           }
         } catch { /* intentionally empty */ }

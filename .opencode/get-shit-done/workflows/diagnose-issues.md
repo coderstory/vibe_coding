@@ -1,13 +1,13 @@
-<purpose>
+<objective>
 Orchestrate parallel debug agents to investigate UAT gaps and find root causes.
 
 After UAT finds gaps, spawn one debug agent per gap. Each agent investigates autonomously with symptoms pre-filled from UAT. Collect root causes, update UAT.md gaps with diagnosis, then hand off to plan-phase --gaps with actual diagnoses.
 
 Orchestrator stays lean: parse gaps, spawn agents, collect results, update UAT.
-</purpose>
+</objective>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-debugger — Diagnoses and fixes issues
 </available_agent_types>
 
@@ -31,7 +31,7 @@ With diagnosis: "Comment doesn't refresh" → "useEffect missing dependency" →
 <step name="parse_gaps">
 **Extract gaps from UAT.md:**
 
-Read the "Gaps" section (YAML format):
+read the "Gaps" section (YAML format):
 ```yaml
 - truth: "Comment appears immediately after submission"
   status: failed
@@ -81,7 +81,7 @@ This runs in parallel - all gaps investigated simultaneously.
 **Load agent skills:**
 
 ```bash
-AGENT_SKILLS_DEBUGGER=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-debugger 2>/dev/null)
+AGENT_SKILLS_DEBUGGER=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-debugger 2>/dev/null)
 ```
 
 **Spawn debug agents in parallel:**
@@ -89,7 +89,7 @@ AGENT_SKILLS_DEBUGGER=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done
 For each gap, fill the debug-subagent-prompt template and spawn:
 
 ```
-Task(
+task(
   prompt=filled_debug_subagent_prompt + "\n\n<files_to_read>\n- {phase_dir}/{phase_num}-UAT.md\n- .planning/STATE.md\n</files_to_read>\n${AGENT_SKILLS_DEBUGGER}",
   subagent_type="gsd-debugger",
   isolation="worktree",
@@ -170,7 +170,7 @@ Update status in frontmatter to "diagnosed".
 
 Commit the updated UAT.md:
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs({phase_num}): add root causes from diagnosis" --files ".planning/phases/XX-name/{phase_num}-UAT.md"
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs({phase_num}): add root causes from diagnosis" --files ".planning/phases/XX-name/{phase_num}-UAT.md"
 ```
 </step>
 

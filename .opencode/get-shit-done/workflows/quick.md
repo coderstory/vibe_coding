@@ -1,4 +1,4 @@
-<purpose>
+<objective>
 Execute small, ad-hoc tasks with GSD guarantees (atomic commits, STATE.md tracking). Quick mode spawns gsd-planner (quick mode) + gsd-executor(s), tracks tasks in `.planning/quick/`, and updates STATE.md's "Quick Tasks Completed" table.
 
 With `--discuss` flag: lightweight discussion phase before planning. Surfaces assumptions, clarifies gray areas, captures decisions in CONTEXT.md so the planner treats them as locked.
@@ -8,14 +8,14 @@ With `--full` flag: enables plan-checking (max 2 iterations) and post-execution 
 With `--research` flag: spawns a focused research agent before planning. Investigates implementation approaches, library options, and pitfalls. Use when you're unsure how to approach a task.
 
 Flags are composable: `--discuss --research --full` gives discussion + research + plan-checking + verification.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-phase-researcher — Researches technical approaches for a phase
 - gsd-planner — Creates detailed plans from phase scope
 - gsd-plan-checker — Reviews plan quality before execution
@@ -36,7 +36,7 @@ If `$DESCRIPTION` is empty after parsing, prompt user interactively:
 
 ```
 question(
-  header: "Quick Task",
+  header: "Quick task",
   question: "What do you want to do?",
   followUp: null
 )
@@ -116,12 +116,12 @@ If `$FULL_MODE` only:
 **Step 2: Initialize**
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init quick "$DESCRIPTION")
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init quick "$DESCRIPTION")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_PLANNER=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-planner 2>/dev/null)
-AGENT_SKILLS_EXECUTOR=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-executor 2>/dev/null)
-AGENT_SKILLS_CHECKER=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-checker 2>/dev/null)
-AGENT_SKILLS_VERIFIER=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-verifier 2>/dev/null)
+AGENT_SKILLS_PLANNER=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-planner 2>/dev/null)
+AGENT_SKILLS_EXECUTOR=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-executor 2>/dev/null)
+AGENT_SKILLS_CHECKER=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-checker 2>/dev/null)
+AGENT_SKILLS_VERIFIER=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-verifier 2>/dev/null)
 ```
 
 Parse JSON for: `planner_model`, `executor_model`, `checker_model`, `verifier_model`, `commit_docs`, `branch_name`, `quick_id`, `slug`, `date`, `timestamp`, `quick_dir`, `task_dir`, `roadmap_exists`, `planning_exists`.
@@ -229,7 +229,7 @@ question(
     { label: "${concrete_choice_1}", description: "${what_this_means}" },
     { label: "${concrete_choice_2}", description: "${what_this_means}" },
     { label: "${concrete_choice_3}", description: "${what_this_means}" },
-    { label: "You decide", description: "the agent's discretion" }
+    { label: "You decide", description: "OpenCode's discretion" }
   ],
   multiSelect: false
 )
@@ -239,23 +239,23 @@ Rules:
 - Options must be concrete choices, not abstract categories
 - Highlight recommended choice where you have a clear opinion
 - If user selects "Other" with freeform text, switch to plain text follow-up (per questioning.md freeform rule)
-- If user selects "You decide", capture as the agent's Discretion in CONTEXT.md
+- If user selects "You decide", capture as OpenCode's Discretion in CONTEXT.md
 - Max 2 questions per area — this is lightweight, not a deep dive
 
 Collect all decisions into `$DECISIONS`.
 
-**4.5d. Write CONTEXT.md**
+**4.5d. write CONTEXT.md**
 
-Write `${QUICK_DIR}/${quick_id}-CONTEXT.md` using the standard context template structure:
+write `${QUICK_DIR}/${quick_id}-CONTEXT.md` using the standard context template structure:
 
 ```markdown
-# Quick Task ${quick_id}: ${DESCRIPTION} - Context
+# Quick task ${quick_id}: ${DESCRIPTION} - Context
 
 **Gathered:** ${date}
 **Status:** Ready for planning
 
 <domain>
-## Task Boundary
+## task Boundary
 
 ${DESCRIPTION}
 
@@ -270,7 +270,7 @@ ${DESCRIPTION}
 ### ${area_2_name}
 - ${decision_from_discussion}
 
-### the agent's Discretion
+### OpenCode's Discretion
 ${areas_where_user_said_you_decide_or_areas_not_discussed}
 
 </decisions>
@@ -316,12 +316,12 @@ Display banner:
 Spawn a single focused researcher (not 4 parallel researchers like full phases — quick tasks need targeted research, not broad domain surveys):
 
 ```
-Task(
+task(
   prompt="
 <research_context>
 
 **Mode:** quick-task
-**Task:** ${DESCRIPTION}
+**task:** ${DESCRIPTION}
 **Output:** ${QUICK_DIR}/${quick_id}-RESEARCH.md
 
 <files_to_read>
@@ -346,7 +346,7 @@ Do NOT produce a full domain survey. Target 1-2 pages of actionable findings.
 </focus>
 
 <output>
-Write research to: ${QUICK_DIR}/${quick_id}-RESEARCH.md
+write research to: ${QUICK_DIR}/${quick_id}-RESEARCH.md
 Use standard research format but keep it lean — skip sections that don't apply.
 Return: ## RESEARCH COMPLETE with file path
 </output>
@@ -372,7 +372,7 @@ If research file not found, warn but continue: "Research agent did not produce o
 **If NOT `$FULL_MODE`:** Use standard `quick` mode.
 
 ```
-Task(
+task(
   prompt="
 <planning_context>
 
@@ -389,7 +389,7 @@ ${RESEARCH_MODE ? '- ' + QUICK_DIR + '/' + quick_id + '-RESEARCH.md (Research fi
 
 ${AGENT_SKILLS_PLANNER}
 
-**Project skills:** Check .claude/skills/ or .agents/skills/ directory (if either exists) — read SKILL.md files, plans should account for project skill rules
+**Project skills:** Check .OpenCode/skills/ or .agents/skills/ directory (if either exists) — read SKILL.md files, plans should account for project skill rules
 
 </planning_context>
 
@@ -403,7 +403,7 @@ ${FULL_MODE ? '- Each task MUST have `files`, `action`, `verify`, `done` fields'
 </constraints>
 
 <output>
-Write plan to: ${QUICK_DIR}/${quick_id}-PLAN.md
+write plan to: ${QUICK_DIR}/${quick_id}-PLAN.md
 Return: ## PLANNING COMPLETE with plan path
 </output>
 ",
@@ -440,7 +440,7 @@ Checker prompt:
 ```markdown
 <verification_context>
 **Mode:** quick-full
-**Task Description:** ${DESCRIPTION}
+**task Description:** ${DESCRIPTION}
 
 <files_to_read>
 - ${QUICK_DIR}/${quick_id}-PLAN.md (Plan to verify)
@@ -453,7 +453,7 @@ ${AGENT_SKILLS_CHECKER}
 
 <check_dimensions>
 - Requirement coverage: Does the plan address the task description?
-- Task completeness: Do tasks have files, action, verify, done fields?
+- task completeness: Do tasks have files, action, verify, done fields?
 - Key links: Are referenced files real?
 - Scope sanity: Is this appropriately sized for a quick task (1-3 tasks)?
 - must_haves derivation: Are must_haves traceable to the task description?
@@ -469,7 +469,7 @@ ${DISCUSS_MODE ? '- Context compliance: Does the plan honor locked decisions fro
 ```
 
 ```
-Task(
+task(
   prompt=checker_prompt,
   subagent_type="gsd-plan-checker",
   model="{checker_model}",
@@ -514,7 +514,7 @@ Return what changed.
 ```
 
 ```
-Task(
+task(
   prompt=revision_prompt,
   subagent_type="gsd-planner",
   model="{planner_model}",
@@ -537,7 +537,7 @@ Offer: 1) Force proceed, 2) Abort
 Spawn gsd-executor with plan reference:
 
 ```
-Task(
+task(
   prompt="
 Execute quick task ${quick_id}.
 
@@ -545,7 +545,7 @@ Execute quick task ${quick_id}.
 - ${QUICK_DIR}/${quick_id}-PLAN.md (Plan)
 - .planning/STATE.md (Project state)
 - ./AGENTS.md (Project instructions, if exists)
-- .claude/skills/ or .agents/skills/ (Project skills, if either exists — list skills, read SKILL.md for each, follow relevant rules during implementation)
+- .OpenCode/skills/ or .agents/skills/ (Project skills, if either exists — list skills, read SKILL.md for each, follow relevant rules during implementation)
 </files_to_read>
 
 ${AGENT_SKILLS_EXECUTOR}
@@ -569,7 +569,7 @@ After executor returns:
 2. Extract commit hash from executor output
 3. Report completion status
 
-**Known Claude Code bug (classifyHandoffIfNeeded):** If executor reports "failed" with error `classifyHandoffIfNeeded is not defined`, this is a Claude Code runtime bug — not a real failure. Check if summary file exists and git log shows commits. If so, treat as successful.
+**Known OpenCode bug (classifyHandoffIfNeeded):** If executor reports "failed" with error `classifyHandoffIfNeeded is not defined`, this is a OpenCode runtime bug — not a real failure. Check if summary file exists and git log shows commits. If so, treat as successful.
 
 If summary not found, error: "Executor failed to create ${quick_id}-SUMMARY.md"
 
@@ -591,10 +591,10 @@ Display banner:
 ```
 
 ```
-Task(
+task(
   prompt="Verify quick task goal achievement.
-Task directory: ${QUICK_DIR}
-Task goal: ${DESCRIPTION}
+task directory: ${QUICK_DIR}
+task goal: ${DESCRIPTION}
 
 <files_to_read>
 - ${QUICK_DIR}/${quick_id}-PLAN.md (Plan)
@@ -609,7 +609,7 @@ Check must_haves against actual codebase. Create VERIFICATION.md at ${QUICK_DIR}
 )
 ```
 
-Read verification status:
+read verification status:
 ```bash
 grep "^status:" "${QUICK_DIR}/${quick_id}-VERIFICATION.md" | cut -d: -f2 | tr -d ' '
 ```
@@ -630,7 +630,7 @@ Update STATE.md with quick task completion record.
 
 **7a. Check if "Quick Tasks Completed" section exists:**
 
-Read STATE.md and check for `### Quick Tasks Completed` section.
+read STATE.md and check for `### Quick Tasks Completed` section.
 
 **7b. If section doesn't exist, create it:**
 
@@ -675,7 +675,7 @@ Use `date` from init:
 Last activity: ${date} - Completed quick task ${quick_id}: ${DESCRIPTION}
 ```
 
-Use Edit tool to make these changes atomically
+Use edit tool to make these changes atomically
 
 ---
 
@@ -692,7 +692,7 @@ Build file list:
 - If `$FULL_MODE` and verification file exists: `${QUICK_DIR}/${quick_id}-VERIFICATION.md`
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(quick-${quick_id}): ${DESCRIPTION}" --files ${file_list}
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(quick-${quick_id}): ${DESCRIPTION}" --files ${file_list}
 ```
 
 Get final commit hash:
@@ -708,7 +708,7 @@ Display completion output:
 
 GSD > QUICK TASK COMPLETE (FULL MODE)
 
-Quick Task ${quick_id}: ${DESCRIPTION}
+Quick task ${quick_id}: ${DESCRIPTION}
 
 ${RESEARCH_MODE ? 'Research: ' + QUICK_DIR + '/' + quick_id + '-RESEARCH.md' : ''}
 Summary: ${QUICK_DIR}/${quick_id}-SUMMARY.md
@@ -726,7 +726,7 @@ Ready for next task: /gsd-quick ${GSD_WS}
 
 GSD > QUICK TASK COMPLETE
 
-Quick Task ${quick_id}: ${DESCRIPTION}
+Quick task ${quick_id}: ${DESCRIPTION}
 
 ${RESEARCH_MODE ? 'Research: ' + QUICK_DIR + '/' + quick_id + '-RESEARCH.md' : ''}
 Summary: ${QUICK_DIR}/${quick_id}-SUMMARY.md

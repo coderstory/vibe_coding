@@ -1,6 +1,6 @@
 # Model Profiles
 
-Model profiles control which the agent model each GSD agent uses. This allows balancing quality vs token spend, or inheriting the currently selected session model.
+Model profiles control which OpenCode model each GSD agent uses. This allows balancing quality vs token spend, or inheriting the currently selected session model.
 
 ## Profile Definitions
 
@@ -43,9 +43,9 @@ Model profiles control which the agent model each GSD agent uses. This allows ba
 - **Required when using non-Anthropic providers** (OpenRouter, local models, etc.) — otherwise GSD may call Anthropic models directly, incurring unexpected costs
 - Use when: you want GSD to follow your currently selected runtime model
 
-## Using Non-the agent Runtimes (Codex, OpenCode, Gemini CLI)
+## Using Non-OpenCode Runtimes (Codex, OpenCode, Gemini CLI)
 
-When installed for a non-the agent runtime, the GSD installer sets `resolve_model_ids: "omit"` in `~/.gsd/defaults.json`. This returns an empty model parameter for all agents, so each agent uses the runtime's default model. No manual setup is needed.
+When installed for a non-OpenCode runtime, the GSD installer sets `resolve_model_ids: "omit"` in `~/.gsd/defaults.json`. This returns an empty model parameter for all agents, so each agent uses the runtime's default model. No manual setup is needed.
 
 To assign different models to different agents, add `model_overrides` with model IDs your runtime recognizes:
 
@@ -63,9 +63,9 @@ To assign different models to different agents, add `model_overrides` with model
 
 The same tiering logic applies: stronger models for planning and debugging, cheaper models for execution and mapping.
 
-## Using Claude Code with Non-Anthropic Providers (OpenRouter, Local)
+## Using OpenCode with Non-Anthropic Providers (OpenRouter, Local)
 
-If you're using Claude Code with OpenRouter, a local model, or any non-Anthropic provider, set the `inherit` profile to prevent GSD from calling Anthropic models for subagents:
+If you're using OpenCode with OpenRouter, a local model, or any non-Anthropic provider, set the `inherit` profile to prevent GSD from calling Anthropic models for subagents:
 
 ```bash
 # Via settings command
@@ -85,10 +85,10 @@ Without `inherit`, GSD's default `balanced` profile spawns specific Anthropic mo
 Orchestrators resolve model before spawning:
 
 ```
-1. Read .planning/config.json
+1. read .planning/config.json
 2. Check model_overrides for agent-specific override
 3. If no override, look up agent in profile table
-4. Pass model parameter to Task call
+4. Pass model parameter to task call
 ```
 
 ## Per-Agent Overrides
@@ -130,10 +130,10 @@ Executors follow explicit PLAN.md instructions. The plan already contains the re
 Verification requires goal-backward reasoning - checking if code *delivers* what the phase promised, not just pattern matching. Sonnet handles this well; Haiku may miss subtle gaps.
 
 **Why Haiku for gsd-codebase-mapper?**
-Read-only exploration and pattern extraction. No reasoning required, just structured output from file contents.
+read-only exploration and pattern extraction. No reasoning required, just structured output from file contents.
 
 **Why `inherit` instead of passing `opus` directly?**
-Claude Code's `"opus"` alias maps to a specific model version. Organizations may block older opus versions while allowing newer ones. GSD returns `"inherit"` for opus-tier agents, causing them to use whatever opus version the user has configured in their session. This avoids version conflicts and silent fallbacks to Sonnet.
+OpenCode's `"opus"` alias maps to a specific model version. Organizations may block older opus versions while allowing newer ones. GSD returns `"inherit"` for opus-tier agents, causing them to use whatever opus version the user has configured in their session. This avoids version conflicts and silent fallbacks to Sonnet.
 
 **Why `inherit` profile?**
 Some runtimes (including OpenCode) let users switch models at runtime (`/model`). The `inherit` profile keeps all GSD subagents aligned to that live selection.

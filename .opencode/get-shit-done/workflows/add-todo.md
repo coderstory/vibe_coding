@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Capture an idea, task, or issue that surfaces during a GSD session as a structured todo for later work. Enables "thought → capture → continue" flow without losing context.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -12,7 +12,7 @@ Read all files referenced by the invoking prompt's execution_context before star
 Load todo context:
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init todos)
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init todos)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -67,7 +67,7 @@ grep -l -i "[key words from title]" .planning/todos/pending/*.md 2>/dev/null || 
 ```
 
 If potential duplicate found:
-1. Read the existing todo
+1. read the existing todo
 2. Compare scope
 
 If overlapping, use question:
@@ -84,10 +84,10 @@ Use values from init context: `timestamp` and `date` are already available.
 
 Generate slug for the title:
 ```bash
-slug=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" generate-slug "$title" --raw)
+slug=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" generate-slug "$title" --raw)
 ```
 
-Write to `.planning/todos/pending/${date}-${slug}.md`:
+write to `.planning/todos/pending/${date}-${slug}.md`:
 
 ```markdown
 ---
@@ -100,7 +100,7 @@ files:
 
 ## Problem
 
-[problem description - enough context for future the agent to understand weeks later]
+[problem description - enough context for future OpenCode to understand weeks later]
 
 ## Solution
 
@@ -119,7 +119,7 @@ If `.planning/STATE.md` exists:
 Commit the todo and any updated state:
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: capture todo - [title]" --files .planning/todos/pending/[filename] .planning/STATE.md
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: capture todo - [title]" --files .planning/todos/pending/[filename] .planning/STATE.md
 ```
 
 Tool respects `commit_docs` config and gitignore automatically.
@@ -150,7 +150,7 @@ Would you like to:
 <success_criteria>
 - [ ] Directory structure exists
 - [ ] Todo file created with valid frontmatter
-- [ ] Problem section has enough context for future the agent
+- [ ] Problem section has enough context for future OpenCode
 - [ ] No duplicates (checked and resolved)
 - [ ] Area consistent with existing todos
 - [ ] STATE.md updated if exists

@@ -1,20 +1,20 @@
-<purpose>
+<objective>
 Detect current project state and automatically advance to the next logical GSD workflow step.
 Reads project state to determine: discuss → plan → execute → verify → complete progression.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
 
 <step name="detect_state">
-Read project state to determine current position:
+read project state to determine current position:
 
 ```bash
 # Get state snapshot
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" state json 2>/dev/null || echo "{}"
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" state json 2>/dev/null || echo "{}"
 ```
 
 Also read:
@@ -83,7 +83,7 @@ Display the determination:
   [One-line explanation of why this is the next step]
 ```
 
-Then immediately invoke the determined command via skill.
+Then immediately invoke the determined command via command.
 Do not ask for confirmation — the whole point of `/gsd-next` is zero-friction advancement.
 </step>
 

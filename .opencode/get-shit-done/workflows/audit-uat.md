@@ -1,6 +1,6 @@
-<purpose>
+<objective>
 Cross-phase audit of all UAT and verification files. Finds every outstanding item (pending, skipped, blocked, human_needed), optionally verifies against the codebase to detect stale docs, and produces a prioritized human test plan.
-</purpose>
+</objective>
 
 <process>
 
@@ -8,7 +8,7 @@ Cross-phase audit of all UAT and verification files. Finds every outstanding ite
 Run the CLI audit:
 
 ```bash
-AUDIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" audit-uat --raw)
+AUDIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" audit-uat --raw)
 ```
 
 Parse JSON for `results` array and `summary` object.
@@ -37,7 +37,7 @@ Group items by what's actionable NOW vs. what needs prerequisites:
 - `build_needed` — needs release/preview build
 - `third_party` — needs external service configuration
 
-For each item in "Testable Now", use Grep/Read to check if the underlying feature still exists in the codebase:
+For each item in "Testable Now", use grep/read to check if the underlying feature still exists in the codebase:
 - If the test references a component/function that no longer exists → mark as `stale`
 - If the test references code that has been significantly rewritten → mark as `needs_update`
 - Otherwise → mark as `active`

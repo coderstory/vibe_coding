@@ -21,7 +21,7 @@ depends_on: []              # Plan IDs this plan requires (e.g., ["01-01"]).
 files_modified: []          # Files this plan modifies.
 autonomous: true            # false if plan has checkpoints requiring user interaction
 requirements: []            # REQUIRED — Requirement IDs from ROADMAP this plan addresses. MUST NOT be empty.
-user_setup: []              # Human-required setup the agent cannot automate (see below)
+user_setup: []              # Human-required setup OpenCode cannot automate (see below)
 
 # Goal-backward verification (derived during planning, verified after execution)
 must_haves:
@@ -38,10 +38,10 @@ Output: [What artifacts will be created]
 </objective>
 
 <execution_context>
-@D:/Data/桌面/vibe coding/.opencode/get-shit-done/workflows/execute-plan.md
-@D:/Data/桌面/vibe coding/.opencode/get-shit-done/templates/summary.md
+@./.opencode/get-shit-done/workflows/execute-plan.md
+@./.opencode/get-shit-done/templates/summary.md
 [If plan contains checkpoint tasks (type="checkpoint:*"), add:]
-@D:/Data/桌面/vibe coding/.opencode/get-shit-done/references/checkpoints.md
+@./.opencode/get-shit-done/references/checkpoints.md
 </execution_context>
 
 <context>
@@ -61,31 +61,31 @@ Output: [What artifacts will be created]
 <tasks>
 
 <task type="auto">
-  <name>Task 1: [Action-oriented name]</name>
+  <name>task 1: [Action-oriented name]</name>
   <files>path/to/file.ext, another/file.ext</files>
   <read_first>path/to/reference.ext, path/to/source-of-truth.ext</read_first>
   <action>[Specific implementation - what to do, how to do it, what to avoid and WHY. Include CONCRETE values: exact identifiers, parameters, expected outputs, file paths, command arguments. Never say "align X with Y" without specifying the exact target state.]</action>
   <verify>[Command or check to prove it worked]</verify>
   <acceptance_criteria>
-    - [Grep-verifiable condition: "file.ext contains 'exact string'"]
+    - [grep-verifiable condition: "file.ext contains 'exact string'"]
     - [Measurable condition: "output.ext uses 'expected-value', NOT 'wrong-value'"]
   </acceptance_criteria>
   <done>[Measurable acceptance criteria]</done>
 </task>
 
 <task type="auto">
-  <name>Task 2: [Action-oriented name]</name>
+  <name>task 2: [Action-oriented name]</name>
   <files>path/to/file.ext</files>
   <read_first>path/to/reference.ext</read_first>
   <action>[Specific implementation with concrete values]</action>
   <verify>[Command or check]</verify>
   <acceptance_criteria>
-    - [Grep-verifiable condition]
+    - [grep-verifiable condition]
   </acceptance_criteria>
   <done>[Acceptance criteria]</done>
 </task>
 
-<!-- For checkpoint task examples and patterns, see @D:/Data/桌面/vibe coding/.opencode/get-shit-done/references/checkpoints.md -->
+<!-- For checkpoint task examples and patterns, see @./.opencode/get-shit-done/references/checkpoints.md -->
 
 <task type="checkpoint:decision" gate="blocking">
   <decision>[What needs deciding]</decision>
@@ -98,7 +98,7 @@ Output: [What artifacts will be created]
 </task>
 
 <task type="checkpoint:human-verify" gate="blocking">
-  <what-built>[What the agent built] - server running at [URL]</what-built>
+  <what-built>[What OpenCode built] - server running at [URL]</what-built>
   <how-to-verify>Visit [URL] and verify: [visual checks only, NO CLI commands]</how-to-verify>
   <resume-signal>Type "approved" or describe issues</resume-signal>
 </task>
@@ -278,15 +278,15 @@ TDD features get dedicated plans with `type: tdd`.
 → Yes: Create a TDD plan
 → No: Standard task in standard plan
 
-See `D:/Data/桌面/vibe coding/.opencode/get-shit-done/references/tdd.md` for TDD plan structure.
+See `./.opencode/get-shit-done/references/tdd.md` for TDD plan structure.
 
 ---
 
-## Task Types
+## task Types
 
 | Type | Use For | Autonomy |
 |------|---------|----------|
-| `auto` | Everything the agent can do independently | Fully autonomous |
+| `auto` | Everything OpenCode can do independently | Fully autonomous |
 | `checkpoint:human-verify` | Visual/functional verification | Pauses, returns to orchestrator |
 | `checkpoint:decision` | Implementation choices | Pauses, returns to orchestrator |
 | `checkpoint:human-action` | Truly unavoidable manual steps (rare) | Pauses, returns to orchestrator |
@@ -330,7 +330,7 @@ Output: User model, API endpoints, and UI components.
 
 <tasks>
 <task type="auto">
-  <name>Task 1: Create User model</name>
+  <name>task 1: Create User model</name>
   <files>src/features/user/model.ts</files>
   <action>Define User type with id, email, name, createdAt. Export TypeScript interface.</action>
   <verify>tsc --noEmit passes</verify>
@@ -338,7 +338,7 @@ Output: User model, API endpoints, and UI components.
 </task>
 
 <task type="auto">
-  <name>Task 2: Create User API endpoints</name>
+  <name>task 2: Create User API endpoints</name>
   <files>src/features/user/api.ts</files>
   <action>GET /users (list), GET /users/:id (single), POST /users (create). Use User type from model.</action>
   <verify>fetch tests pass for all endpoints</verify>
@@ -382,9 +382,9 @@ Output: Working dashboard component.
 </objective>
 
 <execution_context>
-@D:/Data/桌面/vibe coding/.opencode/get-shit-done/workflows/execute-plan.md
-@D:/Data/桌面/vibe coding/.opencode/get-shit-done/templates/summary.md
-@D:/Data/桌面/vibe coding/.opencode/get-shit-done/references/checkpoints.md
+@./.opencode/get-shit-done/workflows/execute-plan.md
+@./.opencode/get-shit-done/templates/summary.md
+@./.opencode/get-shit-done/references/checkpoints.md
 </execution_context>
 
 <context>
@@ -396,14 +396,14 @@ Output: Working dashboard component.
 
 <tasks>
 <task type="auto">
-  <name>Task 1: Build Dashboard layout</name>
+  <name>task 1: Build Dashboard layout</name>
   <files>src/components/Dashboard.tsx</files>
   <action>Create responsive grid with UserList and ProductList components. Use Tailwind for styling.</action>
   <verify>npm run build succeeds</verify>
   <done>Dashboard renders without errors</done>
 </task>
 
-<!-- Checkpoint pattern: the agent starts server, user visits URL. See checkpoints.md for full patterns. -->
+<!-- Checkpoint pattern: OpenCode starts server, user visits URL. See checkpoints.md for full patterns. -->
 <task type="auto">
   <name>Start dev server</name>
   <action>Run `npm run dev` in background, wait for ready</action>
@@ -501,7 +501,7 @@ files_modified: [...]
 
 ## Guidelines
 
-- Always use XML structure for the agent parsing
+- Always use XML structure for OpenCode parsing
 - Include `wave`, `depends_on`, `files_modified`, `autonomous` in every plan
 - Prefer vertical slices over horizontal layers
 - Only reference prior SUMMARYs when genuinely needed
@@ -531,16 +531,16 @@ user_setup:
       - "stripe listen --forward-to localhost:3000/api/webhooks/stripe"
 ```
 
-**The automation-first rule:** `user_setup` contains ONLY what the agent literally cannot do:
+**The automation-first rule:** `user_setup` contains ONLY what OpenCode literally cannot do:
 - Account creation (requires human signup)
 - Secret retrieval (requires dashboard access)
 - Dashboard configuration (requires human in browser)
 
-**NOT included:** Package installs, code changes, file creation, CLI commands the agent can run.
+**NOT included:** Package installs, code changes, file creation, CLI commands OpenCode can run.
 
 **Result:** Execute-plan generates `{phase}-USER-SETUP.md` with checklist for the user.
 
-See `D:/Data/桌面/vibe coding/.opencode/get-shit-done/templates/user-setup.md` for full schema and examples
+See `./.opencode/get-shit-done/templates/user-setup.md` for full schema and examples
 
 ---
 
@@ -596,7 +596,7 @@ must_haves:
 
 **Why this matters:**
 
-Task completion ≠ Goal achievement. A task "create chat component" can complete by creating a placeholder. The `must_haves` field captures what must actually work, enabling verification to catch gaps before they compound.
+task completion ≠ Goal achievement. A task "create chat component" can complete by creating a placeholder. The `must_haves` field captures what must actually work, enabling verification to catch gaps before they compound.
 
 **Verification flow:**
 
@@ -607,4 +607,4 @@ Task completion ≠ Goal achievement. A task "create chat component" can complet
 5. Gaps found → fix plans created → execute → re-verify
 6. All must_haves pass → phase complete
 
-See `D:/Data/桌面/vibe coding/.opencode/get-shit-done/workflows/verify-phase.md` for verification logic.
+See `./.opencode/get-shit-done/workflows/verify-phase.md` for verification logic.

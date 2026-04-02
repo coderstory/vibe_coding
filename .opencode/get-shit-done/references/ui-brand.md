@@ -69,7 +69,7 @@ User action required. 62-character width.
 Progress: ████████░░ 80%
 ```
 
-**Task level:**
+**task level:**
 ```
 Tasks: 2/4 complete
 ```
@@ -110,7 +110,7 @@ Always at end of major completions.
 
 `{copy-paste command}`
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ───────────────────────────────────────────────────────────────
 

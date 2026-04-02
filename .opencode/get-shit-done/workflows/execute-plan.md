@@ -1,16 +1,16 @@
-<purpose>
+<objective>
 Execute a phase prompt (PLAN.md) and create the outcome summary (SUMMARY.md).
-</purpose>
+</objective>
 
 <required_reading>
-Read STATE.md before any operation to load project context.
-Read config.json for planning behavior settings.
+read STATE.md before any operation to load project context.
+read config.json for planning behavior settings.
 
-@D:/Data/桌面/vibe coding/.opencode/get-shit-done/references/git-integration.md
+@./.opencode/get-shit-done/references/git-integration.md
 </required_reading>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-executor — Executes plan tasks, commits, creates SUMMARY.md
 </available_agent_types>
 
@@ -20,7 +20,7 @@ Valid GSD subagent types (use exact names — do not fall back to 'general-purpo
 Load execution context (paths only to minimize orchestrator context):
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init execute-phase "${PHASE}")
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init execute-phase "${PHASE}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -72,7 +72,7 @@ grep -n "type=\"checkpoint" .planning/phases/XX-name/{phase}-{plan}-PLAN.md
 | Verify-only | B (segmented) | Segments between checkpoints. After none/human-verify → SUBAGENT. After decision/human-action → MAIN |
 | Decision | C (main) | Execute entirely in main context |
 
-**Pattern A:** init_agent_tracking → spawn Task(subagent_type="gsd-executor", model=executor_model, isolation="worktree") with prompt: execute plan at [path], autonomous, all tasks + SUMMARY + commit, follow deviation/auth rules, report: plan name, tasks, SUMMARY path, commit hash → track agent_id → wait → update tracking → report.
+**Pattern A:** init_agent_tracking → spawn task(subagent_type="gsd-executor", model=executor_model, isolation="worktree") with prompt: execute plan at [path], autonomous, all tasks + SUMMARY + commit, follow deviation/auth rules, report: plan name, tasks, SUMMARY path, commit hash → track agent_id → wait → update tracking → report.
 
 **Pattern B:** Execute segment-by-segment. Autonomous segments: spawn subagent for assigned tasks only (no SUMMARY/commit). Checkpoints: main context. After all segments: aggregate, create SUMMARY, commit. See segment_execution.
 
@@ -93,7 +93,7 @@ if [ -f .planning/current-agent-id.txt ]; then
 fi
 ```
 
-If interrupted: ask user to resume (Task `resume` parameter) or start fresh.
+If interrupted: ask user to resume (task `resume` parameter) or start fresh.
 
 **Tracking protocol:** On spawn: write agent_id to `current-agent-id.txt`, append to agent-history.json: `{"agent_id":"[id]","task_description":"[desc]","phase":"[phase]","plan":"[plan]","segment":[num|null],"timestamp":"[ISO]","status":"spawned","completion_timestamp":null}`. On completion: status → "completed", set completion_timestamp, delete current-agent-id.txt. Prune: if entries > max_entries, remove oldest "completed" (never "spawned").
 
@@ -112,7 +112,7 @@ Pattern B only (verify-only checkpoints). Skip for A/C.
    - Check `git log --oneline --all --grep="{phase}-{plan}"` returns ≥1 commit
    - Append `## Self-Check: PASSED` or `## Self-Check: FAILED` to SUMMARY
 
-   **Known Claude Code bug (classifyHandoffIfNeeded):** If any segment agent reports "failed" with `classifyHandoffIfNeeded is not defined`, this is a Claude Code runtime bug — not a real failure. Run spot-checks; if they pass, treat as successful.
+   **Known OpenCode bug (classifyHandoffIfNeeded):** If any segment agent reports "failed" with `classifyHandoffIfNeeded is not defined`, this is a OpenCode runtime bug — not a real failure. Run spot-checks; if they pass, treat as successful.
 
 
 
@@ -130,7 +130,7 @@ This IS the execution instructions. Follow exactly. If plan references CONTEXT.m
 
 <step name="previous_phase_check">
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" phases list --type summaries --raw
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" phases list --type summaries --raw
 # Extract the second-to-last summary from the JSON result
 ```
 If previous SUMMARY has unresolved "Issues Encountered" or "Next Phase Readiness" blockers: question(header="Previous Issues", options: "Proceed anyway" | "Address first" | "Review previous").
@@ -139,8 +139,8 @@ If previous SUMMARY has unresolved "Issues Encountered" or "Next Phase Readiness
 <step name="execute">
 Deviations are normal — handle via rules below.
 
-1. Read @context files from prompt
-2. **MCP tools:** If AGENTS.md or project instructions reference MCP tools (e.g. jCodeMunch for code navigation), prefer them over Grep/Glob when available. Fall back to Grep/Glob if MCP tools are not accessible.
+1. read @context files from prompt
+2. **MCP tools:** If AGENTS.md or project instructions reference MCP tools (e.g. jCodeMunch for code navigation), prefer them over grep/glob when available. Fall back to grep/glob if MCP tools are not accessible.
 3. Per task:
    - **MANDATORY read_first gate:** If the task has a `<read_first>` field, you MUST read every listed file BEFORE making any edits. This is not optional. Do not skip files because you "already know" what's in them — read them. The read_first files establish ground truth for the task.
    - `type="auto"`: if `tdd="true"` → TDD execution. Implement with deviation rules + auth gates. Verify done criteria. Commit (see task_commit). Track hash for Summary.
@@ -213,7 +213,7 @@ Proceed with proposed change? (yes / different approach / defer)
 
 Summary MUST include deviations section. None? → `## Deviations from Plan\n\nNone - plan executed exactly as written.`
 
-Per deviation: **[Rule N - Category] Title** — Found during: Task X | Issue | Fix | Files modified | Verification | Commit hash
+Per deviation: **[Rule N - Category] Title** — Found during: task X | Issue | Fix | Files modified | Verification | Commit hash
 
 End with: **Total deviations:** N auto-fixed (breakdown). **Impact:** assessment.
 
@@ -225,13 +225,13 @@ End with: **Total deviations:** N auto-fixed (breakdown). **Impact:** assessment
 For `type: tdd` plans — RED-GREEN-REFACTOR:
 
 1. **Infrastructure** (first TDD plan only): detect project, install framework, config, verify empty suite
-2. **RED:** Read `<behavior>` → failing test(s) → run (MUST fail) → commit: `test({phase}-{plan}): add failing test for [feature]`
-3. **GREEN:** Read `<implementation>` → minimal code → run (MUST pass) → commit: `feat({phase}-{plan}): implement [feature]`
+2. **RED:** read `<behavior>` → failing test(s) → run (MUST fail) → commit: `test({phase}-{plan}): add failing test for [feature]`
+3. **GREEN:** read `<implementation>` → minimal code → run (MUST pass) → commit: `feat({phase}-{plan}): implement [feature]`
 4. **REFACTOR:** Clean up → tests MUST pass → commit: `refactor({phase}-{plan}): clean up [feature]`
 
 Errors: RED doesn't fail → investigate test/existing feature. GREEN doesn't pass → debug, iterate. REFACTOR breaks → undo.
 
-See `D:/Data/桌面/vibe coding/.opencode/get-shit-done/references/tdd.md` for structure.
+See `./.opencode/get-shit-done/references/tdd.md` for structure.
 </tdd_plan_execution>
 
 <precommit_failure_handling>
@@ -246,7 +246,7 @@ Use `--no-verify` on all commits. Pre-commit hooks cause build lock contention w
 If a commit is BLOCKED by a hook:
 
 1. The `git commit` command fails with hook error output
-2. Read the error — it tells you exactly which hook and what failed
+2. read the error — it tells you exactly which hook and what failed
 3. Fix the issue (type error, lint violation, secret leak, etc.)
 4. `git add` the fixed files
 5. Retry the commit
@@ -254,7 +254,7 @@ If a commit is BLOCKED by a hook:
 </precommit_failure_handling>
 
 <task_commit>
-## Task Commit Protocol
+## task Commit Protocol
 
 After each task (verification passed, done criteria met), commit immediately.
 
@@ -285,7 +285,7 @@ git add src/types/user.ts
 **Sub-repos mode:** If `sub_repos` is configured (non-empty array from init context), use `commit-to-subrepo` instead of standard git commit. This routes files to their correct sub-repo based on path prefix.
 
 ```bash
-node D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs commit-to-subrepo "{type}({phase}-{plan}): {description}" --files file1 file2 ...
+node ./.opencode/get-shit-done/bin/gsd-tools.cjs commit-to-subrepo "{type}({phase}-{plan}): {description}" --files file1 file2 ...
 ```
 
 The command groups files by sub-repo prefix and commits atomically to each. Returns JSON: `{ committed: true, repos: { "backend": { hash: "abc", files: [...] }, ... } }`.
@@ -298,7 +298,7 @@ Record hashes from each repo in the response for SUMMARY tracking.
 **5. Record hash:**
 ```bash
 TASK_COMMIT=$(git rev-parse --short HEAD)
-TASK_COMMITS+=("Task ${TASK_NUM}: ${TASK_COMMIT}")
+TASK_COMMITS+=("task ${TASK_NUM}: ${TASK_COMMIT}")
 ```
 
 **6. Check for untracked generated files:**
@@ -315,7 +315,7 @@ If new untracked files appeared after running scripts or tools, decide for each:
 <step name="checkpoint_protocol">
 On `type="checkpoint:*"`: automate everything possible first. Checkpoints are for verification/decisions only.
 
-Display: `CHECKPOINT: [Type]` box → Progress {X}/{Y} → Task name → type-specific content → `YOUR ACTION: [signal]`
+Display: `CHECKPOINT: [Type]` box → Progress {X}/{Y} → task name → type-specific content → `YOUR ACTION: [signal]`
 
 | Type | Content | Resume signal |
 |------|---------|---------------|
@@ -325,13 +325,13 @@ Display: `CHECKPOINT: [Type]` box → Progress {X}/{Y} → Task name → type-sp
 
 After response: verify if specified. Pass → continue. Fail → inform, wait. WAIT for user — do NOT hallucinate completion.
 
-See D:/Data/桌面/vibe coding/.opencode/get-shit-done/references/checkpoints.md for details.
+See ./.opencode/get-shit-done/references/checkpoints.md for details.
 </step>
 
 <step name="checkpoint_return_for_orchestrator">
-When spawned via Task and hitting checkpoint: return structured state (cannot interact with user directly).
+When spawned via task and hitting checkpoint: return structured state (cannot interact with user directly).
 
-**Required return:** 1) Completed Tasks table (hashes + files) 2) Current Task (what's blocking) 3) Checkpoint Details (user-facing content) 4) Awaiting (what's needed from user)
+**Required return:** 1) Completed Tasks table (hashes + files) 2) Current task (what's blocking) 3) Checkpoint Details (user-facing content) 4) Awaiting (what's needed from user)
 
 Orchestrator parses → presents to user → spawns fresh continuation with your completed tasks state. You will NOT be resumed. In main context: use checkpoint_protocol above.
 </step>
@@ -341,10 +341,10 @@ If verification fails:
 
 **Check if node repair is enabled** (default: on):
 ```bash
-NODE_REPAIR=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.node_repair 2>/dev/null || echo "true")
+NODE_REPAIR=$(node "./.OpenCode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.node_repair 2>/dev/null || echo "true")
 ```
 
-If `NODE_REPAIR` is `true`: invoke `@./.opencode/get-shit-done/workflows/node-repair.md` with:
+If `NODE_REPAIR` is `true`: invoke `@./.OpenCode/get-shit-done/workflows/node-repair.md` with:
 - FAILED_TASK: task number, name, done-criteria
 - ERROR: expected vs actual result
 - PLAN_CONTEXT: adjacent task names + phase goal
@@ -352,7 +352,7 @@ If `NODE_REPAIR` is `true`: invoke `@./.opencode/get-shit-done/workflows/node-re
 
 Node repair will attempt RETRY, DECOMPOSE, or PRUNE autonomously. Only reaches this gate again if repair budget is exhausted (ESCALATE).
 
-If `NODE_REPAIR` is `false` OR repair returns ESCALATE: STOP. Present: "Verification failed for Task [X]: [name]. Expected: [criteria]. Actual: [result]. Repair attempted: [summary of what was tried]." Options: Retry | Skip (mark incomplete) | Stop (investigate). If skipped → SUMMARY "Issues Encountered".
+If `NODE_REPAIR` is `false` OR repair returns ESCALATE: STOP. Present: "Verification failed for task [X]: [name]. Expected: [criteria]. Actual: [result]. Repair attempted: [summary of what was tried]." Options: Retry | Skip (mark incomplete) | Stop (investigate). If skipped → SUMMARY "Issues Encountered".
 </step>
 
 <step name="record_completion_time">
@@ -378,11 +378,11 @@ fi
 grep -A 50 "^user_setup:" .planning/phases/XX-name/{phase}-{plan}-PLAN.md | head -50
 ```
 
-If user_setup exists: create `{phase}-USER-SETUP.md` using template `D:/Data/桌面/vibe coding/.opencode/get-shit-done/templates/user-setup.md`. Per service: env vars table, account setup checklist, dashboard config, local dev notes, verification commands. Status "Incomplete". Set `USER_SETUP_CREATED=true`. If empty/missing: skip.
+If user_setup exists: create `{phase}-USER-SETUP.md` using template `./.opencode/get-shit-done/templates/user-setup.md`. Per service: env vars table, account setup checklist, dashboard config, local dev notes, verification commands. Status "Incomplete". Set `USER_SETUP_CREATED=true`. If empty/missing: skip.
 </step>
 
 <step name="create_summary">
-Create `{phase}-{plan}-SUMMARY.md` at `.planning/phases/XX-name/`. Use `D:/Data/桌面/vibe coding/.opencode/get-shit-done/templates/summary.md`.
+Create `{phase}-{plan}-SUMMARY.md` at `.planning/phases/XX-name/`. Use `./.opencode/get-shit-done/templates/summary.md`.
 
 **Frontmatter:** phase, plan, subsystem, tags | requires/provides/affects | tech-stack.added/patterns | key-files.created/modified | key-decisions | requirements-completed (**MUST** copy `requirements` array from PLAN.md frontmatter verbatim) | duration ($DURATION), completed ($PLAN_END_TIME date).
 
@@ -400,13 +400,13 @@ Update STATE.md using gsd-tools:
 
 ```bash
 # Advance plan counter (handles last-plan edge case)
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" state advance-plan
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" state advance-plan
 
 # Recalculate progress bar from disk state
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" state update-progress
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" state update-progress
 
 # Record execution metrics
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" state record-metric \
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" state record-metric \
   --phase "${PHASE}" --plan "${PLAN}" --duration "${DURATION}" \
   --tasks "${TASK_COUNT}" --files "${FILE_COUNT}"
 ```
@@ -418,11 +418,11 @@ From SUMMARY: Extract decisions and add to STATE.md:
 ```bash
 # Add each decision from SUMMARY key-decisions
 # Prefer file inputs for shell-safe text (preserves `$`, `*`, etc. exactly)
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" state add-decision \
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" state add-decision \
   --phase "${PHASE}" --summary-file "${DECISION_TEXT_FILE}" --rationale-file "${RATIONALE_FILE}"
 
 # Add blockers if any found
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" state add-blocker --text-file "${BLOCKER_TEXT_FILE}"
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" state add-blocker --text-file "${BLOCKER_TEXT_FILE}"
 ```
 </step>
 
@@ -430,7 +430,7 @@ node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" stat
 Update session info using gsd-tools:
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" state record-session \
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" state record-session \
   --stopped-at "Completed ${PHASE}-${PLAN}-PLAN.md" \
   --resume-file "None"
 ```
@@ -444,7 +444,7 @@ If SUMMARY "Issues Encountered" ≠ "None": yolo → log and continue. Interacti
 
 <step name="update_roadmap">
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap update-plan-progress "${PHASE}"
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap update-plan-progress "${PHASE}"
 ```
 Counts PLAN vs SUMMARY files on disk. Updates progress table row with correct count and status (`In Progress` or `Complete` with date).
 </step>
@@ -453,17 +453,17 @@ Counts PLAN vs SUMMARY files on disk. Updates progress table row with correct co
 Mark completed requirements from the PLAN.md frontmatter `requirements:` field:
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" requirements mark-complete ${REQ_IDS}
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" requirements mark-complete ${REQ_IDS}
 ```
 
 Extract requirement IDs from the plan's frontmatter (e.g., `requirements: [AUTH-01, AUTH-02]`). If no requirements field, skip.
 </step>
 
 <step name="git_commit_metadata">
-Task code already committed per-task. Commit plan metadata:
+task code already committed per-task. Commit plan metadata:
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs({phase}-{plan}): complete [plan-name] plan" --files .planning/phases/XX-name/{phase}-{plan}-SUMMARY.md .planning/STATE.md .planning/ROADMAP.md .planning/REQUIREMENTS.md
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs({phase}-{plan}): complete [plan-name] plan" --files .planning/phases/XX-name/{phase}-{plan}-SUMMARY.md .planning/STATE.md .planning/ROADMAP.md .planning/REQUIREMENTS.md
 ```
 </step>
 
@@ -478,7 +478,7 @@ git diff --name-only ${FIRST_TASK}^..HEAD 2>/dev/null || true
 Update only structural changes: new src/ dir → STRUCTURE.md | deps → STACK.md | file pattern → CONVENTIONS.md | API client → INTEGRATIONS.md | config → STACK.md | renamed → update paths. Skip code-only/bugfix/content changes.
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "" --files .planning/codebase/*.md --amend
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "" --files .planning/codebase/*.md --amend
 ```
 </step>
 
@@ -496,7 +496,7 @@ If `USER_SETUP_CREATED=true`: display `⚠️ USER SETUP REQUIRED` with path + e
 | summaries = plans, current < highest phase | **B: Phase done** | Show completion, suggest `/gsd-plan-phase {Z+1}` + `/gsd-verify-work {Z}` + `/gsd-discuss-phase {Z+1}` |
 | summaries = plans, current = highest phase | **C: Milestone done** | Show banner, suggest `/gsd-complete-milestone` + `/gsd-verify-work` + `/gsd-add-phase` |
 
-All routes: `/clear` first for fresh context.
+All routes: `/new` first for fresh context.
 </step>
 
 </process>

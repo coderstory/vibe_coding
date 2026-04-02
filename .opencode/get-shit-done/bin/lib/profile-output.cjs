@@ -5,8 +5,8 @@
  *   - write-profile: USER-PROFILE.md from analysis JSON
  *   - profile-questionnaire: fallback when no sessions available
  *   - generate-dev-preferences: dev-preferences.md command artifact
- *   - generate-claude-profile: Developer Profile section in CLAUDE.md
- *   - generate-claude-md: full CLAUDE.md with managed sections
+ *   - generate-OpenCode-profile: Developer Profile section in AGENTS.md
+ *   - generate-OpenCode-md: full AGENTS.md with managed sections
  */
 
 const fs = require('fs');
@@ -26,8 +26,8 @@ const PROFILING_QUESTIONS = [
   {
     dimension: 'communication_style',
     header: 'Communication Style',
-    context: 'Think about the last few times you asked Claude to build or change something. How did you frame the request?',
-    question: 'When you ask Claude to build something, how much context do you typically provide?',
+    context: 'Think about the last few times you asked OpenCode to build or change something. How did you frame the request?',
+    question: 'When you ask OpenCode to build something, how much context do you typically provide?',
     options: [
       { label: 'Minimal -- "fix the bug", "add dark mode", just say what\'s needed', value: 'a', rating: 'terse-direct' },
       { label: 'Some context -- explain what and why in a paragraph or two', value: 'b', rating: 'conversational' },
@@ -38,20 +38,20 @@ const PROFILING_QUESTIONS = [
   {
     dimension: 'decision_speed',
     header: 'Decision Making',
-    context: 'Think about times when Claude presented you with multiple options -- like choosing a library, picking an architecture, or selecting an approach.',
-    question: 'When Claude presents you with options, how do you typically decide?',
+    context: 'Think about times when OpenCode presented you with multiple options -- like choosing a library, picking an architecture, or selecting an approach.',
+    question: 'When OpenCode presents you with options, how do you typically decide?',
     options: [
       { label: 'Pick quickly based on gut feeling or past experience', value: 'a', rating: 'fast-intuitive' },
       { label: 'Ask for a comparison table or pros/cons, then decide', value: 'b', rating: 'deliberate-informed' },
       { label: 'Research independently (read docs, check GitHub stars) before deciding', value: 'c', rating: 'research-first' },
-      { label: 'Let Claude recommend -- I generally trust the suggestion', value: 'd', rating: 'delegator' },
+      { label: 'Let OpenCode recommend -- I generally trust the suggestion', value: 'd', rating: 'delegator' },
     ],
   },
   {
     dimension: 'explanation_depth',
     header: 'Explanation Preferences',
-    context: 'Think about when Claude explains code it wrote or an approach it took. How much detail feels right?',
-    question: 'When Claude explains something, how much detail do you want?',
+    context: 'Think about when OpenCode explains code it wrote or an approach it took. How much detail feels right?',
+    question: 'When OpenCode explains something, how much detail do you want?',
     options: [
       { label: 'Just the code -- I\'ll read it and figure it out myself', value: 'a', rating: 'code-only' },
       { label: 'Brief explanation with the code -- a sentence or two about the approach', value: 'b', rating: 'concise' },
@@ -62,12 +62,12 @@ const PROFILING_QUESTIONS = [
   {
     dimension: 'debugging_approach',
     header: 'Debugging Style',
-    context: 'Think about the last few times something broke in your code. How did you approach it with Claude?',
-    question: 'When something breaks, how do you typically approach debugging with Claude?',
+    context: 'Think about the last few times something broke in your code. How did you approach it with OpenCode?',
+    question: 'When something breaks, how do you typically approach debugging with OpenCode?',
     options: [
       { label: 'Paste the error and say "fix it" -- get it working fast', value: 'a', rating: 'fix-first' },
-      { label: 'Share the error plus context, ask Claude to diagnose what went wrong', value: 'b', rating: 'diagnostic' },
-      { label: 'Investigate myself first, then ask Claude about my specific theories', value: 'c', rating: 'hypothesis-driven' },
+      { label: 'Share the error plus context, ask OpenCode to diagnose what went wrong', value: 'b', rating: 'diagnostic' },
+      { label: 'Investigate myself first, then ask OpenCode about my specific theories', value: 'c', rating: 'hypothesis-driven' },
       { label: 'Walk through the code together step by step to understand the issue', value: 'd', rating: 'collaborative' },
     ],
   },
@@ -89,7 +89,7 @@ const PROFILING_QUESTIONS = [
     context: 'Think about the last time you needed a library or service for a project. How did you go about choosing it?',
     question: 'When choosing libraries or services, what is your typical approach?',
     options: [
-      { label: 'Use whatever Claude suggests -- speed matters more than the perfect choice', value: 'a', rating: 'pragmatic-fast' },
+      { label: 'Use whatever OpenCode suggests -- speed matters more than the perfect choice', value: 'a', rating: 'pragmatic-fast' },
       { label: 'Prefer well-known, battle-tested options (React, PostgreSQL, Express)', value: 'b', rating: 'conservative' },
       { label: 'Research alternatives, read docs, compare benchmarks before committing', value: 'c', rating: 'thorough-evaluator' },
       { label: 'Strong opinions -- I already know what I like and I stick with it', value: 'd', rating: 'opinionated' },
@@ -113,9 +113,9 @@ const PROFILING_QUESTIONS = [
     context: 'Think about encountering something new -- an unfamiliar library, a codebase you inherited, a concept you hadn\'t used before.',
     question: 'When you encounter something new in your codebase, how do you prefer to learn about it?',
     options: [
-      { label: 'Read the code directly -- I figure things out by reading and experimenting', value: 'a', rating: 'self-directed' },
-      { label: 'Ask Claude to explain the relevant parts to me', value: 'b', rating: 'guided' },
-      { label: 'Read official docs and tutorials first, then try things', value: 'c', rating: 'documentation-first' },
+      { label: 'read the code directly -- I figure things out by reading and experimenting', value: 'a', rating: 'self-directed' },
+      { label: 'Ask OpenCode to explain the relevant parts to me', value: 'b', rating: 'guided' },
+      { label: 'read official docs and tutorials first, then try things', value: 'c', rating: 'documentation-first' },
       { label: 'See a working example, then modify it to understand how it works', value: 'd', rating: 'example-driven' },
     ],
   },
@@ -173,19 +173,19 @@ const CLAUDE_INSTRUCTIONS = {
 };
 
 const CLAUDE_MD_FALLBACKS = {
-  project: 'Project not yet initialized. Run /gsd:new-project to set up.',
+  project: 'Project not yet initialized. Run /gsd-new-project to set up.',
   stack: 'Technology stack not yet documented. Will populate after codebase mapping or first phase.',
   conventions: 'Conventions not yet established. Will populate as patterns emerge during development.',
   architecture: 'Architecture not yet mapped. Follow existing patterns found in the codebase.',
 };
 
 const CLAUDE_MD_WORKFLOW_ENFORCEMENT = [
-  'Before using Edit, Write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.',
+  'Before using edit, write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.',
   '',
   'Use these entry points:',
-  '- `/gsd:quick` for small fixes, doc updates, and ad-hoc tasks',
-  '- `/gsd:debug` for investigation and bug fixing',
-  '- `/gsd:execute-phase` for planned phase work',
+  '- `/gsd-quick` for small fixes, doc updates, and ad-hoc tasks',
+  '- `/gsd-debug` for investigation and bug fixing',
+  '- `/gsd-execute-phase` for planned phase work',
   '',
   'Do not make direct repo edits outside a GSD workflow unless the user explicitly asks to bypass it.',
 ].join('\n');
@@ -194,8 +194,8 @@ const CLAUDE_MD_PROFILE_PLACEHOLDER = [
   '<!-- GSD:profile-start -->',
   '## Developer Profile',
   '',
-  '> Profile not yet configured. Run `/gsd:profile-user` to generate your developer profile.',
-  '> This section is managed by `generate-claude-profile` -- do not edit manually.',
+  '> Profile not yet configured. Run `/gsd-profile-user` to generate your developer profile.',
+  '> This section is managed by `generate-OpenCode-profile` -- do not edit manually.',
   '<!-- GSD:profile-end -->',
 ].join('\n');
 
@@ -275,7 +275,7 @@ function extractMarkdownSection(content, sectionName) {
   return result.length > 0 ? result.join('\n').trim() : null;
 }
 
-// ─── CLAUDE.md Section Generators ─────────────────────────────────────────────
+// ─── AGENTS.md Section Generators ─────────────────────────────────────────────
 
 function generateProjectSection(cwd) {
   const projectPath = path.join(cwd, '.planning', 'PROJECT.md');
@@ -528,7 +528,7 @@ function cmdWriteProfile(cwd, options, raw) {
 
   let outputPath = options.output;
   if (!outputPath) {
-    outputPath = path.join(os.homedir(), '.claude', 'get-shit-done', 'USER-PROFILE.md');
+    outputPath = path.join(os.homedir(), '.OpenCode', 'get-shit-done', 'USER-PROFILE.md');
   } else if (!path.isAbsolute(outputPath)) {
     outputPath = path.join(cwd, outputPath);
   }
@@ -671,7 +671,7 @@ function cmdGenerateDevPreferences(cwd, options, raw) {
 
   let stackBlock;
   if (analysis.data_source === 'questionnaire') {
-    stackBlock = 'Stack preferences not available (questionnaire-only profile). Run `/gsd:profile-user --refresh` with session data to populate.';
+    stackBlock = 'Stack preferences not available (questionnaire-only profile). Run `/gsd-profile-user --refresh` with session data to populate.';
   } else if (options.stack) {
     stackBlock = options.stack;
   } else {
@@ -681,7 +681,7 @@ function cmdGenerateDevPreferences(cwd, options, raw) {
 
   let outputPath = options.output;
   if (!outputPath) {
-    outputPath = path.join(os.homedir(), '.claude', 'commands', 'gsd', 'dev-preferences.md');
+    outputPath = path.join(os.homedir(), '.OpenCode', 'commands', 'gsd', 'dev-preferences.md');
   } else if (!path.isAbsolute(outputPath)) {
     outputPath = path.join(cwd, outputPath);
   }
@@ -691,7 +691,7 @@ function cmdGenerateDevPreferences(cwd, options, raw) {
 
   const result = {
     command_path: outputPath,
-    command_name: '/gsd:dev-preferences',
+    command_name: '/gsd-dev-preferences',
     dimensions_included: dimensionsIncluded,
     source: analysis.data_source || 'session_analysis',
   };
@@ -757,7 +757,7 @@ function cmdGenerateClaudeProfile(cwd, options, raw) {
     '<!-- GSD:profile-start -->',
     '## Developer Profile',
     '',
-    `> Generated by GSD from ${dataSource}. Run \`/gsd:profile-user --refresh\` to update.`,
+    `> Generated by GSD from ${dataSource}. Run \`/gsd-profile-user --refresh\` to update.`,
     '',
     '| Dimension | Rating | Confidence |',
     '|-----------|--------|------------|',
@@ -772,11 +772,11 @@ function cmdGenerateClaudeProfile(cwd, options, raw) {
 
   let targetPath;
   if (options.global) {
-    targetPath = path.join(os.homedir(), '.claude', 'CLAUDE.md');
+    targetPath = path.join(os.homedir(), '.OpenCode', 'AGENTS.md');
   } else if (options.output) {
     targetPath = path.isAbsolute(options.output) ? options.output : path.join(cwd, options.output);
   } else {
-    targetPath = path.join(cwd, 'CLAUDE.md');
+    targetPath = path.join(cwd, 'AGENTS.md');
   }
 
   let action;
@@ -848,7 +848,7 @@ function cmdGenerateClaudeMd(cwd, options, raw) {
 
   let outputPath = options.output;
   if (!outputPath) {
-    outputPath = path.join(cwd, 'CLAUDE.md');
+    outputPath = path.join(cwd, 'AGENTS.md');
   } else if (!path.isAbsolute(outputPath)) {
     outputPath = path.join(cwd, outputPath);
   }
@@ -925,7 +925,7 @@ function cmdGenerateClaudeMd(cwd, options, raw) {
   let message = `Generated ${genCount}/${totalManaged} sections.`;
   if (sectionsFallback.length > 0) message += ` Fallback: ${sectionsFallback.join(', ')}.`;
   if (sectionsSkipped.length > 0) message += ` Skipped (manually edited): ${sectionsSkipped.join(', ')}.`;
-  if (profileStatus === 'placeholder_added') message += ' Run /gsd:profile-user to unlock Developer Profile.';
+  if (profileStatus === 'placeholder_added') message += ' Run /gsd-profile-user to unlock Developer Profile.';
 
   const result = {
     claude_md_path: outputPath,

@@ -1,8 +1,8 @@
-<purpose>
+<objective>
 
 Archive accumulated phase directories from completed milestones into `.planning/milestones/v{X.Y}-phases/`. Identifies which phases belong to each completed milestone, shows a dry-run summary, and moves directories on confirmation.
 
-</purpose>
+</objective>
 
 <required_reading>
 
@@ -16,7 +16,7 @@ Archive accumulated phase directories from completed milestones into `.planning/
 
 <step name="identify_completed_milestones">
 
-Read `.planning/MILESTONES.md` to identify completed milestones and their versions.
+read `.planning/MILESTONES.md` to identify completed milestones and their versions.
 
 ```bash
 cat .planning/MILESTONES.md
@@ -122,7 +122,7 @@ Repeat for all milestones in the cleanup set.
 Commit the changes:
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "chore: archive phase directories from completed milestones" --files .planning/milestones/ .planning/phases/
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "chore: archive phase directories from completed milestones" --files .planning/milestones/ .planning/phases/
 ```
 
 </step>

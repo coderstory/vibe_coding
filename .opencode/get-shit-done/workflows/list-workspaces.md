@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 List all GSD workspaces found in ~/gsd-workspaces/ with their status.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -11,7 +11,7 @@ Read all files referenced by the invoking prompt's execution_context before star
 ## 1. Setup
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init list-workspaces)
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init list-workspaces)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 

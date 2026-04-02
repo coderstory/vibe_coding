@@ -46,7 +46,7 @@ RETRO_PATH=".planning/RETROSPECTIVE.md"
 STATE_PATH=".planning/STATE.md"
 ```
 
-Read all files that exist. Missing files are fine — the summary adapts to what's available.
+read all files that exist. Missing files are fine — the summary adapts to what's available.
 
 ## Step 3: Discover Phase Artifacts
 
@@ -58,10 +58,10 @@ gsd-tools.cjs init progress
 
 This returns phase metadata. For each phase in the milestone scope:
 
-- Read `{phase_dir}/{padded}-SUMMARY.md` if it exists — extract `one_liner`, `accomplishments`, `decisions`
-- Read `{phase_dir}/{padded}-VERIFICATION.md` if it exists — extract status, gaps, deferred items
-- Read `{phase_dir}/{padded}-CONTEXT.md` if it exists — extract key decisions from `<decisions>` section
-- Read `{phase_dir}/{padded}-RESEARCH.md` if it exists — note what was researched
+- read `{phase_dir}/{padded}-SUMMARY.md` if it exists — extract `one_liner`, `accomplishments`, `decisions`
+- read `{phase_dir}/{padded}-VERIFICATION.md` if it exists — extract status, gaps, deferred items
+- read `{phase_dir}/{padded}-CONTEXT.md` if it exists — extract key decisions from `<decisions>` section
+- read `{phase_dir}/{padded}-RESEARCH.md` if it exists — note what was researched
 
 Track which phases have which artifacts.
 
@@ -82,7 +82,7 @@ git diff --stat $(git log --format=%H --reverse v${VERSION} | head -1)..v${VERSI
 ```
 
 **Method 2 — STATE.md date range** (if no tag):
-Read STATE.md and extract the `started_at` or earliest session date. Use it as the `--since` boundary:
+read STATE.md and extract the `started_at` or earliest session date. Use it as the `--since` boundary:
 ```bash
 git log --oneline --since="<started_at_date>" | wc -l
 ```
@@ -105,7 +105,7 @@ Extract (when available):
 
 ## Step 5: Generate Summary Document
 
-Write to `.planning/reports/MILESTONE_SUMMARY-v${VERSION}.md`:
+write to `.planning/reports/MILESTONE_SUMMARY-v${VERSION}.md`:
 
 ```markdown
 # Milestone v{VERSION} — Project Summary
@@ -176,7 +176,7 @@ Present as a bulleted list of decisions with brief rationale:
 - **Contributors:** {list}
 ```
 
-## Step 6: Write and Commit
+## Step 6: write and Commit
 
 **Overwrite guard:** If `.planning/reports/MILESTONE_SUMMARY-v${VERSION}.md` already exists, ask the user:
 > "A milestone summary for v{VERSION} already exists. Overwrite it, or view the existing one?"
@@ -187,7 +187,7 @@ Create the reports directory if needed:
 mkdir -p .planning/reports
 ```
 
-Write the summary, then commit:
+write the summary, then commit:
 ```bash
 gsd-tools.cjs commit "docs(v${VERSION}): generate milestone summary for onboarding" \
   --files ".planning/reports/MILESTONE_SUMMARY-v${VERSION}.md"

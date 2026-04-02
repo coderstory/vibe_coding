@@ -1,4 +1,4 @@
-<purpose>
+<objective>
 Capture a forward-looking idea as a structured seed file with trigger conditions.
 Seeds auto-surface during /gsd-new-milestone when trigger conditions match the
 new milestone's scope.
@@ -8,7 +8,7 @@ Seeds beat deferred items because they:
 - Define WHEN to surface (trigger conditions, not manual scanning)
 - Track breadcrumbs (code references, related decisions)
 - Auto-present at the right time via new-milestone scan
-</purpose>
+</objective>
 
 <process>
 
@@ -95,7 +95,7 @@ Generate slug from idea summary.
 </step>
 
 <step name="write_seed">
-Write `.planning/seeds/SEED-{PADDED}-{slug}.md`:
+write `.planning/seeds/SEED-{PADDED}-{slug}.md`:
 
 ```markdown
 ---
@@ -140,7 +140,7 @@ Related code and decisions found in the current codebase:
 
 <step name="commit_seed">
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: plant seed — {$IDEA}" --files .planning/seeds/SEED-{PADDED}-{slug}.md
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: plant seed — {$IDEA}" --files .planning/seeds/SEED-{PADDED}-{slug}.md
 ```
 </step>
 

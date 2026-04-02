@@ -1,13 +1,13 @@
-<purpose>
+<objective>
 Verify milestone achieved its definition of done by aggregating phase verifications, checking cross-phase integration, and assessing requirements coverage. Reads existing VERIFICATION.md files (phases already verified during execute-phase), aggregates tech debt and deferred gaps, then spawns integration checker for cross-phase wiring.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-integration-checker — Checks cross-phase integration
 </available_agent_types>
 
@@ -16,23 +16,23 @@ Valid GSD subagent types (use exact names — do not fall back to 'general-purpo
 ## 0. Initialize Milestone Context
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init milestone-op)
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init milestone-op)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_CHECKER=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-integration-checker 2>/dev/null)
+AGENT_SKILLS_CHECKER=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-integration-checker 2>/dev/null)
 ```
 
 Extract from init JSON: `milestone_version`, `milestone_name`, `phase_count`, `completed_phases`, `commit_docs`.
 
 Resolve integration checker model:
 ```bash
-integration_checker_model=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" resolve-model gsd-integration-checker --raw)
+integration_checker_model=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" resolve-model gsd-integration-checker --raw)
 ```
 
 ## 1. Determine Milestone Scope
 
 ```bash
 # Get phases in milestone (sorted numerically, handles decimals)
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" phases list
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" phases list
 ```
 
 - Parse version from arguments or detect current from ROADMAP.md
@@ -40,13 +40,13 @@ node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" phas
 - Extract milestone definition of done from ROADMAP.md
 - Extract requirements mapped to this milestone from REQUIREMENTS.md
 
-## 2. Read All Phase Verifications
+## 2. read All Phase Verifications
 
 For each phase directory, read the VERIFICATION.md:
 
 ```bash
 # For each phase, use find-phase to resolve the directory (handles archived phases)
-PHASE_INFO=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" find-phase 01 --raw)
+PHASE_INFO=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" find-phase 01 --raw)
 # Extract directory from JSON, then read VERIFICATION.md from that directory
 # Repeat for each phase number from ROADMAP.md
 ```
@@ -67,7 +67,7 @@ With phase context collected:
 Extract `MILESTONE_REQ_IDS` from REQUIREMENTS.md traceability table — all REQ-IDs assigned to phases in this milestone.
 
 ```
-Task(
+task(
   prompt="Check cross-phase integration and E2E flows.
 
 Phases: {phase_dirs}
@@ -113,7 +113,7 @@ For each phase's SUMMARY.md, extract `requirements-completed` from YAML frontmat
 ```bash
 for summary in .planning/phases/*-*/*-SUMMARY.md; do
   [ -e "$summary" ] || continue
-  node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" summary-extract "$summary" --fields requirements_completed --pick requirements_completed
+  node "./.opencode/get-shit-done/bin/gsd-tools.cjs" summary-extract "$summary" --fields requirements_completed --pick requirements_completed
 done
 ```
 
@@ -141,7 +141,7 @@ For each REQ-ID, determine status using all three sources:
 Skip if `workflow.nyquist_validation` is explicitly `false` (absent = enabled).
 
 ```bash
-NYQUIST_CONFIG=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.nyquist_validation --raw 2>/dev/null)
+NYQUIST_CONFIG=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.nyquist_validation --raw 2>/dev/null)
 ```
 
 If `false`: skip entirely.
@@ -231,7 +231,7 @@ All requirements covered. Cross-phase integration verified. E2E flows complete.
 
 /gsd-complete-milestone {version}
 
-<sub>/clear first → fresh context window</sub>
+*/new first → fresh context window*
 
 ───────────────────────────────────────────────────────────────
 
@@ -276,7 +276,7 @@ Phases needing validation: run `/gsd-validate-phase {N}` for each flagged phase.
 
 /gsd-plan-milestone-gaps
 
-<sub>/clear first → fresh context window</sub>
+*/new first → fresh context window*
 
 ───────────────────────────────────────────────────────────────
 
@@ -318,7 +318,7 @@ All requirements met. No critical blockers. Accumulated tech debt needs review.
 
 /gsd-plan-milestone-gaps
 
-<sub>/clear first → fresh context window</sub>
+*/new first → fresh context window*
 
 ───────────────────────────────────────────────────────────────
 </offer_next>

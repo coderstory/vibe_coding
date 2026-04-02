@@ -1,13 +1,13 @@
-<purpose>
+<objective>
 Initialize a new project through unified flow: questioning, research (optional), requirements, roadmap. This is the most leveraged moment in any project — deep questioning here means better plans, better execution, better outcomes. One workflow takes you from idea to ready-for-planning.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-project-researcher — Researches project-level technical decisions
 - gsd-research-synthesizer — Synthesizes findings from parallel research agents
 - gsd-roadmapper — Creates phased execution roadmaps
@@ -57,11 +57,11 @@ The document should describe what you want to build.
 **MANDATORY FIRST STEP — Execute these checks before ANY user interaction:**
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init new-project)
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init new-project)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_RESEARCHER=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-project-researcher 2>/dev/null)
-AGENT_SKILLS_SYNTHESIZER=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-synthesizer 2>/dev/null)
-AGENT_SKILLS_ROADMAPPER=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-roadmapper 2>/dev/null)
+AGENT_SKILLS_RESEARCHER=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-project-researcher 2>/dev/null)
+AGENT_SKILLS_SYNTHESIZER=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-synthesizer 2>/dev/null)
+AGENT_SKILLS_ROADMAPPER=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-roadmapper 2>/dev/null)
 ```
 
 Parse JSON for: `researcher_model`, `synthesizer_model`, `roadmapper_model`, `commit_docs`, `project_exists`, `has_codebase_map`, `planning_exists`, `has_existing_code`, `has_package_file`, `is_brownfield`, `needs_codebase_map`, `has_git`, `project_path`.
@@ -175,9 +175,9 @@ question([
     question: "Which AI models for planning agents?",
     multiSelect: false,
     options: [
-      { label: "Balanced (Recommended)", description: "Sonnet for most agents — good quality/cost ratio" },
-      { label: "Quality", description: "Opus for research/roadmap — higher cost, deeper analysis" },
-      { label: "Budget", description: "Haiku where possible — fastest, lowest cost" },
+      { label: "Smart (Recommended)", description: "Two models: one for reseach and planing, other for execution and verification" },
+      { label: "Simple", description: Description: "One model for all agents (not flexible)" },
+      { label: "Genius (most flexible)", description: "Three models: different for every stage" },
       { label: "Inherit", description: "Use the current session model for all agents (OpenCode /model)" }
     ]
   }
@@ -188,7 +188,7 @@ Create `.planning/config.json` with all settings (CLI fills in remaining default
 
 ```bash
 mkdir -p .planning
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-new-project '{"mode":"yolo","granularity":"[selected]","parallelization":true|false,"commit_docs":true|false,"model_profile":"quality|balanced|budget|inherit","workflow":{"research":true|false,"plan_check":true|false,"verifier":true|false,"nyquist_validation":true|false,"auto_advance":true}}'
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-new-project '{"mode":"yolo","granularity":"[selected]","parallelization":true|false,"commit_docs":true|false,"model_profile":"simple|smart|genius|inherit","workflow":{"research":true|false,"plan_check":true|false,"verifier":true|false,"nyquist_validation":true|false,"auto_advance":true}}'
 ```
 
 **If commit_docs = No:** Add `.planning/` to `.gitignore`.
@@ -197,13 +197,13 @@ node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" conf
 
 ```bash
 mkdir -p .planning
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "chore: add project config" --files .planning/config.json
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "chore: add project config" --files .planning/config.json
 ```
 
 **Persist auto-advance chain flag to config (survives context compaction):**
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow._auto_chain_active true
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow._auto_chain_active true
 ```
 
 Proceed to Step 4 (skip Steps 3 and 5).
@@ -274,7 +274,7 @@ If "Keep exploring" — ask what they want to add, or identify gaps and probe na
 
 Loop until "Create PROJECT.md" selected.
 
-## 4. Write PROJECT.md
+## 4. write PROJECT.md
 
 **If auto mode:** Synthesize from provided document. No "Ready?" gate was shown — proceed directly to commit.
 
@@ -309,7 +309,7 @@ All Active requirements are hypotheses until shipped and validated.
 
 Infer Validated requirements from existing code:
 
-1. Read `.planning/codebase/ARCHITECTURE.md` and `STACK.md`
+1. read `.planning/codebase/ARCHITECTURE.md` and `STACK.md`
 2. Identify what the codebase already does
 3. These become the initial Validated set
 
@@ -378,7 +378,7 @@ Do not compress. Capture everything gathered.
 
 ```bash
 mkdir -p .planning
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: initialize project" --files .planning/PROJECT.md
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: initialize project" --files .planning/PROJECT.md
 ```
 
 ## 5. Workflow Preferences
@@ -495,9 +495,9 @@ questions: [
     question: "Which AI models for planning agents?",
     multiSelect: false,
     options: [
-      { label: "Balanced (Recommended)", description: "Sonnet for most agents — good quality/cost ratio" },
-      { label: "Quality", description: "Opus for research/roadmap — higher cost, deeper analysis" },
-      { label: "Budget", description: "Haiku where possible — fastest, lowest cost" },
+      { label: "Smart (Recommended)", description: "Two models: one for reseach and planing, other for execution and verification" },
+      { label: "Simple", description: Description: "One model for all agents (not flexible)" },
+      { label: "Genius (most flexible)", description: "Three models: different for every stage" },
       { label: "Inherit", description: "Use the current session model for all agents (OpenCode /model)" }
     ]
   }
@@ -508,7 +508,7 @@ Create `.planning/config.json` with all settings (CLI fills in remaining default
 
 ```bash
 mkdir -p .planning
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-new-project '{"mode":"[yolo|interactive]","granularity":"[selected]","parallelization":true|false,"commit_docs":true|false,"model_profile":"quality|balanced|budget|inherit","workflow":{"research":true|false,"plan_check":true|false,"verifier":true|false,"nyquist_validation":[false if granularity=coarse, true otherwise]}}'
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-new-project '{"mode":"[yolo|interactive]","granularity":"[selected]","parallelization":true|false,"commit_docs":true|false,"model_profile":"simple|smart|genius|inherit","workflow":{"research":true|false,"plan_check":true|false,"verifier":true|false,"nyquist_validation":[false if granularity=coarse, true otherwise]}}'
 ```
 
 **Note:** Run `/gsd-settings` anytime to update model profile, workflow agents, branching strategy, and other preferences.
@@ -525,7 +525,7 @@ node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" conf
 **Commit config.json:**
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "chore: add project config" --files .planning/config.json
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "chore: add project config" --files .planning/config.json
 ```
 
 ## 5.1. Sub-Repo Detection
@@ -614,7 +614,7 @@ Display spawning indicator:
 Spawn 4 parallel gsd-project-researcher agents with path references:
 
 ```
-Task(prompt="<research_type>
+task(prompt="<research_type>
 Project Research — Stack dimension for [domain].
 </research_type>
 
@@ -649,12 +649,12 @@ Your STACK.md feeds into roadmap creation. Be prescriptive:
 </quality_gate>
 
 <output>
-Write to: .planning/research/STACK.md
-Use template: D:/Data/桌面/vibe coding/.opencode/get-shit-done/templates/research-project/STACK.md
+write to: .planning/research/STACK.md
+Use template: ./.opencode/get-shit-done/templates/research-project/STACK.md
 </output>
 ", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Stack research")
 
-Task(prompt="<research_type>
+task(prompt="<research_type>
 Project Research — Features dimension for [domain].
 </research_type>
 
@@ -689,12 +689,12 @@ Your FEATURES.md feeds into requirements definition. Categorize clearly:
 </quality_gate>
 
 <output>
-Write to: .planning/research/FEATURES.md
-Use template: D:/Data/桌面/vibe coding/.opencode/get-shit-done/templates/research-project/FEATURES.md
+write to: .planning/research/FEATURES.md
+Use template: ./.opencode/get-shit-done/templates/research-project/FEATURES.md
 </output>
 ", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Features research")
 
-Task(prompt="<research_type>
+task(prompt="<research_type>
 Project Research — Architecture dimension for [domain].
 </research_type>
 
@@ -729,12 +729,12 @@ Your ARCHITECTURE.md informs phase structure in roadmap. Include:
 </quality_gate>
 
 <output>
-Write to: .planning/research/ARCHITECTURE.md
-Use template: D:/Data/桌面/vibe coding/.opencode/get-shit-done/templates/research-project/ARCHITECTURE.md
+write to: .planning/research/ARCHITECTURE.md
+Use template: ./.opencode/get-shit-done/templates/research-project/ARCHITECTURE.md
 </output>
 ", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Architecture research")
 
-Task(prompt="<research_type>
+task(prompt="<research_type>
 Project Research — Pitfalls dimension for [domain].
 </research_type>
 
@@ -769,8 +769,8 @@ Your PITFALLS.md prevents mistakes in roadmap/planning. For each pitfall:
 </quality_gate>
 
 <output>
-Write to: .planning/research/PITFALLS.md
-Use template: D:/Data/桌面/vibe coding/.opencode/get-shit-done/templates/research-project/PITFALLS.md
+write to: .planning/research/PITFALLS.md
+Use template: ./.opencode/get-shit-done/templates/research-project/PITFALLS.md
 </output>
 ", subagent_type="gsd-project-researcher", model="{researcher_model}", description="Pitfalls research")
 ```
@@ -778,7 +778,7 @@ Use template: D:/Data/桌面/vibe coding/.opencode/get-shit-done/templates/resea
 After all 4 agents complete, spawn synthesizer to create SUMMARY.md:
 
 ```
-Task(prompt="
+task(prompt="
 <task>
 Synthesize research outputs into SUMMARY.md.
 </task>
@@ -793,8 +793,8 @@ Synthesize research outputs into SUMMARY.md.
 ${AGENT_SKILLS_SYNTHESIZER}
 
 <output>
-Write to: .planning/research/SUMMARY.md
-Use template: D:/Data/桌面/vibe coding/.opencode/get-shit-done/templates/research-project/SUMMARY.md
+write to: .planning/research/SUMMARY.md
+Use template: ./.opencode/get-shit-done/templates/research-project/SUMMARY.md
 Commit after writing.
 </output>
 ", subagent_type="gsd-research-synthesizer", model="{synthesizer_model}", description="Synthesize research")
@@ -830,13 +830,13 @@ Display stage banner:
 
 **Load context:**
 
-Read PROJECT.md and extract:
+read PROJECT.md and extract:
 
 - Core value (the ONE thing that must work)
 - Stated constraints (budget, timeline, tech limitations)
 - Any explicit scope boundaries
 
-**If research exists:** Read research/FEATURES.md and extract feature categories.
+**If research exists:** read research/FEATURES.md and extract feature categories.
 
 **If auto mode:**
 
@@ -969,7 +969,7 @@ If "adjust": Return to scoping.
 **Commit requirements:**
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: define v1 requirements" --files .planning/REQUIREMENTS.md
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: define v1 requirements" --files .planning/REQUIREMENTS.md
 ```
 
 ## 8. Create Roadmap
@@ -987,7 +987,7 @@ Display stage banner:
 Spawn gsd-roadmapper agent with path references:
 
 ```
-Task(prompt="
+task(prompt="
 <planning_context>
 
 <files_to_read>
@@ -1007,10 +1007,10 @@ Create roadmap:
 2. Map every v1 requirement to exactly one phase
 3. Derive 2-5 success criteria per phase (observable user behaviors)
 4. Validate 100% coverage
-5. Write files immediately (ROADMAP.md, STATE.md, update REQUIREMENTS.md traceability)
+5. write files immediately (ROADMAP.md, STATE.md, update REQUIREMENTS.md traceability)
 6. Return ROADMAP CREATED with summary
 
-Write files first, then return. This ensures artifacts persist even if context is lost.
+write files first, then return. This ensures artifacts persist even if context is lost.
 </instructions>
 ", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Create roadmap")
 ```
@@ -1025,7 +1025,7 @@ Write files first, then return. This ensures artifacts persist even if context i
 
 **If `## ROADMAP CREATED`:**
 
-Read the created ROADMAP.md and present it nicely inline:
+read the created ROADMAP.md and present it nicely inline:
 
 ```
 ---
@@ -1084,7 +1084,7 @@ Use question:
 - Re-spawn roadmapper with revision context:
 
   ```
-  Task(prompt="
+  task(prompt="
   <revision>
   User feedback on roadmap:
   [user's notes]
@@ -1095,7 +1095,7 @@ Use question:
 
   ${AGENT_SKILLS_ROADMAPPER}
 
-  Update the roadmap based on feedback. Edit files in place.
+  Update the roadmap based on feedback. edit files in place.
   Return ROADMAP REVISED with changes made.
   </revision>
   ", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Revise roadmap")
@@ -1109,7 +1109,7 @@ Use question:
 **Generate or refresh project AGENTS.md before final commit:**
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" generate-claude-md
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" generate-OpenCode-md
 ```
 
 This ensures new projects get the default GSD workflow-enforcement guidance and current project context in `AGENTS.md`.
@@ -1117,7 +1117,7 @@ This ensures new projects get the default GSD workflow-enforcement guidance and 
 **Commit roadmap (after approval or auto mode):**
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: create roadmap ([N] phases)" --files .planning/ROADMAP.md .planning/STATE.md .planning/REQUIREMENTS.md AGENTS.md
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: create roadmap ([N] phases)" --files .planning/ROADMAP.md .planning/STATE.md .planning/REQUIREMENTS.md AGENTS.md
 ```
 
 ## 9. Done
@@ -1151,14 +1151,14 @@ Present completion summary:
 ╚══════════════════════════════════════════╝
 ```
 
-Exit skill and invoke skill("/gsd-discuss-phase 1 --auto")
+Exit skill and invoke command("/gsd-discuss-phase 1 --auto")
 
 **If interactive mode:**
 
 Check if Phase 1 has UI indicators (look for `**UI hint**: yes` in Phase 1 detail section of ROADMAP.md):
 
 ```bash
-PHASE1_SECTION=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase 1 2>/dev/null)
+PHASE1_SECTION=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase 1 2>/dev/null)
 PHASE1_HAS_UI=$(echo "$PHASE1_SECTION" | grep -qi "UI hint.*yes" && echo "true" || echo "false")
 ```
 
@@ -1173,7 +1173,7 @@ PHASE1_HAS_UI=$(echo "$PHASE1_SECTION" | grep -qi "UI hint.*yes" && echo "true" 
 
 /gsd-discuss-phase 1 — gather context and clarify approach
 
-<sub>/clear first → fresh context window</sub>
+*/new first → fresh context window*
 
 ---
 
@@ -1195,7 +1195,7 @@ PHASE1_HAS_UI=$(echo "$PHASE1_SECTION" | grep -qi "UI hint.*yes" && echo "true" 
 
 /gsd-discuss-phase 1 — gather context and clarify approach
 
-<sub>/clear first → fresh context window</sub>
+*/new first → fresh context window*
 
 ---
 

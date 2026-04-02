@@ -1,16 +1,16 @@
-<purpose>
+<objective>
 Orchestrate the full developer profiling flow: consent, session analysis (or questionnaire fallback), profile generation, result display, and artifact creation.
 
 This workflow wires Phase 1 (session pipeline) and Phase 2 (profiling engine) into a cohesive user-facing experience. All heavy lifting is done by existing gsd-tools.cjs subcommands and the gsd-user-profiler agent -- this workflow orchestrates the sequence, handles branching, and provides the UX.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 
 Key references:
-- @D:/Data/桌面/vibe coding/.opencode/get-shit-done/references/ui-brand.md (display patterns)
-- @D:/Data/桌面/vibe coding/.opencode/get-shit-done/agents/gsd-user-profiler.md (profiler agent definition)
-- @D:/Data/桌面/vibe coding/.opencode/get-shit-done/references/user-profiling.md (profiling reference doc)
+- @./.opencode/get-shit-done/references/ui-brand.md (display patterns)
+- @./.opencode/get-shit-done/agents/gsd-user-profiler.md (profiler agent definition)
+- @./.opencode/get-shit-done/references/user-profiling.md (profiling reference doc)
 </required_reading>
 
 <process>
@@ -24,7 +24,7 @@ Parse flags from $ARGUMENTS:
 Check for existing profile:
 
 ```bash
-PROFILE_PATH="D:/Data/桌面/vibe coding/.opencode/get-shit-done/USER-PROFILE.md"
+PROFILE_PATH="./.opencode/get-shit-done/USER-PROFILE.md"
 [ -f "$PROFILE_PATH" ] && echo "EXISTS" || echo "NOT_FOUND"
 ```
 
@@ -38,7 +38,7 @@ Use question:
   - "Refresh it" -- Continue with --refresh behavior
   - "Cancel" -- Exit workflow
 
-If "View it": Read USER-PROFILE.md, display its content formatted as a summary card, then exit.
+If "View it": read USER-PROFILE.md, display its content formatted as a summary card, then exit.
 If "Refresh it": Set --refresh behavior and continue.
 If "Cancel": Display "No changes made." and exit.
 
@@ -46,7 +46,7 @@ If "Cancel": Display "No changes made." and exit.
 
 Backup existing profile:
 ```bash
-cp "D:/Data/桌面/vibe coding/.opencode/get-shit-done/USER-PROFILE.md" "D:/Data/桌面/vibe coding/.opencode/get-shit-done/USER-PROFILE.backup.md"
+cp "./.opencode/get-shit-done/USER-PROFILE.md" "./.opencode/get-shit-done/USER-PROFILE.backup.md"
 ```
 
 Display: "Re-analyzing your sessions to update your profile."
@@ -67,12 +67,12 @@ Display consent screen:
  GSD > PROFILE YOUR CODING STYLE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-the agent starts every conversation generic. A profile teaches the agent
+OpenCode starts every conversation generic. A profile teaches OpenCode
 how YOU actually work -- not how you think you work.
 
 ## What We'll Analyze
 
-Your recent Claude Code sessions, looking for patterns in these
+Your recent OpenCode sessions, looking for patterns in these
 8 behavioral dimensions:
 
 | Dimension            | What It Measures                            |
@@ -83,14 +83,14 @@ Your recent Claude Code sessions, looking for patterns in these
 | Debugging Approach   | How you tackle errors and bugs               |
 | UX Philosophy        | How much you care about design vs. function  |
 | Vendor Philosophy    | How you evaluate libraries and tools         |
-| Frustration Triggers | What makes you correct the agent                |
+| Frustration Triggers | What makes you correct OpenCode                |
 | Learning Style       | How you prefer to learn new things           |
 
 ## Data Handling
 
 ✓ Reads session files locally (read-only, nothing modified)
 ✓ Analyzes message patterns (not content meaning)
-✓ Stores profile at D:/Data/桌面/vibe coding/.opencode/get-shit-done/USER-PROFILE.md
+✓ Stores profile at ./.opencode/get-shit-done/USER-PROFILE.md
 ✗ Nothing is sent to external services
 ✗ Sensitive content (API keys, passwords) is automatically excluded
 ```
@@ -128,7 +128,7 @@ Display: "◆ Scanning sessions..."
 
 Run session scan:
 ```bash
-SCAN_RESULT=$(node D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs scan-sessions --json 2>/dev/null)
+SCAN_RESULT=$(node ./.opencode/get-shit-done/bin/gsd-tools.cjs scan-sessions --json 2>/dev/null)
 ```
 
 Parse the JSON output to get session count and project count.
@@ -148,7 +148,7 @@ Display: "◆ Sampling messages..."
 
 Run profile sampling:
 ```bash
-SAMPLE_RESULT=$(node D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs profile-sample --json 2>/dev/null)
+SAMPLE_RESULT=$(node ./.opencode/get-shit-done/bin/gsd-tools.cjs profile-sample --json 2>/dev/null)
 ```
 
 Parse the JSON output to get the temp directory path and message count.
@@ -157,17 +157,17 @@ Display: "✓ Sampled N messages from M projects"
 
 Display: "◆ Analyzing patterns..."
 
-**Spawn gsd-user-profiler agent using Task tool:**
+**Spawn gsd-user-profiler agent using task tool:**
 
-Use the Task tool to spawn the `gsd-user-profiler` agent. Provide it with:
+Use the task tool to spawn the `gsd-user-profiler` agent. Provide it with:
 - The sampled JSONL file path from profile-sample output
-- The user-profiling reference doc at `D:/Data/桌面/vibe coding/.opencode/get-shit-done/references/user-profiling.md`
+- The user-profiling reference doc at `./.opencode/get-shit-done/references/user-profiling.md`
 
 The agent prompt should follow this structure:
 ```
-Read the profiling reference document and the sampled session messages, then analyze the developer's behavioral patterns across all 8 dimensions.
+read the profiling reference document and the sampled session messages, then analyze the developer's behavioral patterns across all 8 dimensions.
 
-Reference: @D:/Data/桌面/vibe coding/.opencode/get-shit-done/references/user-profiling.md
+Reference: @./.opencode/get-shit-done/references/user-profiling.md
 Session data: @{temp_dir}/profile-sample.jsonl
 
 Analyze these messages and return your analysis in the <analysis> JSON format specified in the reference document.
@@ -181,12 +181,12 @@ Analyze these messages and return your analysis in the <analysis> JSON format sp
 ANALYSIS_PATH="{temp_dir}/analysis.json"
 ```
 
-Write the analysis JSON to `$ANALYSIS_PATH`.
+write the analysis JSON to `$ANALYSIS_PATH`.
 
 Display: "✓ Analysis complete (N dimensions scored)"
 
 **Check for thin data:**
-- Read the analysis JSON and check the total message count
+- read the analysis JSON and check the total message count
 - If < 50 messages were analyzed: Note that a questionnaire supplement could improve accuracy. Display: "Note: Limited session data (N messages). Results may have lower confidence."
 
 Continue to step 5.
@@ -199,7 +199,7 @@ Display: "Using questionnaire to build your profile."
 
 **Get questions:**
 ```bash
-QUESTIONS=$(node D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs profile-questionnaire --json 2>/dev/null)
+QUESTIONS=$(node ./.opencode/get-shit-done/bin/gsd-tools.cjs profile-questionnaire --json 2>/dev/null)
 ```
 
 Parse the questions JSON. It contains 8 questions, one per dimension.
@@ -218,11 +218,11 @@ Collect all answers into an answers JSON object mapping dimension keys to select
 ANSWERS_PATH=$(mktemp /tmp/gsd-profile-answers-XXXXXX.json)
 ```
 
-Write the answers JSON to `$ANSWERS_PATH`.
+write the answers JSON to `$ANSWERS_PATH`.
 
 **Convert answers to analysis:**
 ```bash
-ANALYSIS_RESULT=$(node D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs profile-questionnaire --answers "$ANSWERS_PATH" --json 2>/dev/null)
+ANALYSIS_RESULT=$(node ./.opencode/get-shit-done/bin/gsd-tools.cjs profile-questionnaire --answers "$ANSWERS_PATH" --json 2>/dev/null)
 ```
 
 Parse the analysis JSON from the result.
@@ -232,7 +232,7 @@ Save analysis JSON to a temp file:
 ANALYSIS_PATH=$(mktemp /tmp/gsd-profile-analysis-XXXXXX.json)
 ```
 
-Write the analysis JSON to `$ANALYSIS_PATH`.
+write the analysis JSON to `$ANALYSIS_PATH`.
 
 Continue to step 5 (skip split resolution since questionnaire handles ambiguity internally).
 
@@ -242,7 +242,7 @@ Continue to step 5 (skip split resolution since questionnaire handles ambiguity 
 
 **Skip if** questionnaire-only path (splits already handled internally).
 
-Read the analysis JSON from `$ANALYSIS_PATH`.
+read the analysis JSON from `$ANALYSIS_PATH`.
 
 Check each dimension for `cross_project_consistent: false`.
 
@@ -260,25 +260,25 @@ Use question:
 
 **If user picks "Context-dependent":** Keep the dominant rating in the `rating` field. Add a `context_note` to the dimension's summary describing the split (e.g., "Context-dependent: terse in CLI projects, detailed in frontend projects").
 
-Write updated analysis JSON back to `$ANALYSIS_PATH`.
+write updated analysis JSON back to `$ANALYSIS_PATH`.
 
 ---
 
-## 6. Profile Write
+## 6. Profile write
 
 Display: "◆ Writing profile..."
 
 ```bash
-node D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs write-profile --input "$ANALYSIS_PATH" --json 2>/dev/null
+node ./.opencode/get-shit-done/bin/gsd-tools.cjs write-profile --input "$ANALYSIS_PATH" --json 2>/dev/null
 ```
 
-Display: "✓ Profile written to D:/Data/桌面/vibe coding/.opencode/get-shit-done/USER-PROFILE.md"
+Display: "✓ Profile written to ./.opencode/get-shit-done/USER-PROFILE.md"
 
 ---
 
 ## 7. Result Display
 
-Read the analysis JSON from `$ANALYSIS_PATH` to build the display.
+read the analysis JSON from `$ANALYSIS_PATH` to build the display.
 
 **Show report card table:**
 
@@ -310,7 +310,7 @@ Pick 3-4 dimensions with the highest confidence and most evidence signals. Forma
   headers and problem statements before making requests
 - **Vendor Choices (HIGH):** You research alternatives thoroughly -- comparing
   docs, GitHub activity, and bundle sizes before committing
-- **Frustrations (MEDIUM):** You correct the agent most often for doing things
+- **Frustrations (MEDIUM):** You correct OpenCode most often for doing things
   you didn't ask for -- scope creep is your primary trigger
 ```
 
@@ -322,7 +322,7 @@ Use question:
 - header: "Profile"
 - question: "Want to see the full profile?"
 - options:
-  - "Yes" -- Read and display the full USER-PROFILE.md content, then continue to step 8
+  - "Yes" -- read and display the full USER-PROFILE.md content, then continue to step 8
   - "Continue to artifacts" -- Proceed directly to step 8
 
 ---
@@ -335,9 +335,9 @@ Use question with multiSelect:
 - options (ALL pre-selected by default):
   - "/gsd-dev-preferences command file" -- "Load your preferences in any session"
   - "AGENTS.md profile section" -- "Add profile to this project's AGENTS.md"
-  - "Global AGENTS.md" -- "Add profile to D:/Data/桌面/vibe coding/.opencode/AGENTS.md for all projects"
+  - "Global AGENTS.md" -- "Add profile to $HOME/.OpenCode/AGENTS.md for all projects"
 
-**If no artifacts selected:** Display "No artifacts generated. Your profile is saved at D:/Data/桌面/vibe coding/.opencode/get-shit-done/USER-PROFILE.md" and jump to step 10.
+**If no artifacts selected:** Display "No artifacts generated. Your profile is saved at ./.opencode/get-shit-done/USER-PROFILE.md" and jump to step 10.
 
 ---
 
@@ -348,15 +348,15 @@ Generate selected artifacts sequentially (file I/O is fast, no benefit from para
 **For /gsd-dev-preferences (if selected):**
 
 ```bash
-node D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs generate-dev-preferences --analysis "$ANALYSIS_PATH" --json 2>/dev/null
+node ./.opencode/get-shit-done/bin/gsd-tools.cjs generate-dev-preferences --analysis "$ANALYSIS_PATH" --json 2>/dev/null
 ```
 
-Display: "✓ Generated /gsd-dev-preferences at D:/Data/桌面/vibe coding/.opencode/commands/gsd/dev-preferences.md"
+Display: "✓ Generated /gsd-dev-preferences at $HOME/.OpenCode/commands/gsd/dev-preferences.md"
 
 **For AGENTS.md profile section (if selected):**
 
 ```bash
-node D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs generate-claude-profile --analysis "$ANALYSIS_PATH" --json 2>/dev/null
+node ./.opencode/get-shit-done/bin/gsd-tools.cjs generate-OpenCode-profile --analysis "$ANALYSIS_PATH" --json 2>/dev/null
 ```
 
 Display: "✓ Added profile section to AGENTS.md"
@@ -364,10 +364,10 @@ Display: "✓ Added profile section to AGENTS.md"
 **For Global AGENTS.md (if selected):**
 
 ```bash
-node D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs generate-claude-profile --analysis "$ANALYSIS_PATH" --global --json 2>/dev/null
+node ./.opencode/get-shit-done/bin/gsd-tools.cjs generate-OpenCode-profile --analysis "$ANALYSIS_PATH" --global --json 2>/dev/null
 ```
 
-Display: "✓ Added profile section to D:/Data/桌面/vibe coding/.opencode/AGENTS.md"
+Display: "✓ Added profile section to $HOME/.OpenCode/AGENTS.md"
 
 **Error handling:** If any gsd-tools.cjs call fails, display the error message and use question to offer "Retry" or "Skip this artifact". On retry, re-run the command. On skip, continue to next artifact.
 
@@ -377,11 +377,11 @@ Display: "✓ Added profile section to D:/Data/桌面/vibe coding/.opencode/AGEN
 
 **If --refresh path:**
 
-Read both old backup and new analysis to compare dimension ratings/confidence.
+read both old backup and new analysis to compare dimension ratings/confidence.
 
-Read the backed-up profile:
+read the backed-up profile:
 ```bash
-BACKUP_PATH="D:/Data/桌面/vibe coding/.opencode/get-shit-done/USER-PROFILE.backup.md"
+BACKUP_PATH="./.opencode/get-shit-done/USER-PROFILE.backup.md"
 ```
 
 Compare each dimension's rating and confidence between old and new. Display diff table showing only changed dimensions:
@@ -404,15 +404,15 @@ If nothing changed: Display "No changes detected -- your profile is already up t
  GSD > PROFILE COMPLETE ✓
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Your profile:    D:/Data/桌面/vibe coding/.opencode/get-shit-done/USER-PROFILE.md
+Your profile:    ./.opencode/get-shit-done/USER-PROFILE.md
 ```
 
 Then list paths for each generated artifact:
 ```
 Artifacts:
-  ✓ /gsd-dev-preferences   D:/Data/桌面/vibe coding/.opencode/commands/gsd/dev-preferences.md
+  ✓ /gsd-dev-preferences   $HOME/.OpenCode/commands/gsd/dev-preferences.md
   ✓ AGENTS.md section       ./AGENTS.md
-  ✓ Global AGENTS.md        D:/Data/桌面/vibe coding/.opencode/AGENTS.md
+  ✓ Global AGENTS.md        $HOME/.OpenCode/AGENTS.md
 ```
 
 (Only show artifacts that were actually generated.)

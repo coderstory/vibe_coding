@@ -247,9 +247,9 @@ function cmdPhasePlanIndex(cwd, phase, raw) {
     const content = fs.readFileSync(planPath, 'utf-8');
     const fm = extractFrontmatter(content);
 
-    // Count tasks: XML <task> tags (canonical) or ## Task N markdown (legacy)
+    // Count tasks: XML <task> tags (canonical) or ## task N markdown (legacy)
     const xmlTasks = content.match(/<task[\s>]/gi) || [];
-    const mdTasks = content.match(/##\s*Task\s*\d+/gi) || [];
+    const mdTasks = content.match(/##\s*task\s*\d+/gi) || [];
     const taskCount = xmlTasks.length || mdTasks.length;
 
     // Parse wave as integer
@@ -354,7 +354,7 @@ function cmdPhaseAdd(cwd, description, raw, customId) {
 
   // Build phase entry
   const dependsOn = config.phase_naming === 'custom' ? '' : `\n**Depends on:** Phase ${typeof newPhaseId === 'number' ? newPhaseId - 1 : 'TBD'}`;
-  const phaseEntry = `\n### Phase ${newPhaseId}: ${description}\n\n**Goal:** [To be planned]\n**Requirements**: TBD${dependsOn}\n**Plans:** 0 plans\n\nPlans:\n- [ ] TBD (run /gsd:plan-phase ${newPhaseId} to break down)\n`;
+  const phaseEntry = `\n### Phase ${newPhaseId}: ${description}\n\n**Goal:** [To be planned]\n**Requirements**: TBD${dependsOn}\n**Plans:** 0 plans\n\nPlans:\n- [ ] TBD (run /gsd-plan-phase ${newPhaseId} to break down)\n`;
 
   // Find insertion point: before last "---" or at end
   let updatedContent;
@@ -427,7 +427,7 @@ function cmdPhaseInsert(cwd, afterPhase, description, raw) {
   fs.writeFileSync(path.join(dirPath, '.gitkeep'), '');
 
   // Build phase entry
-  const phaseEntry = `\n### Phase ${decimalPhase}: ${description} (INSERTED)\n\n**Goal:** [Urgent work - to be planned]\n**Requirements**: TBD\n**Depends on:** Phase ${afterPhase}\n**Plans:** 0 plans\n\nPlans:\n- [ ] TBD (run /gsd:plan-phase ${decimalPhase} to break down)\n`;
+  const phaseEntry = `\n### Phase ${decimalPhase}: ${description} (INSERTED)\n\n**Goal:** [Urgent work - to be planned]\n**Requirements**: TBD\n**Depends on:** Phase ${afterPhase}\n**Plans:** 0 plans\n\nPlans:\n- [ ] TBD (run /gsd-plan-phase ${decimalPhase} to break down)\n`;
 
   // Insert after the target phase section
   const headerPattern = new RegExp(`(#{2,4}\\s*Phase\\s+0*${afterPhaseEscaped}:[^\\n]*\\n)`, 'i');

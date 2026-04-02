@@ -1,7 +1,7 @@
 /**
  * Profile Pipeline — session scanning, message extraction, and sampling
  *
- * Reads Claude Code session history (read-only) to extract user messages
+ * Reads OpenCode session history (read-only) to extract user messages
  * for behavioral profiling. Three commands:
  *   - scan-sessions: list all projects and sessions
  *   - extract-messages: extract user messages from a specific project
@@ -17,7 +17,7 @@ const { output, error, safeReadFile, reapStaleTempFiles } = require('./core.cjs'
 // ─── Session I/O Helpers ──────────────────────────────────────────────────────
 
 function getSessionsDir(overridePath) {
-  const dir = overridePath || path.join(os.homedir(), '.claude', 'projects');
+  const dir = overridePath || path.join(os.homedir(), '.OpenCode', 'projects');
   if (!fs.existsSync(dir)) return null;
   return dir;
 }
@@ -159,8 +159,8 @@ async function streamExtractMessages(filePath, filterFn, maxMessages = 300) {
 async function cmdScanSessions(overridePath, options, raw) {
   const sessionsDir = getSessionsDir(overridePath);
   if (!sessionsDir) {
-    const searchedPath = overridePath || '~/.claude/projects';
-    error(`No Claude Code sessions found at ${searchedPath}.${overridePath ? '' : ' Is Claude Code installed?'}`);
+    const searchedPath = overridePath || '$HOME/.config/opencode/projects';
+    error(`No OpenCode sessions found at ${searchedPath}.${overridePath ? '' : ' Is OpenCode installed?'}`);
   }
 
   process.stderr.write('Reading your session history (read-only, nothing is modified or sent anywhere)...\n');
@@ -251,8 +251,8 @@ async function cmdScanSessions(overridePath, options, raw) {
 async function cmdExtractMessages(projectArg, options, raw, overridePath) {
   const sessionsDir = getSessionsDir(overridePath);
   if (!sessionsDir) {
-    const searchedPath = overridePath || '~/.claude/projects';
-    error(`No Claude Code sessions found at ${searchedPath}.${overridePath ? '' : ' Is Claude Code installed?'}`);
+    const searchedPath = overridePath || '$HOME/.config/opencode/projects';
+    error(`No OpenCode sessions found at ${searchedPath}.${overridePath ? '' : ' Is OpenCode installed?'}`);
   }
 
   let projectDirs;
@@ -392,8 +392,8 @@ async function cmdExtractMessages(projectArg, options, raw, overridePath) {
 async function cmdProfileSample(overridePath, options, raw) {
   const sessionsDir = getSessionsDir(overridePath);
   if (!sessionsDir) {
-    const searchedPath = overridePath || '~/.claude/projects';
-    error(`No Claude Code sessions found at ${searchedPath}.${overridePath ? '' : ' Is Claude Code installed?'}`);
+    const searchedPath = overridePath || '$HOME/.config/opencode/projects';
+    error(`No OpenCode sessions found at ${searchedPath}.${overridePath ? '' : ' Is OpenCode installed?'}`);
   }
 
   process.stderr.write('Reading your session history (read-only, nothing is modified or sent anywhere)...\n');

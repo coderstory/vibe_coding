@@ -16,7 +16,7 @@ verification. Users should never be told to run `/gsd-transition`.
 
 <required_reading>
 
-**Read these files NOW:**
+**read these files NOW:**
 
 1. `.planning/STATE.md`
 2. `.planning/PROJECT.md`
@@ -26,13 +26,13 @@ verification. Users should never be told to run `/gsd-transition`.
 
 </required_reading>
 
-<purpose>
+<objective>
 
 Mark current phase complete and advance to next. This is the natural point where progress tracking and PROJECT.md evolution happen.
 
 "Planning next phase" = "current phase is done"
 
-</purpose>
+</objective>
 
 <process>
 
@@ -163,7 +163,7 @@ If found, delete them — phase is complete, handoffs are stale.
 **Delegate ROADMAP.md and STATE.md updates to gsd-tools:**
 
 ```bash
-TRANSITION=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" phase complete "${current_phase}")
+TRANSITION=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" phase complete "${current_phase}")
 ```
 
 The CLI handles:
@@ -188,7 +188,7 @@ The `completed/` subfolder pattern from create-meta-prompts handles archival.
 
 Evolve PROJECT.md to reflect learnings from completed phase.
 
-**Read phase summaries:**
+**read phase summaries:**
 
 ```bash
 cat .planning/phases/XX-current/*-SUMMARY.md
@@ -278,7 +278,7 @@ After (Phase 2 shipped JWT auth, discovered rate limiting needed):
 Verify the updates are correct by reading STATE.md. If the progress bar needs updating, use:
 
 ```bash
-PROGRESS=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" progress bar --raw)
+PROGRESS=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" progress bar --raw)
 ```
 
 Update the progress bar line in STATE.md with the result.
@@ -387,7 +387,7 @@ The `next_phase` and `next_phase_name` fields give you the next phase details.
 
 If you need additional context, use:
 ```bash
-ROADMAP=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap analyze)
+ROADMAP=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap analyze)
 ```
 
 This returns all phases with goals, disk status, and completion info.
@@ -406,7 +406,7 @@ In flat mode, go directly to **Route B**.
 ```bash
 # Only check if we're in workstream mode
 if [ -n "$GSD_WORKSTREAM" ]; then
-  WS_LIST=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" workstream list --raw)
+  WS_LIST=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" workstream list --raw)
 fi
 ```
 
@@ -424,7 +424,7 @@ The remaining entries are **other active workstreams**.
 
 **Route A: More phases remain in milestone**
 
-Read ROADMAP.md to get the next phase's name and goal.
+read ROADMAP.md to get the next phase's name and goal.
 
 **Check if next phase has CONTEXT.md:**
 
@@ -446,7 +446,7 @@ Next: Phase [X+1] — [Name]
 ⚡ Auto-continuing: Plan Phase [X+1] in detail
 ```
 
-Exit skill and invoke skill("/gsd-plan-phase [X+1] --auto ${GSD_WS}")
+Exit skill and invoke command("/gsd-plan-phase [X+1] --auto ${GSD_WS}")
 
 **If CONTEXT.md does NOT exist:**
 
@@ -458,7 +458,7 @@ Next: Phase [X+1] — [Name]
 ⚡ Auto-continuing: Discuss Phase [X+1] first
 ```
 
-Exit skill and invoke skill("/gsd-discuss-phase [X+1] --auto ${GSD_WS}")
+Exit skill and invoke command("/gsd-discuss-phase [X+1] --auto ${GSD_WS}")
 
 </if>
 
@@ -477,7 +477,7 @@ Exit skill and invoke skill("/gsd-discuss-phase [X+1] --auto ${GSD_WS}")
 
 `/gsd-discuss-phase [X+1] ${GSD_WS}` — gather context and clarify approach
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 
@@ -498,11 +498,11 @@ Exit skill and invoke skill("/gsd-discuss-phase [X+1] --auto ${GSD_WS}")
 ## ▶ Next Up
 
 **Phase [X+1]: [Name]** — [Goal from ROADMAP.md]
-<sub>✓ Context gathered, ready to plan</sub>
+*✓ Context gathered, ready to plan*
 
 `/gsd-plan-phase [X+1] ${GSD_WS}`
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 
@@ -526,7 +526,7 @@ to the next milestone — other workstreams are still working.
 **Clear auto-advance chain flag** — workstream boundary is the natural stopping point:
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow._auto_chain_active false
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow._auto_chain_active false
 ```
 
 <if mode="yolo">
@@ -560,7 +560,7 @@ See overall milestone progress:
 
 `/gsd-workstreams progress ${GSD_WS}`
 
-<sub>Milestone completion will be available once all workstreams finish.</sub>
+*Milestone completion will be available once all workstreams finish.*
 
 ---
 ```
@@ -580,7 +580,7 @@ Do NOT auto-invoke any further slash commands.
 **Clear auto-advance chain flag** — milestone boundary is the natural stopping point:
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow._auto_chain_active false
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow._auto_chain_active false
 ```
 
 <if mode="yolo">
@@ -593,7 +593,7 @@ Phase {X} marked complete.
 ⚡ Auto-continuing: Complete milestone and archive
 ```
 
-Exit skill and invoke skill("/gsd-complete-milestone {version} ${GSD_WS}")
+Exit skill and invoke command("/gsd-complete-milestone {version} ${GSD_WS}")
 
 </if>
 
@@ -612,7 +612,7 @@ Exit skill and invoke skill("/gsd-complete-milestone {version} ${GSD_WS}")
 
 `/gsd-complete-milestone {version} ${GSD_WS}`
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 

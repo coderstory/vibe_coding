@@ -1,6 +1,6 @@
-<purpose>
+<objective>
 Execute all plans in a phase using wave-based parallel execution. Orchestrator stays lean — delegates plan execution to subagents.
-</purpose>
+</objective>
 
 <core_principle>
 Orchestrator coordinates, not executes. Each subagent loads the full execute-plan context. Orchestrator: discover plans → analyze deps → group waves → spawn agents → handle checkpoints → collect results.
@@ -8,13 +8,13 @@ Orchestrator coordinates, not executes. Each subagent loads the full execute-pla
 
 <runtime_compatibility>
 **Subagent spawning is runtime-specific:**
-- **Claude Code:** Uses `Task(subagent_type="gsd-executor", ...)` — blocks until complete, returns result
+- **OpenCode:** Uses `task(subagent_type="gsd-executor", ...)` — blocks until complete, returns result
 - **Copilot:** Subagent spawning does not reliably return completion signals. **Default to
   sequential inline execution**: read and follow execute-plan.md directly for each plan
   instead of spawning parallel agents. Only attempt parallel spawning if the user
   explicitly requests it — and in that case, rely on the spot-check fallback in step 3
   to detect completion.
-- **Other runtimes:** If `Task`/`task` tool is unavailable, use sequential inline execution as the
+- **Other runtimes:** If `task`/`task` tool is unavailable, use sequential inline execution as the
   fallback. Check for tool availability at runtime rather than assuming based on runtime name.
 
 **Fallback rule:** If a spawned agent completes its work (commits visible, SUMMARY.md exists) but
@@ -24,12 +24,12 @@ via filesystem and git state.
 </runtime_compatibility>
 
 <required_reading>
-Read STATE.md before any operation to load project context.
+read STATE.md before any operation to load project context.
 </required_reading>
 
 <available_agent_types>
-These are the valid GSD subagent types registered in .claude/agents/ (or equivalent for your runtime).
-Always use the exact name from this list — do not fall back to 'general-purpose' or other built-in types:
+These are the valid GSD subagent types registered in .OpenCode/agents/ (or equivalent for your runtime).
+Always use the exact name from this list — do not fall back to 'general' or other built-in types:
 
 - gsd-executor — Executes plan tasks, commits, creates SUMMARY.md
 - gsd-verifier — Verifies phase completion, checks quality gates
@@ -61,9 +61,9 @@ If `--wave` is absent, preserve the current behavior of executing all incomplete
 Load all context in one call:
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init execute-phase "${PHASE_ARG}")
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init execute-phase "${PHASE_ARG}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-executor 2>/dev/null)
+AGENT_SKILLS=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-executor 2>/dev/null)
 ```
 
 Parse JSON for: `executor_model`, `verifier_model`, `commit_docs`, `parallelization`, `branching_strategy`, `branch_name`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `plans`, `incomplete_plans`, `plan_count`, `incomplete_count`, `state_exists`, `roadmap_exists`, `phase_req_ids`.
@@ -76,7 +76,7 @@ When `parallelization` is false, plans within a wave execute sequentially.
 
 **Runtime detection for Copilot:**
 Check if the current runtime is Copilot by testing for the `@gsd-executor` agent pattern
-or absence of the `Task()` subagent API. If running under Copilot, force sequential inline
+or absence of the `task()` subagent API. If running under Copilot, force sequential inline
 execution regardless of the `parallelization` setting — Copilot's subagent completion
 signals are unreliable (see `<runtime_compatibility>`). Set `COPILOT_SEQUENTIAL=true`
 internally and skip the `execute_waves` step in favor of `check_interactive_mode`'s
@@ -86,7 +86,7 @@ inline path for each plan.
 ```bash
 # REQUIRED: prevents stale auto-chain from previous --auto runs
 if [[ ! "$ARGUMENTS" =~ --auto ]]; then
-  node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow._auto_chain_active false 2>/dev/null
+  node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow._auto_chain_active false 2>/dev/null
 fi
 ```
 </step>
@@ -118,9 +118,9 @@ checkpoints between tasks. The user can review, modify, or redirect work at any 
       - Stop (end execution, save progress)
       ```
 
-   b. **If "Review first":** Read and display the full plan file. Ask again: Execute, Modify, Skip.
+   b. **If "Review first":** read and display the full plan file. Ask again: Execute, Modify, Skip.
 
-   c. **If "Execute":** Read and follow `D:/Data/桌面/vibe coding/.opencode/get-shit-done/workflows/execute-plan.md` **inline**
+   c. **If "Execute":** read and follow `./.opencode/get-shit-done/workflows/execute-plan.md` **inline**
       (do NOT spawn a subagent). Execute tasks one at a time.
 
    d. **After each task:** Pause briefly. If the user intervenes (types anything), stop and address
@@ -159,7 +159,7 @@ Report: "Found {plan_count} plans in {phase_dir} ({incomplete_count} incomplete)
 
 **Update STATE.md for phase start:**
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" state begin-phase --phase "${PHASE_NUMBER}" --name "${PHASE_NAME}" --plans "${PLAN_COUNT}"
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" state begin-phase --phase "${PHASE_NUMBER}" --name "${PHASE_NAME}" --plans "${PLAN_COUNT}"
 ```
 This updates Status, Last Activity, Current focus, Current Position, and plan counts in STATE.md so frontmatter and body text reflect the active phase immediately.
 </step>
@@ -168,7 +168,7 @@ This updates Status, Last Activity, Current focus, Current Position, and plan co
 Load plan inventory with wave grouping in one call:
 
 ```bash
-PLAN_INDEX=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" phase-plan-index "${PHASE_NUMBER}")
+PLAN_INDEX=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" phase-plan-index "${PHASE_NUMBER}")
 ```
 
 Parse JSON for: `phase`, `plans[]` (each with `id`, `wave`, `autonomous`, `objective`, `files_modified`, `task_count`, `has_summary`), `waves` (map of wave number → plan IDs), `incomplete`, `has_checkpoints`.
@@ -201,7 +201,7 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
 
 1. **Describe what's being built (BEFORE spawning):**
 
-   Read each plan's `<objective>`. Extract what's being built and why.
+   read each plan's `<objective>`. Extract what's being built and why.
 
    ```
    ---
@@ -224,7 +224,7 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
    For 1M+ models (Opus 4.6, Sonnet 4.6), richer context can be passed directly.
 
    ```
-   Task(
+   task(
      subagent_type="gsd-executor",
      model="{executor_model}",
      isolation="worktree",
@@ -243,29 +243,29 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
        </parallel_execution>
 
        <execution_context>
-       @D:/Data/桌面/vibe coding/.opencode/get-shit-done/workflows/execute-plan.md
-       @D:/Data/桌面/vibe coding/.opencode/get-shit-done/templates/summary.md
-       @D:/Data/桌面/vibe coding/.opencode/get-shit-done/references/checkpoints.md
-       @D:/Data/桌面/vibe coding/.opencode/get-shit-done/references/tdd.md
+       @./.opencode/get-shit-done/workflows/execute-plan.md
+       @./.opencode/get-shit-done/templates/summary.md
+       @./.opencode/get-shit-done/references/checkpoints.md
+       @./.opencode/get-shit-done/references/tdd.md
        </execution_context>
 
        <files_to_read>
-       Read these files at execution start using the Read tool:
+       read these files at execution start using the read tool:
        - {phase_dir}/{plan_file} (Plan)
        - .planning/PROJECT.md (Project context — core value, requirements, evolution rules)
        - .planning/STATE.md (State)
        - .planning/config.json (Config, if exists)
        - ./AGENTS.md (Project instructions, if exists — follow project-specific guidelines and coding conventions)
-       - .claude/skills/ or .agents/skills/ (Project skills, if either exists — list skills, read SKILL.md for each, follow relevant rules during implementation)
+       - .OpenCode/skills/ or .agents/skills/ (Project skills, if either exists — list skills, read SKILL.md for each, follow relevant rules during implementation)
        </files_to_read>
 
        ${AGENT_SKILLS}
 
        <mcp_tools>
        If AGENTS.md or project instructions reference MCP tools (e.g. jCodeMunch, context7,
-       or other MCP servers), prefer those tools over Grep/Glob for code navigation when available.
+       or other MCP servers), prefer those tools over grep/glob for code navigation when available.
        MCP tools often save significant tokens by providing structured code indexes.
-       Check tool availability first — if MCP tools are not accessible, fall back to Grep/Glob.
+       Check tool availability first — if MCP tools are not accessible, fall back to grep/glob.
        </mcp_tools>
 
        <success_criteria>
@@ -281,7 +281,7 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
 
 3. **Wait for all agents in wave to complete.**
 
-   **Completion signal fallback (Copilot and runtimes where Task() may not return):**
+   **Completion signal fallback (Copilot and runtimes where task() may not return):**
 
    If a spawned agent does not return a completion signal but appears to have finished
    its work, do NOT block indefinitely. Instead, verify completion via spot-checks:
@@ -300,7 +300,7 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
    activity. If commits are still appearing, wait longer. If no activity, report
    the plan as failed and route to the failure handler in step 5.
 
-   **This fallback applies automatically to all runtimes.** Claude Code's Task() normally
+   **This fallback applies automatically to all runtimes.** OpenCode's task() normally
    returns synchronously, but the fallback ensures resilience if it doesn't.
 
 4. **Post-wave hook validation (parallel mode only):**
@@ -340,7 +340,7 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
 
 5. **Handle failures:**
 
-   **Known Claude Code bug (classifyHandoffIfNeeded):** If an agent reports "failed" with error containing `classifyHandoffIfNeeded is not defined`, this is a Claude Code runtime bug — not a GSD or agent issue. The error fires in the completion handler AFTER all tool calls finish. In this case: run the same spot-checks as step 4 (SUMMARY.md exists, git commits present, no Self-Check: FAILED). If spot-checks PASS → treat as **successful**. If spot-checks FAIL → treat as real failure below.
+   **Known OpenCode bug (classifyHandoffIfNeeded):** If an agent reports "failed" with error containing `classifyHandoffIfNeeded is not defined`, this is a OpenCode runtime bug — not a GSD or agent issue. The error fires in the completion handler AFTER all tool calls finish. In this case: run the same spot-checks as step 4 (SUMMARY.md exists, git commits present, no Self-Check: FAILED). If spot-checks PASS → treat as **successful**. If spot-checks FAIL → treat as real failure below.
 
    For real failures: report which plan failed → ask "Continue?" or "Stop?" → if continue, dependent plans may also fail. If stop, partial completion report.
 
@@ -348,7 +348,7 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
 
     Before spawning wave N+1, for each plan in the upcoming wave:
     ```bash
-    node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" verify key-links {phase_dir}/{plan}-PLAN.md
+    node "./.opencode/get-shit-done/bin/gsd-tools.cjs" verify key-links {phase_dir}/{plan}-PLAN.md
     ```
 
     If any key-link from a PRIOR wave's artifact fails verification:
@@ -375,10 +375,10 @@ Plans with `autonomous: false` require user interaction.
 
 **Auto-mode checkpoint handling:**
 
-Read auto-advance config (chain flag + user preference):
+read auto-advance config (chain flag + user preference):
 ```bash
-AUTO_CHAIN=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow._auto_chain_active 2>/dev/null || echo "false")
-AUTO_CFG=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.auto_advance 2>/dev/null || echo "false")
+AUTO_CHAIN=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow._auto_chain_active 2>/dev/null || echo "false")
+AUTO_CFG=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.auto_advance 2>/dev/null || echo "false")
 ```
 
 When executor returns a checkpoint AND (`AUTO_CHAIN` is `"true"` OR `AUTO_CFG` is `"true"`):
@@ -442,7 +442,7 @@ After all waves:
 If `WAVE_FILTER` was used, re-run plan discovery after execution:
 
 ```bash
-POST_PLAN_INDEX=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" phase-plan-index "${PHASE_NUMBER}")
+POST_PLAN_INDEX=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" phase-plan-index "${PHASE_NUMBER}")
 ```
 
 Apply the same "incomplete" filtering rules as earlier:
@@ -484,7 +484,7 @@ fi
 
 **2. Find parent UAT file:**
 ```bash
-PARENT_INFO=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" find-phase "${PARENT_PHASE}" --raw)
+PARENT_INFO=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" find-phase "${PARENT_PHASE}" --raw)
 # Extract directory from PARENT_INFO JSON, then find UAT file in that directory
 ```
 
@@ -492,7 +492,7 @@ PARENT_INFO=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-t
 
 **3. Update UAT gap statuses:**
 
-Read the parent UAT file's `## Gaps` section. For each gap entry with `status: failed`:
+read the parent UAT file's `## Gaps` section. For each gap entry with `status: failed`:
 - Update to `status: resolved`
 
 **4. Update UAT frontmatter:**
@@ -504,7 +504,7 @@ If all gaps now have `status: resolved`:
 **5. Resolve referenced debug sessions:**
 
 For each gap that has a `debug_session:` field:
-- Read the debug session file
+- read the debug session file
 - Update frontmatter `status:` → `resolved`
 - Update frontmatter `updated:` timestamp
 - Move to resolved directory:
@@ -515,7 +515,7 @@ mv .planning/debug/{slug}.md .planning/debug/resolved/
 
 **6. Commit updated artifacts:**
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(phase-${PARENT_PHASE}): resolve UAT gaps and debug sessions after ${PHASE_NUMBER} gap closure" --files .planning/phases/*${PARENT_PHASE}*/*-UAT.md .planning/debug/resolved/*.md
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(phase-${PARENT_PHASE}): resolve UAT gaps and debug sessions after ${PHASE_NUMBER} gap closure" --files .planning/phases/*${PARENT_PHASE}*/*-UAT.md .planning/debug/resolved/*.md
 ```
 </step>
 
@@ -584,11 +584,11 @@ Use question to present the options.
 Verify phase achieved its GOAL, not just completed tasks.
 
 ```bash
-VERIFIER_SKILLS=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-verifier 2>/dev/null)
+VERIFIER_SKILLS=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-verifier 2>/dev/null)
 ```
 
 ```
-Task(
+task(
   prompt="Verify phase {phase_number} goal achievement.
 Phase directory: {phase_dir}
 Phase goal: {goal from ROADMAP.md}
@@ -602,7 +602,7 @@ ${VERIFIER_SKILLS}",
 )
 ```
 
-Read status:
+read status:
 ```bash
 grep "^status:" "$PHASE_DIR"/*-VERIFICATION.md | cut -d: -f2 | tr -d ' '
 ```
@@ -654,7 +654,7 @@ blocked: 0
 
 Commit the file:
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "test({phase_num}): persist human verification items as UAT" --files "{phase_dir}/{phase_num}-HUMAN-UAT.md"
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "test({phase_num}): persist human verification items as UAT" --files "{phase_dir}/{phase_num}-HUMAN-UAT.md"
 ```
 
 **Step B: Present to user:**
@@ -690,7 +690,7 @@ Items saved to `{phase_num}-HUMAN-UAT.md` — they will appear in `/gsd-progress
 
 `/gsd-plan-phase {X} --gaps ${GSD_WS}`
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 Also: `cat {phase_dir}/{phase_num}-VERIFICATION.md` — full report
 Also: `/gsd-verify-work {X} ${GSD_WS}` — manual testing first
@@ -703,7 +703,7 @@ Gap closure cycle: `/gsd-plan-phase {X} --gaps ${GSD_WS}` reads VERIFICATION.md 
 **Mark phase complete and update all tracking files:**
 
 ```bash
-COMPLETION=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" phase complete "${PHASE_NUMBER}")
+COMPLETION=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" phase complete "${PHASE_NUMBER}")
 ```
 
 The CLI handles:
@@ -726,7 +726,7 @@ These items are tracked and will appear in `/gsd-progress` and `/gsd-audit-uat`.
 ```
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(phase-{X}): complete phase execution" --files .planning/ROADMAP.md .planning/STATE.md .planning/REQUIREMENTS.md {phase_dir}/*-VERIFICATION.md
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(phase-{X}): complete phase execution" --files .planning/ROADMAP.md .planning/STATE.md .planning/REQUIREMENTS.md {phase_dir}/*-VERIFICATION.md
 ```
 </step>
 
@@ -736,7 +736,7 @@ node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" comm
 PROJECT.md tracks validated requirements, decisions, and current state. Without this step,
 PROJECT.md falls behind silently over multiple phases.
 
-1. Read `.planning/PROJECT.md`
+1. read `.planning/PROJECT.md`
 2. If the file exists and has a `## Validated Requirements` or `## Requirements` section:
    - Move any requirements validated by this phase from Active → Validated
    - Add a brief note: `Validated in Phase {X}: {Name}`
@@ -746,7 +746,7 @@ PROJECT.md falls behind silently over multiple phases.
 5. Commit the change:
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(phase-{X}): evolve PROJECT.md after phase completion" --files .planning/PROJECT.md
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(phase-{X}): evolve PROJECT.md after phase completion" --files .planning/PROJECT.md
 ```
 
 **Skip this step if** `.planning/PROJECT.md` does not exist.
@@ -782,10 +782,10 @@ STOP. Do not proceed to auto-advance or transition.
 **Auto-advance detection:**
 
 1. Parse `--auto` flag from $ARGUMENTS
-2. Read both the chain flag and user preference (chain flag already synced in init step):
+2. read both the chain flag and user preference (chain flag already synced in init step):
    ```bash
-   AUTO_CHAIN=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow._auto_chain_active 2>/dev/null || echo "false")
-   AUTO_CFG=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.auto_advance 2>/dev/null || echo "false")
+   AUTO_CHAIN=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow._auto_chain_active 2>/dev/null || echo "false")
+   AUTO_CFG=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.auto_advance 2>/dev/null || echo "false")
    ```
 
 **If `--auto` flag present OR `AUTO_CHAIN` is true OR `AUTO_CFG` is true (AND verification passed with no gaps):**
@@ -797,9 +797,9 @@ STOP. Do not proceed to auto-advance or transition.
 ╚══════════════════════════════════════════╝
 ```
 
-Execute the transition workflow inline (do NOT use Task — orchestrator context is ~10-15%, transition needs phase completion data already in context):
+Execute the transition workflow inline (do NOT use task — orchestrator context is ~10-15%, transition needs phase completion data already in context):
 
-Read and follow `D:/Data/桌面/vibe coding/.opencode/get-shit-done/workflows/transition.md`, passing through the `--auto` flag so it propagates to the next phase invocation.
+read and follow `./.opencode/get-shit-done/workflows/transition.md`, passing through the `--auto` flag so it propagates to the next phase invocation.
 
 **If none of `--auto`, `AUTO_CHAIN`, or `AUTO_CFG` is true:**
 
@@ -823,16 +823,16 @@ Only suggest the commands listed above. Do not invent or hallucinate command nam
 
 <context_efficiency>
 Orchestrator: ~10-15% context for 200k windows, can use more for 1M+ windows.
-Subagents: fresh context each (200k-1M depending on model). No polling (Task blocks). No context bleed.
+Subagents: fresh context each (200k-1M depending on model). No polling (task blocks). No context bleed.
 
 For 1M+ context models, consider:
 - Passing richer context (code snippets, dependency outputs) directly to executors instead of just file paths
 - Running small phases (≤3 plans, no dependencies) inline without subagent spawning overhead
-- Relaxing /clear recommendations — context rot onset is much further out with 5x window
+- Relaxing /new recommendations — context rot onset is much further out with 5x window
 </context_efficiency>
 
 <failure_handling>
-- **classifyHandoffIfNeeded false failure:** Agent reports "failed" but error is `classifyHandoffIfNeeded is not defined` → Claude Code bug, not GSD. Spot-check (SUMMARY exists, commits present) → if pass, treat as success
+- **classifyHandoffIfNeeded false failure:** Agent reports "failed" but error is `classifyHandoffIfNeeded is not defined` → OpenCode bug, not GSD. Spot-check (SUMMARY exists, commits present) → if pass, treat as success
 - **Agent fails mid-plan:** Missing SUMMARY.md → report, ask user how to proceed
 - **Dependency chain breaks:** Wave 1 fails → Wave 2 dependents likely fail → user chooses attempt or skip
 - **All agents in wave fail:** Systemic issue → stop, report for investigation

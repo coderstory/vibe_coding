@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Analyze freeform text from the user and route to the most appropriate GSD command. This is a dispatcher — it never does the work itself. Match user intent to the best command, confirm the routing, and hand off.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -24,7 +24,7 @@ Wait for response before continuing.
 **Check if project exists.**
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" state load 2>/dev/null)
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" state load 2>/dev/null)
 ```
 
 Track whether `.planning/` exists — some routes require it, others don't.

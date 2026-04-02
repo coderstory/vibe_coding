@@ -1,12 +1,12 @@
-<purpose>
-Execute a trivial task inline without subagent overhead. No PLAN.md, no Task spawning,
+<objective>
+Execute a trivial task inline without subagent overhead. No PLAN.md, no task spawning,
 no research, no plan checking. Just: understand → do → commit → log.
 
 For tasks like: fix a typo, update a config value, add a missing import, rename a
 variable, commit uncommitted work, add a .gitignore entry, bump a version number.
 
 Use /gsd-quick for anything that needs multi-step planning or research.
-</purpose>
+</objective>
 
 <process>
 
@@ -44,7 +44,7 @@ And stop.
 <step name="execute_inline">
 Do the work directly:
 
-1. Read the relevant file(s)
+1. read the relevant file(s)
 2. Make the change(s)
 3. Verify the change works (run existing tests if applicable, or do a quick sanity check)
 
@@ -90,7 +90,7 @@ No next-step suggestions. No workflow routing. Just done.
 </process>
 
 <guardrails>
-- NEVER spawn a Task/subagent — this runs inline
+- NEVER spawn a task/subagent — this runs inline
 - NEVER create PLAN.md or SUMMARY.md files
 - NEVER run research or plan-checking
 - If the task takes more than 3 file edits, STOP and redirect to /gsd-quick
@@ -98,7 +98,7 @@ No next-step suggestions. No workflow routing. Just done.
 </guardrails>
 
 <success_criteria>
-- [ ] Task completed in current context (no subagents)
+- [ ] task completed in current context (no subagents)
 - [ ] Atomic git commit with conventional message
 - [ ] STATE.md updated if it exists
 - [ ] Total operation under 2 minutes wall time

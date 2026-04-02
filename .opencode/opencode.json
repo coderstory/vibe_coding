@@ -1,4 +1,7 @@
 {
+  "plugin": [
+    "superpowers@git+https://github.com/obra/superpowers.git"
+  ],
   "$schema": "https://opencode.ai/config.json",
   "permission": {
     "read": {

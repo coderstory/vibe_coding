@@ -17,7 +17,7 @@ The git log should read like a changelog of what shipped, not a diary of plannin
 | PLAN.md created         | NO      | Intermediate - commit with plan completion       |
 | RESEARCH.md created     | NO      | Intermediate                                     |
 | DISCOVERY.md created    | NO      | Intermediate                                     |
-| **Task completed**      | YES     | Atomic unit of work (1 commit per task)         |
+| **task completed**      | YES     | Atomic unit of work (1 commit per task)         |
 | **Plan completed**      | YES     | Metadata commit (SUMMARY + STATE + ROADMAP)     |
 | Handoff created         | YES     | WIP state preserved                              |
 
@@ -51,13 +51,13 @@ Phases:
 What to commit:
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: initialize [project-name] ([N] phases)" --files .planning/
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: initialize [project-name] ([N] phases)" --files .planning/
 ```
 
 </format>
 
 <format name="task-completion">
-## Task Completion (During Plan Execution)
+## task Completion (During Plan Execution)
 
 Each task gets its own commit immediately after completion.
 
@@ -123,9 +123,9 @@ After all tasks committed, one final metadata commit captures plan completion.
 docs({phase}-{plan}): complete [plan-name] plan
 
 Tasks completed: [N]/[N]
-- [Task 1 name]
-- [Task 2 name]
-- [Task 3 name]
+- [task 1 name]
+- [task 2 name]
+- [task 3 name]
 
 SUMMARY: .planning/phases/XX-name/{phase}-{plan}-SUMMARY.md
 ```
@@ -133,7 +133,7 @@ SUMMARY: .planning/phases/XX-name/{phase}-{plan}-SUMMARY.md
 What to commit:
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs({phase}-{plan}): complete [plan-name] plan" --files .planning/phases/XX-name/{phase}-{plan}-PLAN.md .planning/phases/XX-name/{phase}-{plan}-SUMMARY.md .planning/STATE.md .planning/ROADMAP.md
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs({phase}-{plan}): complete [plan-name] plan" --files .planning/phases/XX-name/{phase}-{plan}-PLAN.md .planning/phases/XX-name/{phase}-{plan}-SUMMARY.md .planning/STATE.md .planning/ROADMAP.md
 ```
 
 **Note:** Code files NOT included - already committed per-task.
@@ -153,7 +153,7 @@ Current: [task name]
 What to commit:
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "wip: [phase-name] paused at task [X]/[Y]" --files .planning/
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "wip: [phase-name] paused at task [X]/[Y]" --files .planning/
 ```
 
 </format>
@@ -226,17 +226,17 @@ Each plan produces 2-4 commits (tasks + metadata). Clear, granular, bisectable.
 
 <commit_strategy_rationale>
 
-## Why Per-Task Commits?
+## Why Per-task Commits?
 
 **Context engineering for AI:**
-- Git history becomes primary context source for future the agent sessions
+- Git history becomes primary context source for future OpenCode sessions
 - `git log --grep="{phase}-{plan}"` shows all work for a plan
 - `git diff <hash>^..<hash>` shows exact changes per task
 - Less reliance on parsing SUMMARY.md = more context for actual work
 
 **Failure recovery:**
-- Task 1 committed ✅, Task 2 failed ❌
-- the agent in next session: sees task 1 complete, can retry task 2
+- task 1 committed ✅, task 2 failed ❌
+- OpenCode in next session: sees task 1 complete, can retry task 2
 - Can `git reset --hard` to last successful task
 
 **Debugging:**
@@ -245,9 +245,9 @@ Each plan produces 2-4 commits (tasks + metadata). Clear, granular, bisectable.
 - Each commit is independently revertable
 
 **Observability:**
-- Solo developer + the agent workflow benefits from granular attribution
+- Solo developer + OpenCode workflow benefits from granular attribution
 - Atomic commits are git best practice
-- "Commit noise" irrelevant when consumer is the agent, not humans
+- "Commit noise" irrelevant when consumer is OpenCode, not humans
 
 </commit_strategy_rationale>
 
@@ -284,7 +284,7 @@ Set `commit_docs: false` so planning docs stay local and are not committed to an
 Instead of the standard `commit` command, use `commit-to-subrepo` when `sub_repos` is configured:
 
 ```bash
-node D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs commit-to-subrepo "feat(02-01): add user API" \
+node ./.opencode/get-shit-done/bin/gsd-tools.cjs commit-to-subrepo "feat(02-01): add user API" \
   --files backend/src/api/users.ts backend/src/types/user.ts frontend/src/components/UserForm.tsx
 ```
 

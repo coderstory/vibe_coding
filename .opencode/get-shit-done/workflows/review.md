@@ -1,4 +1,4 @@
-<purpose>
+<objective>
 Cross-AI peer review — invoke external AI CLIs to independently review phase plans.
 Each CLI gets the same prompt (PROJECT.md context, phase plans, requirements) and
 produces structured feedback. Results are combined into REVIEWS.md for the planner
@@ -6,7 +6,7 @@ to incorporate via --reviews flag.
 
 This implements adversarial review: different AI models catch different blind spots.
 A plan that survives review from 2-3 independent AI systems is more robust.
-</purpose>
+</objective>
 
 <process>
 
@@ -16,13 +16,13 @@ Check which AI CLIs are available on the system:
 ```bash
 # Check each CLI
 command -v gemini >/dev/null 2>&1 && echo "gemini:available" || echo "gemini:missing"
-command -v claude >/dev/null 2>&1 && echo "claude:available" || echo "claude:missing"
+command -v OpenCode >/dev/null 2>&1 && echo "OpenCode:available" || echo "OpenCode:missing"
 command -v codex >/dev/null 2>&1 && echo "codex:available" || echo "codex:missing"
 ```
 
 Parse flags from `$ARGUMENTS`:
 - `--gemini` → include Gemini
-- `--claude` → include the agent
+- `--OpenCode` → include OpenCode
 - `--codex` → include Codex
 - `--all` → include all available
 - No flags → include all available
@@ -32,13 +32,13 @@ If no CLIs are available:
 No external AI CLIs found. Install at least one:
 - gemini: https://github.com/google-gemini/gemini-cli
 - codex: https://github.com/openai/codex
-- claude: https://github.com/anthropics/claude-code
+- OpenCode: https://github.com/anthropics/OpenCode-code
 
 Then run /gsd-review again.
 ```
 Exit.
 
-If only one CLI is the current runtime (e.g. running inside the agent), skip it for the review
+If only one CLI is the current runtime (e.g. running inside OpenCode), skip it for the review
 to ensure independence. At least one DIFFERENT CLI must be available.
 </step>
 
@@ -46,11 +46,11 @@ to ensure independence. At least one DIFFERENT CLI must be available.
 Collect phase artifacts for the review prompt:
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${PHASE_ARG}")
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${PHASE_ARG}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
-Read from init: `phase_dir`, `phase_number`, `padded_phase`.
+read from init: `phase_dir`, `phase_number`, `padded_phase`.
 
 Then read:
 1. `.planning/PROJECT.md` (first 80 lines — project context)
@@ -110,7 +110,7 @@ Focus on:
 Output your review in markdown format.
 ```
 
-Write to a temp file: `/tmp/gsd-review-prompt-{phase}.md`
+write to a temp file: `/tmp/gsd-review-prompt-{phase}.md`
 </step>
 
 <step name="invoke_reviewers">
@@ -121,9 +121,9 @@ For each selected CLI, invoke in sequence (not parallel — avoid rate limits):
 gemini -p "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-gemini-{phase}.md
 ```
 
-**the agent (separate session):**
+**OpenCode (separate session):**
 ```bash
-claude -p "$(cat /tmp/gsd-review-prompt-{phase}.md)" --no-input 2>/dev/null > /tmp/gsd-review-claude-{phase}.md
+OpenCode -p "$(cat /tmp/gsd-review-prompt-{phase}.md)" --no-input 2>/dev/null > /tmp/gsd-review-OpenCode-{phase}.md
 ```
 
 **Codex:**
@@ -150,7 +150,7 @@ Combine all review responses into `{phase_dir}/{padded_phase}-REVIEWS.md`:
 ```markdown
 ---
 phase: {N}
-reviewers: [gemini, claude, codex]
+reviewers: [gemini, OpenCode, codex]
 reviewed_at: {ISO timestamp}
 plans_reviewed: [{list of PLAN.md files}]
 ---
@@ -163,9 +163,9 @@ plans_reviewed: [{list of PLAN.md files}]
 
 ---
 
-## the agent Review
+## OpenCode Review
 
-{claude review content}
+{OpenCode review content}
 
 ---
 
@@ -191,7 +191,7 @@ plans_reviewed: [{list of PLAN.md files}]
 
 Commit:
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: cross-AI review for phase {N}" --files {phase_dir}/{padded_phase}-REVIEWS.md
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: cross-AI review for phase {N}" --files {phase_dir}/{padded_phase}-REVIEWS.md
 ```
 </step>
 

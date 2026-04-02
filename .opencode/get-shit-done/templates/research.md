@@ -2,7 +2,7 @@
 
 Template for `.planning/phases/XX-name/{phase_num}-RESEARCH.md` - comprehensive ecosystem research before planning.
 
-**Purpose:** Document what the agent needs to know to implement a phase well - not just "which library" but "how do experts build this."
+**Purpose:** Document what OpenCode needs to know to implement a phase well - not just "which library" but "how do experts build this."
 
 ---
 
@@ -25,7 +25,7 @@ Template for `.planning/phases/XX-name/{phase_num}-RESEARCH.md` - comprehensive 
 - [Decision 1]
 - [Decision 2]
 
-### the agent's Discretion
+### OpenCode's Discretion
 [Copy from CONTEXT.md - areas where researcher/planner can choose]
 - [Area 1]
 - [Area 2]
@@ -35,7 +35,7 @@ Template for `.planning/phases/XX-name/{phase_num}-RESEARCH.md` - comprehensive 
 - [Deferred 1]
 - [Deferred 2]
 
-**If no CONTEXT.md exists:** Write "No user constraints - all decisions at the agent's discretion"
+**If no CONTEXT.md exists:** write "No user constraints - all decisions at OpenCode's discretion"
 </user_constraints>
 
 <research_summary>
@@ -193,12 +193,12 @@ What's changed recently:
 
 Things that couldn't be fully resolved:
 
-1. **[Question]**
+1. **[question]**
    - What we know: [partial info]
    - What's unclear: [the gap]
    - Recommendation: [how to handle during planning/execution]
 
-2. **[Question]**
+2. **[question]**
    - What we know: [partial info]
    - What's unclear: [the gap]
    - Recommendation: [how to handle]
@@ -212,10 +212,10 @@ Things that couldn't be fully resolved:
 - [Official docs URL] - [what was checked]
 
 ### Secondary (MEDIUM confidence)
-- [WebSearch verified with official source] - [finding + verification]
+- [websearch verified with official source] - [finding + verification]
 
 ### Tertiary (LOW confidence - needs validation)
-- [WebSearch only] - [finding, marked for validation during implementation]
+- [websearch only] - [finding, marked for validation during implementation]
 </sources>
 
 <metadata>
@@ -524,7 +524,7 @@ function useVehicleControls(rigidBodyRef) {
 
 **When to create:**
 - Before planning phases in niche/complex domains
-- When the agent's training data is likely stale or sparse
+- When OpenCode's training data is likely stale or sparse
 - When "how do experts do this" matters more than "which library"
 
 **Structure:**

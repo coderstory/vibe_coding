@@ -1,12 +1,12 @@
-<purpose>
+<objective>
 
-Drive all remaining milestone phases autonomously. For each incomplete phase: discuss → plan → execute using Skill() flat invocations. Pauses only for explicit user decisions (grey area acceptance, blockers, validation requests). Re-reads ROADMAP.md after each phase to catch dynamically inserted phases.
+Drive all remaining milestone phases autonomously. For each incomplete phase: discuss → plan → execute using skill() flat invocations. Pauses only for explicit user decisions (grey area acceptance, blockers, validation requests). Re-reads ROADMAP.md after each phase to catch dynamically inserted phases.
 
-</purpose>
+</objective>
 
 <required_reading>
 
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 
 </required_reading>
 
@@ -28,7 +28,7 @@ fi
 Bootstrap via milestone-level init:
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init milestone-op)
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init milestone-op)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -59,7 +59,7 @@ If `FROM_PHASE` is set, display: `Starting from phase ${FROM_PHASE}`
 Run phase discovery:
 
 ```bash
-ROADMAP=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap analyze)
+ROADMAP=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap analyze)
 ```
 
 Parse the JSON `phases` array.
@@ -89,7 +89,7 @@ Exit cleanly.
 
 | # | Phase | Status |
 |---|-------|--------|
-| 5 | Skill Scaffolding & Phase Discovery | In Progress |
+| 5 | skill Scaffolding & Phase Discovery | In Progress |
 | 6 | Smart Discuss | Not Started |
 | 7 | Auto-Chain Refinements | Not Started |
 | 8 | Lifecycle Orchestration | Not Started |
@@ -98,7 +98,7 @@ Exit cleanly.
 **Fetch details for each phase:**
 
 ```bash
-DETAIL=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase ${PHASE_NUM})
+DETAIL=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase ${PHASE_NUM})
 ```
 
 Extract `phase_name`, `goal`, `success_criteria` from each. Store for use in execute_phase and transition messages.
@@ -124,7 +124,7 @@ Where N = current phase number (from the ROADMAP, e.g., 6), T = total milestone 
 Check if CONTEXT.md already exists for this phase:
 
 ```bash
-PHASE_STATE=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op ${PHASE_NUM})
+PHASE_STATE=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op ${PHASE_NUM})
 ```
 
 Parse `has_context` from JSON.
@@ -140,7 +140,7 @@ Proceed to 3b.
 **If has_context is false:** Check if discuss is disabled via settings:
 
 ```bash
-SKIP_DISCUSS=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.skip_discuss 2>/dev/null || echo "false")
+SKIP_DISCUSS=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.skip_discuss 2>/dev/null || echo "false")
 ```
 
 **If SKIP_DISCUSS is `true`:** Skip discuss entirely — the ROADMAP phase description is the spec. Display:
@@ -149,13 +149,13 @@ SKIP_DISCUSS=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-
 Phase ${PHASE_NUM}: Discuss skipped (workflow.skip_discuss=true) — using ROADMAP phase goal as spec.
 ```
 
-Write a minimal CONTEXT.md so downstream plan-phase has valid input. Get phase details:
+write a minimal CONTEXT.md so downstream plan-phase has valid input. Get phase details:
 
 ```bash
-DETAIL=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase ${PHASE_NUM})
+DETAIL=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase ${PHASE_NUM})
 ```
 
-Extract `goal` and `requirements` from JSON. Write `${phase_dir}/${padded_phase}-CONTEXT.md` with:
+Extract `goal` and `requirements` from JSON. write `${phase_dir}/${padded_phase}-CONTEXT.md` with:
 
 ```markdown
 # Phase {PHASE_NUM}: {Phase Name} - Context
@@ -174,8 +174,8 @@ Extract `goal` and `requirements` from JSON. Write `${phase_dir}/${padded_phase}
 <decisions>
 ## Implementation Decisions
 
-### the agent's Discretion
-All implementation choices are at the agent's discretion — discuss phase was skipped per user setting. Use ROADMAP phase goal, success criteria, and codebase conventions to guide decisions.
+### OpenCode's Discretion
+All implementation choices are at OpenCode's discretion — discuss phase was skipped per user setting. Use ROADMAP phase goal, success criteria, and codebase conventions to guide decisions.
 
 </decisions>
 
@@ -204,7 +204,7 @@ None — discuss phase skipped.
 Commit the minimal context:
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(${PADDED_PHASE}): auto-generated context (discuss skipped)" --files "${phase_dir}/${padded_phase}-CONTEXT.md"
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(${PADDED_PHASE}): auto-generated context (discuss skipped)" --files "${phase_dir}/${padded_phase}-CONTEXT.md"
 ```
 
 Proceed to 3b.
@@ -214,7 +214,7 @@ Proceed to 3b.
 After smart_discuss completes, verify context was written:
 
 ```bash
-PHASE_STATE=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op ${PHASE_NUM})
+PHASE_STATE=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op ${PHASE_NUM})
 ```
 
 Check `has_context`. If false → go to handle_blocker: "Smart discuss for phase ${PHASE_NUM} did not produce CONTEXT.md."
@@ -224,7 +224,7 @@ Check `has_context`. If false → go to handle_blocker: "Smart discuss for phase
 Check if this phase has frontend indicators and whether a UI-SPEC already exists:
 
 ```bash
-PHASE_SECTION=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase ${PHASE_NUM} 2>/dev/null)
+PHASE_SECTION=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase ${PHASE_NUM} 2>/dev/null)
 echo "$PHASE_SECTION" | grep -iE "UI|interface|frontend|component|layout|page|screen|view|form|dashboard|widget" > /dev/null 2>&1
 HAS_UI=$?
 UI_SPEC_FILE=$(ls "${PHASE_DIR}"/*-UI-SPEC.md 2>/dev/null | head -1)
@@ -233,7 +233,7 @@ UI_SPEC_FILE=$(ls "${PHASE_DIR}"/*-UI-SPEC.md 2>/dev/null | head -1)
 Check if UI phase workflow is enabled:
 
 ```bash
-UI_PHASE_CFG=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.ui_phase 2>/dev/null || echo "true")
+UI_PHASE_CFG=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.ui_phase 2>/dev/null || echo "true")
 ```
 
 **If `HAS_UI` is 0 (frontend indicators found) AND `UI_SPEC_FILE` is empty (no UI-SPEC exists) AND `UI_PHASE_CFG` is not `false`:**
@@ -245,7 +245,7 @@ Phase ${PHASE_NUM}: Frontend phase detected — generating UI design contract...
 ```
 
 ```
-Skill(skill="gsd:ui-phase", args="${PHASE_NUM}")
+skill(skill="gsd-ui-phase", args="${PHASE_NUM}")
 ```
 
 Verify UI-SPEC was created:
@@ -261,7 +261,7 @@ UI_SPEC_FILE=$(ls "${PHASE_DIR}"/*-UI-SPEC.md 2>/dev/null | head -1)
 **3b. Plan**
 
 ```
-Skill(skill="gsd:plan-phase", args="${PHASE_NUM}")
+skill(skill="gsd-plan-phase", args="${PHASE_NUM}")
 ```
 
 Verify plan produced output — re-run `init phase-op` and check `has_plans`. If false → go to handle_blocker: "Plan phase ${PHASE_NUM} did not produce any plans."
@@ -269,7 +269,7 @@ Verify plan produced output — re-run `init phase-op` and check `has_plans`. If
 **3c. Execute**
 
 ```
-Skill(skill="gsd:execute-phase", args="${PHASE_NUM} --no-transition")
+skill(skill="gsd-execute-phase", args="${PHASE_NUM} --no-transition")
 ```
 
 **3d. Post-Execution Routing**
@@ -283,7 +283,7 @@ VERIFY_STATUS=$(grep "^status:" "${PHASE_DIR}"/*-VERIFICATION.md 2>/dev/null | h
 Where `PHASE_DIR` comes from the `init phase-op` call already made in step 3a. If the variable is not in scope, re-fetch:
 
 ```bash
-PHASE_STATE=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op ${PHASE_NUM})
+PHASE_STATE=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op ${PHASE_NUM})
 ```
 
 Parse `phase_dir` from the JSON.
@@ -303,7 +303,7 @@ Proceed to iterate step.
 
 **If `human_needed`:**
 
-Read the human_verification section from VERIFICATION.md to get the count and items requiring manual testing.
+read the human_verification section from VERIFICATION.md to get the count and items requiring manual testing.
 
 Display the items, then ask user via question:
 - **question:** "Phase ${PHASE_NUM} has items needing manual verification. Validate now or continue to next phase?"
@@ -321,7 +321,7 @@ On **"Continue without validation"**: Display `Phase ${PHASE_NUM} ⏭ Human vali
 
 **If `gaps_found`:**
 
-Read gap summary from VERIFICATION.md (score and missing items). Display:
+read gap summary from VERIFICATION.md (score and missing items). Display:
 ```
 ⚠ Phase ${PHASE_NUM}: ${PHASE_NAME} — Gaps Found
 Score: {N}/{M} must-haves verified
@@ -334,14 +334,14 @@ Ask user via question:
 On **"Run gap closure"**: Execute gap closure cycle (limit: 1 attempt):
 
 ```
-Skill(skill="gsd:plan-phase", args="${PHASE_NUM} --gaps")
+skill(skill="gsd-plan-phase", args="${PHASE_NUM} --gaps")
 ```
 
 Verify gap plans were created — re-run `init phase-op ${PHASE_NUM}` and check `has_plans`. If no new gap plans → go to handle_blocker: "Gap closure planning for phase ${PHASE_NUM} did not produce plans."
 
 Re-execute:
 ```
-Skill(skill="gsd:execute-phase", args="${PHASE_NUM} --no-transition")
+skill(skill="gsd-execute-phase", args="${PHASE_NUM} --no-transition")
 ```
 
 Re-read verification status:
@@ -377,7 +377,7 @@ UI_SPEC_FILE=$(ls "${PHASE_DIR}"/*-UI-SPEC.md 2>/dev/null | head -1)
 Check if UI review is enabled:
 
 ```bash
-UI_REVIEW_CFG=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.ui_review 2>/dev/null || echo "true")
+UI_REVIEW_CFG=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.ui_review 2>/dev/null || echo "true")
 ```
 
 **If `UI_SPEC_FILE` is not empty AND `UI_REVIEW_CFG` is not `false`:**
@@ -389,7 +389,7 @@ Phase ${PHASE_NUM}: Frontend phase with UI-SPEC — running UI review audit...
 ```
 
 ```
-Skill(skill="gsd:ui-review", args="${PHASE_NUM}")
+skill(skill="gsd-ui-review", args="${PHASE_NUM}")
 ```
 
 Display the review result summary (score from UI-REVIEW.md if produced). Continue to iterate step regardless of score — UI review is advisory, not blocking.
@@ -404,12 +404,12 @@ Display the review result summary (score from UI-REVIEW.md if produced). Continu
 
 Run smart discuss for the current phase. Proposes grey area answers in batch tables — the user accepts or overrides per area. Produces identical CONTEXT.md output to regular discuss-phase.
 
-> **Note:** Smart discuss is an autonomous-optimized variant of the `gsd:discuss-phase` skill. It produces identical CONTEXT.md output but uses batch table proposals instead of sequential questioning. The original `discuss-phase` skill remains unchanged (per CTRL-03). Future milestones may extract this to a separate skill file.
+> **Note:** Smart discuss is an autonomous-optimized variant of the `gsd-discuss-phase` skill. It produces identical CONTEXT.md output but uses batch table proposals instead of sequential questioning. The original `discuss-phase` skill remains unchanged (per CTRL-03). Future milestones may extract this to a separate skill file.
 
 **Inputs:** `PHASE_NUM` from execute_phase. Run init to get phase paths:
 
 ```bash
-PHASE_STATE=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op ${PHASE_NUM})
+PHASE_STATE=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op ${PHASE_NUM})
 ```
 
 Parse from JSON: `phase_dir`, `phase_slug`, `padded_phase`, `phase_name`.
@@ -418,9 +418,9 @@ Parse from JSON: `phase_dir`, `phase_slug`, `padded_phase`, `phase_name`.
 
 ### Sub-step 1: Load prior context
 
-Read project-level and prior phase context to avoid re-asking decided questions.
+read project-level and prior phase context to avoid re-asking decided questions.
 
-**Read project files:**
+**read project files:**
 
 ```bash
 cat .planning/PROJECT.md 2>/dev/null || true
@@ -433,15 +433,15 @@ Extract from these:
 - **REQUIREMENTS.md** — Acceptance criteria, constraints, must-haves vs nice-to-haves
 - **STATE.md** — Current progress, decisions logged so far
 
-**Read all prior CONTEXT.md files:**
+**read all prior CONTEXT.md files:**
 
 ```bash
 (find .planning/phases -name "*-CONTEXT.md" 2>/dev/null || true) | sort
 ```
 
 For each CONTEXT.md where phase number < current phase:
-- Read the `<decisions>` section — these are locked preferences
-- Read `<specifics>` — particular references or "I want it like X" moments
+- read the `<decisions>` section — these are locked preferences
+- read `<specifics>` — particular references or "I want it like X" moments
 - Note patterns (e.g., "user consistently prefers minimal UI", "user rejected verbose output")
 
 **Build internal prior_decisions context** (do not write to file):
@@ -473,7 +473,7 @@ Lightweight codebase scan to inform grey area identification and proposals. Keep
 ls .planning/codebase/*.md 2>/dev/null || true
 ```
 
-**If codebase maps exist:** Read the most relevant ones (CONVENTIONS.md, STRUCTURE.md, STACK.md based on phase type). Extract reusable components, established patterns, integration points. Skip to building context below.
+**If codebase maps exist:** read the most relevant ones (CONVENTIONS.md, STRUCTURE.md, STACK.md based on phase type). Extract reusable components, established patterns, integration points. Skip to building context below.
 
 **If no codebase maps, do targeted grep:**
 
@@ -484,7 +484,7 @@ grep -rl "{term1}\|{term2}" src/ app/ --include="*.ts" --include="*.tsx" --inclu
 ls src/components/ src/hooks/ src/lib/ src/utils/ 2>/dev/null || true
 ```
 
-Read the 3-5 most relevant files to understand existing patterns.
+read the 3-5 most relevant files to understand existing patterns.
 
 **Build internal codebase_context** (do not write to file):
 - **Reusable assets** — existing components, hooks, utilities usable in this phase
@@ -498,7 +498,7 @@ Read the 3-5 most relevant files to understand existing patterns.
 **Get phase details:**
 
 ```bash
-DETAIL=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase ${PHASE_NUM})
+DETAIL=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase ${PHASE_NUM})
 ```
 
 Extract `goal`, `requirements`, `success_criteria` from the JSON response.
@@ -518,7 +518,7 @@ Phase ${PHASE_NUM}: Infrastructure phase — skipping discuss, writing minimal c
 
 Use these defaults for the CONTEXT.md:
 - `<domain>`: Phase boundary from ROADMAP goal
-- `<decisions>`: Single "### the agent's Discretion" subsection — "All implementation choices are at the agent's discretion — pure infrastructure phase"
+- `<decisions>`: Single "### OpenCode's Discretion" subsection — "All implementation choices are at OpenCode's discretion — pure infrastructure phase"
 - `<code_context>`: Whatever the codebase scout found
 - `<specifics>`: "No specific requirements — infrastructure phase"
 - `<deferred>`: "None"
@@ -550,7 +550,7 @@ Display a table:
 ```
 ### Grey Area {M}/{N}: {Area Name}
 
-| # | Question | ✅ Recommended | Alternative(s) |
+| # | question | ✅ Recommended | Alternative(s) |
 |---|----------|---------------|-----------------|
 | 1 | {question} | {answer} — {rationale} | {alt1}; {alt2} |
 | 2 | {question} | {answer} — {rationale} | {alt1} |
@@ -568,7 +568,7 @@ Then prompt the user via **question**:
 **On "Change QN":** Use question with the alternatives for that specific question:
 - **header:** "{Area Name}"
 - **question:** "Q{N}: {question text}"
-- **options:** List the 1-2 alternatives plus "You decide" (maps to the agent's Discretion)
+- **options:** List the 1-2 alternatives plus "You decide" (maps to OpenCode's Discretion)
 
 Record the user's choice. Re-display the updated table with the change reflected. Re-present the full acceptance prompt so the user can make additional changes or accept.
 
@@ -594,7 +594,7 @@ Track deferred ideas internally for inclusion in CONTEXT.md.
 
 ---
 
-### Sub-step 5: Write CONTEXT.md
+### Sub-step 5: write CONTEXT.md
 
 After all areas are resolved (or infrastructure skip), write the CONTEXT.md file.
 
@@ -629,8 +629,8 @@ Use **exactly** this structure (identical to discuss-phase output):
 - {Accepted/chosen answer for Q2}
 ...
 
-### the agent's Discretion
-{Any "You decide" answers collected — note the agent has flexibility here}
+### OpenCode's Discretion
+{Any "You decide" answers collected — note OpenCode has flexibility here}
 
 </decisions>
 
@@ -665,12 +665,12 @@ Use **exactly** this structure (identical to discuss-phase output):
 </deferred>
 ```
 
-Write the file.
+write the file.
 
 **Commit:**
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(${PADDED_PHASE}): smart discuss context" --files "${phase_dir}/${padded_phase}-CONTEXT.md"
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(${PADDED_PHASE}): smart discuss context" --files "${phase_dir}/${padded_phase}-CONTEXT.md"
 ```
 
 Display confirmation:
@@ -689,7 +689,7 @@ Decisions captured: {count} across {area_count} areas
 After each phase completes, re-read ROADMAP.md to catch phases inserted mid-execution (decimal phases like 5.1):
 
 ```bash
-ROADMAP=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap analyze)
+ROADMAP=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap analyze)
 ```
 
 Re-filter incomplete phases using the same logic as discover_phases:
@@ -697,7 +697,7 @@ Re-filter incomplete phases using the same logic as discover_phases:
 - Apply `--from N` filter if originally provided
 - Sort by number ascending
 
-Read STATE.md fresh:
+read STATE.md fresh:
 
 ```bash
 cat .planning/STATE.md
@@ -731,7 +731,7 @@ Display lifecycle transition banner:
 **5a. Audit**
 
 ```
-Skill(skill="gsd:audit-milestone")
+skill(skill="gsd-audit-milestone")
 ```
 
 After audit completes, detect the result:
@@ -756,7 +756,7 @@ Proceed to 5b (no user pause — per CTRL-01).
 
 **If `gaps_found`:**
 
-Read the gaps summary from the audit file. Display:
+read the gaps summary from the audit file. Display:
 ```
 ⚠ Audit: Gaps Found
 ```
@@ -771,7 +771,7 @@ On **"Stop"**: Go to handle_blocker with "User stopped — audit gaps remain. Ru
 
 **If `tech_debt`:**
 
-Read the tech debt summary from the audit file. Display:
+read the tech debt summary from the audit file. Display:
 ```
 ⚠ Audit: Tech Debt Identified
 ```
@@ -787,7 +787,7 @@ On **"Stop"**: Go to handle_blocker with "User stopped — tech debt to address.
 **5b. Complete Milestone**
 
 ```
-Skill(skill="gsd:complete-milestone", args="${milestone_version}")
+skill(skill="gsd-complete-milestone", args="${milestone_version}")
 ```
 
 After complete-milestone returns, verify it produced output:
@@ -801,7 +801,7 @@ If the archive file does not exist, go to handle_blocker: "Complete milestone di
 **5c. Cleanup**
 
 ```
-Skill(skill="gsd:cleanup")
+skill(skill="gsd-cleanup")
 ```
 
 Cleanup shows its own dry-run and asks user for approval internally — this is an acceptable pause per CTRL-01 since it's an explicit decision about file deletion.
@@ -876,11 +876,11 @@ When any phase operation fails or a blocker is detected, present 3 options via q
 - [ ] Final completion or stop summary displayed
 - [ ] After all phases complete, lifecycle step is invoked (not manual suggestion)
 - [ ] Lifecycle transition banner displayed before audit
-- [ ] Audit invoked via Skill(skill="gsd:audit-milestone")
+- [ ] Audit invoked via skill(skill="gsd-audit-milestone")
 - [ ] Audit result routing: passed → auto-continue, gaps_found → user decides, tech_debt → user decides
 - [ ] Audit technical failure (no file/no status) routes to handle_blocker
-- [ ] Complete-milestone invoked via Skill() with ${milestone_version} arg
-- [ ] Cleanup invoked via Skill() — internal confirmation is acceptable (CTRL-01)
+- [ ] Complete-milestone invoked via skill() with ${milestone_version} arg
+- [ ] Cleanup invoked via skill() — internal confirmation is acceptable (CTRL-01)
 - [ ] Final completion banner displayed after lifecycle
 - [ ] Progress bar uses phase number / total milestone phases (not position among incomplete)
 - [ ] Smart discuss documents relationship to discuss-phase with CTRL-03 note

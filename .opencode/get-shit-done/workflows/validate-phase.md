@@ -1,13 +1,13 @@
-<purpose>
+<objective>
 Audit Nyquist validation gaps for a completed phase. Generate missing tests. Update VALIDATION.md.
-</purpose>
+</objective>
 
 <required_reading>
-@D:/Data/桌面/vibe coding/.opencode/get-shit-done/references/ui-brand.md
+@./.opencode/get-shit-done/references/ui-brand.md
 </required_reading>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-nyquist-auditor — Validates verification coverage
 </available_agent_types>
 
@@ -16,16 +16,16 @@ Valid GSD subagent types (use exact names — do not fall back to 'general-purpo
 ## 0. Initialize
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${PHASE_ARG}")
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${PHASE_ARG}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_AUDITOR=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-nyquist-auditor 2>/dev/null)
+AGENT_SKILLS_AUDITOR=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-nyquist-auditor 2>/dev/null)
 ```
 
 Parse: `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded_phase`.
 
 ```bash
-AUDITOR_MODEL=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" resolve-model gsd-nyquist-auditor --raw)
-NYQUIST_CFG=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.nyquist_validation --raw)
+AUDITOR_MODEL=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" resolve-model gsd-nyquist-auditor --raw)
+NYQUIST_CFG=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.nyquist_validation --raw)
 ```
 
 If `NYQUIST_CFG` is `false`: exit with "Nyquist validation is disabled. Enable via /gsd-settings."
@@ -45,11 +45,11 @@ SUMMARY_FILES=$(ls "${PHASE_DIR}"/*-SUMMARY.md 2>/dev/null)
 
 ## 2. Discovery
 
-### 2a. Read Phase Artifacts
+### 2a. read Phase Artifacts
 
-Read all PLAN and SUMMARY files. Extract: task lists, requirement IDs, key-files changed, verify blocks.
+read all PLAN and SUMMARY files. Extract: task lists, requirement IDs, key-files changed, verify blocks.
 
-### 2b. Build Requirement-to-Task Map
+### 2b. Build Requirement-to-task Map
 
 Per task: `{ task_id, plan_id, wave, requirement_ids, has_automated_command }`
 
@@ -91,8 +91,8 @@ Call question with gap table and options:
 ## 5. Spawn gsd-nyquist-auditor
 
 ```
-Task(
-  prompt="Read D:/Data/桌面/vibe coding/.opencode/agents/gsd-nyquist-auditor.md for instructions.\n\n" +
+task(
+  prompt="read ./.opencode/agents/gsd-nyquist-auditor.md for instructions.\n\n" +
     "<files_to_read>{PLAN, SUMMARY, impl files, VALIDATION.md}</files_to_read>" +
     "<gaps>{gap list}</gaps>" +
     "<test_infrastructure>{framework, config, commands}</test_infrastructure>" +
@@ -112,12 +112,12 @@ Handle return:
 ## 6. Generate/Update VALIDATION.md
 
 **State B (create):**
-1. Read template from `D:/Data/桌面/vibe coding/.opencode/get-shit-done/templates/VALIDATION.md`
-2. Fill: frontmatter, Test Infrastructure, Per-Task Map, Manual-Only, Sign-Off
-3. Write to `${PHASE_DIR}/${PADDED_PHASE}-VALIDATION.md`
+1. read template from `./.opencode/get-shit-done/templates/VALIDATION.md`
+2. Fill: frontmatter, Test Infrastructure, Per-task Map, Manual-Only, Sign-Off
+3. write to `${PHASE_DIR}/${PADDED_PHASE}-VALIDATION.md`
 
 **State A (update):**
-1. Update Per-Task Map statuses, add escalated to Manual-Only, update frontmatter
+1. Update Per-task Map statuses, add escalated to Manual-Only, update frontmatter
 2. Append audit trail:
 
 ```markdown
@@ -135,7 +135,7 @@ Handle return:
 git add {test_files}
 git commit -m "test(phase-${PHASE}): add Nyquist validation tests"
 
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(phase-${PHASE}): add/update validation strategy"
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(phase-${PHASE}): add/update validation strategy"
 ```
 
 ## 8. Results + Routing
@@ -154,7 +154,7 @@ GSD > PHASE {N} VALIDATED (PARTIAL)
 ▶ Retry: /gsd-validate-phase {N} ${GSD_WS}
 ```
 
-Display `/clear` reminder.
+Display `/new` reminder.
 
 </process>
 

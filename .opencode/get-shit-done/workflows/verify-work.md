@@ -1,11 +1,11 @@
-<purpose>
-Validate built features through conversational testing with persistent state. Creates UAT.md that tracks test progress, survives /clear, and feeds gaps into /gsd-plan-phase --gaps.
+<objective>
+Validate built features through conversational testing with persistent state. Creates UAT.md that tracks test progress, survives /new, and feeds gaps into /gsd-plan-phase --gaps.
 
-User tests, the agent records. One test at a time. Plain text responses.
-</purpose>
+User tests, OpenCode records. One test at a time. Plain text responses.
+</objective>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-planner — Creates detailed plans from phase scope
 - gsd-plan-checker — Reviews plan quality before execution
 </available_agent_types>
@@ -13,7 +13,7 @@ Valid GSD subagent types (use exact names — do not fall back to 'general-purpo
 <philosophy>
 **Show expected, ask if reality matches.**
 
-the agent presents what SHOULD happen. User confirms or describes what's different.
+OpenCode presents what SHOULD happen. User confirms or describes what's different.
 - "yes" / "y" / "next" / empty → pass
 - Anything else → logged as issue, severity inferred
 
@@ -21,7 +21,7 @@ No Pass/Fail buttons. No severity questions. Just: "Here's what should happen. D
 </philosophy>
 
 <template>
-@D:/Data/桌面/vibe coding/.opencode/get-shit-done/templates/UAT.md
+@./.opencode/get-shit-done/templates/UAT.md
 </template>
 
 <process>
@@ -30,10 +30,10 @@ No Pass/Fail buttons. No severity questions. Just: "Here's what should happen. D
 If $ARGUMENTS contains a phase number, load context:
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init verify-work "${PHASE_ARG}")
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init verify-work "${PHASE_ARG}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_PLANNER=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-planner 2>/dev/null)
-AGENT_SKILLS_CHECKER=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-checker 2>/dev/null)
+AGENT_SKILLS_PLANNER=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-planner 2>/dev/null)
+AGENT_SKILLS_CHECKER=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-checker 2>/dev/null)
 ```
 
 Parse JSON for: `planner_model`, `checker_model`, `commit_docs`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `has_verification`, `uat_path`.
@@ -48,7 +48,7 @@ Parse JSON for: `planner_model`, `checker_model`, `commit_docs`, `phase_found`, 
 
 **If active sessions exist AND no $ARGUMENTS provided:**
 
-Read each file's frontmatter (status, phase) and Current Test section.
+read each file's frontmatter (status, phase) and Current Test section.
 
 Display inline:
 
@@ -95,7 +95,7 @@ Use `phase_dir` from init (or run init if not already done).
 ls "$phase_dir"/*-SUMMARY.md 2>/dev/null || true
 ```
 
-Read each SUMMARY.md to extract testable deliverables.
+read each SUMMARY.md to extract testable deliverables.
 </step>
 
 <step name="extract_tests">
@@ -186,7 +186,7 @@ skipped: 0
 [none yet]
 ```
 
-Write to `.planning/phases/XX-name/{phase_num}-UAT.md`
+write to `.planning/phases/XX-name/{phase_num}-UAT.md`
 
 Proceed to `present_test`.
 </step>
@@ -197,7 +197,7 @@ Proceed to `present_test`.
 Render the checkpoint from the structured UAT file instead of composing it freehand:
 
 ```bash
-CHECKPOINT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" uat render-checkpoint --file "$uat_path" --raw)
+CHECKPOINT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" uat render-checkpoint --file "$uat_path" --raw)
 if [[ "$CHECKPOINT" == @file:* ]]; then CHECKPOINT=$(cat "${CHECKPOINT#@file:}"); fi
 ```
 
@@ -304,7 +304,7 @@ If no more tests → Go to `complete_session`
 <step name="resume_from_file">
 **Resume testing from UAT file:**
 
-Read the full UAT file.
+read the full UAT file.
 
 Find first test with `result: [pending]`.
 
@@ -353,7 +353,7 @@ Clear Current Test section:
 
 Commit the UAT file:
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "test({phase_num}): complete UAT - {passed} passed, {issues} issues" --files ".planning/phases/XX-name/{phase_num}-UAT.md"
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "test({phase_num}): complete UAT - {passed} passed, {issues} issues" --files ".planning/phases/XX-name/{phase_num}-UAT.md"
 ```
 
 Present summary:
@@ -396,7 +396,7 @@ Spawning parallel debug agents to investigate each issue.
 ```
 
 - Load diagnose-issues workflow
-- Follow @D:/Data/桌面/vibe coding/.opencode/get-shit-done/workflows/diagnose-issues.md
+- Follow @./.opencode/get-shit-done/workflows/diagnose-issues.md
 - Spawn parallel debug agents for each issue
 - Collect root causes
 - Update UAT.md with root causes
@@ -420,7 +420,7 @@ Display:
 Spawn gsd-planner in --gaps mode:
 
 ```
-Task(
+task(
   prompt="""
 <planning_context>
 
@@ -470,7 +470,7 @@ Initialize: `iteration_count = 1`
 Spawn gsd-plan-checker:
 
 ```
-Task(
+task(
   prompt="""
 <verification_context>
 
@@ -512,7 +512,7 @@ Display: `Sending back to planner for revision... (iteration {N}/3)`
 Spawn gsd-planner with revision context:
 
 ```
-Task(
+task(
   prompt="""
 <revision_context>
 
@@ -531,7 +531,7 @@ ${AGENT_SKILLS_PLANNER}
 </revision_context>
 
 <instructions>
-Read existing PLAN.md files. Make targeted updates to address checker issues.
+read existing PLAN.md files. Make targeted updates to address checker issues.
 Do NOT replan from scratch unless issues are fundamental.
 </instructions>
 """,
@@ -579,7 +579,7 @@ Plans verified and ready for execution.
 
 **Execute fixes** — run fix plans
 
-`/clear` then `/gsd-execute-phase {phase} --gaps-only`
+`/new` then `/gsd-execute-phase {phase} --gaps-only`
 
 ───────────────────────────────────────────────────────────────
 ```
@@ -590,7 +590,7 @@ Plans verified and ready for execution.
 <update_rules>
 **Batched writes for efficiency:**
 
-Keep results in memory. Write to file only when:
+Keep results in memory. write to file only when:
 1. **Issue found** — Preserve the problem immediately
 2. **Session complete** — Final write before commit
 3. **Checkpoint** — Every 5 passed tests (safety net)

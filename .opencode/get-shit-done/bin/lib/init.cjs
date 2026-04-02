@@ -26,7 +26,7 @@ function getLatestCompletedMilestone(cwd) {
 
 /**
  * Inject `project_root` into an init result object.
- * Workflows use this to prefix `.planning/` paths correctly when Claude's CWD
+ * Workflows use this to prefix `.planning/` paths correctly when OpenCode's CWD
  * differs from the project root (e.g., inside a sub-repo).
  */
 function withProjectRoot(cwd, result) {
@@ -275,7 +275,7 @@ function cmdInitNewProject(cwd, raw) {
       '.ex', '.exs',           // Elixir
       '.clj',                  // Clojure
     ]);
-    const skipDirs = new Set(['node_modules', '.git', '.planning', '.claude', '__pycache__', 'target', 'dist', 'build']);
+    const skipDirs = new Set(['node_modules', '.git', '.planning', '.OpenCode', '__pycache__', 'target', 'dist', 'build']);
     function findCodeFiles(dir, depth) {
       if (depth > 3) return false;
       let entries;
@@ -804,10 +804,10 @@ function cmdInitManager(cwd, raw) {
 
   // Validate prerequisites
   if (!fs.existsSync(paths.roadmap)) {
-    error('No ROADMAP.md found. Run /gsd:new-milestone first.');
+    error('No ROADMAP.md found. Run /gsd-new-milestone first.');
   }
   if (!fs.existsSync(paths.state)) {
-    error('No STATE.md found. Run /gsd:new-milestone first.');
+    error('No STATE.md found. Run /gsd-new-milestone first.');
   }
   const rawContent = fs.readFileSync(paths.roadmap, 'utf-8');
   const content = extractCurrentMilestone(rawContent, cwd);
@@ -964,7 +964,7 @@ function cmdInitManager(cwd, raw) {
         phase_name: phase.name,
         action: 'execute',
         reason: `${phase.plan_count} plans ready, dependencies met`,
-        command: `/gsd:execute-phase ${phase.number}`,
+        command: `/gsd-execute-phase ${phase.number}`,
       });
     } else if (phase.disk_status === 'discussed' || phase.disk_status === 'researched') {
       recommendedActions.push({
@@ -972,7 +972,7 @@ function cmdInitManager(cwd, raw) {
         phase_name: phase.name,
         action: 'plan',
         reason: 'Context gathered, ready for planning',
-        command: `/gsd:plan-phase ${phase.number}`,
+        command: `/gsd-plan-phase ${phase.number}`,
       });
     } else if ((phase.disk_status === 'empty' || phase.disk_status === 'no_directory') && phase.is_next_to_discuss) {
       recommendedActions.push({
@@ -980,7 +980,7 @@ function cmdInitManager(cwd, raw) {
         phase_name: phase.name,
         action: 'discuss',
         reason: 'Unblocked, ready to gather context',
-        command: `/gsd:discuss-phase ${phase.number}`,
+        command: `/gsd-discuss-phase ${phase.number}`,
       });
     }
   }
@@ -1349,7 +1349,7 @@ function cmdInitRemoveWorkspace(cwd, name, raw) {
 }
 
 /**
- * Build a formatted agent skills block for injection into Task() prompts.
+ * Build a formatted agent skills block for injection into task() prompts.
  *
  * Reads `config.agent_skills[agentType]` and validates each skill path exists
  * within the project root. Returns a formatted `<agent_skills>` block or empty
@@ -1386,7 +1386,7 @@ function buildAgentSkillsBlock(config, agentType, projectRoot) {
     // Check that the skill directory and SKILL.md exist
     const skillMdPath = path.join(projectRoot, skillPath, 'SKILL.md');
     if (!fs.existsSync(skillMdPath)) {
-      process.stderr.write(`[agent-skills] WARNING: Skill not found at "${skillPath}/SKILL.md" — skipping\n`);
+      process.stderr.write(`[agent-skills] WARNING: skill not found at "${skillPath}/SKILL.md" — skipping\n`);
       continue;
     }
 

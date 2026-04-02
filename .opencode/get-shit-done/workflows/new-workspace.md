@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Create an isolated workspace directory with git repo copies (worktrees or clones) and an independent `.planning/` directory. Supports multi-repo orchestration and single-repo feature branch isolation.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -13,7 +13,7 @@ Read all files referenced by the invoking prompt's execution_context before star
 **MANDATORY FIRST STEP — Execute init command:**
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init new-workspace)
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init new-workspace)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -160,9 +160,9 @@ git checkout -b "$BRANCH_NAME" 2>&1
 
 Track results: which repos succeeded, which failed, what branch was used.
 
-## 7. Write WORKSPACE.md
+## 7. write WORKSPACE.md
 
-Write the workspace manifest at `$TARGET_PATH/WORKSPACE.md`:
+write the workspace manifest at `$TARGET_PATH/WORKSPACE.md`:
 
 ```markdown
 # Workspace: $WORKSPACE_NAME

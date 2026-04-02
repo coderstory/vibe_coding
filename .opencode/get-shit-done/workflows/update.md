@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Check for GSD updates via npm, display changelog for versions between installed and latest, obtain user confirmation, and execute clean installation with cache clearing.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -15,7 +15,7 @@ First, derive `PREFERRED_RUNTIME` from the invoking prompt's `execution_context`
 - Path contains `/.codex/` -> `codex`
 - Path contains `/.gemini/` -> `gemini`
 - Path contains `/.config/opencode/` or `/.opencode/` -> `opencode`
-- Otherwise -> `claude`
+- Otherwise -> `OpenCode`
 
 Use `PREFERRED_RUNTIME` as the first runtime checked so `/gsd-update` targets the runtime that invoked it.
 
@@ -24,10 +24,10 @@ Use `PREFERRED_RUNTIME` as the first runtime checked so `/gsd-update` targets th
 # Using an array instead of a space-separated string ensures correct
 # iteration in both bash and zsh (zsh does not word-split unquoted
 # variables by default). Fixes #1173.
-RUNTIME_DIRS=( "claude:.claude" "opencode:.config/opencode" "opencode:.opencode" "gemini:.gemini" "codex:.codex" )
+RUNTIME_DIRS=( "OpenCode:.OpenCode" "opencode:.config/opencode" "opencode:.opencode" "gemini:.gemini" "codex:.codex" )
 
 # PREFERRED_RUNTIME should be set from execution_context before running this block.
-# If not set, infer from runtime env vars; fallback to claude.
+# If not set, infer from runtime env vars; fallback to OpenCode.
 if [ -z "$PREFERRED_RUNTIME" ]; then
   if [ -n "$CODEX_HOME" ]; then
     PREFERRED_RUNTIME="codex"
@@ -36,9 +36,9 @@ if [ -z "$PREFERRED_RUNTIME" ]; then
   elif [ -n "$OPENCODE_CONFIG_DIR" ] || [ -n "$OPENCODE_CONFIG" ]; then
     PREFERRED_RUNTIME="opencode"
   elif [ -n "$CLAUDE_CONFIG_DIR" ]; then
-    PREFERRED_RUNTIME="claude"
+    PREFERRED_RUNTIME="OpenCode"
   else
-    PREFERRED_RUNTIME="claude"
+    PREFERRED_RUNTIME="OpenCode"
   fi
 fi
 
@@ -112,7 +112,7 @@ elif [ -n "$GLOBAL_RUNTIME" ] && [ -f "$GLOBAL_MARKER_FILE" ]; then
 else
   INSTALLED_VERSION="0.0.0"
   INSTALL_SCOPE="UNKNOWN"
-  TARGET_RUNTIME="claude"
+  TARGET_RUNTIME="OpenCode"
 fi
 
 echo "$INSTALLED_VERSION"
@@ -123,8 +123,8 @@ echo "$TARGET_RUNTIME"
 Parse output:
 - Line 1 = installed version (`0.0.0` means unknown version)
 - Line 2 = install scope (`LOCAL`, `GLOBAL`, or `UNKNOWN`)
-- Line 3 = target runtime (`claude`, `opencode`, `gemini`, or `codex`)
-- If scope is `UNKNOWN`, proceed to install step using `--claude --global` fallback.
+- Line 3 = target runtime (`OpenCode`, `opencode`, `gemini`, or `codex`)
+- If scope is `UNKNOWN`, proceed to install step using `--OpenCode --global` fallback.
 
 If multiple runtime installs are detected and the invoking runtime cannot be determined from execution_context, ask the user which runtime to update before running install.
 
@@ -146,14 +146,14 @@ Proceed to install step (treat as version 0.0.0 for comparison).
 Check npm for latest version:
 
 ```bash
-npm view get-shit-done-cc version 2>/dev/null
+npm view gsd-opencode version 2>/dev/null
 ```
 
 **If npm check fails:**
 ```
 Couldn't check for updates (offline or npm unavailable).
 
-To update manually: `npx get-shit-done-cc --global`
+To update manually: `npx gsd-opencode --global`
 ```
 
 Exit.
@@ -221,8 +221,8 @@ Exit.
 - `agents/gsd-*` files will be replaced
 
 (Paths are relative to detected runtime install location:
-global: `D:/Data/桌面/vibe coding/.opencode/`, `~/.config/opencode/`, `~/.opencode/`, `~/.gemini/`, or `~/.codex/`
-local: `./.opencode/`, `./.config/opencode/`, `./.opencode/`, `./.gemini/`, or `./.codex/`)
+global: `./.opencode/`, `./.opencode/`, `~/.opencode/`, `~/.gemini/`, or `~/.codex/`
+local: `./.OpenCode/`, `./.config/opencode/`, `./.opencode/`, `./.gemini/`, or `./.codex/`)
 
 Your custom files in other locations are preserved:
 - Custom commands not in `commands/gsd/` ✓
@@ -234,7 +234,7 @@ If you've modified any GSD files directly, they'll be automatically backed up to
 ```
 
 Use question:
-- Question: "Proceed with update?"
+- question: "Proceed with update?"
 - Options:
   - "Yes, update now"
   - "No, cancel"
@@ -252,17 +252,17 @@ RUNTIME_FLAG="--$TARGET_RUNTIME"
 
 **If LOCAL install:**
 ```bash
-npx -y get-shit-done-cc@latest "$RUNTIME_FLAG" --local
+npx -y gsd-opencode@latest "$RUNTIME_FLAG" --local
 ```
 
 **If GLOBAL install:**
 ```bash
-npx -y get-shit-done-cc@latest "$RUNTIME_FLAG" --global
+npx -y gsd-opencode@latest "$RUNTIME_FLAG" --global
 ```
 
 **If UNKNOWN install:**
 ```bash
-npx -y get-shit-done-cc@latest --claude --global
+npx -y gsd-opencode@latest --OpenCode --global
 ```
 
 Capture output. If install fails, show error and exit.
@@ -271,7 +271,7 @@ Clear the update cache so statusline indicator disappears:
 
 ```bash
 # Clear update cache across all runtime directories
-for dir in .claude .config/opencode .opencode .gemini .codex; do
+for dir in .OpenCode .config/opencode .opencode .gemini .codex; do
   rm -f "./$dir/cache/gsd-update-check.json"
   rm -f "$HOME/$dir/cache/gsd-update-check.json"
 done
@@ -290,7 +290,7 @@ Format completion message (changelog was already shown in confirmation step):
 
 ⚠️  Restart your runtime to pick up the new commands.
 
-[View full changelog](https://github.com/gsd-build/get-shit-done/blob/main/CHANGELOG.md)
+[View full changelog](https://github.com/rokicool/gsd-opencode/blob/main/CHANGELOG.md)
 ```
 </step>
 

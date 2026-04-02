@@ -1,15 +1,15 @@
-<purpose>
+<objective>
 Create executable phase prompts (PLAN.md files) for a roadmap phase with integrated research and verification. Default flow: Research (if needed) -> Plan -> Verify -> Done. Orchestrates gsd-phase-researcher, gsd-planner, and gsd-plan-checker agents with a revision loop (max 3 iterations).
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 
-@D:/Data/桌面/vibe coding/.opencode/get-shit-done/references/ui-brand.md
+@./.opencode/get-shit-done/references/ui-brand.md
 </required_reading>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-phase-researcher — Researches technical approaches for a phase
 - gsd-planner — Creates detailed plans from phase scope
 - gsd-plan-checker — Reviews plan quality before execution
@@ -22,11 +22,11 @@ Valid GSD subagent types (use exact names — do not fall back to 'general-purpo
 Load all context in one call (paths only to minimize orchestrator context):
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init plan-phase "$PHASE")
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init plan-phase "$PHASE")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_RESEARCHER=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-researcher 2>/dev/null)
-AGENT_SKILLS_PLANNER=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-planner 2>/dev/null)
-AGENT_SKILLS_CHECKER=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-checker 2>/dev/null)
+AGENT_SKILLS_RESEARCHER=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-researcher 2>/dev/null)
+AGENT_SKILLS_PLANNER=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-planner 2>/dev/null)
+AGENT_SKILLS_CHECKER=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" agent-skills gsd-checker 2>/dev/null)
 ```
 
 Parse JSON for: `researcher_model`, `planner_model`, `checker_model`, `research_enabled`, `plan_checker_enabled`, `nyquist_validation_enabled`, `commit_docs`, `text_mode`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded_phase`, `has_research`, `has_context`, `has_reviews`, `has_plans`, `plan_count`, `planning_exists`, `roadmap_exists`, `phase_req_ids`.
@@ -39,7 +39,7 @@ Parse JSON for: `researcher_model`, `planner_model`, `checker_model`, `research_
 
 Extract from $ARGUMENTS: phase number (integer or decimal like `2.1`), flags (`--research`, `--skip-research`, `--gaps`, `--skip-verify`, `--prd <filepath>`, `--reviews`, `--text`).
 
-Set `TEXT_MODE=true` if `--text` is present in $ARGUMENTS OR `text_mode` from init JSON is `true`. When `TEXT_MODE` is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for Claude Code remote sessions (`/rc` mode) where TUI menus don't work through the the agent App.
+Set `TEXT_MODE=true` if `--text` is present in $ARGUMENTS OR `text_mode` from init JSON is `true`. When `TEXT_MODE` is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for OpenCode remote sessions (`/rc` mode) where TUI menus don't work through the OpenCode App.
 
 Extract `--prd <filepath>` from $ARGUMENTS. If present, set PRD_FILE to the filepath.
 
@@ -73,7 +73,7 @@ Exit workflow.
 ## 3. Validate Phase
 
 ```bash
-PHASE_INFO=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase "${PHASE}")
+PHASE_INFO=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase "${PHASE}")
 ```
 
 **If `found` is false:** Error with available phases. **If `found` is true:** Extract `phase_number`, `phase_name`, `goal` from JSON.
@@ -84,7 +84,7 @@ PHASE_INFO=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-to
 
 **If `--prd <filepath>` provided:**
 
-1. Read the PRD file:
+1. read the PRD file:
 ```bash
 PRD_CONTENT=$(cat "$PRD_FILE" 2>/dev/null)
 if [ -z "$PRD_CONTENT" ]; then
@@ -106,11 +106,11 @@ Generating CONTEXT.md from requirements...
 3. Parse the PRD content and generate CONTEXT.md. The orchestrator should:
    - Extract all requirements, user stories, acceptance criteria, and constraints from the PRD
    - Map each to a locked decision (everything in the PRD is treated as a locked decision)
-   - Identify any areas the PRD doesn't cover and mark as "the agent's Discretion"
+   - Identify any areas the PRD doesn't cover and mark as "OpenCode's Discretion"
    - **Extract canonical refs** from ROADMAP.md for this phase, plus any specs/ADRs referenced in the PRD — expand to full file paths (MANDATORY)
    - Create CONTEXT.md in the phase directory
 
-4. Write CONTEXT.md:
+4. write CONTEXT.md:
 ```markdown
 # Phase [X]: [Name] - Context
 
@@ -132,7 +132,7 @@ Generating CONTEXT.md from requirements...
 ### [Category derived from content]
 - [Requirement as locked decision]
 
-### the agent's Discretion
+### OpenCode's Discretion
 [Areas not covered by PRD — implementation details, technical choices]
 
 </decisions>
@@ -175,7 +175,7 @@ Use full relative paths. Group by topic area.]
 
 5. Commit:
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(${padded_phase}): generate context from PRD" --files "${phase_dir}/${padded_phase}-CONTEXT.md"
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(${padded_phase}): generate context from PRD" --files "${phase_dir}/${padded_phase}-CONTEXT.md"
 ```
 
 6. Set `context_content` to the generated CONTEXT.md content and continue to step 5 (Handle Research).
@@ -192,9 +192,9 @@ If `context_path` is not null, display: `Using phase context from: ${context_pat
 
 **If `context_path` is null (no CONTEXT.md exists):**
 
-Read discuss mode for context gate label:
+read discuss mode for context gate label:
 ```bash
-DISCUSS_MODE=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.discuss_mode 2>/dev/null || echo "discuss")
+DISCUSS_MODE=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.discuss_mode 2>/dev/null || echo "discuss")
 ```
 
 If `TEXT_MODE` is true, present as a plain-text numbered list:
@@ -222,7 +222,7 @@ Otherwise use question:
 
 If "Continue without context": Proceed to step 5.
 If "Run discuss-phase first":
-  **IMPORTANT:** Do NOT invoke discuss-phase as a nested Skill/Task call — question
+  **IMPORTANT:** Do NOT invoke discuss-phase as a nested skill/task call — question
   does not work correctly in nested subcontexts (#1009). Instead, display the command
   and exit so the user runs it as a top-level command:
   ```
@@ -284,7 +284,7 @@ Display banner:
 ### Spawn gsd-phase-researcher
 
 ```bash
-PHASE_DESC=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase "${PHASE}" --pick section)
+PHASE_DESC=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase "${PHASE}" --pick section)
 ```
 
 Research prompt:
@@ -307,17 +307,17 @@ ${AGENT_SKILLS_RESEARCHER}
 **Phase description:** {phase_description}
 **Phase requirement IDs (MUST address):** {phase_req_ids}
 
-**Project instructions:** Read ./AGENTS.md if exists — follow project-specific guidelines
-**Project skills:** Check .claude/skills/ or .agents/skills/ directory (if either exists) — read SKILL.md files, research should account for project skill patterns
+**Project instructions:** read ./AGENTS.md if exists — follow project-specific guidelines
+**Project skills:** Check .OpenCode/skills/ or .agents/skills/ directory (if either exists) — read SKILL.md files, research should account for project skill patterns
 </additional_context>
 
 <output>
-Write to: {phase_dir}/{phase_num}-RESEARCH.md
+write to: {phase_dir}/{phase_num}-RESEARCH.md
 </output>
 ```
 
 ```
-Task(
+task(
   prompt=research_prompt,
   subagent_type="gsd-phase-researcher",
   model="{researcher_model}",
@@ -348,8 +348,8 @@ grep -l "## Validation Architecture" "${PHASE_DIR}"/*-RESEARCH.md 2>/dev/null ||
 ```
 
 **If found:**
-1. Read template: `D:/Data/桌面/vibe coding/.opencode/get-shit-done/templates/VALIDATION.md`
-2. Write to `${PHASE_DIR}/${PADDED_PHASE}-VALIDATION.md` (use Write tool)
+1. read template: `./.opencode/get-shit-done/templates/VALIDATION.md`
+2. write to `${PHASE_DIR}/${PADDED_PHASE}-VALIDATION.md` (use write tool)
 3. Fill frontmatter: `{N}` → phase number, `{phase-slug}` → slug, `{date}` → current date
 4. Verify:
 ```bash
@@ -365,8 +365,8 @@ test -f "${PHASE_DIR}/${PADDED_PHASE}-VALIDATION.md" && echo "VALIDATION_CREATED
 > Skip if `workflow.ui_phase` is explicitly `false` AND `workflow.ui_safety_gate` is explicitly `false` in `.planning/config.json`. If keys are absent, treat as enabled.
 
 ```bash
-UI_PHASE_CFG=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.ui_phase 2>/dev/null || echo "true")
-UI_GATE_CFG=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.ui_safety_gate 2>/dev/null || echo "true")
+UI_PHASE_CFG=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.ui_phase 2>/dev/null || echo "true")
+UI_GATE_CFG=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.ui_safety_gate 2>/dev/null || echo "true")
 ```
 
 **If both are `false`:** Skip to step 6.
@@ -374,7 +374,7 @@ UI_GATE_CFG=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-t
 Check if phase has frontend indicators:
 
 ```bash
-PHASE_SECTION=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase "${PHASE}" 2>/dev/null)
+PHASE_SECTION=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" roadmap get-phase "${PHASE}" 2>/dev/null)
 echo "$PHASE_SECTION" | grep -iE "UI|interface|frontend|component|layout|page|screen|view|form|dashboard|widget" > /dev/null 2>&1
 HAS_UI=$?
 ```
@@ -455,7 +455,7 @@ VALIDATION_EXISTS=$(ls "${PHASE_DIR}"/*-VALIDATION.md 2>/dev/null | head -1)
 If missing and Nyquist is still enabled/applicable — ask user:
 1. Re-run: `/gsd-plan-phase {PHASE} --research ${GSD_WS}`
 2. Disable Nyquist with the exact command:
-   `node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow.nyquist_validation false`
+   `node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow.nyquist_validation false`
 3. Continue anyway (plans fail Dimension 8)
 
 Proceed to Step 8 only if user selects 2 or 3.
@@ -494,8 +494,8 @@ ${AGENT_SKILLS_PLANNER}
 
 **Phase requirement IDs (every ID MUST appear in a plan's `requirements` field):** {phase_req_ids}
 
-**Project instructions:** Read ./AGENTS.md if exists — follow project-specific guidelines
-**Project skills:** Check .claude/skills/ or .agents/skills/ directory (if either exists) — read SKILL.md files, plans should account for project skill rules
+**Project instructions:** read ./AGENTS.md if exists — follow project-specific guidelines
+**Project skills:** Check .OpenCode/skills/ or .agents/skills/ directory (if either exists) — read SKILL.md files, plans should account for project skill rules
 </planning_context>
 
 <downstream_consumer>
@@ -549,7 +549,7 @@ Every task MUST include these fields — they are NOT optional:
 ```
 
 ```
-Task(
+task(
   prompt=filled_prompt,
   subagent_type="gsd-planner",
   model="{planner_model}",
@@ -593,8 +593,8 @@ ${AGENT_SKILLS_CHECKER}
 
 **Phase requirement IDs (MUST ALL be covered):** {phase_req_ids}
 
-**Project instructions:** Read ./AGENTS.md if exists — verify plans honor project guidelines
-**Project skills:** Check .claude/skills/ or .agents/skills/ directory (if either exists) — verify plans account for project skill rules
+**Project instructions:** read ./AGENTS.md if exists — verify plans honor project guidelines
+**Project skills:** Check .OpenCode/skills/ or .agents/skills/ directory (if either exists) — verify plans account for project skill rules
 </verification_context>
 
 <expected_output>
@@ -604,7 +604,7 @@ ${AGENT_SKILLS_CHECKER}
 ```
 
 ```
-Task(
+task(
   prompt=checker_prompt,
   subagent_type="gsd-plan-checker",
   model="{checker_model}",
@@ -650,7 +650,7 @@ Return what changed.
 ```
 
 ```
-Task(
+task(
   prompt=revision_prompt,
   subagent_type="gsd-planner",
   model="{planner_model}",
@@ -686,7 +686,7 @@ For each REQ-ID in `phase_req_ids`:
 
 **Step 3: Check CONTEXT.md features against plan objectives**
 
-Read CONTEXT.md `<decisions>` section. Extract feature/capability names. Check each against plan `<objective>` blocks. Features not mentioned in any plan objective → potentially dropped.
+read CONTEXT.md `<decisions>` section. Extract feature/capability names. Check each against plan `<objective>` blocks. Features not mentioned in any plan objective → potentially dropped.
 
 **Step 4: Report**
 
@@ -729,13 +729,13 @@ Check for auto-advance trigger:
 2. **Sync chain flag with intent** — if user invoked manually (no `--auto`), clear the ephemeral chain flag from any previous interrupted `--auto` chain. This does NOT touch `workflow.auto_advance` (the user's persistent settings preference):
    ```bash
    if [[ ! "$ARGUMENTS" =~ --auto ]]; then
-     node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow._auto_chain_active false 2>/dev/null
+     node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-set workflow._auto_chain_active false 2>/dev/null
    fi
    ```
-3. Read both the chain flag and user preference:
+3. read both the chain flag and user preference:
    ```bash
-   AUTO_CHAIN=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow._auto_chain_active 2>/dev/null || echo "false")
-   AUTO_CFG=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.auto_advance 2>/dev/null || echo "false")
+   AUTO_CHAIN=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow._auto_chain_active 2>/dev/null || echo "false")
+   AUTO_CFG=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.auto_advance 2>/dev/null || echo "false")
    ```
 
 **If `--auto` flag present OR `AUTO_CHAIN` is true OR `AUTO_CFG` is true:**
@@ -749,12 +749,12 @@ Display banner:
 Plans ready. Launching execute-phase...
 ```
 
-Launch execute-phase using the Skill tool to avoid nested Task sessions (which cause runtime freezes due to deep agent nesting):
+Launch execute-phase using the skill tool to avoid nested task sessions (which cause runtime freezes due to deep agent nesting):
 ```
-Skill(skill="gsd:execute-phase", args="${PHASE} --auto --no-transition ${GSD_WS}")
+skill(skill="gsd-execute-phase", args="${PHASE} --auto --no-transition ${GSD_WS}")
 ```
 
-The `--no-transition` flag tells execute-phase to return status after verification instead of chaining further. This keeps the auto-advance chain flat — each phase runs at the same nesting level rather than spawning deeper Task agents.
+The `--no-transition` flag tells execute-phase to return status after verification instead of chaining further. This keeps the auto-advance chain flat — each phase runs at the same nesting level rather than spawning deeper task agents.
 
 **Handle execute-phase return:**
 - **PHASE COMPLETE** → Display final summary:
@@ -805,7 +805,7 @@ Verification: {Passed | Passed with override | Skipped}
 
 /gsd-execute-phase {X} ${GSD_WS}
 
-<sub>/clear first → fresh context window</sub>
+*/new first → fresh context window*
 
 ───────────────────────────────────────────────────────────────
 
@@ -820,7 +820,7 @@ Verification: {Passed | Passed with override | Skipped}
 
 <windows_troubleshooting>
 **Windows users:** If plan-phase freezes during agent spawning (common on Windows due to
-stdio deadlocks with MCP servers — see Claude Code issue anthropics/claude-code#28126):
+stdio deadlocks with MCP servers — see OpenCode issue anthropics/OpenCode-code#28126):
 
 1. **Force-kill:** Close the terminal (Ctrl+C may not work)
 2. **Clean up orphaned processes:**
@@ -830,11 +830,11 @@ stdio deadlocks with MCP servers — see Claude Code issue anthropics/claude-cod
    ```
 3. **Clean up stale task directories:**
    ```powershell
-   # Remove stale subagent task dirs (Claude Code never cleans these on crash)
-   Remove-Item -Recurse -Force "$env:USERPROFILE\.claude\tasks\*" -ErrorAction SilentlyContinue
+   # Remove stale subagent task dirs (OpenCode never cleans these on crash)
+   Remove-Item -Recurse -Force "$env:USERPROFILE\.OpenCode\tasks\*" -ErrorAction SilentlyContinue
    ```
 4. **Reduce MCP server count:** Temporarily disable non-essential MCP servers in settings.json
-5. **Retry:** Restart Claude Code and run `/gsd-plan-phase` again
+5. **Retry:** Restart OpenCode and run `/gsd-plan-phase` again
 
 If freezes persist, try `--skip-research` to reduce the agent chain from 3 to 2 agents:
 ```

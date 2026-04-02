@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 List all pending todos, allow selection, load full context for the selected todo, and route to appropriate action.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -12,7 +12,7 @@ Read all files referenced by the invoking prompt's execution_context before star
 Load todo context:
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init todos)
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init todos)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -71,7 +71,7 @@ If invalid: "Invalid selection. Reply with a number (1-[N]) or `q` to exit."
 </step>
 
 <step name="load_context">
-Read the todo file completely. Display:
+read the todo file completely. Display:
 
 ```
 ## [title]
@@ -155,7 +155,7 @@ If todo was moved to done/, commit the change:
 
 ```bash
 git rm --cached .planning/todos/pending/[filename] 2>/dev/null || true
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: start work on todo - [title]" --files .planning/todos/done/[filename] .planning/STATE.md
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs: start work on todo - [title]" --files .planning/todos/done/[filename] .planning/STATE.md
 ```
 
 Tool respects `commit_docs` config and gitignore automatically.

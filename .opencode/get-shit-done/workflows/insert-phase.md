@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Insert a decimal phase for urgent work discovered mid-milestone between existing integer phases. Uses decimal numbering (72.1, 72.2, etc.) to preserve the logical sequence of planned phases while accommodating urgent insertions without renumbering the entire roadmap.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -34,7 +34,7 @@ Validate first argument is an integer.
 Load phase operation context:
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${after_phase}")
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${after_phase}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -49,7 +49,7 @@ Exit.
 **Delegate the phase insertion to gsd-tools:**
 
 ```bash
-RESULT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" phase insert "${after_phase}" "${description}")
+RESULT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" phase insert "${after_phase}" "${description}")
 ```
 
 The CLI handles:
@@ -65,7 +65,7 @@ Extract from result: `phase_number`, `after_phase`, `name`, `slug`, `directory`.
 <step name="update_project_state">
 Update STATE.md to reflect the inserted phase:
 
-1. Read `.planning/STATE.md`
+1. read `.planning/STATE.md`
 2. Under "## Accumulated Context" → "### Roadmap Evolution" add entry:
    ```
    - Phase {decimal_phase} inserted after Phase {after_phase}: {description} (URGENT)
@@ -95,7 +95,7 @@ Project state updated: .planning/STATE.md
 
 `/gsd-plan-phase {decimal_phase}`
 
-<sub>`/clear` first -> fresh context window</sub>
+*`/new` first -> fresh context window*
 
 ---
 

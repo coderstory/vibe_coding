@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Create all phases necessary to close gaps identified by `/gsd-audit-milestone`. Reads MILESTONE-AUDIT.md, groups gaps into logical phases, creates phase entries in ROADMAP.md, and offers to plan each phase. One command creates all fix phases — no manual `/gsd-add-phase` per gap.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -65,7 +65,7 @@ Gap: Flow "View dashboard" broken at data fetch
 Find highest existing phase:
 ```bash
 # Get sorted phase list, extract last one
-HIGHEST=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" phases list --pick directories[-1])
+HIGHEST=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" phases list --pick directories[-1])
 ```
 
 New phases continue from there:
@@ -146,7 +146,7 @@ mkdir -p ".planning/phases/{NN}-{name}"
 ## 9. Commit Roadmap and Requirements Update
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(roadmap): add gap closure phases {N}-{M}" --files .planning/ROADMAP.md .planning/REQUIREMENTS.md
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "docs(roadmap): add gap closure phases {N}-{M}" --files .planning/ROADMAP.md .planning/REQUIREMENTS.md
 ```
 
 ## 10. Offer Next Steps
@@ -165,7 +165,7 @@ node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" comm
 
 `/gsd-plan-phase {N}`
 
-<sub>`/clear` first → fresh context window</sub>
+*`/new` first → fresh context window*
 
 ---
 

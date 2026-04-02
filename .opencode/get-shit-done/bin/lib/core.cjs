@@ -40,7 +40,7 @@ function detectSubRepos(cwd) {
 /**
  * Walk up from `startDir` to find the project root that owns `.planning/`.
  *
- * In multi-repo workspaces, Claude may open inside a sub-repo (e.g. `backend/`)
+ * In multi-repo workspaces, OpenCode may open inside a sub-repo (e.g. `backend/`)
  * instead of the project root. This function prevents `.planning/` from being
  * created inside the sub-repo by locating the nearest ancestor that already has
  * a `.planning/` directory.
@@ -161,8 +161,8 @@ function output(result, raw, rawValue) {
     data = String(rawValue);
   } else {
     const json = JSON.stringify(result, null, 2);
-    // Large payloads exceed Claude Code's Bash tool buffer (~50KB).
-    // Write to tmpfile and output the path prefixed with @file: so callers can detect it.
+    // Large payloads exceed OpenCode's bash tool buffer (~50KB).
+    // write to tmpfile and output the path prefixed with @file: so callers can detect it.
     if (json.length > 50000) {
       reapStaleTempFiles();
       const tmpPath = path.join(require('os').tmpdir(), `gsd-${Date.now()}.json`);
@@ -212,9 +212,9 @@ function loadConfig(cwd) {
     brave_search: false,
     firecrawl: false,
     exa_search: false,
-    text_mode: false, // when true, use plain-text numbered lists instead of AskUserQuestion menus
+    text_mode: false, // when true, use plain-text numbered lists instead of question menus
     sub_repos: [],
-    resolve_model_ids: false, // false: return alias as-is | true: map to full Claude model ID | "omit": return '' (runtime uses its default)
+    resolve_model_ids: false, // false: return alias as-is | true: map to full OpenCode model ID | "omit": return '' (runtime uses its default)
     context_window: 200000, // default 200k; set to 1000000 for Opus/Sonnet 4.6 1M models
     phase_naming: 'sequential', // 'sequential' (default, auto-increment) or 'custom' (arbitrary string IDs)
   };
@@ -992,9 +992,9 @@ function checkAgentsInstalled() {
  * Users can override with model_overrides in config.json for custom/latest models.
  */
 const MODEL_ALIAS_MAP = {
-  'opus': 'claude-opus-4-0',
-  'sonnet': 'claude-sonnet-4-5',
-  'haiku': 'claude-haiku-3-5',
+  'opus': 'OpenCode-opus-4-0',
+  'sonnet': 'OpenCode-sonnet-4-5',
+  'haiku': 'OpenCode-haiku-3-5',
 };
 
 function resolveModelInternal(cwd, agentType) {
@@ -1008,8 +1008,8 @@ function resolveModelInternal(cwd, agentType) {
   }
 
   // resolve_model_ids: "omit" — return empty string so the runtime uses its configured
-  // default model. For non-Claude runtimes (OpenCode, Codex, etc.) that don't recognize
-  // Claude aliases (opus/sonnet/haiku/inherit). Set automatically during install. See #1156.
+  // default model. For non-OpenCode runtimes (OpenCode, Codex, etc.) that don't recognize
+  // OpenCode aliases (opus/sonnet/haiku/inherit). Set automatically during install. See #1156.
   if (config.resolve_model_ids === 'omit') {
     return '';
   }
@@ -1021,8 +1021,8 @@ function resolveModelInternal(cwd, agentType) {
   if (profile === 'inherit') return 'inherit';
   const alias = agentModels[profile] || agentModels['balanced'] || 'sonnet';
 
-  // resolve_model_ids: true — map alias to full Claude model ID
-  // Prevents 404s when the Task tool passes aliases directly to the API
+  // resolve_model_ids: true — map alias to full OpenCode model ID
+  // Prevents 404s when the task tool passes aliases directly to the API
   if (config.resolve_model_ids) {
     return MODEL_ALIAS_MAP[alias] || alias;
   }
@@ -1154,7 +1154,7 @@ function filterSummaryFiles(files) {
 }
 
 /**
- * Read a phase directory and return counts/flags for common file types.
+ * read a phase directory and return counts/flags for common file types.
  * Returns an object with plans[], summaries[], and boolean flags for
  * research/context/verification files.
  */
@@ -1171,7 +1171,7 @@ function getPhaseFileStats(phaseDir) {
 }
 
 /**
- * Read immediate child directories from a path.
+ * read immediate child directories from a path.
  * Returns [] if the path doesn't exist or can't be read.
  * Pass sort=true to apply comparePhaseNum ordering.
  */

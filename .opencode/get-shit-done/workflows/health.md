@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Validate `.planning/` directory integrity and report actionable issues. Checks for missing files, invalid configurations, inconsistent state, and orphaned plans. Optionally repairs auto-fixable issues.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -25,7 +25,7 @@ fi
 **Run health validation:**
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" validate health $REPAIR_FLAG
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" validate health $REPAIR_FLAG
 ```
 
 Parse JSON output:
@@ -112,7 +112,7 @@ If yes, re-run with --repair flag and display results.
 Re-run health check without --repair to confirm issues are resolved:
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" validate health
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" validate health
 ```
 
 Report final status.
@@ -159,20 +159,20 @@ Report final status.
 </repair_actions>
 
 <stale_task_cleanup>
-**Windows-specific:** Check for stale Claude Code task directories that accumulate on crash/freeze.
+**Windows-specific:** Check for stale OpenCode task directories that accumulate on crash/freeze.
 These are left behind when subagents are force-killed and consume disk space.
 
 When `--repair` is active, detect and clean up:
 
 ```bash
 # Check for stale task directories (older than 24 hours)
-TASKS_DIR="D:/Data/桌面/vibe coding/.opencode/tasks"
+TASKS_DIR="$HOME/.OpenCode/tasks"
 if [ -d "$TASKS_DIR" ]; then
   STALE_COUNT=$( (find "$TASKS_DIR" -maxdepth 1 -type d -mtime +1 2>/dev/null || true) | wc -l )
   if [ "$STALE_COUNT" -gt 0 ]; then
-    echo "⚠️  Found $STALE_COUNT stale task directories in D:/Data/桌面/vibe coding/.opencode/tasks/"
+    echo "⚠️  Found $STALE_COUNT stale task directories in ./.opencode/tasks/"
     echo "   These are leftover from crashed subagent sessions."
-    echo "   Run: rm -rf D:/Data/桌面/vibe coding/.opencode/tasks/*  (safe — only affects dead sessions)"
+    echo "   Run: rm -rf ./.opencode/tasks/*  (safe — only affects dead sessions)"
   fi
 fi
 ```

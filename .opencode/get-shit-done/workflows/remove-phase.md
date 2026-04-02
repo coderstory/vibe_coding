@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Remove an unstarted future phase from the project roadmap, delete its directory, renumber all subsequent phases to maintain a clean linear sequence, and commit the change. The git commit serves as the historical record of removal.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -29,7 +29,7 @@ Exit.
 Load phase operation context:
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${target}")
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${target}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -80,13 +80,13 @@ Wait for confirmation.
 **Delegate the entire removal operation to gsd-tools:**
 
 ```bash
-RESULT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" phase remove "${target}")
+RESULT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" phase remove "${target}")
 ```
 
 If the phase has executed plans (SUMMARY.md files), gsd-tools will error. Use `--force` only if the user confirms:
 
 ```bash
-RESULT=$(node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" phase remove "${target}" --force)
+RESULT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" phase remove "${target}" --force)
 ```
 
 The CLI handles:
@@ -103,7 +103,7 @@ Extract from result: `removed`, `directory_deleted`, `renamed_directories`, `ren
 Stage and commit the removal:
 
 ```bash
-node "D:/Data/桌面/vibe coding/.opencode/get-shit-done/bin/gsd-tools.cjs" commit "chore: remove phase {target} ({original-phase-name})" --files .planning/
+node "./.opencode/get-shit-done/bin/gsd-tools.cjs" commit "chore: remove phase {target} ({original-phase-name})" --files .planning/
 ```
 
 The commit message preserves the historical record of what was removed.
