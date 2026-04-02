@@ -5,7 +5,30 @@ import { StarterKit } from '@tiptap/starter-kit'
 import { getArticleDetail, createArticle, updateArticle, getAllTags, getArticleTags, uploadFile, createTag } from '@/api/knowledge'
 import { ElMessage } from 'element-plus'
 
-console.log('ArticleEditor mounted, StarterKit:', StarterKit)
+const props = defineProps({
+  modelValue: Boolean,
+  articleId: Number,
+  categoryId: Number
+})
+
+const emit = defineEmits(['update:modelValue', 'success'])
+
+const visible = computed({
+  get: () => props.modelValue,
+  set: (val) => emit('update:modelValue', val)
+})
+
+const isEdit = computed(() => !!props.articleId)
+const form = ref({
+  title: '',
+  categoryId: null,
+  content: '',
+  tagIds: [],
+  status: 1
+})
+const allTags = ref([])
+const fileList = ref([])
+const uploadedFiles = ref([])
 
 const editor = useEditor({
   content: '<p>输入知识内容...</p>',
@@ -16,8 +39,6 @@ const editor = useEditor({
     form.value.content = editor.getHTML()
   }
 })
-
-console.log('Editor created:', editor)
 
 watch(visible, async (val) => {
   if (val) {
