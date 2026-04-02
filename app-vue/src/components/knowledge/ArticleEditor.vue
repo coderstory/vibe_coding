@@ -190,7 +190,8 @@ onBeforeUnmount(() => {
         <div style="border: 1px solid red; min-height: 400px; padding: 10px;">
           <div>调试: {{ editor ? '有editor' : '无editor' }}</div>
           <div>editor.isEmpty: {{ editor?.isEmpty }}</div>
-          <editor-content :editor="editor" style="border: 1px solid blue; display: block;" />
+          <div>editor.getHTML: {{ editor?.getHTML() }}</div>
+          <editor-content :editor="editor" style="border: 1px solid blue; display: block; min-height: 350px;" />
         </div>
       </div>
       <el-form-item label="附件">
@@ -216,5 +217,16 @@ onBeforeUnmount(() => {
   border-radius: 4px;
   min-height: 400px;
   padding: 0;
+}
+</style>
+<style>
+.ProseMirror {
+  min-height: 380px !important;
+  padding: 16px !important;
+  outline: none !important;
+  box-sizing: border-box;
+}
+.ProseMirror p {
+  margin: 0 0 8px 0;
 }
 </style>
