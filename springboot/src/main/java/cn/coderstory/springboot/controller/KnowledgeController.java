@@ -72,8 +72,7 @@ public class KnowledgeController {
         article.setContent((String) request.get("content"));
         article.setStatus((Integer) request.getOrDefault("status", 1));
         
-        @SuppressWarnings("unchecked")
-        List<Long> tagIds = (List<Long>) request.get("tagIds");
+        List<Integer> tagIds = (List<Integer>) request.get("tagIds");
         KnowledgeArticle created = knowledgeService.createArticle(article, tagIds);
         return ok(created);
     }
@@ -85,8 +84,7 @@ public class KnowledgeController {
         article.setContent((String) request.get("content"));
         article.setStatus((Integer) request.getOrDefault("status", 1));
         
-        @SuppressWarnings("unchecked")
-        List<Long> tagIds = (List<Long>) request.get("tagIds");
+        List<Integer> tagIds = (List<Integer>) request.get("tagIds");
         KnowledgeArticle updated = knowledgeService.updateArticle(id, article, tagIds);
         return ok(updated);
     }
