@@ -25,3 +25,11 @@ mybatis-plus:
 
 server:
   port: 8080
+
+jwt:
+  secret: mySecretKeyForJwtTokenGeneration123456789
+  expiration: 86400000
+
+logging:
+  level:
+    cn.coderstory: debug
