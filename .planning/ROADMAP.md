@@ -30,7 +30,9 @@
   8. 登录页面设计精美，符合企业级审美
   9. 管理后台主界面布局合理（左侧菜单 + 顶部用户栏 + 内容区）
   10. 审计日志记录操作用户、操作时间、操作类型、目标对象、IP地址
-**Plans**: TBD
+**Plans**: 2 plans
+- [x] 01-foundation-01-PLAN.md — 后端认证 API 和数据库层
+- [x] 01-foundation-02-PLAN.md — 前端认证 UI 和管理后台布局
 
 ### Phase 2: 用户与权限管理
 **Goal**: 管理员可以完整管理用户、角色和查看审计日志
@@ -75,6 +77,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. 认证与基础框架 | 0/? | Not started | - |
+| 1. 认证与基础框架 | 2/2 | Planned | - |
 | 2. 用户与权限管理 | 0/? | Not started | - |
 | 3. 业务数据管理 | 0/? | Not started | - |
