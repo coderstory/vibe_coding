@@ -2,8 +2,7 @@
 import { ref, watch, computed, onBeforeUnmount } from 'vue'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
-import '@tiptap/starter-kit/dist/starter-kit.css'
-import { getArticleDetail, createArticle, updateArticle, getAllTags, getArticleTags, uploadFile } from '@/api/knowledge'
+import { getArticleDetail, createArticle, updateArticle, getAllTags, getArticleTags, uploadFile, createTag } from '@/api/knowledge'
 import { ElMessage } from 'element-plus'
 
 const props = defineProps({
@@ -91,6 +90,18 @@ function resetForm() {
   fileList.value = []
 }
 
+async function handleCreateTag(tagName) {
+  try {
+    const tag = { name: tagName, color: '#409EFF' }
+    const res = await createTag(tag)
+    allTags.value.push(res.data)
+    return res.data.id
+  } catch (e) {
+    ElMessage.error('创建标签失败')
+    return null
+  }
+}
+
 async function handleSave() {
   if (!form.value.title) {
     ElMessage.warning('请输入标题')
@@ -162,7 +173,16 @@ onBeforeUnmount(() => {
         </el-col>
         <el-col :xs="24" :sm="8" :md="4">
           <el-form-item label="标签">
-            <el-select v-model="form.tagIds" multiple placeholder="请选择标签" style="width: 100%">
+            <el-select
+              v-model="form.tagIds"
+              multiple
+              filterable
+              allow-create
+              default-first-option
+              placeholder="选择或输入新标签"
+              style="width: 100%"
+              @created="handleCreateTag"
+            >
               <el-option v-for="tag in allTags" :key="tag.id" :label="tag.name" :value="tag.id">
                 <span :style="{ color: tag.color }">{{ tag.name }}</span>
               </el-option>
