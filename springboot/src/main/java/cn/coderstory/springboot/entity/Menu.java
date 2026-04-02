@@ -3,6 +3,8 @@ package cn.coderstory.springboot.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @TableName("sys_menu")
@@ -26,4 +28,7 @@ public class Menu {
     
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
+    
+    @TableField(exist = false)
+    private List<Menu> children = new ArrayList<>();
 }
