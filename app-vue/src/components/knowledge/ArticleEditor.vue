@@ -2,8 +2,7 @@
 import { ref, watch, computed, onBeforeUnmount } from 'vue'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
-import Image from '@tiptap/extension-image'
-import Placeholder from '@tiptap/extension-placeholder'
+import '@tiptap/starter-kit/dist/starter-kit.css'
 import { getArticleDetail, createArticle, updateArticle, getAllTags, getArticleTags, uploadFile } from '@/api/knowledge'
 import { ElMessage } from 'element-plus'
 
@@ -33,16 +32,9 @@ const fileList = ref([])
 const uploadedFiles = ref([])
 
 const editor = useEditor({
-  content: '',
+  content: '<p>输入知识内容...</p>',
   extensions: [
-    StarterKit,
-    Image.configure({
-      inline: true,
-      allowBase64: true
-    }),
-    Placeholder.configure({
-      placeholder: '输入知识内容...'
-    })
+    StarterKit
   ],
   onUpdate: ({ editor }) => {
     form.value.content = editor.getHTML()
