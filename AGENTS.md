@@ -330,7 +330,9 @@ git push
 
  
 ---
-
+## 编程规范
+1. 后端的SQL写道mapper.xml中，而不是接口类上
+2. 后端数据库操作尽可能复用mybatis plus的特性，比如使用basesevice简化增删改查
  
 
  
