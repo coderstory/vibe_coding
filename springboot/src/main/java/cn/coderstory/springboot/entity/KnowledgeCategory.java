@@ -13,7 +13,7 @@ public class KnowledgeCategory {
     @TableId(type = IdType.AUTO)
     private Long id;
     
-    private Long parentId;
+    private Long parentId; 
     
     private String name;
     

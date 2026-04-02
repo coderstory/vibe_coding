@@ -37,8 +37,8 @@ function handleNodeClick(data) {
 
 async function handleAddRoot() {
   try {
-    const name = await ElMessageBox.prompt('请输入分类名称', '新增分类')
-    await createCategory({ name, parentId: 0, sortOrder: 0 })
+    const result = await ElMessageBox.prompt('请输入分类名称', '新增分类')
+    await createCategory({ name: result.value, parentId: 0, sortOrder: 0 })
     ElMessage.success('创建成功')
     loadTree()
   } catch (e) {
@@ -48,8 +48,8 @@ async function handleAddRoot() {
 
 async function handleAddChild(data) {
   try {
-    const name = await ElMessageBox.prompt('请输入子分类名称', '新增子分类')
-    await createCategory({ name, parentId: data.id, sortOrder: 0 })
+    const result = await ElMessageBox.prompt('请输入子分类名称', '新增子分类')
+    await createCategory({ name: result.value, parentId: data.id, sortOrder: 0 })
     ElMessage.success('创建成功')
     loadTree()
   } catch (e) {
