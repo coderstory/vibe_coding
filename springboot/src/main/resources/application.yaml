@@ -2,7 +2,7 @@ spring:
   application:
     name: admin-system
   flyway:
-    enabled: false
+    enabled: true
     baseline-on-migrate: true
     baseline-description: "init"
     baseline-version: "0"
