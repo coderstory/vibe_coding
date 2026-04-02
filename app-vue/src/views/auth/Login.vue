@@ -3,9 +3,11 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/store/user'
+import { useThemeStore } from '@/store/theme'
 
 const router = useRouter()
 const userStore = useUserStore()
+const themeStore = useThemeStore()
 
 const loginForm = reactive({
   username: '',
@@ -51,11 +53,18 @@ function handleKeydown(e) {
 </script>
 
 <template>
-  <div class="login-container" @keydown="handleKeydown">
-    <div class="login-card">
+  <div class="login-container dynamic-gradient" @keydown="handleKeydown">
+    <div class="login-particles">
+      <div class="particle floating" style="top: 10%; left: 20%;"></div>
+      <div class="particle floating" style="top: 60%; left: 80%; animation-delay: 0.5s;"></div>
+      <div class="particle floating" style="top: 80%; left: 10%; animation-delay: 1s;"></div>
+      <div class="particle floating" style="top: 20%; left: 70%; animation-delay: 1.5s;"></div>
+    </div>
+    
+    <div class="login-card glass glow">
       <div class="login-header">
         <h1 class="login-title">管理系统</h1>
-        <p class="login-subtitle">欢迎登录</p>
+        <p class="login-subtitle">欢迎回来</p>
       </div>
       
       <el-form
@@ -69,7 +78,6 @@ function handleKeydown(e) {
           <el-input
             v-model="loginForm.username"
             placeholder="请输入用户名"
-            prefix-icon="User"
             size="large"
           />
         </el-form-item>
@@ -79,7 +87,6 @@ function handleKeydown(e) {
             v-model="loginForm.password"
             type="password"
             placeholder="请输入密码"
-            prefix-icon="Lock"
             size="large"
             show-password
           />
@@ -90,13 +97,19 @@ function handleKeydown(e) {
             type="primary"
             size="large"
             :loading="loading"
-            class="login-button"
+            class="login-button glass-button"
             @click="handleLogin"
           >
-            登录
+            登 录
           </el-button>
         </el-form-item>
       </el-form>
+      
+      <div class="login-footer">
+        <span class="theme-toggle" @click="themeStore.toggleTheme">
+          {{ themeStore.isDark ? '☀️ 亮色模式' : '🌙 暗色模式' }}
+        </span>
+      </div>
     </div>
   </div>
 </template>
@@ -107,32 +120,49 @@ function handleKeydown(e) {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4e7ed 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
 }
 
 .login-card {
-  width: 400px;
-  padding: 40px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 420px;
+  padding: 48px 40px;
+  position: relative;
+  z-index: 10;
 }
 
 .login-header {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 40px;
 }
 
 .login-title {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
-  color: #303133;
-  margin: 0 0 8px 0;
+  color: white;
+  margin: 0 0 12px 0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .login-subtitle {
-  font-size: 14px;
-  color: #606266;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.8);
   margin: 0;
 }
 
@@ -141,12 +171,43 @@ function handleKeydown(e) {
 }
 
 .login-form :deep(.el-input__wrapper) {
-  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: none !important;
+  border: none !important;
+  border-radius: 8px;
+}
+
+.login-form :deep(.el-input__inner) {
+  color: white;
+}
+
+.login-form :deep(.el-input__inner::placeholder) {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .login-button {
   width: 100%;
-  height: 40px;
-  font-size: 16px;
+  height: 48px;
+  font-size: 18px;
+  border: none;
+  margin-top: 8px;
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 24px;
+}
+
+.theme-toggle {
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+.theme-toggle:hover {
+  color: white;
 }
 </style>

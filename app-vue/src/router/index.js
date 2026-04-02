@@ -5,7 +5,7 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: () => import('@/views/Login.vue'),
+    component: () => import('@/views/auth/Login.vue'),
     meta: { requiresAuth: false }
   },
   {
@@ -15,20 +15,20 @@ const routes = [
   {
     path: '/dashboard',
     name: 'Dashboard',
-    component: () => import('@/views/Layout.vue'),
+    component: () => import('@/views/layout/Layout.vue'),
     redirect: '/dashboard/index',
     meta: { requiresAuth: true },
     children: [
       {
         path: 'index',
         name: 'DashboardIndex',
-        component: () => import('@/views/DashboardIndex.vue'),
+        component: () => import('@/views/dashboard/DashboardIndex.vue'),
         meta: { title: '首页', requiresAuth: true }
       },
       {
         path: 'system/user',
         name: 'UserManage',
-        component: () => import('@/views/system/UserManage.vue'),
+        component: () => import('@/views/system/UserManagement.vue'),
         meta: { title: '用户管理', requiresAuth: true }
       },
       {
@@ -40,13 +40,13 @@ const routes = [
       {
         path: 'audit',
         name: 'AuditLog',
-        component: () => import('@/views/AuditLog.vue'),
+        component: () => import('@/views/audit/AuditLog.vue'),
         meta: { title: '审计日志', requiresAuth: true }
       },
       {
         path: 'business',
         name: 'BusinessData',
-        component: () => import('@/views/BusinessData.vue'),
+        component: () => import('@/views/business/BusinessData.vue'),
         meta: { title: '业务数据', requiresAuth: true }
       }
     ]
@@ -58,7 +58,6 @@ const router = createRouter({
   routes
 })
 
-// 路由守卫
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
   userStore.initFromStorage()
