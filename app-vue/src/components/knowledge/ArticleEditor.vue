@@ -187,7 +187,8 @@ onBeforeUnmount(() => {
       </el-row>
       <div style="margin-bottom: 20px;">
         <label style="display: block; margin-bottom: 8px; font-weight: 500;">内容</label>
-        <div class="editor-container">
+        <div class="editor-container" id="editor-debug">
+          <div style="background: #ccc; padding: 10px;">调试: {{ editor ? '有editor' : '无editor' }}</div>
           <editor-content :editor="editor" />
         </div>
       </div>
