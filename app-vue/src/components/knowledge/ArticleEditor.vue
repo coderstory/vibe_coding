@@ -187,9 +187,10 @@ onBeforeUnmount(() => {
       </el-row>
       <div style="margin-bottom: 20px;">
         <label style="display: block; margin-bottom: 8px; font-weight: 500;">内容</label>
-        <div class="editor-container" id="editor-debug">
-          <div style="background: #ccc; padding: 10px;">调试: {{ editor ? '有editor' : '无editor' }}</div>
-          <editor-content :editor="editor" />
+        <div style="border: 1px solid red; min-height: 400px; padding: 10px;">
+          <div>调试: {{ editor ? '有editor' : '无editor' }}</div>
+          <div>editor.isEmpty: {{ editor?.isEmpty }}</div>
+          <editor-content :editor="editor" style="border: 1px solid blue; display: block;" />
         </div>
       </div>
       <el-form-item label="附件">
