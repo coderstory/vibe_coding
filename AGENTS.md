@@ -9,7 +9,9 @@
 1. 处理所有问题时，**全程思考过程必须使用中文**（包括需求分析、逻辑拆解、方案选择、步骤推导等所有内部推理环节）。
 2. 最终输出的所有回答内容（包括文字解释、代码注释、步骤说明等）**必须全部使用中文**，仅代码语法本身的英文关键词除外。
 3. 操作系统为 Windows 10，生成的 shell 命令必须是 powershell 命令，不能是 sh 或 bash 命令。
-
+4. 回复简洁直接，不要解释性废话
+5. 不确定的主动询问，不要编造答案
+ 
 ---
 
 ## 项目概述
@@ -328,8 +330,41 @@ git push
 
  
 
- 
 ---
+
+## 数据库迁移 (Flyway)
+
+### 迁移脚本位置
+```
+springboot/src/main/resources/db/migration/
+```
+
+### 脚本命名规范
+- 格式：`V{版本号}__{描述}.sql`
+- 版本号使用整数，从 1 开始递增
+- 描述使用下划线分隔单词
+- 示例：`V1__init.sql`、`V2__add_user_phone.sql`、`V3__create_role_table.sql`
+
+### 迁移规则
+1. **每次数据库变更必须创建新迁移脚本**，禁止直接修改已执行的脚本
+2. 迁移脚本必须具有幂等性（重复执行不会报错）
+3. 使用 `CREATE TABLE IF NOT EXISTS`、`ALTER TABLE ADD COLUMN IF NOT EXISTS` 等安全语句
+4. 提交前确保迁移脚本在本地测试通过
+
+### 示例迁移脚本
+
+```sql
+-- V2__add_user_phone.sql
+ALTER TABLE sys_user ADD COLUMN phone VARCHAR(20) COMMENT '手机号' AFTER name;
+```
+
+### 常见问题处理
+- **已有表需要 Flyway 管理**：设置 `spring.flyway.baseline-on-migrate: true`
+- **迁移失败**：检查 SQL 语法，确保语句完整
+- **版本冲突**：确保版本号唯一，不重复
+
+---
+
 ## 编程规范
 1. 后端的SQL写道mapper.xml中，而不是接口类上
 2. 后端数据库操作尽可能复用mybatis plus的特性，比如使用basesevice简化增删改查
@@ -340,3 +375,4 @@ git push
 
 - **2024**: 初始创建
 - **改进**: 优化代码风格指南，添加更详细的测试命令和 API 设计约定
+- **2026-04-02**: 集成 Flyway 数据库迁移工具，添加数据库迁移规范
