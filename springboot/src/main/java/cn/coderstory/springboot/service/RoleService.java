@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface RoleService {
     
+    Role getById(Long id);
+    
     IPage<Role> getRolePage(Page<Role> page, String roleName);
     
     boolean saveRole(Role role);

@@ -25,6 +25,11 @@ public class RoleServiceImpl implements RoleService {
     private final RoleMenuPermissionMapper roleMenuPermissionMapper;
     
     @Override
+    public Role getById(Long id) {
+        return roleMapper.selectById(id);
+    }
+    
+    @Override
     public IPage<Role> getRolePage(Page<Role> page, String roleName) {
         LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
         if (roleName != null && !roleName.isEmpty()) {
