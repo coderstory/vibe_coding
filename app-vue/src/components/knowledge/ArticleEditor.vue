@@ -42,6 +42,9 @@ const editor = useEditor({
   }
 })
 
+console.log('Editor created:', editor.value)
+console.log('Editor element:', editor.value?.element)
+
 watch(visible, async (val) => {
   if (val) {
     await loadTags()
@@ -191,7 +194,6 @@ onBeforeUnmount(() => {
         <label style="display: block; margin-bottom: 8px; font-weight: 500;">内容</label>
         <div class="editor-container">
           <editor-content :editor="editor" />
-          <div style="color: red; padding: 20px;">测试文本</div>
         </div>
       </div>
       <el-form-item label="附件">
