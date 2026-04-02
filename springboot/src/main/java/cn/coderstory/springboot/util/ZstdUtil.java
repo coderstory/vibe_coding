@@ -24,7 +24,9 @@ public class ZstdUtil {
             return null;
         }
         try {
-            return Zstd.decompress(new byte[(int) originalSize], compressed);
+            byte[] decompressed = new byte[(int) originalSize];
+            Zstd.decompress(decompressed, compressed);
+            return decompressed;
         } catch (Exception e) {
             log.error("zstd decompress error", e);
             return null;
