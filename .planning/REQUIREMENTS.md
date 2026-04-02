@@ -22,15 +22,15 @@
 
 ### 角色管理 (ROLE)
 
-- [ ] **ROLE-01**: 管理员可以查看角色列表
-- [ ] **ROLE-02**: 管理员可以新增角色（角色名、描述、权限）
-- [ ] **ROLE-03**: 管理员可以编辑角色
-- [ ] **ROLE-04**: 管理员可以删除角色
+- [x] **ROLE-01**: 管理员可以查看角色列表
+- [x] **ROLE-02**: 管理员可以新增角色（角色名、描述、权限）
+- [x] **ROLE-03**: 管理员可以编辑角色
+- [x] **ROLE-04**: 管理员可以删除角色
 
 ### 菜单与导航 (MENU)
 
 - [ ] **MENU-01**: 系统左侧显示菜单导航
-- [ ] **MENU-02**: 用户只能看到有权限访问的菜单项
+- [x] **MENU-02**: 用户只能看到有权限访问的菜单项
 - [ ] **MENU-03**: 菜单支持多级展开
 - [ ] **MENU-04**: 页面支持页签式多任务切换
 - [ ] **MENU-05**: 顶部显示当前登录用户信息和登出按钮
@@ -95,12 +95,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | USER-03 | Phase 2 | Pending |
 | USER-04 | Phase 2 | Pending |
 | USER-05 | Phase 2 | Pending |
-| ROLE-01 | Phase 2 | Pending |
-| ROLE-02 | Phase 2 | Pending |
-| ROLE-03 | Phase 2 | Pending |
-| ROLE-04 | Phase 2 | Pending |
+| ROLE-01 | Phase 2 | Complete |
+| ROLE-02 | Phase 2 | Complete |
+| ROLE-03 | Phase 2 | Complete |
+| ROLE-04 | Phase 2 | Complete |
 | MENU-01 | Phase 1 | Pending |
-| MENU-02 | Phase 2 | Pending |
+| MENU-02 | Phase 2 | Complete |
 | MENU-03 | Phase 1 | Pending |
 | MENU-04 | Phase 1 | Pending |
 | MENU-05 | Phase 1 | Pending |
