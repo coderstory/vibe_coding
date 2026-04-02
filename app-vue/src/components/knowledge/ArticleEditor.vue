@@ -1,36 +1,11 @@
 <script setup>
 import { ref, watch, computed, onBeforeUnmount, onMounted } from 'vue'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
-import StarterKit from '@tiptap/starter-kit'
+import { StarterKit } from '@tiptap/starter-kit'
 import { getArticleDetail, createArticle, updateArticle, getAllTags, getArticleTags, uploadFile, createTag } from '@/api/knowledge'
 import { ElMessage } from 'element-plus'
 
-console.log('ArticleEditor mounted, StarterKit:', typeof StarterKit)
-
-const props = defineProps({
-  modelValue: Boolean,
-  articleId: Number,
-  categoryId: Number
-})
-
-const emit = defineEmits(['update:modelValue', 'success'])
-
-const visible = computed({
-  get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val)
-})
-
-const isEdit = computed(() => !!props.articleId)
-const form = ref({
-  title: '',
-  categoryId: null,
-  content: '',
-  tagIds: [],
-  status: 1
-})
-const allTags = ref([])
-const fileList = ref([])
-const uploadedFiles = ref([])
+console.log('ArticleEditor mounted, StarterKit:', StarterKit)
 
 const editor = useEditor({
   content: '<p>输入知识内容...</p>',
@@ -42,8 +17,7 @@ const editor = useEditor({
   }
 })
 
-console.log('Editor created:', editor.value)
-console.log('Editor element:', editor.value?.element)
+console.log('Editor created:', editor)
 
 watch(visible, async (val) => {
   if (val) {
