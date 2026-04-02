@@ -21,6 +21,8 @@ public class User {
     
     private String avatar;
     
+    private String phone;
+    
     private Long roleId;
     
     private String email;
