@@ -109,20 +109,20 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BIZ-03 | Phase 3 | Pending |
 | BIZ-04 | Phase 3 | Pending |
 | BIZ-05 | Phase 3 | Pending |
-| AUDIT-01 | Phase 1 | Pending |
+| AUDIT-01 | Phase 2 | Pending |
 | AUDIT-02 | Phase 2 | Pending |
 | AUDIT-03 | Phase 2 | Pending |
 | AUDIT-04 | Phase 1 | Pending |
 | UI-01 | Phase 1 | Pending |
 | UI-02 | Phase 1 | Pending |
-| UI-03 | Phase 1 | Pending |
-| UI-04 | Phase 1 | Pending |
-| UI-05 | Phase 1 | Pending |
-| UI-06 | Phase 1 | Pending |
+| UI-03 | Phase 2 | Pending |
+| UI-04 | Phase 2 | Pending |
+| UI-05 | Phase 2 | Pending |
+| UI-06 | Phase 3 | Pending |
 
 **Coverage:**
-- v1 requirements: 31 total
-- Mapped to phases: 31
+- v1 requirements: 33 total
+- Mapped to phases: 33
 - Unmapped: 0 ✓
 
 ---
