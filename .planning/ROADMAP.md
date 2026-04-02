@@ -71,7 +71,10 @@
   4. 用户可以删除业务数据
   5. 用户可以查看业务数据详情
   6. 响应式布局，适配不同屏幕尺寸
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 03-01-PLAN.md — 数据库迁移 + 知识库实体类
+- [ ] 03-02-PLAN.md — 后端 API（分类、搜索、文件压缩）
+- [ ] 03-03-PLAN.md — 前端界面（Tiptap编辑器、响应式布局）
 
 ## Progress
 
@@ -80,6 +83,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. 认证与基础框架 | 2/2 | Planned | - |
-| 2. 用户与权限管理 | 0/3 | Complete    | 2026-04-02 |
-| 3. 业务数据管理 | 0/? | Not started | - |
+| 1. 认证与基础框架 | 2/2 | Complete | - |
+| 2. 用户与权限管理 | 3/3 | Complete | 2026-04-02 |
+| 3. 业务数据管理 | 0/3 | Not started | - |
