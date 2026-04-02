@@ -188,6 +188,7 @@ onBeforeUnmount(() => {
       <div style="margin-bottom: 20px;">
         <label style="display: block; margin-bottom: 8px; font-weight: 500;">内容</label>
         <div class="editor-container">
+          <div>editor ref: {{ editor }}</div>
           <editor-content :editor="editor" />
         </div>
       </div>
