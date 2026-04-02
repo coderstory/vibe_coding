@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.coderstory.springboot.mapper.MenuMapper">
+    
+    <select id="selectMenuTree" resultType="cn.coderstory.springboot.entity.Menu">
+        SELECT id, parent_id AS parentId, name, path, icon, sort_order AS sortOrder, deleted, create_time AS createTime
+        FROM sys_menu
+        WHERE deleted = 0
+        ORDER BY sort_order ASC
+    </select>
+    
+    <select id="selectByRoleId" resultType="cn.coderstory.springboot.entity.Menu">
+        SELECT m.id, m.parent_id AS parentId, m.name, m.path, m.icon, m.sort_order AS sortOrder, m.deleted, m.create_time AS createTime
+        FROM sys_menu m
+        INNER JOIN sys_role_menu rm ON m.id = rm.menu_id
+        WHERE rm.role_id = #{roleId} AND m.deleted = 0
+        ORDER BY m.sort_order ASC
+    </select>
+    
+    <select id="selectAllOrderBySortOrder" resultType="cn.coderstory.springboot.entity.Menu">
+        SELECT id, parent_id AS parentId, name, path, icon, sort_order AS sortOrder, deleted, create_time AS createTime
+        FROM sys_menu
+        WHERE deleted = 0
+        ORDER BY sort_order ASC
+    </select>
+    
+</mapper>
