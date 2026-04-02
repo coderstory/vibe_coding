@@ -1,6 +1,10 @@
 spring:
   application:
     name: admin-system
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
   flyway:
     enabled: true
     baseline-on-migrate: true
@@ -32,6 +36,9 @@ mybatis-plus:
 
 server:
   port: 8080
+
+security:
+  whitelist: /api/auth/**,/api/knowledge/files/**
 
 jwt:
   secret: mySecretKeyForJwtTokenGeneration123456789
