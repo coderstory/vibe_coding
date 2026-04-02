@@ -90,18 +90,6 @@ function resetForm() {
   fileList.value = []
 }
 
-async function handleCreateTag(tagName) {
-  try {
-    const tag = { name: tagName, color: '#409EFF' }
-    const res = await createTag(tag)
-    allTags.value.push(res.data)
-    return res.data.id
-  } catch (e) {
-    ElMessage.error('创建标签失败')
-    return null
-  }
-}
-
 async function handleSave() {
   if (!form.value.title) {
     ElMessage.warning('请输入标题')
@@ -109,11 +97,19 @@ async function handleSave() {
   }
 
   try {
+    let tagIds = [...form.value.tagIds]
+    const newTagNames = tagIds.filter(id => typeof id === 'string')
+    for (const name of newTagNames) {
+      const res = await createTag({ name, color: '#409EFF' })
+      tagIds = tagIds.map(id => id === name ? res.data.id : id)
+      allTags.value.push(res.data)
+    }
+
     const data = {
       title: form.value.title,
       categoryId: form.value.categoryId,
       content: form.value.content,
-      tagIds: form.value.tagIds,
+      tagIds: tagIds.filter(id => typeof id === 'number'),
       status: form.value.status
     }
 
@@ -181,7 +177,6 @@ onBeforeUnmount(() => {
               default-first-option
               placeholder="选择或输入新标签"
               style="width: 100%"
-              @created="handleCreateTag"
             >
               <el-option v-for="tag in allTags" :key="tag.id" :label="tag.name" :value="tag.id">
                 <span :style="{ color: tag.color }">{{ tag.name }}</span>
