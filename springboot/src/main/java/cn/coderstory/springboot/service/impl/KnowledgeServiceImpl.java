@@ -85,15 +85,15 @@ public class KnowledgeServiceImpl implements KnowledgeService {
     public KnowledgeArticle getArticleById(Long id) {
         KnowledgeArticle article = articleMapper.selectById(id);
         if (article != null) {
-            List<KnowledgeTag> tags = getTagsByArticleId(id);
-            article.setTags(tags.stream().map(KnowledgeTag::getName).collect(Collectors.toList()));
+            List<Long> tagIds = articleTagMapper.selectTagIdsByArticleId(id);
+            article.setTags(tagIds);
         }
         return article;
     }
     
     @Override
     @Transactional
-    public KnowledgeArticle createArticle(KnowledgeArticle article, List<Long> tagIds) {
+    public KnowledgeArticle createArticle(KnowledgeArticle article, List<Integer> tagIds) {
         articleMapper.insert(article);
         if (tagIds != null && !tagIds.isEmpty()) {
             saveArticleTags(article.getId(), tagIds);
@@ -103,21 +103,26 @@ public class KnowledgeServiceImpl implements KnowledgeService {
     
     @Override
     @Transactional
-    public KnowledgeArticle updateArticle(Long id, KnowledgeArticle article, List<Long> tagIds) {
+    public KnowledgeArticle updateArticle(Long id, KnowledgeArticle article, List<Integer> tagIds) {
         article.setId(id);
         articleMapper.updateById(article);
-        if (tagIds != null) {
+        List<Long> currentTagIds = articleTagMapper.selectTagIdsByArticleId(id);
+        Set<Integer> currentSet = new java.util.HashSet<>(currentTagIds.stream().map(Long::intValue).toList());
+        Set<Integer> newSet = tagIds != null ? new java.util.HashSet<>(tagIds) : new java.util.HashSet<>();
+        if (!currentSet.equals(newSet)) {
             articleTagMapper.deleteByArticleId(id);
-            saveArticleTags(id, tagIds);
+            if (tagIds != null && !tagIds.isEmpty()) {
+                saveArticleTags(id, tagIds);
+            }
         }
         return article;
     }
     
-    private void saveArticleTags(Long articleId, List<Long> tagIds) {
-        for (Long tagId : tagIds) {
+    private void saveArticleTags(Long articleId, List<Integer> tagIds) {
+        for (Integer tagId : tagIds) {
             KnowledgeArticleTag at = new KnowledgeArticleTag();
             at.setArticleId(articleId);
-            at.setTagId(tagId);
+            at.setTagId(tagId.longValue());
             articleTagMapper.insert(at);
         }
     }
