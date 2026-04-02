@@ -1,9 +1,11 @@
 <script setup>
-import { ref, watch, computed, onBeforeUnmount } from 'vue'
+import { ref, watch, computed, onBeforeUnmount, onMounted } from 'vue'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import { getArticleDetail, createArticle, updateArticle, getAllTags, getArticleTags, uploadFile, createTag } from '@/api/knowledge'
 import { ElMessage } from 'element-plus'
+
+console.log('ArticleEditor mounted, StarterKit:', typeof StarterKit)
 
 const props = defineProps({
   modelValue: Boolean,
@@ -185,12 +187,13 @@ onBeforeUnmount(() => {
           </el-form-item>
         </el-col>
       </el-row>
-      <el-form-item label="内容">
-        <div v-if="editor" class="editor-container">
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 500;">内容</label>
+        <div class="editor-container">
           <editor-content :editor="editor" />
+          <div style="color: red; padding: 20px;">测试文本</div>
         </div>
-        <div v-else class="editor-loading">加载中...</div>
-      </el-form-item>
+      </div>
       <el-form-item label="附件">
         <el-upload
           :file-list="fileList"
@@ -212,26 +215,7 @@ onBeforeUnmount(() => {
 .editor-container {
   border: 1px solid #dcdfe6;
   border-radius: 4px;
-  height: 500px;
-  overflow-y: auto;
-}
-
-.editor-loading {
-  height: 500px;
-  line-height: 500px;
-  text-align: center;
-  color: #999;
-  border: 1px solid #dcdfe6;
-  border-radius: 4px;
-}
-
-:deep(.ProseMirror) {
   min-height: 400px;
-  padding: 16px;
-  box-sizing: border-box;
-}
-
-:deep(.ProseMirror:focus) {
-  outline: none;
+  padding: 0;
 }
 </style>
