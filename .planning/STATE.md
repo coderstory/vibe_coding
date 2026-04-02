@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-04-02)
 
 **Core value:** 为运营人员提供一个安全、高效、易用的后台管理平台，能够安全地管理用户、审计数据、操作业务数据。
-**Current focus:** Phase 1: 认证与基础框架
+**Current focus:** Phase 2: 用户与权限管理
 
 ## Current Position
 
-Phase: 1 of 3 (认证与基础框架)
-Plan: 2 of 2 in current phase
-Status: Executing
-Last activity: 2026-04-02 — 执行 Phase 1 两个计划
+Phase: 2 of 3 (用户与权限管理)
+Plan: 0 of ? in current phase
+Status: Discuss complete
+Last activity: 2026-04-02 — Phase 2 discuss 完成
 
 Progress: [▓▓▓▓▓▓▓▓▓▓] 100%
 
@@ -40,7 +40,7 @@ Progress: [▓▓▓▓▓▓▓▓▓▓] 100%
 ### Decisions
 
 - Phase 1: JWT 认证方案 + Element Plus UI 框架
-- Phase 2: 简化版 RBAC（页面级权限）
+- Phase 2: 简化版 RBAC（页面级权限）、用户字段含性别/头像/部门/岗位、管理员直接设置新密码
 - Phase 3: EasyExcel 用于导入导出（待研究）
 
 See: .planning/PROJECT.md Key Decisions table
