@@ -211,49 +211,43 @@ onBeforeUnmount(() => {
 .editor-container {
   border: 1px solid #dcdfe6;
   border-radius: 4px;
-  min-height: 400px;
+  height: calc(100vh - 300px);
+  overflow: auto;
 }
 
-.tiptap-editor {
+:deep(.ProseMirror) {
+  height: 100%;
   padding: 16px;
-}
-
-.tiptap-editor :deep(.ProseMirror) {
-  min-height: 360px;
   outline: none;
 }
 
-.tiptap-editor :deep(.ProseMirror p.is-editor-empty:first-child::before) {
-  content: attr(data-placeholder);
-  float: left;
-  color: #aaa;
-  pointer-events: none;
-  height: 0;
+:deep(.ProseMirror p) {
+  margin: 0;
 }
 
-.tiptap-editor :deep(.ProseMirror h1) {
+:deep(.ProseMirror h1) {
   font-size: 2em;
   margin-top: 1em;
 }
 
-.tiptap-editor :deep(.ProseMirror h2) {
+:deep(.ProseMirror h2) {
   font-size: 1.5em;
   margin-top: 1em;
 }
 
-.tiptap-editor :deep(.ProseMirror h3) {
+:deep(.ProseMirror h3) {
   font-size: 1.25em;
   margin-top: 1em;
 }
 
-.tiptap-editor :deep(.ProseMirror code) {
+:deep(.ProseMirror code) {
   background: #f0f0f0;
   padding: 2px 6px;
   border-radius: 3px;
   font-family: monospace;
 }
 
-.tiptap-editor :deep(.ProseMirror pre) {
+:deep(.ProseMirror pre) {
   background: #1e1e1e;
   color: #d4d4d4;
   padding: 12px;
@@ -261,7 +255,7 @@ onBeforeUnmount(() => {
   overflow-x: auto;
 }
 
-.tiptap-editor :deep(.ProseMirror pre code) {
+:deep(.ProseMirror pre code) {
   background: none;
   padding: 0;
 }
