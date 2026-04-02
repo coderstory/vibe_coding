@@ -38,3 +38,4 @@ jwt:
 logging:
   level:
     cn.coderstory: debug
+    org.flywaydb: DEBUG
