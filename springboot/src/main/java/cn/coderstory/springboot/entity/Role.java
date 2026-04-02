@@ -5,31 +5,17 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("sys_user")
-public class User {
+@TableName("sys_role")
+public class Role {
     
     @TableId(type = IdType.AUTO)
     private Long id;
     
-    private String username;
+    private String roleName;
     
-    private String password;
+    private String roleCode;
     
-    private String name;
-    
-    private Integer gender;
-    
-    private String avatar;
-    
-    private Long roleId;
-    
-    private String email;
-    
-    private String department;
-    
-    private String position;
-    
-    private Integer enabled;
+    private String description;
     
     @TableLogic
     private Integer deleted;
