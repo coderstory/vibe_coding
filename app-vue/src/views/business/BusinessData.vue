@@ -56,6 +56,10 @@ async function handleSearch() {
 }
 
 function handleCreate() {
+  if (!selectedCategory.value?.id) {
+    ElMessage.warning('请先选择左侧分类')
+    return
+  }
   currentArticleId.value = null
   editorVisible.value = true
 }
@@ -162,7 +166,7 @@ onMounted(() => {
     <ArticleEditor
       v-model="editorVisible"
       :article-id="currentArticleId"
-      :flat-categories="categoryTreeRef?.flatCategories"
+      :category-id="selectedCategory?.id"
       @success="handleEditorSuccess"
     />
   </div>
