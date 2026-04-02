@@ -5,6 +5,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 
 const emit = defineEmits(['select'])
 
+const treeRef = ref(null)
 const treeData = ref([])
 const selectedId = ref(null)
 
@@ -84,9 +85,12 @@ defineExpose({ loadTree, flatCategories })
       </el-button>
     </div>
     <el-tree
+      ref="treeRef"
       :data="treeData"
       :props="{ label: 'name', children: 'children' }"
       node-key="id"
+      v-model:current-node-key="selectedId"
+      highlight-current
       :expand-on-click-node="false"
       :default-expand-all="true"
       @node-click="handleNodeClick"
