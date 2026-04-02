@@ -163,12 +163,12 @@ onBeforeUnmount(() => {
   >
     <el-form :model="form" label-width="80px" class="form紧凑">
       <el-row :gutter="12">
-        <el-col :xs="24" :sm="12" :md="12">
+        <el-col :xs="24" :sm="16" :md="8">
           <el-form-item label="标题">
             <el-input v-model="form.title" placeholder="请输入标题" />
           </el-form-item>
         </el-col>
-        <el-col :xs="24" :sm="12" :md="12">
+        <el-col :xs="24" :sm="8" :md="4">
           <el-form-item label="标签">
             <el-select v-model="form.tagIds" multiple placeholder="请选择标签" style="width: 100%">
               <el-option v-for="tag in allTags" :key="tag.id" :label="tag.name" :value="tag.id">
