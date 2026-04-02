@@ -11,7 +11,7 @@
 
 - [ ] **Phase 1: 认证与基础框架** - 用户登录登出 + 管理后台基础布局
 - [ ] **Phase 2: 用户与权限管理** - 用户 CRUD、角色管理、审计日志查询
-- [ ] **Phase 3: 业务数据管理** - 业务数据 CRUD + 响应式布局
+- [ ] **Phase 3: 业务数据管理** - 业务数据 CRUD + 响应式布局`n- [ ] **Phase 4: UI 增强与主题系统** - 动态效果、液态玻璃、主题切换
 
 ## Phase Details
 
@@ -55,7 +55,10 @@
   14. 列表页面统一使用表格组件，支持分页
   15. 表单页面统一使用 Element Plus 表单组件
   16. 操作反馈使用 Message 消息提示
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 02-01-PLAN.md — 角色与菜单管理后端基础设施
+- [ ] 02-02-PLAN.md — 用户管理API + 审计日志功能
+- [ ] 02-03-PLAN.md — 角色管理前端 + 动态菜单权限
 
 ### Phase 3: 业务数据管理
 **Goal**: 用户可以完整管理业务数据
@@ -78,5 +81,5 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. 认证与基础框架 | 2/2 | Planned | - |
-| 2. 用户与权限管理 | 0/? | Not started | - |
+| 2. 用户与权限管理 | 0/3 | Planned | - |
 | 3. 业务数据管理 | 0/? | Not started | - |
