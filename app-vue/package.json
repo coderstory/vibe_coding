@@ -1,27 +1,41 @@
 {
-  "name": "app-vue",
-  "version": "0.0.0",
-  "private": true,
   "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "vue": "^3.5.31",
-    "vue-router": "^4.5.0",
-    "axios": "^1.7.9",
-    "pinia": "^2.3.0",
-    "element-plus": "^2.9.0",
-    "@element-plus/icons-vue": "^2.3.1"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-vue": "^6.0.5",
-    "vite": "^8.0.3",
-    "vite-plugin-vue-devtools": "^8.1.1"
-  },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
+  },
+  "scripts": {
+    "lint:fix": "eslint . --ext .vue,.js,.ts --fix",
+    "format": "prettier --write \"**/*.{vue,js,ts,json}\"",
+    "dev": "vite",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "coverage": "vitest coverage",
+    "preview": "vite preview",
+    "build": "vite build",
+    "lint": "eslint . --ext .vue,.js,.ts"
+  },
+  "private": true,
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.28.6",
+    "@vitejs/plugin-vue": "^6.0.5",
+    "@vue/test-utils": "^2.4.6",
+    "eslint": "^10.1.0",
+    "eslint-plugin-vue": "^10.8.0",
+    "jsdom": "^29.0.1",
+    "prettier": "^3.8.1",
+    "vite": "^8.0.3",
+    "vite-plugin-vue-devtools": "^8.1.1",
+    "vitest": "^4.1.2",
+    "vue-test-utils": "^0.5.0"
+  },
+  "version": "0.0.0",
+  "name": "app-vue",
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
+    "axios": "^1.7.9",
+    "element-plus": "^2.9.0",
+    "pinia": "^2.3.0",
+    "vue": "^3.5.31",
+    "vue-router": "^4.5.0"
   }
 }

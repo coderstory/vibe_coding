@@ -35,4 +35,4 @@ CREATE TABLE IF NOT EXISTS sys_audit_log (
 
 -- 插入默认管理员用户 (密码: admin123)
 INSERT INTO sys_user (username, password, name, role_id) 
-VALUES ('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5EH', '管理员', 1);
+VALUES ('admin', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '管理员', 1);
