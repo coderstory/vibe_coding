@@ -15,12 +15,31 @@
 
 
 ## 开发流程 （基于GSD的方案）
-1. 提出问题,初步分析 /gsd:new-project
-2. 拆解问题，讨论方案，产出多个需求 /gsd:discuss-phase 1
-3. 针对单个需求，详细设计 /gsd:plan-phase N
-4. 针对单个需求，执行编码 /gsd:execute-phase N
-5. 针对每个模块，功能测试 /gsd:verify-work N
-6. 完成全部需求开发和验证，结束本轮开发 /gsd:complete-milestone
-7. 开始新的一轮 /gsd:new-milestone
+1. 提出问题,初步分析 `/gsd:new-project`
+2. 拆解问题，讨论方案，产出多个需求 `/gsd:discuss-phase N`
+3. 针对单个需求，详细设计 `/gsd:plan-phase N`
+4. 针对单个需求，执行编码 `/gsd:execute-phase N`
+5. 针对每个模块，功能测试 `/gsd:verify-work N`
+6. 完成全部需求开发和验证，结束本轮开发 `/gsd:complete-milestone`
+7. 开始新的一轮 `/gsd:new-milestone`
 
 ## 分析复杂的场景
+1. 使用 **/brainstorming**进行头脑风暴
+ 
+## 中文问题
+1. agents.md里已经写了相应规则，部分场景能输出中文
+2. 目前使用的skill都是英文的导致，导致和skill内容强相关的都是输出英文，可以直接汉化，但是后续更新后又会变成英文
+
+## 缺陷
+1. 目前opencode没法接管日志输出，看不到异常，导致需要手动处理（让他跑程序会卡死，看上去是在等命令完成输出，但明显是不可能的）
+2. 缺少broswer-use 技能
+
+## 数据库更新
+1. 后端装了flyway框架，让他数据库变更生成对应的SQL文件，springboot启动的时候自动执行
+
+## 直接访问数据
+1. 让agent有直接访问数据库能力，方便分析一些问题，直接使用，配置在opencode.json里，自己改下地址和账号
+
+## 技能
+1. GSD 是直接安装到了.opencode目录下 `npx gsd-opencode@latest`
+2. superpower是配置到的opencode.json的plugin的属性内，会自动安装
