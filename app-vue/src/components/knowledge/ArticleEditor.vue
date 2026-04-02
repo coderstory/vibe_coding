@@ -3,7 +3,6 @@ import { ref, watch, computed, onBeforeUnmount } from 'vue'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
-import { Markdown } from '@tiptap/markdown'
 import Placeholder from '@tiptap/extension-placeholder'
 import { getArticleDetail, createArticle, updateArticle, getAllTags, getArticleTags, uploadFile } from '@/api/knowledge'
 import { ElMessage } from 'element-plus'
@@ -35,23 +34,17 @@ const uploadedFiles = ref([])
 const editor = useEditor({
   content: '',
   extensions: [
-    StarterKit.configure({
-      heading: { levels: [1, 2, 3] }
-    }),
+    StarterKit,
     Image.configure({
       inline: true,
       allowBase64: true
-    }),
-    Markdown.configure({
-      markedOptions: { gfm: true, breaks: false }
     }),
     Placeholder.configure({
       placeholder: '输入知识内容...'
     })
   ],
-  contentType: 'markdown',
   onUpdate: ({ editor }) => {
-    form.value.content = editor.getMarkdown()
+    form.value.content = editor.getHTML()
   }
 })
 
@@ -171,22 +164,30 @@ onBeforeUnmount(() => {
     fullscreen
     :close-on-click-modal="false"
   >
-    <el-form :model="form" label-width="80px">
-      <el-form-item label="分类">
-        <el-select v-model="form.categoryId" placeholder="请选择分类" style="width: 100%">
-          <el-option v-for="cat in $attrs.flatCategories" :key="cat.id" :label="cat.name" :value="cat.id" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="标题">
-        <el-input v-model="form.title" placeholder="请输入标题" />
-      </el-form-item>
-      <el-form-item label="标签">
-        <el-select v-model="form.tagIds" multiple placeholder="请选择标签" style="width: 100%">
-          <el-option v-for="tag in allTags" :key="tag.id" :label="tag.name" :value="tag.id">
-            <span :style="{ color: tag.color }">{{ tag.name }}</span>
-          </el-option>
-        </el-select>
-      </el-form-item>
+    <el-form :model="form" label-width="80px" class="form紧凑">
+      <el-row :gutter="12">
+        <el-col :xs="24" :sm="8" :md="6">
+          <el-form-item label="分类">
+            <el-select v-model="form.categoryId" placeholder="请选择分类" style="width: 100%">
+              <el-option v-for="cat in $attrs.flatCategories" :key="cat.id" :label="cat.name" :value="cat.id" />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :xs="24" :sm="10" :md="10">
+          <el-form-item label="标题">
+            <el-input v-model="form.title" placeholder="请输入标题" />
+          </el-form-item>
+        </el-col>
+        <el-col :xs="24" :sm="6" :md="8">
+          <el-form-item label="标签">
+            <el-select v-model="form.tagIds" multiple placeholder="请选择标签" style="width: 100%">
+              <el-option v-for="tag in allTags" :key="tag.id" :label="tag.name" :value="tag.id">
+                <span :style="{ color: tag.color }">{{ tag.name }}</span>
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
       <el-form-item label="内容">
         <div class="editor-container">
           <editor-content :editor="editor" class="tiptap-editor" />
