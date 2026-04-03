@@ -2,3 +2,59 @@
  * Keyframes 动画定义
  * 定义所有可复用的 @keyframes 动画
  */
+
+/* CSS 变量：动画控制 */
+:root {
+  --animation-wave-duration: 3s;
+  --animation-float-duration: 6s;
+  --animation-pulse-duration: 2s;
+  --animation-bubble-rise-duration: 8s;
+  --animation-shimmer-duration: 2s;
+  --animation-wave-float-duration: 4s;
+}
+
+@keyframes wave {
+  0% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-30%) translateY(-5px); }
+  100% { transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) scale(1); opacity: 0.6; }
+  50% { transform: translateY(-20px) scale(1.05); opacity: 0.8; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes bubble-rise {
+  0% {
+    transform: translateY(100vh) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes wave-float {
+  0% { transform: translateX(-50%) translateY(0); }
+  25% { transform: translateX(-40%) translateY(-10px); }
+  50% { transform: translateX(-50%) translateY(-5px); }
+  75% { transform: translateX(-60%) translateY(-10px); }
+  100% { transform: translateX(-50%) translateY(0); }
+}
