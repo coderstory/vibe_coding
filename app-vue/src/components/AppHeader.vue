@@ -3,11 +3,9 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
 import { useUserStore } from '@/store/user'
-import { useThemeStore } from '@/store/theme'
 
 const router = useRouter()
 const userStore = useUserStore()
-const themeStore = useThemeStore()
 
 const username = computed(() => userStore.user?.name || userStore.user?.username || '未登录')
 const avatar = computed(() => userStore.user?.name?.charAt(0) || 'U')
@@ -30,19 +28,11 @@ async function handleCommand(command) {
     // TODO: 跳转到个人中心
   }
 }
-
-function toggleTheme() {
-  themeStore.toggleTheme()
-  themeStore.syncTheme()
-}
 </script>
 
 <template>
   <div class="app-header">
     <div class="header-right">
-      <el-button text @click="toggleTheme" class="theme-btn">
-        {{ themeStore.isDark ? '☀️' : '🌙' }}
-      </el-button>
       <el-dropdown @command="handleCommand">
         <div class="user-info">
           <el-avatar :size="32" class="user-avatar">
@@ -81,40 +71,36 @@ function toggleTheme() {
   gap: 12px;
 }
 
-.theme-btn {
-  font-size: 20px;
-  padding: 8px;
-  border-radius: 8px;
-}
-
 .user-info {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   cursor: pointer;
+  padding: 8px 16px;
+  border-radius: var(--el-border-radius-round);
+  transition: all 0.3s;
+  background: transparent;
+}
+
+.user-info:hover {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
 }
 
 .user-avatar {
-  background: #409eff;
+  background: linear-gradient(135deg, #3b82f6, #1e3a8a);
   color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
 }
 
 .username {
   font-size: 14px;
-  color: #303133;
-}
-</style>
-
-<style>
-.dark .theme-btn {
-  color: #e0e0e0;
+  font-weight: 500;
+  color: #1e293b;
 }
 
-.dark .username {
-  color: #e0e0e0;
-}
-
-.dark .user-avatar {
-  background: #409eff;
+.user-info:hover .username {
+  color: #92400e;
 }
 </style>

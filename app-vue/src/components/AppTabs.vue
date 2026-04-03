@@ -60,44 +60,44 @@ function handleTabClose(path) {
 
 <style scoped>
 .app-tabs {
-  background: #fff;
-  padding: 0 16px;
-  border-bottom: 1px solid #e4e7ed;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  padding: 0 24px;
+  border-bottom: 1px solid rgba(147, 197, 253, 0.5);
 }
 
 .app-tabs :deep(.el-tabs__header) {
   margin: 0;
 }
 
+.app-tabs :deep(.el-tabs__nav-wrap::after) {
+  display: none;
+}
+
 .app-tabs :deep(.el-tabs__item) {
-  height: 40px;
-  line-height: 40px;
-}
-</style>
-
-<style>
-.dark .app-tabs {
-  background: #1d1f20;
-  border-color: #3d3d3d;
-}
-
-.dark .app-tabs .el-tabs__header {
-  border-color: #3d3d3d;
-}
-
-.dark .app-tabs .el-tabs__item {
-  color: #a0a0a0;
-  background: #1d1f20;
-  border-color: #3d3d3d;
+  height: 42px;
+  line-height: 42px;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 0 20px;
+  background: transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-right: 4px;
+  border-radius: 8px 8px 0 0;
 }
 
-.dark .app-tabs .el-tabs__item:hover {
-  color: #e0e0e0;
+.app-tabs :deep(.el-tabs__item:hover) {
+  color: #1e3a8a;
+  background: rgba(147, 197, 253, 0.2);
 }
 
-.dark .app-tabs .el-tabs__item.is-active {
-  color: #409eff;
-  background: #2d2d2d;
-  border-color: #409eff;
+.app-tabs :deep(.el-tabs__item.is-active) {
+  color: #1e3a8a;
+  background: rgba(254, 243, 199, 0.5);
+  border-bottom-color: #fbbf24;
+  font-weight: 600;
 }
 </style>

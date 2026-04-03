@@ -105,6 +105,18 @@ function handleSelect(path) {
   router.push(path)
 }
 
+function getIconColor(icon) {
+  const colorMap = {
+    House: 'icon-dashboard',
+    Setting: 'icon-system',
+    Document: 'icon-audit',
+    Folder: 'icon-business',
+    User: 'icon-user',
+    Key: 'icon-role'
+  }
+  return colorMap[icon] || 'icon-settings'
+}
+
 onMounted(() => {
   loadUserMenus()
 })
@@ -115,15 +127,12 @@ onMounted(() => {
     :default-active="defaultActive"
     :collapse="collapsed"
     class="app-menu"
-    background-color="#304156"
-    text-color="#bfcbd9"
-    active-text-color="#409eff"
     @select="handleSelect"
   >
     <template v-for="item in menuItems" :key="item.path">
       <el-sub-menu v-if="item.children" :index="item.path">
         <template #title>
-          <el-icon><component :is="item.icon" /></el-icon>
+          <el-icon :class="getIconColor(item.icon)"><component :is="item.icon" /></el-icon>
           <span>{{ item.title }}</span>
         </template>
         <el-menu-item
@@ -131,13 +140,13 @@ onMounted(() => {
           :key="child.path"
           :index="child.path"
         >
-          <el-icon><component :is="child.icon" /></el-icon>
+          <el-icon :class="getIconColor(child.icon)"><component :is="child.icon" /></el-icon>
           <span>{{ child.title }}</span>
         </el-menu-item>
       </el-sub-menu>
       
       <el-menu-item v-else :index="item.path">
-        <el-icon><component :is="item.icon" /></el-icon>
+        <el-icon :class="getIconColor(item.icon)"><component :is="item.icon" /></el-icon>
         <span>{{ item.title }}</span>
       </el-menu-item>
     </template>
@@ -147,39 +156,100 @@ onMounted(() => {
 <style scoped>
 .app-menu {
   border-right: none;
+  background: transparent;
 }
 
 .app-menu:not(.el-menu--collapse) {
-  width: 200px;
+  width: 100%;
 }
 
 .app-menu .el-menu-item,
 .app-menu .el-sub-menu__title {
-  height: 50px;
-  line-height: 50px;
+  height: 48px;
+  line-height: 48px;
+  margin: 4px 10px;
+  padding-left: 16px !important;
+  color: rgba(255, 255, 255, 0.85);
+  border-radius: 10px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
 }
 
 .app-menu .el-icon {
-  margin-right: 8px;
-}
-</style>
-
-<style>
-.dark .app-menu {
-  background-color: #1d1f20 !important;
+  margin-right: 12px;
+  font-size: 18px;
+  vertical-align: middle;
+  color: rgba(255, 255, 255, 0.6);
+  transition: all 0.3s;
 }
 
-.dark .app-menu .el-menu-item,
-.dark .app-menu .el-sub-menu__title {
-  color: #a0a0a0 !important;
+.app-menu .el-menu-item:hover,
+.app-menu .el-sub-menu__title:hover {
+  background: #fef3c7;
+  color: #92400e;
+  transform: translateX(4px);
 }
 
-.dark .app-menu .el-menu-item:hover,
-.dark .app-menu .el-sub-menu__title:hover {
-  background-color: #2d2d2d !important;
+.app-menu .el-menu-item:hover .el-icon,
+.app-menu .el-sub-menu__title:hover .el-icon {
+  color: #92400e;
+  transform: scale(1.1);
 }
 
-.dark .app-menu .el-menu-item.is-active {
-  color: #409eff !important;
+.app-menu .el-menu-item.is-active {
+  background: linear-gradient(90deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+  font-weight: 600;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+}
+
+.app-menu .el-menu-item.is-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 28px;
+  background: linear-gradient(180deg, #fbbf24, #f59e0b);
+  border-radius: 0 4px 4px 0;
+}
+
+.app-menu .el-menu-item.is-active .el-icon {
+  color: #d97706;
+}
+
+.app-menu .el-menu-item.is-active::after {
+  display: none;
+}
+
+/* Submenu styling */
+.app-menu .el-sub-menu .el-menu {
+  background: rgba(0, 0, 0, 0.1) !important;
+  border-radius: 0 10px 10px 0;
+}
+
+.app-menu .el-sub-menu .el-menu-item {
+  height: 44px;
+  line-height: 44px;
+  margin: 2px 10px;
+  padding-left: 44px !important;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.app-menu .el-sub-menu .el-menu-item:hover {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.app-menu .el-sub-menu .el-menu-item.is-active {
+  background: linear-gradient(90deg, #fef3c7, #fde68a);
+  color: #92400e;
+}
+
+.app-menu .el-sub-menu__title:hover {
+  background: #fef3c7;
+  color: #92400e;
 }
 </style>
