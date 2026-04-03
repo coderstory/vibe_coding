@@ -498,8 +498,6 @@
   background: rgba(255, 255, 255, 0.92) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  display: flex;
-  flex-direction: column;
 }
 
 .el-dialog__header {
@@ -561,10 +559,6 @@
   background: rgba(255, 255, 255, 0.95) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  width: 100% !important;
-  box-sizing: border-box !important;
-  display: flex !important;
-  flex-direction: column !important;
   --el-messagebox-error-font-size: 12px !important;
 }
 
