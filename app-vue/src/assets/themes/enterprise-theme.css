@@ -984,3 +984,151 @@
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
+
+/* ===== el-empty (空状态) ===== */
+.el-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.el-empty__image {
+  width: 200px;
+  height: 200px;
+  margin-bottom: 24px;
+}
+
+.el-empty__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.8;
+}
+
+.el-empty__description {
+  color: #64748b;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.el-empty__bottom {
+  margin-top: 16px;
+}
+
+/* ===== el-link (链接) ===== */
+.el-link {
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.el-link--primary {
+  color: #3b82f6;
+}
+
+.el-link--primary:hover {
+  color: #1e3a8a;
+}
+
+.el-link--success {
+  color: #10b981;
+}
+
+.el-link--success:hover {
+  color: #059669;
+}
+
+.el-link--warning {
+  color: #d97706;
+}
+
+.el-link--warning:hover {
+  color: #92400e;
+}
+
+.el-link--danger {
+  color: #ef4444;
+}
+
+.el-link--danger:hover {
+  color: #dc2626;
+}
+
+.el-link--info {
+  color: #64748b;
+}
+
+.el-link--info:hover {
+  color: #475569;
+}
+
+.el-link:hover {
+  text-decoration: underline;
+}
+
+.el-link.is-underline:hover {
+  text-decoration: underline;
+}
+
+.el-link.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== el-loading (加载) ===== */
+.el-loading-mask {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(4px);
+}
+
+.el-loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.el-loading-spinner .circular {
+  width: 42px;
+  height: 42px;
+  animation: loading-rotate 2s linear infinite;
+}
+
+.el-loading-spinner .path {
+  animation: loading-dash 1.5s ease-in-out infinite;
+  stroke: #3b82f6;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.el-loading-spinner .el-loading-text {
+  color: #3b82f6;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+}
+
+@keyframes loading-rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loading-dash {
+  0% {
+    stroke-dasharray: 1, 126;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 63, 126;
+    stroke-dashoffset: -63;
+  }
+  100% {
+    stroke-dasharray: 63, 126;
+    stroke-dashoffset: -126;
+  }
+}
