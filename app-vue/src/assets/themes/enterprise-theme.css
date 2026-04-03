@@ -560,6 +560,7 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   --el-messagebox-error-font-size: 12px !important;
+  padding: 0 !important;
 }
 
 .el-message-box__wrapper {
