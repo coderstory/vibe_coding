@@ -293,6 +293,8 @@
 }
 
 .el-button--default:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
   background: #eff6ff;
   border-color: #93c5fd;
   color: #1e3a8a;
@@ -302,18 +304,52 @@
   background: linear-gradient(135deg, #10b981, #059669);
   border: none;
   color: #ffffff;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+}
+
+.el-button--success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.5);
+  background: linear-gradient(135deg, #34d399, #059669);
 }
 
 .el-button--warning {
   background: linear-gradient(135deg, #f59e0b, #d97706);
   border: none;
   color: #ffffff;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
+}
+
+.el-button--warning:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.5);
+  background: linear-gradient(135deg, #fbbf24, #d97706);
 }
 
 .el-button--danger {
   background: linear-gradient(135deg, #ef4444, #dc2626);
   border: none;
   color: #ffffff;
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4);
+}
+
+.el-button--danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.5);
+  background: linear-gradient(135deg, #f87171, #dc2626);
+}
+
+.el-button--info {
+  background: linear-gradient(135deg, #64748b, #475569);
+  border: none;
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(100, 116, 139, 0.4);
+}
+
+.el-button--info:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(100, 116, 139, 0.5);
+  background: linear-gradient(135deg, #94a3b8, #475569);
 }
 
 /* ===== Tag Enhancements ===== */
