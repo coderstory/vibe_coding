@@ -3,11 +3,9 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/store/user'
-import { useThemeStore } from '@/store/theme'
 
 const router = useRouter()
 const userStore = useUserStore()
-const themeStore = useThemeStore()
 
 const loginForm = reactive({
   username: '',
@@ -99,11 +97,6 @@ function handleKeydown(e) {
         </el-form-item>
       </el-form>
       
-      <div class="login-footer">
-        <el-button link @click="themeStore.toggleTheme">
-          {{ themeStore.isDark ? '☀️ 切换亮色模式' : '🌙 切换暗色模式' }}
-        </el-button>
-      </div>
     </el-card>
   </div>
 </template>
@@ -146,24 +139,5 @@ function handleKeydown(e) {
 
 .w-full {
   width: 100%;
-}
-</style>
-
-<style>
-.dark .login-container {
-  background: #1d1f20;
-}
-
-.dark .login-card {
-  background: #2d2d2d;
-  border-color: #3d3d3d;
-}
-
-.dark .login-header h1 {
-  color: #e0e0e0;
-}
-
-.dark .login-header p {
-  color: #a0a0a0;
 }
 </style>

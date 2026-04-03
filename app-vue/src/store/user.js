@@ -1,7 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { login as apiLogin, logout as apiLogout, getCurrentUser } from '@/api/auth'
-import { useThemeStore } from '@/store/theme'
 
 export const useUserStore = defineStore('user', () => {
   const token = ref(localStorage.getItem('token') || '')
@@ -15,9 +14,6 @@ export const useUserStore = defineStore('user', () => {
     user.value = res.data.user
     localStorage.setItem('token', token.value)
     localStorage.setItem('user', JSON.stringify(user.value))
-    
-    const themeStore = useThemeStore()
-    themeStore.loadTheme()
   }
   
   async function logout() {
