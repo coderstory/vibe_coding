@@ -625,3 +625,60 @@
     border-radius: 12px;
   }
 }
+
+/* ===== Tree Styles ===== */
+.el-tree {
+  background: transparent;
+  color: #475569;
+  font-size: 14px;
+}
+
+.el-tree-node__content {
+  height: 36px;
+  border-radius: var(--el-border-radius-small);
+  background: transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.el-tree-node__content:hover {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
+}
+
+.el-tree-node__label {
+  color: #475569;
+  font-weight: 500;
+}
+
+.el-tree-node__expand-icon {
+  color: #93c5fd;
+  font-size: 16px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.el-tree-node__expand-icon:hover {
+  color: #3b82f6;
+}
+
+.el-tree-node.is-checked > .el-tree-node__content,
+.el-tree-node.is-selected > .el-tree-node__content {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
+  font-weight: 600;
+}
+
+.el-tree-node.is-current > .el-tree-node__content {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  color: #1e3a8a;
+  font-weight: 600;
+}
+
+.el-tree-node.is-disabled > .el-tree-node__content {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.el-tree-node.is-disabled > .el-tree-node__content:hover {
+  background: transparent;
+  color: #94a3b8;
+}
