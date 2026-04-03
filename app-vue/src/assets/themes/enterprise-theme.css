@@ -184,8 +184,9 @@
 }
 
 .el-table__row:hover > td {
-  background-color: #fef3c7 !important;
-  transition: background-color 0.3s;
+  background: linear-gradient(135deg, #fef3c7, #fde68a) !important;
+  transform: translateX(2px);
+  transition: background-color 0.3s, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ===== Card Styles - Glass Effect ===== */
