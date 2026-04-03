@@ -537,6 +537,13 @@
   color: #d97706;
 }
 
+.el-form-item.is-required .el-form-item__label::before {
+  content: '*';
+  color: #d97706;
+  font-weight: 700;
+  margin-right: 4px;
+}
+
 /* ===== Search Input ===== */
 .el-input__wrapper {
   border-radius: var(--el-border-radius-round);
