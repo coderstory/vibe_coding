@@ -97,7 +97,7 @@ function handleTabClose(path) {
 .app-tabs :deep(.el-tabs__item.is-active) {
   color: #1e3a8a;
   background: rgba(254, 243, 199, 0.5);
-  border-bottom-color: #fbbf24;
+  border-bottom-color: #d97706;
   font-weight: 600;
 }
 </style>

@@ -212,7 +212,7 @@ onMounted(() => {
   transform: translateY(-50%);
   width: 4px;
   height: 28px;
-  background: linear-gradient(180deg, #fbbf24, #f59e0b);
+  background: linear-gradient(180deg, #d97706, #f59e0b);
   border-radius: 0 4px 4px 0;
 }
 

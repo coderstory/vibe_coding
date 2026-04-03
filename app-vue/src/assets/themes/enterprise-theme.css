@@ -12,8 +12,8 @@
   /* Beach Colors */
   --sand: #fef3c7;
   --sand-dark: #fde68a;
-  --sun: #fbbf24;
-  --sun-light: #fcd34d;
+  --sun: #d97706;
+  --sun-light: #fbbf24;
   
   /* Cloud & Base */
   --cloud: #f8fafc;
@@ -276,7 +276,7 @@
 
 .el-tag--warning {
   background: linear-gradient(135deg, #fef3c7, #fde68a);
-  border-color: #fcd34d;
+  border-color: #fbbf24;
   color: #d97706;
 }
 
@@ -335,10 +335,10 @@
 }
 
 .el-pagination.is-background .el-pager li:not(.is-disabled).is-active {
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  background: linear-gradient(135deg, #d97706, #f59e0b);
   color: #ffffff;
-  border-color: #fbbf24;
-  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
+  border-color: #d97706;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.4);
 }
 
 .el-pagination.is-background .btn-next:hover,
@@ -388,7 +388,7 @@
 }
 
 .el-form-item__label::before {
-  color: #fbbf24;
+  color: #d97706;
 }
 
 /* ===== Search Input ===== */
