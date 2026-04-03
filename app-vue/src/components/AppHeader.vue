@@ -3,9 +3,11 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
 import { useUserStore } from '@/store/user'
+import { useAnimationToggle } from '@/composables/useAnimationToggle'
 
 const router = useRouter()
 const userStore = useUserStore()
+const { animationsEnabled, toggleAnimations } = useAnimationToggle()
 
 const username = computed(() => userStore.user?.name || userStore.user?.username || '未登录')
 const avatar = computed(() => userStore.user?.name?.charAt(0) || 'U')
@@ -33,6 +35,9 @@ async function handleCommand(command) {
 <template>
   <div class="app-header">
     <div class="header-right">
+      <el-tooltip :content="animationsEnabled ? '关闭动画' : '开启动画'" placement="bottom">
+        <el-button :icon="animationsEnabled ? 'VideoPause' : 'VideoPlay'" circle @click="toggleAnimations" />
+      </el-tooltip>
       <el-dropdown @command="handleCommand">
         <div class="user-info">
           <el-avatar :size="32" class="user-avatar">
