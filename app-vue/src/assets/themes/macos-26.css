@@ -1,0 +1,428 @@
+/* ===== macOS 26 Enhanced Theme for Element Plus ===== */
+
+/* ===== Light Theme ===== */
+:root {
+  /* Brand Colors - Apple Blue */
+  --el-color-primary: #007AFF;
+  --el-color-primary-light-3: #4DA3FF;
+  --el-color-primary-light-5: #80BFFF;
+  --el-color-primary-light-7: #B3D9FF;
+  --el-color-primary-light-8: #CCE7FF;
+  --el-color-primary-light-9: #E6F2FF;
+  --el-color-primary-dark-2: #0056B3;
+
+  /* Success Colors - Vibrant Green */
+  --el-color-success: #34C759;
+  --el-color-success-light-3: #5DD67A;
+  --el-color-success-light-5: #85E09B;
+  --el-color-success-light-7: #ADEBBC;
+  --el-color-success-light-8: #C8F5D4;
+  --el-color-success-light-9: #E6FBE9;
+  --el-color-success-dark-2: #248A3D;
+
+  /* Warning Colors - Warm Orange */
+  --el-color-warning: #FF9500;
+  --el-color-warning-light-3: #FFAD33;
+  --el-color-warning-light-5: #FFC266;
+  --el-color-warning-light-7: #FFD699;
+  --el-color-warning-light-8: #FFE5B3;
+  --el-color-warning-light-9: #FFF2E5;
+  --el-color-warning-dark-2: #CC7700;
+
+  /* Danger Colors - Rich Red */
+  --el-color-danger: #FF3B30;
+  --el-color-danger-light-3: #FF6B60;
+  --el-color-danger-light-5: #FF918A;
+  --el-color-danger-light-7: #FFB3AD;
+  --el-color-danger-light-8: #FFCDCA;
+  --el-color-danger-light-9: #FFE6E4;
+  --el-color-danger-dark-2: #CC2F26;
+
+  /* Info Colors - Cool Gray-Blue */
+  --el-color-info: #5E5CE6;
+  --el-color-info-light-3: #7A7AEB;
+  --el-color-info-light-5: #9999F0;
+  --el-color-info-light-7: #B3B3F5;
+  --el-color-info-light-8: #C7C7F8;
+  --el-color-info-light-9: #E6E6FC;
+  --el-color-info-dark-2: #4B49B8;
+
+  /* Text Colors - macOS hierarchy */
+  --el-text-color-primary: #1D1D1F;
+  --el-text-color-regular: #3D3D3F;
+  --el-text-color-secondary: #6E6E73;
+  --el-text-color-placeholder: #AEAEB2;
+  --el-text-color-disabled: #C7C7CC;
+
+  /* Background Colors - Enhanced layering */
+  --el-bg-color: #FFFFFF;
+  --el-bg-color-page: #F0F2F5;
+  --el-bg-color-overlay: rgba(255, 255, 255, 0.85);
+
+  /* Border Colors */
+  --el-border-color: #D1D5DB;
+  --el-border-color-light: #E5E7EB;
+  --el-border-color-lighter: #F3F4F6;
+  --el-border-color-extra-light: #F9FAFB;
+  --el-border-color-dark: #6B7280;
+  --el-border-color-darker: #374151;
+
+  /* Fill Colors - Sidebar specific */
+  --el-fill-color: #E8EAED;
+  --el-fill-color-light: #F3F4F6;
+  --el-fill-color-lighter: #F9FAFB;
+  --el-fill-color-blank: #FFFFFF;
+
+  /* Shadows - Soft system */
+  --el-box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  --el-box-shadow-light: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --el-box-shadow-lighter: 0 1px 4px rgba(0, 0, 0, 0.02);
+  --el-box-shadow-dark: 0 4px 24px rgba(0, 0, 0, 0.16);
+
+  /* Border Radius - macOS preference */
+  --el-border-radius-base: 10px;
+  --el-border-radius-small: 8px;
+  --el-border-radius-round: 9999px;
+  --el-border-radius-circle: 50%;
+
+  /* Typography */
+  --el-font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+  --el-font-size-extra-large: 17px;
+  --el-font-size-large: 15px;
+  --el-font-size-base: 14px;
+  --el-font-size-small: 13px;
+  --el-font-size-extra-small: 12px;
+
+  /* Component-specific */
+  --el-menu-bg-color: transparent;
+  --el-menu-text-color: #3D3D3F;
+  --el-menu-hover-bg-color: rgba(0, 122, 255, 0.08);
+  --el-menu-active-color: #007AFF;
+  --el-menu-item-height: 48px;
+
+  --el-header-bg-color: rgba(255, 255, 255, 0.78);
+  --el-header-text-color: #1D1D1F;
+  --el-header-height: 56px;
+
+  --el-button-padding-horizontal: 20px;
+  --el-button-padding-vertical: 10px;
+  --el-button-font-size: 14px;
+
+  /* Transition */
+  --el-transition-duration: 0.3s;
+  --el-transition-function: ease;
+
+  /* ===== Module Colors for Menu Icons ===== */
+  --icon-dashboard: #007AFF;
+  --icon-system: #5E5CE6;
+  --icon-audit: #FF9500;
+  --icon-business: #34C759;
+  --icon-user: #FF3B30;
+  --icon-role: #5E5CE6;
+  --icon-settings: #6E6E73;
+
+  /* ===== Gradient Accents ===== */
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-success: linear-gradient(135deg, #34C759 0%, #10B981 100%);
+  --gradient-warm: linear-gradient(135deg, #FF9500 0%, #FF3B30 100%);
+  --gradient-cool: linear-gradient(135deg, #007AFF 0%, #5E5CE6 100%);
+  --gradient-surface: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%);
+}
+
+/* ===== Dark Theme ===== */
+.dark {
+  --el-color-primary: #0A84FF;
+  --el-color-primary-light-3: #0A84FF;
+  --el-color-primary-light-5: #409EFF;
+  --el-color-primary-light-7: #66B3FF;
+  --el-color-primary-light-9: #E6F2FF;
+  --el-color-primary-dark-2: #0062CC;
+
+  --el-color-success: #30D158;
+  --el-color-success-light-3: #30D158;
+  --el-color-success-light-5: #5DD67A;
+  --el-color-success-light-7: #85E09B;
+  --el-color-success-light-9: #E6FBE9;
+  --el-color-success-dark-2: #248A3D;
+
+  --el-color-warning: #FF9F0A;
+  --el-color-warning-light-3: #FF9F0A;
+  --el-color-warning-light-5: #FFAD33;
+  --el-color-warning-light-7: #FFC266;
+  --el-color-warning-light-9: #FFF2E5;
+  --el-color-warning-dark-2: #CC7700;
+
+  --el-color-danger: #FF453A;
+  --el-color-danger-light-3: #FF453A;
+  --el-color-danger-light-5: #FF6B60;
+  --el-color-danger-light-7: #FF918A;
+  --el-color-danger-light-9: #FFE6E4;
+  --el-color-danger-dark-2: #CC2F26;
+
+  --el-color-info: #5E5CE6;
+  --el-color-info-light-3: #5E5CE6;
+  --el-color-info-light-5: #7A7AEB;
+  --el-color-info-light-7: #9999F0;
+  --el-color-info-light-9: #E6E6FC;
+  --el-color-info-dark-2: #4B49B8;
+
+  --el-text-color-primary: #F5F5F7;
+  --el-text-color-regular: #E5E5E7;
+  --el-text-color-secondary: #98989D;
+  --el-text-color-placeholder: #636366;
+  --el-text-color-disabled: #48484A;
+
+  --el-bg-color: #1D1D1F;
+  --el-bg-color-page: #000000;
+  --el-bg-color-overlay: rgba(29, 29, 31, 0.78);
+
+  --el-border-color: #38383A;
+  --el-border-color-light: #48484A;
+  --el-border-color-lighter: #636366;
+  --el-border-color-darker: #2C2C2E;
+
+  --el-fill-color: #2C2C2E;
+  --el-fill-color-light: #3A3A3C;
+  --el-fill-color-lighter: #48484A;
+  --el-fill-color-blank: #2C2C2E;
+
+  --el-box-shadow: 0 2px 12px rgba(0, 0, 0, 0.24);
+  --el-box-shadow-light: 0 2px 8px rgba(0, 0, 0, 0.16);
+  --el-box-shadow-lighter: 0 1px 4px rgba(0, 0, 0, 0.08);
+  --el-box-shadow-dark: 0 4px 24px rgba(0, 0, 0, 0.48);
+
+  --el-menu-bg-color: transparent;
+  --el-menu-text-color: #E5E5E7;
+  --el-menu-hover-bg-color: rgba(10, 132, 255, 0.12);
+  --el-menu-active-color: #0A84FF;
+
+  --el-header-bg-color: rgba(29, 29, 31, 0.78);
+  --el-header-text-color: #F5F5F7;
+
+  /* Dark mode icon colors - brighter variants */
+  --icon-dashboard: #0A84FF;
+  --icon-system: #7A7AEB;
+  --icon-audit: #FF9F0A;
+  --icon-business: #30D158;
+  --icon-user: #FF453A;
+  --icon-role: #7A7AEB;
+  --icon-settings: #98989D;
+
+  /* Dark gradients */
+  --gradient-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  --gradient-success: linear-gradient(135deg, #30D158 0%, #10B981 100%);
+  --gradient-warm: linear-gradient(135deg, #FF9F0A 0%, #FF453A 100%);
+  --gradient-cool: linear-gradient(135deg, #0A84FF 0%, #5E5CE6 100%);
+  --gradient-surface: linear-gradient(180deg, rgba(29,29,31,0.9) 0%, rgba(29,29,31,0.6) 100%);
+}
+
+/* ===== Glassmorphism Utilities ===== */
+.glass-surface {
+  background: var(--el-bg-color-overlay);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.dark .glass-surface {
+  background: var(--el-bg-color-overlay);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-card {
+  background: var(--el-bg-color-overlay);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: var(--el-border-radius-base);
+  box-shadow: var(--el-box-shadow);
+}
+
+.dark .glass-card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: var(--el-box-shadow-dark);
+}
+
+/* ===== Gradient Accent Classes ===== */
+.gradient-primary {
+  background: var(--gradient-primary);
+}
+
+.gradient-success {
+  background: var(--gradient-success);
+}
+
+.gradient-warm {
+  background: var(--gradient-warm);
+}
+
+.gradient-cool {
+  background: var(--gradient-cool);
+}
+
+.gradient-text {
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background: var(--gradient-cool);
+}
+
+/* ===== Icon Color Classes ===== */
+.icon-dashboard { color: var(--icon-dashboard); }
+.icon-system { color: var(--icon-system); }
+.icon-audit { color: var(--icon-audit); }
+.icon-business { color: var(--icon-business); }
+.icon-user { color: var(--icon-user); }
+.icon-role { color: var(--icon-role); }
+.icon-settings { color: var(--icon-settings); }
+
+/* ===== Zebra Striping for Tables ===== */
+.el-table--striped .el-table__body tr.el-table__row:nth-child(even) {
+  background-color: var(--el-fill-color-lighter);
+}
+
+.dark .el-table--striped .el-table__body tr.el-table__row:nth-child(even) {
+  background-color: var(--el-fill-color-light);
+}
+
+/* ===== Enhanced Card Styles ===== */
+.macos-card {
+  background: var(--el-bg-color);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: var(--el-border-radius-base);
+  box-shadow: var(--el-box-shadow-light);
+  transition: all 0.2s ease;
+}
+
+.macos-card:hover {
+  box-shadow: var(--el-box-shadow);
+  border-color: var(--el-border-color-light);
+}
+
+.macos-card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+  font-weight: 600;
+  color: var(--el-text-color-primary);
+}
+
+.macos-card-body {
+  padding: 20px;
+}
+
+/* ===== Enhanced Button Styles ===== */
+.el-button--primary {
+  background: var(--el-color-primary);
+  border-color: var(--el-color-primary);
+}
+
+.el-button--primary:hover {
+  background: var(--el-color-primary-light-3);
+  border-color: var(--el-color-primary-light-3);
+}
+
+.el-button--success {
+  background: var(--el-color-success);
+  border-color: var(--el-color-success);
+}
+
+.el-button--success:hover {
+  background: var(--el-color-success-light-3);
+  border-color: var(--el-color-success-light-3);
+}
+
+.el-button--warning {
+  background: var(--el-color-warning);
+  border-color: var(--el-color-warning);
+}
+
+.el-button--warning:hover {
+  background: var(--el-color-warning-light-3);
+  border-color: var(--el-color-warning-light-3);
+}
+
+.el-button--danger {
+  background: var(--el-color-danger);
+  border-color: var(--el-color-danger);
+}
+
+.el-button--danger:hover {
+  background: var(--el-color-danger-light-3);
+  border-color: var(--el-color-danger-light-3);
+}
+
+/* ===== Tag Color Enhancements ===== */
+.el-tag--success {
+  background: var(--el-color-success-light-9);
+  border-color: var(--el-color-success-light-8);
+  color: var(--el-color-success-dark-2);
+}
+
+.el-tag--warning {
+  background: var(--el-color-warning-light-9);
+  border-color: var(--el-color-warning-light-8);
+  color: var(--el-color-warning-dark-2);
+}
+
+.el-tag--danger {
+  background: var(--el-color-danger-light-9);
+  border-color: var(--el-color-danger-light-8);
+  color: var(--el-color-danger-dark-2);
+}
+
+.el-tag--info {
+  background: var(--el-color-info-light-9);
+  border-color: var(--el-color-info-light-8);
+  color: var(--el-color-info-dark-2);
+}
+
+/* ===== Badge Enhancements ===== */
+.el-badge__content--primary {
+  background: var(--el-color-primary);
+}
+
+.el-badge__content--success {
+  background: var(--el-color-success);
+}
+
+.el-badge__content--warning {
+  background: var(--el-color-warning);
+}
+
+.el-badge__content--danger {
+  background: var(--el-color-danger);
+}
+
+/* ===== Progress Bar Colors ===== */
+.el-progress-bar__outer {
+  background: var(--el-fill-color);
+}
+
+/* ===== Alert Styles ===== */
+.el-alert--success {
+  background: var(--el-color-success-light-9);
+  border-color: var(--el-color-success-light-8);
+}
+
+.el-alert--warning {
+  background: var(--el-color-warning-light-9);
+  border-color: var(--el-color-warning-light-8);
+}
+
+.el-alert--danger {
+  background: var(--el-color-danger-light-9);
+  border-color: var(--el-color-danger-light-8);
+}
+
+.el-alert--info {
+  background: var(--el-color-info-light-9);
+  border-color: var(--el-color-info-light-8);
+}
+
+/* ===== Global Transitions ===== */
+* {
+  transition: background-color var(--el-transition-duration) var(--el-transition-function),
+              border-color var(--el-transition-duration) var(--el-transition-function),
+              color var(--el-transition-duration) var(--el-transition-function),
+              box-shadow var(--el-transition-duration) var(--el-transition-function);
+}
