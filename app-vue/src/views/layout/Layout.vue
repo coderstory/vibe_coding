@@ -3,6 +3,8 @@ import { ref } from 'vue'
 import AppMenu from '@/components/AppMenu.vue'
 import AppHeader from '@/components/AppHeader.vue'
 import AppTabs from '@/components/AppTabs.vue'
+import '@/assets/themes/animations/_keyframes.css'
+import '@/assets/themes/animations/_wave.css'
 
 const collapsed = ref(false)
 
@@ -14,6 +16,11 @@ function toggleCollapse() {
 <template>
   <el-container class="layout-container">
     <el-aside :width="collapsed ? '64px' : '220px'" class="layout-aside">
+      <div class="wave-container">
+        <div class="wave-layer wave-layer-1"></div>
+        <div class="wave-layer wave-layer-2"></div>
+        <div class="wave-layer wave-layer-3"></div>
+      </div>
       <div class="logo">
         <span v-if="!collapsed">管理系统</span>
         <span v-else>M</span>
@@ -59,6 +66,50 @@ function toggleCollapse() {
 .layout-aside :deep(.el-menu) {
   border-right: none;
   background: transparent;
+}
+
+.wave-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.wave-layer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  height: 100px;
+  background-repeat: repeat-x;
+  transform-origin: center bottom;
+}
+
+.wave-layer-1 {
+  z-index: 1;
+  animation: wave 8s linear infinite;
+  opacity: 0.3;
+}
+
+.wave-layer-2 {
+  z-index: 2;
+  animation: wave 6s linear infinite reverse;
+  opacity: 0.2;
+}
+
+.wave-layer-3 {
+  z-index: 3;
+  animation: wave 10s linear infinite;
+  opacity: 0.15;
+}
+
+.logo, .layout-aside :deep(.el-menu) {
+  position: relative;
+  z-index: 40;
 }
 
 .logo {
