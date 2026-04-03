@@ -563,8 +563,11 @@
   -webkit-backdrop-filter: blur(20px);
   width: 100% !important;
   box-sizing: border-box !important;
-  display: flex;
-  flex-direction: column;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  --el-messagebox-error-font-size: 12px !important;
 }
 
 .el-message-box__wrapper {
