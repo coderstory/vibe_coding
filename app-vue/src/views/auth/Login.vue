@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/store/user'
@@ -8,6 +8,10 @@ import { useThemeStore } from '@/store/theme'
 const router = useRouter()
 const userStore = useUserStore()
 const themeStore = useThemeStore()
+
+onMounted(() => {
+  themeStore.initTheme()
+})
 
 const loginForm = reactive({
   username: '',
@@ -115,6 +119,24 @@ function handleKeydown(e) {
   align-items: center;
   justify-content: center;
   background: #f5f7fa;
+  transition: background 0.3s;
+}
+
+:deep(.dark) .login-container {
+  background: #1d1f20;
+}
+
+:deep(.dark) .login-card {
+  background: #2d2d2d;
+  border-color: #3d3d3d;
+}
+
+:deep(.dark) .login-header h1 {
+  color: #e0e0e0;
+}
+
+:deep(.dark) .login-header p {
+  color: #a0a0a0;
 }
 
 .login-card {
@@ -129,6 +151,7 @@ function handleKeydown(e) {
   margin: 0 0 8px 0;
   font-size: 24px;
   font-weight: 600;
+  color: #303133;
 }
 
 .login-header p {
