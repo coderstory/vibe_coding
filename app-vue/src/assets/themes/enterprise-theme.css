@@ -542,9 +542,12 @@
 }
 
 .el-dialog__footer {
-  padding: 16px 24px;
+  padding: 20px 24px;
   border-top: 1px solid rgba(147, 197, 253, 0.3);
   background: linear-gradient(135deg, #f0f9ff, #eff6ff);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
 }
 
 .el-overlay {
@@ -593,9 +596,12 @@
 }
 
 .el-message-box__footer {
-  padding: 16px 24px;
+  padding: 20px 24px;
   border-top: 1px solid rgba(147, 197, 253, 0.3);
   background: linear-gradient(135deg, #f0f9ff, #eff6ff);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
 }
 
 /* ===== Form ===== */
