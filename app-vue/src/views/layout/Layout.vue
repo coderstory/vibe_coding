@@ -5,6 +5,7 @@ import AppHeader from '@/components/AppHeader.vue'
 import AppTabs from '@/components/AppTabs.vue'
 import '@/assets/themes/animations/_keyframes.css'
 import '@/assets/themes/animations/_wave.css'
+import '@/assets/themes/animations/_bubble.css'
 
 const collapsed = ref(false)
 
@@ -15,6 +16,18 @@ function toggleCollapse() {
 
 <template>
   <el-container class="layout-container">
+    <div class="bubble-container">
+      <div class="bubble bubble-1 bubble-delay-1"></div>
+      <div class="bubble bubble-2 bubble-delay-2"></div>
+      <div class="bubble bubble-3 bubble-delay-3"></div>
+      <div class="bubble bubble-4 bubble-delay-4"></div>
+      <div class="bubble bubble-5 bubble-delay-5"></div>
+      <div class="bubble bubble-6 bubble-delay-6"></div>
+      <div class="bubble bubble-7 bubble-delay-7"></div>
+      <div class="bubble bubble-8 bubble-delay-8"></div>
+      <div class="bubble bubble-9 bubble-delay-9"></div>
+      <div class="bubble bubble-10 bubble-delay-10"></div>
+    </div>
     <el-aside :width="collapsed ? '64px' : '220px'" class="layout-aside">
       <div class="wave-container">
         <div class="wave-layer wave-layer-1"></div>
