@@ -1251,3 +1251,181 @@
   opacity: 0;
   transform: translateX(-20px);
 }
+
+/* ===== el-divider (分隔线) ===== */
+.el-divider {
+  background-color: #bfdbfe;
+  border: none;
+  height: 1px;
+  margin: 16px 0;
+}
+
+.el-divider--horizontal {
+  background-color: #bfdbfe;
+  height: 1px;
+  margin: 16px 0;
+}
+
+.el-divider--vertical {
+  background-color: #bfdbfe;
+  width: 1px;
+  height: auto;
+  margin: 0 16px;
+}
+
+.el-divider__text {
+  background-color: #ffffff;
+  color: #3b82f6;
+  font-weight: 500;
+  padding: 0 16px;
+}
+
+.el-divider__text::before,
+.el-divider__text::after {
+  border-color: #93c5fd;
+}
+
+/* ===== el-avatar (头像) ===== */
+.el-avatar {
+  border: 2px solid #93c5fd;
+  box-shadow: 0 2px 8px rgba(30, 58, 138, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.el-avatar--circle {
+  border-radius: 50%;
+  border: 3px solid #3b82f6;
+}
+
+.el-avatar:hover {
+  transform: scale(1.05);
+  border-color: #3b82f6;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+}
+
+.el-avatar--circle:hover {
+  border-color: #1e3a8a;
+  box-shadow: 0 6px 20px rgba(30, 58, 138, 0.25);
+}
+
+.el-avatar--square {
+  border-radius: var(--el-border-radius-base);
+}
+
+/* ===== el-badge (徽章) ===== */
+.el-badge__content {
+  background: linear-gradient(135deg, #d97706, #f59e0b);
+  border: none;
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.4);
+}
+
+.el-badge__content.is-fixed {
+  top: 8px;
+  right: 8px;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.4);
+}
+
+.el-badge__content.is-dot {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.4);
+}
+
+.el-badge__content--danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.el-badge__content--warning {
+  background: linear-gradient(135deg, #d97706, #f59e0b);
+}
+
+.el-badge__content--success {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.el-badge__content--info {
+  background: linear-gradient(135deg, #64748b, #475569);
+}
+
+@keyframes badge-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 2px 6px rgba(217, 119, 6, 0.4);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.5);
+  }
+}
+
+.el-badge__content:not(.is-dot):not(.is-none) {
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+/* ===== el-progress (进度条) ===== */
+.el-progress-bar__outer {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border-radius: var(--el-border-radius-round);
+  box-shadow: inset 0 2px 4px rgba(30, 58, 138, 0.1);
+}
+
+.el-progress-bar__inner {
+  background: linear-gradient(90deg, #3b82f6, #1e3a8a);
+  border-radius: var(--el-border-radius-round);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.el-progress-bar__inner::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.3) 50%, 
+    transparent 100%);
+  animation: shimmer 2s ease-in-out infinite;
+  background-size: 200% 100%;
+}
+
+.el-progress--line {
+  margin-bottom: 8px;
+}
+
+.el-progress__text {
+  color: #1e3a8a;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.el-progress--circle .el-progress__text {
+  color: #1e3a8a;
+  font-weight: 600;
+}
+
+.el-progress--dashboard .el-progress__text {
+  color: #1e3a8a;
+  font-weight: 600;
+}
+
+.el-progress--success .el-progress-bar__inner {
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.el-progress--warning .el-progress-bar__inner {
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+.el-progress--exception .el-progress-bar__inner {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+.el-progress-bar__inner:hover {
+  filter: brightness(1.1);
+}
