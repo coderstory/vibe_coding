@@ -501,9 +501,13 @@
 }
 
 .el-dialog__header {
-  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
   border-bottom: 1px solid rgba(147, 197, 253, 0.3);
   padding: 20px 24px;
+  margin-right: 0;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .el-dialog__title {
