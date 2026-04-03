@@ -162,22 +162,24 @@ onMounted(() => {
 .app-menu .el-icon {
   margin-right: 8px;
 }
+</style>
 
-:deep(.dark) .app-menu {
+<style>
+.dark .app-menu {
   background-color: #1d1f20 !important;
 }
 
-:deep(.dark) .app-menu .el-menu-item,
-:deep(.dark) .app-menu .el-sub-menu__title {
+.dark .app-menu .el-menu-item,
+.dark .app-menu .el-sub-menu__title {
   color: #a0a0a0 !important;
 }
 
-:deep(.dark) .app-menu .el-menu-item:hover,
-:deep(.dark) .app-menu .el-sub-menu__title:hover {
+.dark .app-menu .el-menu-item:hover,
+.dark .app-menu .el-sub-menu__title:hover {
   background-color: #2d2d2d !important;
 }
 
-:deep(.dark) .app-menu .el-menu-item.is-active {
+.dark .app-menu .el-menu-item.is-active {
   color: #409eff !important;
 }
 </style>

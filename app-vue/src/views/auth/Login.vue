@@ -118,23 +118,6 @@ function handleKeydown(e) {
   transition: background 0.3s;
 }
 
-:deep(.dark) .login-container {
-  background: #1d1f20;
-}
-
-:deep(.dark) .login-card {
-  background: #2d2d2d;
-  border-color: #3d3d3d;
-}
-
-:deep(.dark) .login-header h1 {
-  color: #e0e0e0;
-}
-
-:deep(.dark) .login-header p {
-  color: #a0a0a0;
-}
-
 .login-card {
   width: 400px;
 }
@@ -163,5 +146,24 @@ function handleKeydown(e) {
 
 .w-full {
   width: 100%;
+}
+</style>
+
+<style>
+.dark .login-container {
+  background: #1d1f20;
+}
+
+.dark .login-card {
+  background: #2d2d2d;
+  border-color: #3d3d3d;
+}
+
+.dark .login-header h1 {
+  color: #e0e0e0;
+}
+
+.dark .login-header p {
+  color: #a0a0a0;
 }
 </style>

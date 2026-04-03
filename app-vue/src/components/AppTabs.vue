@@ -73,27 +73,29 @@ function handleTabClose(path) {
   height: 40px;
   line-height: 40px;
 }
+</style>
 
-:deep(.dark) .app-tabs {
+<style>
+.dark .app-tabs {
   background: #1d1f20;
   border-color: #3d3d3d;
 }
 
-:deep(.dark) .app-tabs .el-tabs__header {
+.dark .app-tabs .el-tabs__header {
   border-color: #3d3d3d;
 }
 
-:deep(.dark) .app-tabs .el-tabs__item {
+.dark .app-tabs .el-tabs__item {
   color: #a0a0a0;
   background: #1d1f20;
   border-color: #3d3d3d;
 }
 
-:deep(.dark) .app-tabs .el-tabs__item:hover {
+.dark .app-tabs .el-tabs__item:hover {
   color: #e0e0e0;
 }
 
-:deep(.dark) .app-tabs .el-tabs__item.is-active {
+.dark .app-tabs .el-tabs__item.is-active {
   color: #409eff;
   background: #2d2d2d;
   border-color: #409eff;

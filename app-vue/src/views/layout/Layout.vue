@@ -85,25 +85,27 @@ function toggleCollapse() {
   padding: 16px;
   background: #f5f7fa;
 }
+</style>
 
-:deep(.dark) .layout-aside {
+<style>
+.dark .layout-aside {
   background: #1d1f20;
   border-color: #3d3d3d;
 }
 
-:deep(.dark) .logo {
+.dark .logo {
   background: #121417;
   border-color: #2d2d2d;
   color: #e0e0e0;
 }
 
-:deep(.dark) .layout-header {
+.dark .layout-header {
   background: #1d1f20;
   border-color: #3d3d3d;
   color: #e0e0e0;
 }
 
-:deep(.dark) .layout-main {
+.dark .layout-main {
   background: #121417;
   color: #e0e0e0;
 }

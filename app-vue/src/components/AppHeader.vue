@@ -103,12 +103,18 @@ function toggleTheme() {
   font-size: 14px;
   color: #303133;
 }
+</style>
 
-:deep(.dark) .theme-btn {
+<style>
+.dark .theme-btn {
   color: #e0e0e0;
 }
 
-:deep(.dark) .username {
+.dark .username {
   color: #e0e0e0;
+}
+
+.dark .user-avatar {
+  background: #409eff;
 }
 </style>
