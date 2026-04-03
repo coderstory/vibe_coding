@@ -149,6 +149,7 @@
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.6);
   animation: float 6s ease-in-out infinite;
+  z-index: 5;
 }
 
 .bubble-1 { width: 20px; height: 20px; left: 10%; animation-delay: 0s; }
@@ -176,6 +177,7 @@
     rgba(147, 197, 253, 0.4) 75%,
     transparent 100%);
   animation: wave 8s linear infinite;
+  z-index: 1;
 }
 
 /* ===== Table Styles ===== */
