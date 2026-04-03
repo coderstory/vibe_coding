@@ -190,11 +190,21 @@
 }
 
 /* ===== Card Styles - Glass Effect ===== */
-.macos-card {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(147, 197, 253, 0.3);
+.glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(147, 197, 253, 0.4);
+  border-radius: 16px;
+  box-shadow: var(--el-box-shadow);
+}
+
+.macos-card,
+.glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(147, 197, 253, 0.4);
   border-radius: 16px;
   box-shadow: var(--el-box-shadow);
 }
@@ -209,6 +219,16 @@
 
 .macos-card-body {
   padding: 24px;
+}
+
+/* ===== Header - Glass Effect ===== */
+.glass-header,
+.el-header {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(147, 197, 253, 0.3);
+  box-shadow: 0 2px 12px rgba(30, 58, 138, 0.08);
 }
 
 /* ===== Element Plus Card - Glass Effect ===== */
@@ -449,12 +469,16 @@
   font-size: 15px;
 }
 
-/* ===== Dialog ===== */
+/* ===== Dialog - Glass Effect ===== */
+.glass-dialog,
 .el-dialog {
   border-radius: 16px;
   overflow: hidden;
-  border: 1px solid rgba(147, 197, 253, 0.3);
+  border: 1px solid rgba(147, 197, 253, 0.4);
   box-shadow: var(--el-box-shadow-dark);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .el-dialog__header {
@@ -592,11 +616,12 @@
 /* ===== Dropdown ===== */
 .el-dropdown-menu {
   border-radius: var(--el-border-radius-base);
-  border: 1px solid rgba(147, 197, 253, 0.3);
-  box-shadow: var(--el-box-shadow);
+  border: 1px solid rgba(147, 197, 253, 0.4);
+  box-shadow: var(--el-box-shadow-dark);
   padding: 8px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .el-dropdown-menu__item {
