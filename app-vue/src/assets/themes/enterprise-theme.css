@@ -565,8 +565,6 @@
   box-sizing: border-box !important;
   display: flex !important;
   flex-direction: column !important;
-  padding: 0 !important;
-  margin: 0 !important;
   --el-messagebox-error-font-size: 12px !important;
 }
 
