@@ -381,6 +381,61 @@
   padding: 24px;
 }
 
+.el-dialog__headerbtn {
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+}
+
+.el-dialog__headerbtn .el-dialog__close {
+  color: #94a3b8;
+  transition: color 0.2s;
+}
+
+.el-dialog__headerbtn:hover .el-dialog__close {
+  color: #1e3a8a;
+}
+
+.el-dialog__footer {
+  padding: 16px 24px;
+  border-top: 1px solid rgba(147, 197, 253, 0.3);
+  background: linear-gradient(135deg, #f0f9ff, #eff6ff);
+}
+
+.el-overlay {
+  background: rgba(30, 58, 138, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.el-message-box {
+  border-radius: 16px;
+  border: 1px solid rgba(147, 197, 253, 0.3);
+  box-shadow: var(--el-box-shadow-dark);
+}
+
+.el-message-box__header {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border-bottom: 1px solid rgba(147, 197, 253, 0.3);
+  padding: 20px 24px;
+}
+
+.el-message-box__title {
+  color: #1e3a8a;
+  font-weight: 600;
+}
+
+.el-message-box__content {
+  padding: 24px;
+  color: #475569;
+}
+
+.el-message-box__footer {
+  padding: 16px 24px;
+  border-top: 1px solid rgba(147, 197, 253, 0.3);
+  background: linear-gradient(135deg, #f0f9ff, #eff6ff);
+}
+
 /* ===== Form ===== */
 .el-form-item__label {
   color: #475569;
