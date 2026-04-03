@@ -10,9 +10,6 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
-import { createVuestic } from 'vuestic-ui'
-import 'vuestic-ui/dist/vuestic-ui.css'
-
 const app = createApp(App)
 const pinia = createPinia()
 
@@ -23,6 +20,5 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 app.use(pinia)
 app.use(router)
 app.use(ElementPlus)
-app.use(createVuestic({}))
 
 app.mount('#app')
