@@ -552,6 +552,16 @@
   border-radius: 16px;
   border: 1px solid rgba(147, 197, 253, 0.3);
   box-shadow: var(--el-box-shadow-dark);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.el-message-box__wrapper {
+  background: rgba(30, 58, 138, 0.5);
+  backdrop-filter: blur(4px);
 }
 
 .el-message-box__header {
