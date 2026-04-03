@@ -542,12 +542,9 @@
 }
 
 .el-dialog__footer {
-  padding: 20px 24px;
-  border-top: 1px solid rgba(147, 197, 253, 0.3);
-  background: linear-gradient(135deg, #f0f9ff, #eff6ff);
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
+  padding: 24px !important;
+  border-top: 1px solid rgba(147, 197, 253, 0.3) !important;
+  background: linear-gradient(135deg, #f0f9ff, #eff6ff) !important;
 }
 
 .el-overlay {
@@ -596,12 +593,9 @@
 }
 
 .el-message-box__footer {
-  padding: 20px 24px;
-  border-top: 1px solid rgba(147, 197, 253, 0.3);
-  background: linear-gradient(135deg, #f0f9ff, #eff6ff);
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
+  padding: 24px !important;
+  border-top: 1px solid rgba(147, 197, 253, 0.3) !important;
+  background: linear-gradient(135deg, #f0f9ff, #eff6ff) !important;
 }
 
 /* ===== Form ===== */
