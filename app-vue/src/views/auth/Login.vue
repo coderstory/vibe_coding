@@ -53,26 +53,20 @@ function handleKeydown(e) {
 </script>
 
 <template>
-  <div class="login-container dynamic-gradient" @keydown="handleKeydown">
-    <div class="login-particles">
-      <div class="particle floating" style="top: 10%; left: 20%;"></div>
-      <div class="particle floating" style="top: 60%; left: 80%; animation-delay: 0.5s;"></div>
-      <div class="particle floating" style="top: 80%; left: 10%; animation-delay: 1s;"></div>
-      <div class="particle floating" style="top: 20%; left: 70%; animation-delay: 1.5s;"></div>
-    </div>
-    
-    <div class="login-card glass glow">
-      <div class="login-header">
-        <h1 class="login-title">管理系统</h1>
-        <p class="login-subtitle">欢迎回来</p>
-      </div>
+  <div class="login-container" @keydown="handleKeydown">
+    <el-card class="login-card">
+      <template #header>
+        <div class="login-header">
+          <h1>管理系统</h1>
+          <p>请登录以继续</p>
+        </div>
+      </template>
       
       <el-form
         ref="loginFormRef"
         :model="loginForm"
         :rules="rules"
-        class="login-form"
-        @submit.prevent="handleLogin"
+        label-position="top"
       >
         <el-form-item prop="username">
           <el-input
@@ -97,7 +91,7 @@ function handleKeydown(e) {
             type="primary"
             size="large"
             :loading="loading"
-            class="login-button glass-button"
+            class="w-full"
             @click="handleLogin"
           >
             登 录
@@ -106,11 +100,11 @@ function handleKeydown(e) {
       </el-form>
       
       <div class="login-footer">
-        <span class="theme-toggle" @click="themeStore.toggleTheme">
-          {{ themeStore.isDark ? '☀️ 亮色模式' : '🌙 暗色模式' }}
-        </span>
+        <el-button link @click="themeStore.toggleTheme">
+          {{ themeStore.isDark ? '☀️ 切换亮色模式' : '🌙 切换暗色模式' }}
+        </el-button>
       </div>
-    </div>
+    </el-card>
   </div>
 </template>
 
@@ -120,94 +114,35 @@ function handleKeydown(e) {
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.login-particles {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.particle {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  background: #f5f7fa;
 }
 
 .login-card {
-  width: 420px;
-  padding: 48px 40px;
-  position: relative;
-  z-index: 10;
+  width: 400px;
 }
 
 .login-header {
   text-align: center;
-  margin-bottom: 40px;
 }
 
-.login-title {
-  font-size: 32px;
-  font-weight: 700;
-  color: white;
-  margin: 0 0 12px 0;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+.login-header h1 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 600;
 }
 
-.login-subtitle {
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.8);
+.login-header p {
   margin: 0;
-}
-
-.login-form {
-  margin-top: 24px;
-}
-
-.login-form :deep(.el-input__wrapper) {
-  background: rgba(255, 255, 255, 0.1) !important;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: none !important;
-  border: none !important;
-  border-radius: 8px;
-}
-
-.login-form :deep(.el-input__inner) {
-  color: white;
-}
-
-.login-form :deep(.el-input__inner::placeholder) {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.login-button {
-  width: 100%;
-  height: 48px;
-  font-size: 18px;
-  border: none;
-  margin-top: 8px;
+  color: #909399;
+  font-size: 14px;
 }
 
 .login-footer {
   text-align: center;
-  margin-top: 24px;
+  margin-top: 16px;
 }
 
-.theme-toggle {
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  font-size: 14px;
-  transition: color 0.3s;
-}
-
-.theme-toggle:hover {
-  color: white;
+.w-full {
+  width: 100%;
 }
 </style>
