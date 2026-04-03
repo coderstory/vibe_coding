@@ -1,6 +1,23 @@
 /* ===== Summer Beach Theme - Ocean Breeze Admin ===== */
 /* 清爽夏日海滩风 - 海洋色系 + 沙滩点缀 */
 
+/*
+ * ===== Z-Index 层级规范 =====
+ * 确保 UI 元素堆叠顺序正确，避免层级冲突
+ *
+ * 层级定义:
+ * - Waves (海浪动画):     1-10    - 背景装饰性波浪
+ * - Bubble (气泡动画):    5       - 背景装饰性气泡
+ * - Glass (玻璃容器):     20-30   - 毛玻璃效果容器
+ * - Content (内容层):     40+     - 主要内容区域
+ * - Dropdown (下拉菜单):   100+    - 下拉弹出层
+ * - Modal (模态框):       100+    - 模态对话框
+ * - Overlay (遮罩层):     100+    - 背景遮罩
+ * - Toast (提示):         200+    - 消息提示
+ *
+ * 注意: Element Plus 组件库使用自己的 z-index 层级体系
+ */
+
 /* ===== CSS Variables ===== */
 :root {
   /* Ocean Colors */
