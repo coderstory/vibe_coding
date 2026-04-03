@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/store/user'
@@ -8,10 +8,6 @@ import { useThemeStore } from '@/store/theme'
 const router = useRouter()
 const userStore = useUserStore()
 const themeStore = useThemeStore()
-
-onMounted(() => {
-  themeStore.initTheme()
-})
 
 const loginForm = reactive({
   username: '',
