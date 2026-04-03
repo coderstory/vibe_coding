@@ -542,7 +542,7 @@
 }
 
 .el-dialog__footer {
-  padding: 24px !important;
+  padding: 32px 24px !important;
   border-top: 1px solid rgba(147, 197, 253, 0.3) !important;
   background: linear-gradient(135deg, #f0f9ff, #eff6ff) !important;
 }
@@ -593,7 +593,7 @@
 }
 
 .el-message-box__footer {
-  padding: 24px !important;
+  padding: 32px 24px !important;
   border-top: 1px solid rgba(147, 197, 253, 0.3) !important;
   background: linear-gradient(135deg, #f0f9ff, #eff6ff) !important;
 }
