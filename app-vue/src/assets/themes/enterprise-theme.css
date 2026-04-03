@@ -489,15 +489,61 @@
 }
 
 /* ===== Dialog - Glass Effect ===== */
-.glass-dialog,
 .el-dialog {
-  border-radius: 16px;
+  padding: 0 !important;
+  border-radius: 16px !important;
   overflow: hidden;
   border: 1px solid rgba(147, 197, 253, 0.4);
   box-shadow: var(--el-box-shadow-dark);
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%) !important;
+}
+
+.el-dialog__header {
+  padding: 16px 20px !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.el-dialog__title {
+  color: #1e3a8a !important;
+  font-weight: 600 !important;
+}
+
+.el-dialog__body {
   background: rgba(255, 255, 255, 0.92) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  padding: 24px !important;
+  color: #475569 !important;
+}
+
+.el-dialog__footer {
+  background: rgba(255, 255, 255, 0.92) !important;
+  padding: 20px !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+.el-dialog__headerbtn {
+  width: 44px !important;
+  height: 44px !important;
+  top: 0 !important;
+  right: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.el-dialog__headerbtn:hover {
+  background: rgba(147, 197, 253, 0.3) !important;
+}
+
+.el-dialog__headerbtn .el-dialog__close {
+  color: #1e3a8a !important;
+  font-size: 20px !important;
+}
+
+.el-dialog__headerbtn:hover .el-dialog__close {
+  color: #3b82f6 !important;
 }
 
 .el-dialog__header {
@@ -541,9 +587,49 @@
   color: #1e3a8a;
 }
 
+/* ===== Message Box ===== */
+.el-message-box {
+  padding: 0 !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(147, 197, 253, 0.4) !important;
+  box-shadow: var(--el-box-shadow-dark) !important;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%) !important;
+}
+
+.el-message-box__wrapper {
+  background: rgba(30, 58, 138, 0.5) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+.el-message-box__header {
+  padding: 16px 20px !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.el-message-box__title {
+  color: #1e3a8a !important;
+  font-weight: 600 !important;
+}
+
+.el-message-box__content {
+  background: rgba(255, 255, 255, 0.95) !important;
+  padding: 24px !important;
+  color: #475569 !important;
+}
+
+.el-message-box__footer {
+  background: rgba(255, 255, 255, 0.95) !important;
+  padding: 20px !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
 .el-overlay {
   background: rgba(30, 58, 138, 0.5) !important;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px) !important;
 }
 
 .el-dialog,
