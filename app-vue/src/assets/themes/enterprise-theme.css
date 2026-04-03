@@ -693,6 +693,29 @@
   .macos-card {
     border-radius: 12px;
   }
+
+  /* ===== Mobile Glass Performance Optimization ===== */
+  .glass-card,
+  .macos-card {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .el-header,
+  .glass-header {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .el-dialog {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .el-dropdown-menu {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
 }
 
 /* ===== Tree Styles ===== */
