@@ -21,6 +21,11 @@ export const useThemeStore = defineStore('theme', () => {
   
   function applyTheme(themeName) {
     document.documentElement.setAttribute('data-theme', themeName)
+    if (themeName === 'dark') {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
   }
   
   function initTheme() {

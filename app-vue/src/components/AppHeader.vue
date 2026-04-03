@@ -85,30 +85,30 @@ function toggleTheme() {
   font-size: 20px;
   padding: 8px;
   border-radius: 8px;
-  transition: background 0.3s;
-}
-
-.theme-btn:hover {
-  background: rgba(102, 126, 234, 0.1);
-}
-
-.header-user {
-  cursor: pointer;
 }
 
 .user-info {
   display: flex;
   align-items: center;
   gap: 8px;
+  cursor: pointer;
 }
 
 .user-avatar {
-  background: #667eea;
+  background: #409eff;
   color: #fff;
 }
 
 .username {
   font-size: 14px;
   color: #303133;
+}
+
+:deep(.dark) .theme-btn {
+  color: #e0e0e0;
+}
+
+:deep(.dark) .username {
+  color: #e0e0e0;
 }
 </style>

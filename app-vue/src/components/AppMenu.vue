@@ -15,7 +15,6 @@ const router = useRouter()
 
 const defaultActive = computed(() => route.path)
 
-// 完整的菜单配置（用于超级管理员或获取权限失败时）
 const allMenuItems = [
   {
     path: '/dashboard/index',
@@ -51,56 +50,42 @@ const allMenuItems = [
   }
 ]
 
-// 动态菜单数据（根据用户权限过滤）
 const menuItems = ref([])
 
-// 获取用户可见菜单
 async function loadUserMenus() {
   try {
     const userInfo = JSON.parse(localStorage.getItem('user') || '{}')
     
-    // 如果用户信息中没有id，说明未登录，使用空菜单
     if (!userInfo || !userInfo.id) {
       menuItems.value = []
       return
     }
     
-    // 如果是超级管理员(roleId=1)，显示所有菜单
     if (userInfo.roleId === 1) {
       menuItems.value = allMenuItems
       return
     }
     
-    // 普通用户：调用API获取该用户的菜单权限
     const res = await getUserMenus(userInfo.id)
     const userMenus = res.data || []
-    
-    // 过滤完整菜单配置，只显示用户有权限的菜单
     menuItems.value = filterMenusByPermissions(allMenuItems, userMenus)
   } catch (error) {
     console.error('获取用户菜单失败', error)
-    // 获取失败时显示空菜单
     menuItems.value = []
   }
 }
 
-// 根据用户权限过滤菜单
 function filterMenusByPermissions(fullMenus, allowedMenus) {
   const result = []
-  
-  // 将允许的菜单ID转换为集合，方便查找
   const allowedIds = new Set(allowedMenus.map(m => m.id))
   
   for (const menu of fullMenus) {
-    // 检查当前菜单是否在允许列表中
     const menuId = menu.id || menu.path
     const isAllowed = allowedIds.has(menuId) || allowedMenus.some(m => m.path === menu.path)
     
     if (isAllowed) {
-      // 如果有子菜单，递归过滤
       if (menu.children) {
         const filteredChildren = filterMenusByPermissions(menu.children, allowedMenus)
-        // 只有当有可见的子菜单时才添加父菜单
         if (filteredChildren.length > 0) {
           result.push({
             ...menu,
@@ -120,7 +105,6 @@ function handleSelect(path) {
   router.push(path)
 }
 
-// 初始化时加载用户菜单
 onMounted(() => {
   loadUserMenus()
 })
@@ -177,5 +161,23 @@ onMounted(() => {
 
 .app-menu .el-icon {
   margin-right: 8px;
+}
+
+:deep(.dark) .app-menu {
+  background-color: #1d1f20 !important;
+}
+
+:deep(.dark) .app-menu .el-menu-item,
+:deep(.dark) .app-menu .el-sub-menu__title {
+  color: #a0a0a0 !important;
+}
+
+:deep(.dark) .app-menu .el-menu-item:hover,
+:deep(.dark) .app-menu .el-sub-menu__title:hover {
+  background-color: #2d2d2d !important;
+}
+
+:deep(.dark) .app-menu .el-menu-item.is-active {
+  color: #409eff !important;
 }
 </style>

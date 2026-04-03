@@ -14,19 +14,19 @@ function toggleCollapse() {
 </script>
 
 <template>
-  <el-container class="layout-container" :class="{ 'dark-theme': themeStore.isDark }">
-    <el-aside :width="collapsed ? '64px' : '220px'" class="layout-aside glass">
+  <el-container class="layout-container">
+    <el-aside :width="collapsed ? '64px' : '220px'" class="layout-aside">
       <div class="logo">
-        <span v-if="!collapsed" class="logo-text">管理系统</span>
-        <span v-else class="logo-icon">M</span>
+        <span v-if="!collapsed">管理系统</span>
+        <span v-else>M</span>
       </div>
       <AppMenu :collapsed="collapsed" />
     </el-aside>
     
     <el-container class="main-container">
-      <el-header class="layout-header glass">
+      <el-header class="layout-header">
         <div class="header-left">
-          <el-button text @click="toggleCollapse" class="toggle-btn">
+          <el-button text @click="toggleCollapse">
             <el-icon size="20"><Fold v-if="!collapsed" /><Expand v-else /></el-icon>
           </el-button>
         </div>
@@ -49,82 +49,62 @@ function toggleCollapse() {
 <style scoped>
 .layout-container {
   min-height: 100vh;
-  background: #f5f7fa;
-  transition: background 0.3s;
-}
-
-.layout-container.dark-theme {
-  background: #1a1a2e;
 }
 
 .layout-aside {
-  background: rgba(48, 65, 86, 0.9);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
+  background: #304155;
+  transition: width 0.3s;
 }
 
-.dark-theme .layout-aside {
-  background: rgba(22, 33, 62, 0.9);
+.layout-aside :deep(.el-menu) {
+  border-right: none;
 }
 
 .logo {
-  height: 64px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(38, 52, 69, 0.8);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.logo-text {
-  color: white;
+  color: #fff;
   font-size: 18px;
   font-weight: 600;
-  letter-spacing: 2px;
-}
-
-.logo-icon {
-  color: #667eea;
-  font-size: 24px;
-  font-weight: 700;
+  background: #263445;
+  border-bottom: 1px solid #3d4d5d;
 }
 
 .layout-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  padding: 0 20px;
-  transition: all 0.3s;
-}
-
-.dark-theme .layout-header {
-  background: rgba(26, 26, 46, 0.8);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.toggle-btn {
-  padding: 8px;
-  border-radius: 8px;
-  transition: background 0.3s;
-}
-
-.toggle-btn:hover {
-  background: rgba(102, 126, 234, 0.1);
+  padding: 0 16px;
+  background: #fff;
+  border-bottom: 1px solid #e4e7ed;
 }
 
 .layout-main {
-  background: transparent;
-  padding: 20px;
-  min-height: calc(100vh - 120px);
+  padding: 16px;
+  background: #f5f7fa;
 }
 
-.dark-theme .layout-main {
-  background: transparent;
+:deep(.dark) .layout-aside {
+  background: #1d1f20;
+  border-color: #3d3d3d;
+}
+
+:deep(.dark) .logo {
+  background: #121417;
+  border-color: #2d2d2d;
+  color: #e0e0e0;
+}
+
+:deep(.dark) .layout-header {
+  background: #1d1f20;
+  border-color: #3d3d3d;
+  color: #e0e0e0;
+}
+
+:deep(.dark) .layout-main {
+  background: #121417;
+  color: #e0e0e0;
 }
 </style>

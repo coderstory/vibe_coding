@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
@@ -11,7 +11,6 @@ const tabs = ref([
 
 const activeTab = ref('/dashboard/index')
 
-// 监听路由变化，自动添加页签
 watch(() => route.path, (newPath) => {
   if (newPath.startsWith('/dashboard/') && newPath !== '/dashboard') {
     const title = route.meta?.title || newPath.split('/').pop()
@@ -23,8 +22,8 @@ watch(() => route.path, (newPath) => {
   }
 }, { immediate: true })
 
-function handleTabClick(path) {
-  router.push(path)
+function handleTabClick(tab) {
+  router.push(tab.props.name)
 }
 
 function handleTabClose(path) {
@@ -42,14 +41,18 @@ function handleTabClose(path) {
 
 <template>
   <div class="app-tabs">
-    <el-tabs v-model="activeTab" type="card" @tab-click="handleTabClick">
+    <el-tabs
+      v-model="activeTab"
+      type="card"
+      @tab-click="handleTabClick"
+      @tab-remove="handleTabClose"
+    >
       <el-tab-pane
         v-for="tab in tabs"
         :key="tab.path"
         :label="tab.title"
         :name="tab.path"
         :closable="tab.path !== '/dashboard/index'"
-        @close="handleTabClose(tab.path)"
       />
     </el-tabs>
   </div>
@@ -69,5 +72,30 @@ function handleTabClose(path) {
 .app-tabs :deep(.el-tabs__item) {
   height: 40px;
   line-height: 40px;
+}
+
+:deep(.dark) .app-tabs {
+  background: #1d1f20;
+  border-color: #3d3d3d;
+}
+
+:deep(.dark) .app-tabs .el-tabs__header {
+  border-color: #3d3d3d;
+}
+
+:deep(.dark) .app-tabs .el-tabs__item {
+  color: #a0a0a0;
+  background: #1d1f20;
+  border-color: #3d3d3d;
+}
+
+:deep(.dark) .app-tabs .el-tabs__item:hover {
+  color: #e0e0e0;
+}
+
+:deep(.dark) .app-tabs .el-tabs__item.is-active {
+  color: #409eff;
+  background: #2d2d2d;
+  border-color: #409eff;
 }
 </style>
