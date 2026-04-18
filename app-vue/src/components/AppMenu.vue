@@ -43,9 +43,21 @@ function convertToMenuItems(menus: Menu[]): MenuItem[] {
 
   // 先创建所有菜单项
   menus.forEach(menu => {
+    // 根据路径格式判断是顶级菜单还是子菜单
+    let fullPath = menu.path || ''
+    if (fullPath && !fullPath.startsWith('/dashboard')) {
+      if (fullPath.startsWith('/')) {
+        fullPath = `/dashboard${fullPath}`
+      } else {
+        fullPath = `/dashboard/${fullPath}`
+      }
+    } else if (!fullPath) {
+      fullPath = '/dashboard'
+    }
+
     menuMap.set(menu.id, {
       id: menu.id,
-      path: menu.path || `/dashboard/${menu.path}`,
+      path: fullPath,
       title: menu.name,
       icon: menu.icon || 'Folder',
       parentId: menu.parentId
