@@ -8,10 +8,12 @@ import java.util.List;
 
 @Mapper
 public interface MenuMapper extends BaseMapper<Menu> {
-    
+
     List<Menu> selectMenuTree();
-    
+
     List<Menu> selectByRoleId(@Param("roleId") Long roleId);
-    
+
     List<Menu> selectAllOrderBySortOrder();
+
+    List<Menu> selectByParentId(@Param("parentId") Long parentId);
 }

@@ -4,8 +4,14 @@ import cn.coderstory.springboot.entity.Menu;
 import java.util.List;
 
 public interface MenuService {
-    
+
     List<Menu> getMenuTree();
-    
+
     List<Menu> getMenuTreeByRoleId(Long roleId);
+
+    Menu createMenu(Menu menu);
+
+    Menu updateMenu(Long id, Menu menu);
+
+    boolean deleteMenu(Long id);
 }

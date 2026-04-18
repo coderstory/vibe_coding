@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios'
 import { ElMessage } from 'element-plus'
 import type { ApiResponse } from './types'
+import { refreshToken as apiRefreshToken } from '@/api/auth'
 
 /**
  * 统一的 Axios 请求实例
@@ -9,6 +10,26 @@ const request: AxiosInstance = axios.create({
   baseURL: '/api',
   timeout: 10000
 })
+
+// 标记是否正在刷新 token
+let isRefreshing = false
+// 重试队列
+let refreshSubscribers: Array<(token: string) => void> = []
+
+/**
+ * 将 token 添加到重试队列
+ */
+function subscribeTokenRefresh(callback: (token: string) => void) {
+  refreshSubscribers.push(callback)
+}
+
+/**
+ * 通知所有订阅者 token 已刷新
+ */
+function onTokenRefreshed(token: string) {
+  refreshSubscribers.forEach(callback => callback(token))
+  refreshSubscribers = []
+}
 
 /**
  * 请求拦截器 - 添加 token
@@ -83,6 +104,47 @@ function extractErrorMessage(error: AxiosError): string {
 }
 
 /**
+ * 尝试刷新 token
+ */
+async function tryRefreshToken(): Promise<string | null> {
+  if (isRefreshing) {
+    // 如果正在刷新，返回一个 Promise 等待刷新完成
+    return new Promise((resolve) => {
+      subscribeTokenRefresh((token: string) => {
+        resolve(token)
+      })
+    })
+  }
+
+  isRefreshing = true
+  const refreshToken = localStorage.getItem('refreshToken')
+
+  if (!refreshToken) {
+    isRefreshing = false
+    return null
+  }
+
+  try {
+    const res = await apiRefreshToken(refreshToken)
+    const newToken = res.data.token
+    const newRefreshToken = res.data.refreshToken
+    localStorage.setItem('token', newToken)
+    localStorage.setItem('refreshToken', newRefreshToken)
+    onTokenRefreshed(newToken)
+    isRefreshing = false
+    return newToken
+  } catch {
+    // 刷新失败，清除 token 并跳转到登录页
+    localStorage.removeItem('token')
+    localStorage.removeItem('refreshToken')
+    localStorage.removeItem('user')
+    isRefreshing = false
+    window.location.href = '/login'
+    return null
+  }
+}
+
+/**
  * 响应拦截器
  */
 request.interceptors.response.use(
@@ -95,7 +157,19 @@ request.interceptors.response.use(
       return Promise.reject(new Error(res.message || '请求失败'))
     }
   },
-  (error: AxiosError<ApiResponse>) => {
+  async (error: AxiosError<ApiResponse>) => {
+    // 如果是 401 错误，尝试刷新 token
+    if (error.response?.status === 401) {
+      const originalRequest = error.config
+      if (originalRequest && !originalRequest.url?.includes('/auth/')) {
+        const newToken = await tryRefreshToken()
+        if (newToken && originalRequest.headers) {
+          originalRequest.headers.Authorization = `Bearer ${newToken}`
+          return request(originalRequest)
+        }
+      }
+    }
+
     const message = extractErrorMessage(error)
     ElMessage.error(message)
     return Promise.reject(new Error(message))

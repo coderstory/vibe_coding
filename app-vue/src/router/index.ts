@@ -44,6 +44,12 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '角色管理', requiresAuth: true }
       },
       {
+        path: 'system/menu',
+        name: 'MenuManage',
+        component: () => import('@/views/system/MenuManage.vue'),
+        meta: { title: '菜单管理', requiresAuth: true }
+      },
+      {
         path: 'audit',
         name: 'AuditLog',
         component: () => import('@/views/audit/AuditLog.vue'),
@@ -56,6 +62,12 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '业务数据', requiresAuth: true }
       }
     ]
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('@/views/error/NotFound.vue'),
+    meta: { requiresAuth: false }
   }
 ]
 

@@ -67,12 +67,23 @@ export interface LoginParams {
  */
 export interface LoginResult {
   token: string
+  refreshToken: string
+  expiresIn: number
   user: {
     id: number
     username: string
     name: string
     roleId: number
   }
+}
+
+/**
+ * 刷新令牌响应
+ */
+export interface RefreshTokenResult {
+  token: string
+  refreshToken: string
+  expiresIn: number
 }
 
 /**

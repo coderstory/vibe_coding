@@ -15,12 +15,18 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 public class AuditService {
-    
+
     private final AuditLogMapper auditLogMapper;
-    
+
     @Async
-    public void log(Long userId, String username, String operation, 
+    public void log(Long userId, String username, String operation,
             String targetType, String targetId, String ipAddress) {
+        log(userId, username, operation, targetType, targetId, ipAddress, null);
+    }
+
+    @Async
+    public void log(Long userId, String username, String operation,
+            String targetType, String targetId, String ipAddress, String description) {
         try {
             AuditLog auditLog = new AuditLog();
             auditLog.setUserId(userId);
@@ -29,16 +35,17 @@ public class AuditService {
             auditLog.setTargetType(targetType);
             auditLog.setTargetId(targetId);
             auditLog.setIpAddress(ipAddress);
-            
+            auditLog.setDescription(description);
+
             auditLogMapper.insert(auditLog);
-            log.info("审计日志记录: user={}, operation={}, target={}", 
-                    username, operation, targetId);
+            log.info("审计日志记录: user={}, operation={}, target={}, description={}",
+                    username, operation, targetId, description);
         } catch (Exception e) {
             log.error("审计日志记录失败: {}", e.getMessage());
         }
     }
-    
-    public IPage<AuditLog> getAuditLogPage(Page<AuditLog> page, String operator, 
+
+    public IPage<AuditLog> getAuditLogPage(Page<AuditLog> page, String operator,
             String operationType, LocalDateTime startTime, LocalDateTime endTime) {
         return auditLogMapper.selectPage(page, operator, operationType, startTime, endTime);
     }

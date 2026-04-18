@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { login as apiLogin, logout as apiLogout, getCurrentUser } from '@/api/auth'
+import { login as apiLogin, logout as apiLogout, getCurrentUser, refreshToken as apiRefreshToken } from '@/api/auth'
 import type { LoginResult } from '@/api/types'
 
 interface UserInfo {
@@ -12,6 +12,7 @@ interface UserInfo {
 
 export const useUserStore = defineStore('user', () => {
   const token = ref<string>(localStorage.getItem('token') || '')
+  const storedRefreshToken = ref<string>(localStorage.getItem('refreshToken') || '')
   const user = ref<UserInfo | null>(null)
 
   const isLoggedIn = computed(() => !!token.value)
@@ -19,9 +20,25 @@ export const useUserStore = defineStore('user', () => {
   async function login(username: string, password: string) {
     const res = await apiLogin({ username, password })
     token.value = res.data.token
+    storedRefreshToken.value = res.data.refreshToken
     user.value = res.data.user
     localStorage.setItem('token', token.value)
+    localStorage.setItem('refreshToken', storedRefreshToken.value)
     localStorage.setItem('user', JSON.stringify(user.value))
+  }
+
+  async function refreshToken(): Promise<boolean> {
+    if (!storedRefreshToken.value) return false
+    try {
+      const res = await apiRefreshToken(storedRefreshToken.value)
+      token.value = res.data.token
+      storedRefreshToken.value = res.data.refreshToken
+      localStorage.setItem('token', token.value)
+      localStorage.setItem('refreshToken', storedRefreshToken.value)
+      return true
+    } catch {
+      return false
+    }
   }
 
   async function logout() {
@@ -31,8 +48,10 @@ export const useUserStore = defineStore('user', () => {
       // 忽略登出错误
     }
     token.value = ''
+    storedRefreshToken.value = ''
     user.value = null
     localStorage.removeItem('token')
+    localStorage.removeItem('refreshToken')
     localStorage.removeItem('user')
   }
 
@@ -62,9 +81,11 @@ export const useUserStore = defineStore('user', () => {
 
   return {
     token,
+    refreshToken,
     user,
     isLoggedIn,
     login,
+    refreshToken,
     logout,
     fetchCurrentUser,
     initFromStorage

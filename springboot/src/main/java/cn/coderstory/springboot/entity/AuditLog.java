@@ -7,22 +7,24 @@ import java.time.LocalDateTime;
 @Data
 @TableName("sys_audit_log")
 public class AuditLog {
-    
+
     @TableId(type = IdType.AUTO)
     private Long id;
-    
+
     private Long userId;
-    
+
     private String username;
-    
+
     private String operation;      // 登录/登出/新增/编辑/删除
-    
+
     private String targetType;     // 目标对象类型
-    
+
     private String targetId;       // 目标对象ID
-    
+
     private String ipAddress;
-    
+
+    private String description;    // 操作描述
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 }

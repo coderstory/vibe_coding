@@ -1,8 +1,12 @@
 import request from './request'
-import type { ApiResponse, LoginParams, LoginResult } from './types'
+import type { ApiResponse, LoginParams, LoginResult, RefreshTokenResult } from './types'
 
 export function login(data: LoginParams) {
   return request.post<ApiResponse<LoginResult>>('/auth/login', data)
+}
+
+export function refreshToken(refreshToken: string) {
+  return request.post<ApiResponse<RefreshTokenResult>>('/auth/refresh', { refreshToken })
 }
 
 export function logout() {
