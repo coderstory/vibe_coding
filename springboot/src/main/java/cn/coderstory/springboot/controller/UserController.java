@@ -2,6 +2,7 @@ package cn.coderstory.springboot.controller;
 
 import cn.coderstory.springboot.entity.Role;
 import cn.coderstory.springboot.entity.User;
+import cn.coderstory.springboot.exception.BusinessException;
 import cn.coderstory.springboot.mapper.RoleMapper;
 import cn.coderstory.springboot.service.UserService;
 import cn.coderstory.springboot.vo.UserVO;
@@ -21,10 +22,10 @@ import java.util.Map;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
-    
+
     private final UserService userService;
     private final RoleMapper roleMapper;
-    
+
     @GetMapping
     public ResponseEntity<Map<String, Object>> getUserPage(
             @RequestParam(required = false) String username,
@@ -34,14 +35,14 @@ public class UserController {
             @RequestParam(required = false) String phone,
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "20") Integer size) {
-        
+
         Page<User> pageParam = new Page<>(page, size);
         IPage<User> result = userService.getUserPage(pageParam, username, name, department, enabled, phone);
-        
+
         Map<String, Object> response = new HashMap<>();
         response.put("code", 200);
         response.put("message", "success");
-        
+
         Map<String, Object> data = new HashMap<>();
         data.put("records", result.getRecords());
         data.put("total", result.getTotal());
@@ -49,22 +50,22 @@ public class UserController {
         data.put("current", result.getCurrent());
         data.put("pages", result.getPages());
         response.put("data", data);
-        
+
         return ResponseEntity.ok(response);
     }
-    
+
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> getUserById(@PathVariable Long id) {
         UserVO user = userService.getUserById(id);
-        
+
         Map<String, Object> response = new HashMap<>();
         response.put("code", 200);
         response.put("message", "success");
         response.put("data", user);
-        
+
         return ResponseEntity.ok(response);
     }
-    
+
     @PostMapping
     public ResponseEntity<Map<String, Object>> createUser(@RequestBody Map<String, Object> request) {
         User user = new User();
@@ -74,56 +75,59 @@ public class UserController {
         user.setEmail((String) request.get("email"));
         user.setDepartment((String) request.get("department"));
         user.setPosition((String) request.get("position"));
-        user.setRoleId(((Number) request.get("roleId")).longValue());
+        Object roleIdObj = request.get("roleId");
+        if (roleIdObj != null) {
+            user.setRoleId(((Number) roleIdObj).longValue());
+        }
         user.setEnabled((Integer) request.get("enabled"));
         user.setAvatar((String) request.get("avatar"));
         user.setPhone((String) request.get("phone"));
-        
+
         String password = (String) request.get("password");
-        boolean success = userService.saveUser(user, password);
-        
+        userService.saveUser(user, password);
+
         Map<String, Object> response = new HashMap<>();
-        response.put("code", success ? 200 : 500);
-        response.put("message", success ? "success" : "创建失败");
-        
+        response.put("code", 200);
+        response.put("message", "用户创建成功");
+
         return ResponseEntity.ok(response);
     }
-    
+
     @PutMapping("/{id}")
     public ResponseEntity<Map<String, Object>> updateUser(@PathVariable Long id, @RequestBody User user) {
         user.setId(id);
-        boolean success = userService.updateUser(user);
-        
+        userService.updateUser(user);
+
         Map<String, Object> response = new HashMap<>();
-        response.put("code", success ? 200 : 500);
-        response.put("message", success ? "success" : "更新失败");
-        
+        response.put("code", 200);
+        response.put("message", "用户更新成功");
+
         return ResponseEntity.ok(response);
     }
-    
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable Long id) {
-        boolean success = userService.deleteUser(id);
-        
+        userService.deleteUser(id);
+
         Map<String, Object> response = new HashMap<>();
-        response.put("code", success ? 200 : 500);
-        response.put("message", success ? "success" : "删除失败");
-        
+        response.put("code", 200);
+        response.put("message", "用户删除成功");
+
         return ResponseEntity.ok(response);
     }
-    
+
     @PutMapping("/{id}/password")
     public ResponseEntity<Map<String, Object>> resetPassword(@PathVariable Long id, @RequestBody Map<String, String> request) {
         String password = request.get("password");
-        boolean success = userService.resetPassword(id, password);
-        
+        userService.resetPassword(id, password);
+
         Map<String, Object> response = new HashMap<>();
-        response.put("code", success ? 200 : 500);
-        response.put("message", success ? "success" : "密码重置失败");
-        
+        response.put("code", 200);
+        response.put("message", "密码重置成功");
+
         return ResponseEntity.ok(response);
     }
-    
+
     @GetMapping("/roles/all")
     public ResponseEntity<Map<String, Object>> getAllRoles() {
         List<Role> roles = roleMapper.selectList(null);
@@ -141,11 +145,11 @@ public class UserController {
             @PathVariable Long id,
             @RequestBody Map<String, Integer> request) {
         Integer enabled = request.get("enabled");
-        boolean success = userService.updateUserStatus(id, enabled);
+        userService.updateUserStatus(id, enabled);
 
         Map<String, Object> response = new HashMap<>();
-        response.put("code", success ? 200 : 500);
-        response.put("message", success ? "success" : "状态更新失败");
+        response.put("code", 200);
+        response.put("message", "状态更新成功");
 
         return ResponseEntity.ok(response);
     }

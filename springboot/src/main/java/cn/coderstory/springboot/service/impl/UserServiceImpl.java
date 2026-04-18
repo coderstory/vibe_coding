@@ -1,6 +1,7 @@
 package cn.coderstory.springboot.service.impl;
 
 import cn.coderstory.springboot.entity.User;
+import cn.coderstory.springboot.exception.BusinessException;
 import cn.coderstory.springboot.mapper.UserMapper;
 import cn.coderstory.springboot.security.PasswordEncoder;
 import cn.coderstory.springboot.service.UserService;
@@ -44,31 +45,65 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserVO getUserById(Long id) {
-        return userMapper.selectUserWithRoleName(id);
+        UserVO user = userMapper.selectUserWithRoleName(id);
+        if (user == null) {
+            throw BusinessException.notFound("用户不存在");
+        }
+        return user;
     }
-    
+
     @Override
     public boolean saveUser(User user, String rawPassword) {
+        if (rawPassword == null || rawPassword.isEmpty()) {
+            throw BusinessException.badRequest("密码不能为空");
+        }
+        if (rawPassword.length() < 6) {
+            throw BusinessException.badRequest("密码长度不能少于6位");
+        }
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getUsername, user.getUsername());
+        if (userMapper.selectCount(wrapper) > 0) {
+            throw BusinessException.conflict("用户名已存在");
+        }
         String encodedPassword = passwordEncoder.encode(rawPassword);
         user.setPassword(encodedPassword);
         return userMapper.insert(user) > 0;
     }
-    
+
     @Override
     public boolean updateUser(User user) {
+        if (user.getId() == null) {
+            throw BusinessException.badRequest("用户ID不能为空");
+        }
+        User existing = userMapper.selectById(user.getId());
+        if (existing == null) {
+            throw BusinessException.notFound("用户不存在");
+        }
         return userMapper.updateById(user) > 0;
     }
-    
+
     @Override
     public boolean deleteUser(Long id) {
+        User user = userMapper.selectById(id);
+        if (user == null) {
+            throw BusinessException.notFound("用户不存在");
+        }
         return userMapper.deleteById(id) > 0;
     }
-    
+
     @Override
     public boolean resetPassword(Long id, String newPassword) {
+        if (newPassword == null || newPassword.isEmpty()) {
+            throw BusinessException.badRequest("密码不能为空");
+        }
+        if (newPassword.length() < 6) {
+            throw BusinessException.badRequest("密码长度不能少于6位");
+        }
+        User user = userMapper.selectById(id);
+        if (user == null) {
+            throw BusinessException.notFound("用户不存在");
+        }
         String encodedPassword = passwordEncoder.encode(newPassword);
-        User user = new User();
-        user.setId(id);
         user.setPassword(encodedPassword);
         return userMapper.updateById(user) > 0;
     }
@@ -77,7 +112,7 @@ public class UserServiceImpl implements UserService {
     public boolean updateUserStatus(Long id, Integer enabled) {
         User user = userMapper.selectById(id);
         if (user == null) {
-            return false;
+            throw BusinessException.notFound("用户不存在");
         }
         user.setEnabled(enabled);
         return userMapper.updateById(user) > 0;
