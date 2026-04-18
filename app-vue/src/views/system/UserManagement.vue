@@ -1,14 +1,18 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getUserList, createUser, updateUser, deleteUser, resetUserPassword, getAllRoles } from '@/api/user'
+import { getUserList, createUser, updateUser, deleteUser, resetUserPassword, getAllRoles, updateUserStatus } from '@/api/user'
+
+const router = useRouter()
 
 // 搜索表单
 const searchForm = reactive({
   username: '',
   name: '',
   department: '',
-  enabled: null
+  enabled: null,
+  phone: ''
 })
 
 // 用户列表数据
@@ -88,6 +92,7 @@ async function loadUserList() {
     if (searchForm.name) params.name = searchForm.name
     if (searchForm.department) params.department = searchForm.department
     if (searchForm.enabled !== null) params.enabled = searchForm.enabled
+    if (searchForm.phone) params.phone = searchForm.phone
     
     const res = await getUserList(params)
     userList.value = res.data.records
@@ -121,6 +126,7 @@ function handleReset() {
   searchForm.name = ''
   searchForm.department = ''
   searchForm.enabled = null
+  searchForm.phone = ''
   pagination.page = 1
   loadUserList()
 }
@@ -135,6 +141,11 @@ function handleSizeChange(size) {
   pagination.size = size
   pagination.page = 1
   loadUserList()
+}
+
+// 行点击跳转详情
+function handleRowClick(row) {
+  router.push('/system/user/' + row.id)
 }
 
 // 新建用户
@@ -279,6 +290,18 @@ function formatStatus(enabled) {
   return enabled === 1 ? '启用' : '禁用'
 }
 
+// 状态切换
+async function handleStatusChange(row) {
+  try {
+    await updateUserStatus(row.id, row.enabled)
+    ElMessage.success(row.enabled === 1 ? '用户已启用' : '用户已禁用')
+  } catch (error) {
+    // 恢复原状态
+    row.enabled = row.enabled === 1 ? 0 : 1
+    ElMessage.error('状态更新失败')
+  }
+}
+
 // 初始化
 onMounted(() => {
   loadUserList()
@@ -301,6 +324,9 @@ onMounted(() => {
         </el-form-item>
         <el-form-item label="部门">
           <el-input v-model="searchForm.department" placeholder="请输入部门" clearable style="width: 150px" />
+        </el-form-item>
+        <el-form-item label="手机号">
+          <el-input v-model="searchForm.phone" placeholder="请输入手机号" clearable style="width: 150px" />
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="searchForm.enabled" placeholder="全部" clearable style="width: 120px">
@@ -325,7 +351,7 @@ onMounted(() => {
     </div>
     
     <!-- 用户列表 -->
-    <el-table :data="userList" stripe border v-loading="loading" class="user-table">
+    <el-table :data="userList" stripe border v-loading="loading" class="user-table" @row-click="handleRowClick">
       <el-table-column type="index" label="序号" width="60" align="center" />
       <el-table-column prop="username" label="用户名" min-width="120" />
       <el-table-column prop="name" label="姓名" min-width="100" />
@@ -336,12 +362,16 @@ onMounted(() => {
       </el-table-column>
       <el-table-column prop="department" label="部门" min-width="120" />
       <el-table-column prop="position" label="岗位" min-width="100" />
+      <el-table-column prop="phone" label="手机" min-width="120" />
       <el-table-column prop="email" label="邮箱" min-width="150" />
       <el-table-column prop="enabled" label="状态" width="100" align="center">
         <template #default="{ row }">
-          <el-tag :type="row.enabled === 1 ? 'success' : 'info'" size="small">
-            {{ formatStatus(row.enabled) }}
-          </el-tag>
+          <el-switch
+            v-model="row.enabled"
+            :active-value="1"
+            :inactive-value="0"
+            @change="handleStatusChange(row)"
+          />
         </template>
       </el-table-column>
       <el-table-column prop="createTime" label="创建时间" min-width="160" />

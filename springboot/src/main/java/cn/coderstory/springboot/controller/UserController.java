@@ -30,11 +30,12 @@ public class UserController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String department,
             @RequestParam(required = false) Integer enabled,
+            @RequestParam(required = false) String phone,
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "20") Integer size) {
         
         Page<User> pageParam = new Page<>(page, size);
-        IPage<User> result = userService.getUserPage(pageParam, username, name, department, enabled);
+        IPage<User> result = userService.getUserPage(pageParam, username, name, department, enabled, phone);
         
         Map<String, Object> response = new HashMap<>();
         response.put("code", 200);
@@ -53,7 +54,7 @@ public class UserController {
     
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> getUserById(@PathVariable Long id) {
-        User user = userService.getUserWithRole(id);
+        User user = userService.getUserById(id);
         
         Map<String, Object> response = new HashMap<>();
         response.put("code", 200);
@@ -75,6 +76,7 @@ public class UserController {
         user.setRoleId(((Number) request.get("roleId")).longValue());
         user.setEnabled((Integer) request.get("enabled"));
         user.setAvatar((String) request.get("avatar"));
+        user.setPhone((String) request.get("phone"));
         
         String password = (String) request.get("password");
         boolean success = userService.saveUser(user, password);
@@ -124,12 +126,26 @@ public class UserController {
     @GetMapping("/roles/all")
     public ResponseEntity<Map<String, Object>> getAllRoles() {
         List<Role> roles = roleMapper.selectList(null);
-        
+
         Map<String, Object> response = new HashMap<>();
         response.put("code", 200);
         response.put("message", "success");
         response.put("data", roles);
-        
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Map<String, Object>> updateUserStatus(
+            @PathVariable Long id,
+            @RequestBody Map<String, Integer> request) {
+        Integer enabled = request.get("enabled");
+        boolean success = userService.updateUserStatus(id, enabled);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("code", success ? 200 : 500);
+        response.put("message", success ? "success" : "状态更新失败");
+
         return ResponseEntity.ok(response);
     }
 }

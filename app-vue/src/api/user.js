@@ -87,4 +87,12 @@ export function getAllRoles() {
   })
 }
 
+export function updateUserStatus(id, enabled) {
+  return request({
+    url: `/users/${id}/status`,
+    method: 'patch',
+    data: { enabled }
+  })
+}
+
 export default request

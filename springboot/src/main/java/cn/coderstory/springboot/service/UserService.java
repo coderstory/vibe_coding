@@ -6,9 +6,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 public interface UserService {
     
-    IPage<User> getUserPage(Page<User> page, String username, String name, String department, Integer enabled);
+    IPage<User> getUserPage(Page<User> page, String username, String name, String department, Integer enabled, String phone);
     
-    User getUserWithRole(Long id);
+    User getUserById(Long id);
     
     boolean saveUser(User user, String rawPassword);
     
@@ -17,4 +17,6 @@ public interface UserService {
     boolean deleteUser(Long id);
     
     boolean resetPassword(Long id, String newPassword);
+
+    boolean updateUserStatus(Long id, Integer enabled);
 }

@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     
     @Override
-    public IPage<User> getUserPage(Page<User> page, String username, String name, String department, Integer enabled) {
+    public IPage<User> getUserPage(Page<User> page, String username, String name, String department, Integer enabled, String phone) {
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         if (username != null && !username.isEmpty()) {
             wrapper.like(User::getUsername, username);
@@ -34,12 +34,15 @@ public class UserServiceImpl implements UserService {
         if (enabled != null) {
             wrapper.eq(User::getEnabled, enabled);
         }
+        if (phone != null && !phone.isEmpty()) {
+            wrapper.like(User::getPhone, phone);
+        }
         wrapper.orderByDesc(User::getCreateTime);
         return userMapper.selectPage(page, wrapper);
     }
     
     @Override
-    public User getUserWithRole(Long id) {
+    public User getUserById(Long id) {
         return userMapper.selectById(id);
     }
     
@@ -66,6 +69,16 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setId(id);
         user.setPassword(encodedPassword);
+        return userMapper.updateById(user) > 0;
+    }
+
+    @Override
+    public boolean updateUserStatus(Long id, Integer enabled) {
+        User user = userMapper.selectById(id);
+        if (user == null) {
+            return false;
+        }
+        user.setEnabled(enabled);
         return userMapper.updateById(user) > 0;
     }
 }

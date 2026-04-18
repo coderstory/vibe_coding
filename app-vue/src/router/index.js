@@ -32,6 +32,12 @@ const routes = [
         meta: { title: '用户管理', requiresAuth: true }
       },
       {
+        path: 'system/user/:id',
+        name: 'UserDetail',
+        component: () => import('@/views/system/UserDetail.vue'),
+        meta: { title: '用户详情', requiresAuth: true }
+      },
+      {
         path: 'system/role',
         name: 'RoleManage',
         component: () => import('@/views/system/RoleManage.vue'),
