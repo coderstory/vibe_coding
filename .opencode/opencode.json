@@ -11,20 +11,5 @@
       "D:/Data/桌面/vibe coding/.opencode/get-shit-done/*": "allow"
     }
   },
-  "mcp": {
-    "mysql": {
-      "type": "local",
-      "command": [
-        "node",
-        "C:\\Users\\admin\\AppData\\Roaming\\JetBrains\\IntelliJIdea2026.1\\node\\versions\\24.14.1\\node_modules\\@morris131\\mysql-mcp-server\\dist\\index.js"
-      ],
-      "environment": {
-        "DB_HOST": "localhost",
-        "DB_PORT": "3306",
-        "DB_USER": "root",
-        "DB_PASSWORD": "123456",
-        "DB_NAME": "admin_system"
-      }
-    }
-  }
+  "mcp": {}
 }
