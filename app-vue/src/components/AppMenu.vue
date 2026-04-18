@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getUserMenus } from '@/api/menu'
+import { getMenuTree } from '@/api/menu'
 import type { Menu } from '@/api/types'
 
 interface MenuItem {
@@ -9,6 +9,7 @@ interface MenuItem {
   title: string
   icon?: string
   id?: number
+  parentId?: number
   children?: MenuItem[]
 }
 
@@ -21,90 +22,53 @@ const router = useRouter()
 
 const defaultActive = computed(() => route.path)
 
-const allMenuItems: MenuItem[] = [
-  {
-    path: '/dashboard/index',
-    title: '首页',
-    icon: 'House'
-  },
-  {
-    path: '/dashboard/system',
-    title: '系统管理',
-    icon: 'Setting',
-    children: [
-      {
-        path: '/dashboard/system/user',
-        title: '用户管理',
-        icon: 'User'
-      },
-      {
-        path: '/dashboard/system/role',
-        title: '角色管理',
-        icon: 'Key'
-      }
-    ]
-  },
-  {
-    path: '/dashboard/audit',
-    title: '审计日志',
-    icon: 'Document'
-  },
-  {
-    path: '/dashboard/business',
-    title: '业务数据',
-    icon: 'Folder'
-  }
-]
-
 const menuItems = ref<MenuItem[]>([])
 
-async function loadUserMenus() {
+async function loadMenus() {
   try {
-    const userInfo = JSON.parse(localStorage.getItem('user') || '{}')
-
-    if (!userInfo || !userInfo.id) {
-      menuItems.value = []
-      return
-    }
-
-    if (userInfo.roleId === 1) {
-      menuItems.value = allMenuItems
-      return
-    }
-
-    const res = await getUserMenus(userInfo.id)
-    const userMenus: Menu[] = res.data || []
-    menuItems.value = filterMenusByPermissions(allMenuItems, userMenus)
+    // 从后端获取菜单树
+    const res = await getMenuTree()
+    const menus: Menu[] = res.data || []
+    // 转换后端菜单格式为前端格式
+    menuItems.value = convertToMenuItems(menus)
   } catch (error) {
-    console.error('获取用户菜单失败', error)
+    console.error('获取菜单失败', error)
     menuItems.value = []
   }
 }
 
-function filterMenusByPermissions(fullMenus: MenuItem[], allowedMenus: Menu[]): MenuItem[] {
-  const result: MenuItem[] = []
-  const allowedIds = new Set(allowedMenus.map(m => m.id))
+function convertToMenuItems(menus: Menu[]): MenuItem[] {
+  const menuMap = new Map<number, MenuItem>()
+  const rootMenus: MenuItem[] = []
 
-  for (const menu of fullMenus) {
-    const menuId = menu.id || menu.path
-    const isAllowed = allowedIds.has(menuId as number) || allowedMenus.some(m => m.path === menu.path)
+  // 先创建所有菜单项
+  menus.forEach(menu => {
+    menuMap.set(menu.id, {
+      id: menu.id,
+      path: menu.path || `/dashboard/${menu.path}`,
+      title: menu.name,
+      icon: menu.icon || 'Folder',
+      parentId: menu.parentId
+    })
+  })
 
-    if (isAllowed) {
-      if (menu.children) {
-        const filteredChildren = filterMenusByPermissions(menu.children, allowedMenus)
-        if (filteredChildren.length > 0) {
-          result.push({
-            ...menu,
-            children: filteredChildren
-          })
+  // 构建树形结构
+  menus.forEach(menu => {
+    const menuItem = menuMap.get(menu.id)!
+    if (menu.parentId === 0 || !menu.parentId) {
+      rootMenus.push(menuItem)
+    } else {
+      const parent = menuMap.get(menu.parentId)
+      if (parent) {
+        if (!parent.children) {
+          parent.children = []
         }
-      } else {
-        result.push(menu)
+        parent.children.push(menuItem)
       }
     }
-  }
+  })
 
-  return result
+  return rootMenus
 }
 
 function handleSelect(path: string) {
@@ -118,13 +82,14 @@ function getIconColor(icon: string): string {
     Document: 'icon-audit',
     Folder: 'icon-business',
     User: 'icon-user',
-    Key: 'icon-role'
+    Key: 'icon-role',
+    Menu: 'icon-menu'
   }
   return colorMap[icon] || 'icon-settings'
 }
 
 onMounted(() => {
-  loadUserMenus()
+  loadMenus()
 })
 </script>
 
@@ -136,7 +101,7 @@ onMounted(() => {
     @select="handleSelect"
   >
     <template v-for="item in menuItems" :key="item.path">
-      <el-sub-menu v-if="item.children" :index="item.path">
+      <el-sub-menu v-if="item.children && item.children.length > 0" :index="item.path">
         <template #title>
           <el-icon :class="getIconColor(item.icon)"><component :is="item.icon" /></el-icon>
           <span>{{ item.title }}</span>
@@ -150,7 +115,7 @@ onMounted(() => {
           <span>{{ child.title }}</span>
         </el-menu-item>
       </el-sub-menu>
-      
+
       <el-menu-item v-else :index="item.path">
         <el-icon :class="getIconColor(item.icon)"><component :is="item.icon" /></el-icon>
         <span>{{ item.title }}</span>
