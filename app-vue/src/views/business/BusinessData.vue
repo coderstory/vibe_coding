@@ -1,17 +1,18 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import CategoryTree from '@/components/knowledge/CategoryTree.vue'
 import ArticleEditor from '@/components/knowledge/ArticleEditor.vue'
 import { getArticlePage, deleteArticle, searchArticles } from '@/api/knowledge'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import type { KnowledgeArticle, KnowledgeCategory, ArticleQueryParams } from '@/api/types'
 
-const categoryTreeRef = ref(null)
+const categoryTreeRef = ref<InstanceType<typeof CategoryTree> | null>(null)
 const showMobileTree = ref(false)
-const selectedCategory = ref(null)
+const selectedCategory = ref<KnowledgeCategory | null>(null)
 const searchKeyword = ref('')
-const articleList = ref([])
+const articleList = ref<KnowledgeArticle[]>([])
 const editorVisible = ref(false)
-const currentArticleId = ref(null)
+const currentArticleId = ref<number | null>(null)
 const pagination = ref({
   page: 1,
   size: 20,
@@ -26,7 +27,7 @@ async function loadArticles() {
       articleList.value = res.data || []
       pagination.value.total = articleList.value.length
     } else {
-      const params = {
+      const params: ArticleQueryParams = {
         page: pagination.value.page,
         size: pagination.value.size
       }
@@ -38,12 +39,12 @@ async function loadArticles() {
       articleList.value = data.records || []
       pagination.value.total = data.total || 0
     }
-  } catch (e) {
+  } catch {
     ElMessage.error('加载知识列表失败')
   }
 }
 
-function handleCategorySelect(category) {
+function handleCategorySelect(category: KnowledgeCategory) {
   selectedCategory.value = category
   pagination.value.page = 1
   loadArticles()
@@ -64,18 +65,18 @@ function handleCreate() {
   editorVisible.value = true
 }
 
-function handleEdit(row) {
+function handleEdit(row: KnowledgeArticle) {
   currentArticleId.value = row.id
   editorVisible.value = true
 }
 
-async function handleDelete(row) {
+async function handleDelete(row: KnowledgeArticle) {
   try {
     await ElMessageBox.confirm('确定删除该知识吗？', '警告', { type: 'warning' })
     await deleteArticle(row.id)
     ElMessage.success('删除成功')
     loadArticles()
-  } catch (e) {
+  } catch {
     // user cancelled
   }
 }

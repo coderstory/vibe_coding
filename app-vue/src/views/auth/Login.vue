@@ -1,7 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { useUserStore } from '@/store/user'
 
 const router = useRouter()
@@ -13,9 +13,9 @@ const loginForm = reactive({
 })
 
 const loading = ref(false)
-const loginFormRef = ref(null)
+const loginFormRef = ref<FormInstance | null>(null)
 
-const rules = {
+const rules: FormRules = {
   username: [
     { required: true, message: '请输入用户名', trigger: 'blur' }
   ],
@@ -26,24 +26,25 @@ const rules = {
 
 async function handleLogin() {
   if (!loginFormRef.value) return
-  
+
   await loginFormRef.value.validate(async (valid) => {
     if (!valid) return
-    
+
     loading.value = true
     try {
       await userStore.login(loginForm.username, loginForm.password)
       ElMessage.success('登录成功')
       router.push('/dashboard')
-    } catch (error) {
-      ElMessage.error(error.message || '用户名或密码错误')
+    } catch (error: unknown) {
+      const err = error as Error
+      ElMessage.error(err.message || '用户名或密码错误')
     } finally {
       loading.value = false
     }
   })
 }
 
-function handleKeydown(e) {
+function handleKeydown(e: KeyboardEvent) {
   if (e.key === 'Enter') {
     handleLogin()
   }

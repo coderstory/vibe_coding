@@ -1,21 +1,27 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getUserMenus } from '@/api/menu'
+import type { Menu } from '@/api/types'
 
-const props = defineProps({
-  collapsed: {
-    type: Boolean,
-    default: false
-  }
-})
+interface MenuItem {
+  path: string
+  title: string
+  icon?: string
+  id?: number
+  children?: MenuItem[]
+}
+
+const props = defineProps<{
+  collapsed: boolean
+}>()
 
 const route = useRoute()
 const router = useRouter()
 
 const defaultActive = computed(() => route.path)
 
-const allMenuItems = [
+const allMenuItems: MenuItem[] = [
   {
     path: '/dashboard/index',
     title: '首页',
@@ -50,24 +56,24 @@ const allMenuItems = [
   }
 ]
 
-const menuItems = ref([])
+const menuItems = ref<MenuItem[]>([])
 
 async function loadUserMenus() {
   try {
     const userInfo = JSON.parse(localStorage.getItem('user') || '{}')
-    
+
     if (!userInfo || !userInfo.id) {
       menuItems.value = []
       return
     }
-    
+
     if (userInfo.roleId === 1) {
       menuItems.value = allMenuItems
       return
     }
-    
+
     const res = await getUserMenus(userInfo.id)
-    const userMenus = res.data || []
+    const userMenus: Menu[] = res.data || []
     menuItems.value = filterMenusByPermissions(allMenuItems, userMenus)
   } catch (error) {
     console.error('获取用户菜单失败', error)
@@ -75,14 +81,14 @@ async function loadUserMenus() {
   }
 }
 
-function filterMenusByPermissions(fullMenus, allowedMenus) {
-  const result = []
+function filterMenusByPermissions(fullMenus: MenuItem[], allowedMenus: Menu[]): MenuItem[] {
+  const result: MenuItem[] = []
   const allowedIds = new Set(allowedMenus.map(m => m.id))
-  
+
   for (const menu of fullMenus) {
     const menuId = menu.id || menu.path
-    const isAllowed = allowedIds.has(menuId) || allowedMenus.some(m => m.path === menu.path)
-    
+    const isAllowed = allowedIds.has(menuId as number) || allowedMenus.some(m => m.path === menu.path)
+
     if (isAllowed) {
       if (menu.children) {
         const filteredChildren = filterMenusByPermissions(menu.children, allowedMenus)
@@ -97,16 +103,16 @@ function filterMenusByPermissions(fullMenus, allowedMenus) {
       }
     }
   }
-  
+
   return result
 }
 
-function handleSelect(path) {
+function handleSelect(path: string) {
   router.push(path)
 }
 
-function getIconColor(icon) {
-  const colorMap = {
+function getIconColor(icon: string): string {
+  const colorMap: Record<string, string> = {
     House: 'icon-dashboard',
     Setting: 'icon-system',
     Document: 'icon-audit',

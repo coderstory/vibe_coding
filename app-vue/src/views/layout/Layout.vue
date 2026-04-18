@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import AppMenu from '@/components/AppMenu.vue'
 import AppHeader from '@/components/AppHeader.vue'

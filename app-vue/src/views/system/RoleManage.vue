@@ -1,7 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { getRoleList, createRole, updateRole, deleteRole, getRoleMenus, assignRoleMenus, getMenuTree } from '@/api/role'
+import type { Role, MenuTree, CreateRoleParams, UpdateRoleParams } from '@/api/types'
+import type { ElTree } from 'element-plus'
 
 // 搜索表单
 const searchForm = reactive({
@@ -9,7 +11,7 @@ const searchForm = reactive({
 })
 
 // 角色列表数据
-const roleList = ref([])
+const roleList = ref<Role[]>([])
 const total = ref(0)
 const loading = ref(false)
 
@@ -23,13 +25,13 @@ const pagination = reactive({
 const dialogVisible = ref(false)
 const dialogTitle = ref('新建角色')
 const roleForm = reactive({
-  id: null,
+  id: null as number | null,
   roleName: '',
   roleCode: '',
   description: ''
 })
-const roleFormRef = ref(null)
-const roleFormRules = {
+const roleFormRef = ref<FormInstance | null>(null)
+const roleFormRules: FormRules = {
   roleName: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
   roleCode: [{ required: true, message: '请输入角色编码', trigger: 'blur' }]
 }
@@ -38,10 +40,10 @@ const isEdit = ref(false)
 // 分配权限对话框
 const permissionDialogVisible = ref(false)
 const permissionDialogTitle = ref('分配权限')
-const menuTreeRef = ref(null)
-const menuTreeData = ref([])
-const checkedMenuIds = ref([])
-const currentRoleId = ref(null)
+const menuTreeRef = ref<InstanceType<typeof ElTree> | null>(null)
+const menuTreeData = ref<MenuTree[]>([])
+const checkedMenuIds = ref<number[]>([])
+const currentRoleId = ref<number | null>(null)
 const currentRoleName = ref('')
 
 // el-tree配置
@@ -63,7 +65,7 @@ async function loadRoleList() {
     const res = await getRoleList(params)
     roleList.value = res.data.records
     total.value = res.data.total
-  } catch (error) {
+  } catch {
     ElMessage.error('加载角色列表失败')
   } finally {
     loading.value = false
@@ -84,12 +86,12 @@ function handleReset() {
 }
 
 // 分页变化
-function handlePageChange(page) {
+function handlePageChange(page: number) {
   pagination.page = page
   loadRoleList()
 }
 
-function handleSizeChange(size) {
+function handleSizeChange(size: number) {
   pagination.size = size
   pagination.page = 1
   loadRoleList()
@@ -104,18 +106,18 @@ function handleCreate() {
 }
 
 // 编辑角色
-function handleEdit(row) {
+function handleEdit(row: Role) {
   isEdit.value = true
   dialogTitle.value = '编辑角色'
   roleForm.id = row.id
   roleForm.roleName = row.roleName
-  roleForm.roleCode = row.roleCode
-  roleForm.description = row.description
+  roleForm.roleCode = row.roleCode || ''
+  roleForm.description = row.description || ''
   dialogVisible.value = true
 }
 
 // 删除角色
-function handleDelete(row) {
+function handleDelete(row: Role) {
   ElMessageBox.confirm(
     `确定要删除角色「${row.roleName}」吗？`,
     '删除确认',
@@ -129,29 +131,29 @@ function handleDelete(row) {
       await deleteRole(row.id)
       ElMessage.success('角色删除成功')
       loadRoleList()
-    } catch (error) {
+    } catch {
       ElMessage.error('角色删除失败')
     }
   }).catch(() => {})
 }
 
 // 分配权限
-async function handleAssignPermission(row) {
+async function handleAssignPermission(row: Role) {
   currentRoleId.value = row.id
   currentRoleName.value = row.roleName
   permissionDialogTitle.value = `分配权限 - ${row.roleName}`
-  
+
   try {
     // 获取菜单树
     const treeRes = await getMenuTree()
     menuTreeData.value = treeRes.data || []
-    
+
     // 获取当前角色的菜单权限
     const roleMenuRes = await getRoleMenus(row.id)
     checkedMenuIds.value = roleMenuRes.data || []
-    
+
     permissionDialogVisible.value = true
-  } catch (error) {
+  } catch {
     ElMessage.error('加载权限数据失败')
   }
 }
@@ -159,28 +161,30 @@ async function handleAssignPermission(row) {
 // 保存角色
 async function handleSaveRole() {
   if (!roleFormRef.value) return
-  
+
   await roleFormRef.value.validate(async (valid) => {
     if (!valid) return
-    
+
     try {
       if (isEdit.value) {
-        await updateRole(roleForm.id, {
+        const params: UpdateRoleParams = {
           roleName: roleForm.roleName,
           description: roleForm.description
-        })
+        }
+        await updateRole(roleForm.id as number, params)
         ElMessage.success('角色更新成功')
       } else {
-        await createRole({
+        const params: CreateRoleParams = {
           roleName: roleForm.roleName,
           roleCode: roleForm.roleCode,
           description: roleForm.description
-        })
+        }
+        await createRole(params)
         ElMessage.success('角色创建成功')
       }
       dialogVisible.value = false
       loadRoleList()
-    } catch (error) {
+    } catch {
       ElMessage.error(isEdit.value ? '角色更新失败' : '角色创建失败')
     }
   })
@@ -189,17 +193,17 @@ async function handleSaveRole() {
 // 保存权限分配
 async function handleSavePermission() {
   if (!menuTreeRef.value) return
-  
+
   try {
     // 获取所有选中节点（包括半选状态的父节点）
     const checkedKeys = menuTreeRef.value.getCheckedKeys(false)
     const halfCheckedKeys = menuTreeRef.value.getHalfCheckedKeys()
     const allSelected = [...checkedKeys, ...halfCheckedKeys]
-    
-    await assignRoleMenus(currentRoleId.value, allSelected)
+
+    await assignRoleMenus(currentRoleId.value as number, allSelected)
     ElMessage.success('权限保存成功')
     permissionDialogVisible.value = false
-  } catch (error) {
+  } catch {
     ElMessage.error('权限保存失败')
   }
 }

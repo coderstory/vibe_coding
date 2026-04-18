@@ -1,15 +1,22 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { getCategoryTree, createCategory, deleteCategory } from '@/api/knowledge'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import type { KnowledgeCategory, KnowledgeCategoryTree } from '@/api/types'
 
-const emit = defineEmits(['select'])
+const emit = defineEmits<{
+  select: [category: KnowledgeCategory]
+}>()
 
-const treeRef = ref(null)
-const treeData = ref([])
-const selectedId = ref(null)
+const treeRef = ref<InstanceType<typeof import('element-plus').ElTree> | null>(null)
+const treeData = ref<KnowledgeCategoryTree[]>([])
+const selectedId = ref<number | null>(null)
 
-function flattenCategories(categories, result = [], level = 0) {
+interface FlatCategory extends KnowledgeCategory {
+  level: number
+}
+
+function flattenCategories(categories: KnowledgeCategoryTree[], result: FlatCategory[] = [], level = 0): FlatCategory[] {
   for (const cat of categories) {
     result.push({ ...cat, level })
     if (cat.children && cat.children.length > 0) {
@@ -19,19 +26,19 @@ function flattenCategories(categories, result = [], level = 0) {
   return result
 }
 
-const flatCategories = ref([])
+const flatCategories = ref<FlatCategory[]>([])
 
 async function loadTree() {
   try {
     const res = await getCategoryTree()
     treeData.value = res.data || []
     flatCategories.value = flattenCategories(treeData.value)
-  } catch (e) {
+  } catch {
     ElMessage.error('加载分类失败')
   }
 }
 
-function handleNodeClick(data) {
+function handleNodeClick(data: KnowledgeCategory) {
   selectedId.value = data.id
   emit('select', data)
 }
@@ -42,29 +49,29 @@ async function handleAddRoot() {
     await createCategory({ name: result.value, parentId: 0, sortOrder: 0 })
     ElMessage.success('创建成功')
     loadTree()
-  } catch (e) {
+  } catch {
     // user cancelled
   }
 }
 
-async function handleAddChild(data) {
+async function handleAddChild(data: KnowledgeCategory) {
   try {
     const result = await ElMessageBox.prompt('请输入子分类名称', '新增子分类')
     await createCategory({ name: result.value, parentId: data.id, sortOrder: 0 })
     ElMessage.success('创建成功')
     loadTree()
-  } catch (e) {
+  } catch {
     // user cancelled
   }
 }
 
-async function handleDelete(data) {
+async function handleDelete(data: KnowledgeCategory) {
   try {
     await ElMessageBox.confirm('确定删除该分类吗？', '警告', { type: 'warning' })
     await deleteCategory(data.id)
     ElMessage.success('删除成功')
     loadTree()
-  } catch (e) {
+  } catch {
     // user cancelled
   }
 }

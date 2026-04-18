@@ -1,20 +1,21 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { getUserDetail } from '@/api/user'
+import type { UserVO } from '@/api/types'
 
 const route = useRoute()
 const router = useRouter()
-const user = ref(null)
+const user = ref<UserVO | null>(null)
 const loading = ref(false)
 
 async function loadUser() {
   loading.value = true
   try {
-    const res = await getUserDetail(route.params.id)
+    const res = await getUserDetail(Number(route.params.id))
     user.value = res.data
-  } catch (error) {
+  } catch {
     ElMessage.error('加载用户详情失败')
   } finally {
     loading.value = false
@@ -26,7 +27,7 @@ function goBack() {
 }
 
 function goToEdit() {
-  router.push({ path: '/system/user', query: { editId: route.params.id } })
+  router.push({ path: '/system/user', query: { editId: route.params.id as string } })
 }
 
 onMounted(() => {

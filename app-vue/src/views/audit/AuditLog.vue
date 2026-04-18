@@ -1,17 +1,18 @@
-<script setup>
+<script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { getAuditLogs } from '@/api/audit'
+import type { AuditLog, AuditLogQueryParams } from '@/api/types'
 
 // 查询表单
 const searchForm = reactive({
   operator: '',
-  operationType: null,
-  startTime: null,
-  endTime: null
+  operationType: null as string | null,
+  startTime: null as Date | null,
+  endTime: null as Date | null
 })
 
 // 审计日志列表
-const auditList = ref([])
+const auditList = ref<AuditLog[]>([])
 const total = ref(0)
 const loading = ref(false)
 
@@ -35,15 +36,15 @@ const operationTypeOptions = [
 async function loadAuditLogs() {
   loading.value = true
   try {
-    const params = {
+    const params: AuditLogQueryParams = {
       page: pagination.page,
       size: pagination.size
     }
-    if (searchForm.operator) params.operator = searchForm.operator
-    if (searchForm.operationType) params.operationType = searchForm.operationType
-    if (searchForm.startTime) params.startTime = formatDateTime(searchForm.startTime)
-    if (searchForm.endTime) params.endTime = formatDateTime(searchForm.endTime)
-    
+    if (searchForm.operator) params.username = searchForm.operator
+    if (searchForm.operationType) params.action = searchForm.operationType
+    if (searchForm.startTime) params.startDate = formatDateTime(searchForm.startTime)
+    if (searchForm.endTime) params.endDate = formatDateTime(searchForm.endTime)
+
     const res = await getAuditLogs(params)
     auditList.value = res.data.records
     total.value = res.data.total
@@ -55,7 +56,7 @@ async function loadAuditLogs() {
 }
 
 // 格式化日期时间
-function formatDateTime(date) {
+function formatDateTime(date: Date | null): string | null {
   if (!date) return null
   const d = new Date(date)
   const year = d.getFullYear()
@@ -84,20 +85,20 @@ function handleReset() {
 }
 
 // 分页变化
-function handlePageChange(page) {
+function handlePageChange(page: number) {
   pagination.page = page
   loadAuditLogs()
 }
 
-function handleSizeChange(size) {
+function handleSizeChange(size: number) {
   pagination.size = size
   pagination.page = 1
   loadAuditLogs()
 }
 
 // 格式化操作类型
-function formatOperationType(type) {
-  const typeMap = {
+function formatOperationType(type: string): string {
+  const typeMap: Record<string, string> = {
     'LOGIN': '登录',
     'LOGOUT': '登出',
     '新增': '新增',
@@ -108,7 +109,7 @@ function formatOperationType(type) {
 }
 
 // 获取最近7天的日期范围
-function getDefaultDateRange() {
+function getDefaultDateRange(): [Date, Date] {
   const end = new Date()
   const start = new Date()
   start.setDate(start.getDate() - 7)

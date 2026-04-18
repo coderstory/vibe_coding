@@ -1,11 +1,16 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+interface Tab {
+  path: string
+  title: string
+}
 
 const route = useRoute()
 const router = useRouter()
 
-const tabs = ref([
+const tabs = ref<Tab[]>([
   { path: '/dashboard/index', title: '首页' }
 ])
 
@@ -13,7 +18,7 @@ const activeTab = ref('/dashboard/index')
 
 watch(() => route.path, (newPath) => {
   if (newPath.startsWith('/dashboard/') && newPath !== '/dashboard') {
-    const title = route.meta?.title || newPath.split('/').pop()
+    const title = (route.meta?.title as string) || newPath.split('/').pop() || ''
     const existing = tabs.value.find(t => t.path === newPath)
     if (!existing) {
       tabs.value.push({ path: newPath, title })
@@ -22,16 +27,16 @@ watch(() => route.path, (newPath) => {
   }
 }, { immediate: true })
 
-function handleTabClick(tab) {
+function handleTabClick(tab: { props: { name: string } }) {
   router.push(tab.props.name)
 }
 
-function handleTabClose(path) {
+function handleTabClose(path: string) {
   if (path === '/dashboard/index') return
-  
+
   const index = tabs.value.findIndex(t => t.path === path)
   tabs.value.splice(index, 1)
-  
+
   if (activeTab.value === path) {
     const newTab = tabs.value[Math.max(0, index - 1)]
     router.push(newTab.path)

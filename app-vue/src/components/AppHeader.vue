@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
@@ -12,7 +12,7 @@ const { animationsEnabled, toggleAnimations } = useAnimationToggle()
 const username = computed(() => userStore.user?.name || userStore.user?.username || '未登录')
 const avatar = computed(() => userStore.user?.name?.charAt(0) || 'U')
 
-async function handleCommand(command) {
+async function handleCommand(command: string) {
   if (command === 'logout') {
     try {
       await ElMessageBox.confirm('确定要退出登录吗？', '确认', {
@@ -20,10 +20,10 @@ async function handleCommand(command) {
         cancelButtonText: '取消',
         type: 'warning'
       })
-      
+
       await userStore.logout()
       router.push('/login')
-    } catch (e) {
+    } catch {
       // 用户取消
     }
   } else if (command === 'profile') {

@@ -1,18 +1,29 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch, computed, shallowRef, onBeforeUnmount } from 'vue'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import '@wangeditor/editor/dist/css/style.css'
 import { uploadFile } from '@/api/knowledge'
 import { getArticleDetail, createArticle, updateArticle, getAllTags, createTag } from '@/api/knowledge'
 import { ElMessage } from 'element-plus'
+import type { KnowledgeTag, CreateArticleParams, UpdateArticleParams } from '@/api/types'
 
-const props = defineProps({
-  modelValue: Boolean,
-  articleId: Number,
-  categoryId: Number
-})
+interface ArticleForm {
+  title: string
+  categoryId: number | null
+  tagIds: (string | number)[]
+  status: number
+}
 
-const emit = defineEmits(['update:modelValue', 'success'])
+const props = defineProps<{
+  modelValue: boolean
+  articleId?: number | null
+  categoryId?: number | null
+}>()
+
+const emit = defineEmits<{
+  'update:modelValue': [value: boolean]
+  'success': []
+}>()
 
 const visible = computed({
   get: () => props.modelValue,
@@ -20,21 +31,21 @@ const visible = computed({
 })
 
 const isEdit = computed(() => !!props.articleId)
-const form = ref({
+const form = ref<ArticleForm>({
   title: '',
   categoryId: null,
   tagIds: [],
   status: 1
 })
-const allTags = ref([])
+const allTags = ref<KnowledgeTag[]>([])
 const editorData = ref('')
-const editorRef = shallowRef(null)
+const editorRef = shallowRef<InstanceType<typeof Editor> | null>(null)
 
-const handleCreated = (editor) => {
+const handleCreated = (editor: InstanceType<typeof Editor>) => {
   editorRef.value = editor
 }
 
-const customUpload = (file, insertFn) => {
+const customUpload = (file: File, insertFn: (url: string, alt: string, href: string) => void) => {
   uploadFile(0, file.name, file).then(res => {
     insertFn(`/api/knowledge/files/${res.data.id}`, file.name, '')
   }).catch((err) => {
@@ -43,7 +54,7 @@ const customUpload = (file, insertFn) => {
   })
 }
 
-const getAuthHeaders = () => {
+const getAuthHeaders = (): Record<string, string> => {
   const token = localStorage.getItem('token')
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
@@ -88,7 +99,7 @@ async function loadTags() {
 
 async function loadArticle() {
   try {
-    const res = await getArticleDetail(props.articleId)
+    const res = await getArticleDetail(props.articleId as number)
     const article = res.data
     form.value = {
       title: article.title,
@@ -97,7 +108,7 @@ async function loadArticle() {
       status: article.status
     }
     editorData.value = article.content || ''
-  } catch (e) {
+  } catch {
     ElMessage.error('加载文章失败')
   }
 }
@@ -105,7 +116,7 @@ async function loadArticle() {
 function resetForm() {
   form.value = {
     title: '',
-    categoryId: props.categoryId,
+    categoryId: props.categoryId ?? null,
     tagIds: [],
     status: 1
   }
@@ -124,7 +135,7 @@ async function handleSave() {
 
   try {
     let tagIds = [...form.value.tagIds]
-    const newTagNames = tagIds.filter(id => typeof id === 'string')
+    const newTagNames = tagIds.filter(id => typeof id === 'string') as string[]
     for (const name of newTagNames) {
       const res = await createTag({ name, color: '#409EFF' })
       tagIds = tagIds.map(id => id === name ? res.data.id : id)
@@ -135,20 +146,20 @@ async function handleSave() {
       title: form.value.title,
       categoryId: form.value.categoryId,
       content: editorData.value,
-      tagIds: tagIds.filter(id => typeof id === 'number'),
+      tags: tagIds.filter(id => typeof id === 'number') as number[],
       status: form.value.status
     }
 
     if (isEdit.value) {
-      await updateArticle(props.articleId, data)
+      await updateArticle(props.articleId as number, data as UpdateArticleParams)
       ElMessage.success('更新成功')
     } else {
-      await createArticle(data)
+      await createArticle(data as CreateArticleParams)
       ElMessage.success('创建成功')
     }
     emit('success')
     visible.value = false
-  } catch (e) {
+  } catch {
     ElMessage.error(isEdit.value ? '更新失败' : '创建失败')
   }
 }

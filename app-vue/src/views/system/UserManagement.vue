@@ -1,8 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { getUserList, getUserDetail, createUser, updateUser, deleteUser, resetUserPassword, getAllRoles, updateUserStatus } from '@/api/user'
+import type { User, Role, CreateUserParams, UpdateUserParams } from '@/api/types'
 
 const router = useRouter()
 const route = useRoute()
@@ -12,12 +13,12 @@ const searchForm = reactive({
   username: '',
   name: '',
   department: '',
-  enabled: null,
+  enabled: null as number | null,
   phone: ''
 })
 
 // 用户列表数据
-const userList = ref([])
+const userList = ref<User[]>([])
 const total = ref(0)
 const loading = ref(false)
 
@@ -28,28 +29,28 @@ const pagination = reactive({
 })
 
 // 角色列表
-const roleList = ref([])
+const roleList = ref<Role[]>([])
 
 // 新建/编辑用户对话框
 const dialogVisible = ref(false)
 const dialogTitle = ref('新建用户')
 const userForm = reactive({
-  id: null,
+  id: null as number | null,
   username: '',
   password: '',
   name: '',
-  gender: 1,
+  gender: 1 as number,
   phone: '',
   email: '',
   department: '',
   position: '',
-  roleId: null,
-  enabled: 1,
+  roleId: null as number | null,
+  enabled: 1 as number,
   avatar: '',
   changePassword: false
 })
-const userFormRef = ref(null)
-const userFormRules = {
+const userFormRef = ref<FormInstance | null>(null)
+const userFormRules: FormRules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
   name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
@@ -62,19 +63,19 @@ const isEdit = ref(false)
 // 重置密码对话框
 const passwordDialogVisible = ref(false)
 const passwordForm = reactive({
-  id: null,
+  id: null as number | null,
   username: '',
   password: '',
   confirmPassword: ''
 })
-const passwordRules = {
+const passwordRules: FormRules = {
   password: [{ required: true, message: '请输入新密码', trigger: 'blur' }],
   confirmPassword: [{ required: true, message: '请确认密码', trigger: 'blur' }]
 }
 
 // 状态选项
 const statusOptions = [
-  { value: null, label: '全部' },
+  { value: null as number | null, label: '全部' },
   { value: 1, label: '启用' },
   { value: 0, label: '禁用' }
 ]
@@ -98,11 +99,11 @@ async function loadUserList() {
     if (searchForm.department) params.department = searchForm.department
     if (searchForm.enabled !== null) params.enabled = searchForm.enabled
     if (searchForm.phone) params.phone = searchForm.phone
-    
+
     const res = await getUserList(params)
     userList.value = res.data.records
     total.value = res.data.total
-  } catch (error) {
+  } catch {
     ElMessage.error('加载用户列表失败')
   } finally {
     loading.value = false
@@ -114,7 +115,7 @@ async function loadRoles() {
   try {
     const res = await getAllRoles()
     roleList.value = res.data
-  } catch (error) {
+  } catch {
     ElMessage.error('加载角色列表失败')
   }
 }
@@ -137,19 +138,19 @@ function handleReset() {
 }
 
 // 分页变化
-function handlePageChange(page) {
+function handlePageChange(page: number) {
   pagination.page = page
   loadUserList()
 }
 
-function handleSizeChange(size) {
+function handleSizeChange(size: number) {
   pagination.size = size
   pagination.page = 1
   loadUserList()
 }
 
 // 行点击跳转详情
-function handleRowClick(row) {
+function handleRowClick(row: User) {
   router.push('/system/user/' + row.id)
 }
 
@@ -162,27 +163,27 @@ function handleCreate() {
 }
 
 // 编辑用户
-function handleEdit(row) {
+function handleEdit(row: User) {
   isEdit.value = true
   dialogTitle.value = '编辑用户'
   userForm.id = row.id
   userForm.username = row.username
   userForm.password = ''
   userForm.name = row.name
-  userForm.gender = row.gender
+  userForm.gender = row.gender ?? 1
   userForm.phone = row.phone || ''
-  userForm.email = row.email
-  userForm.department = row.department
-  userForm.position = row.position
-  userForm.roleId = row.roleId
-  userForm.enabled = row.enabled
-  userForm.avatar = row.avatar
+  userForm.email = row.email || ''
+  userForm.department = row.department || ''
+  userForm.position = row.position || ''
+  userForm.roleId = row.roleId ?? null
+  userForm.enabled = row.enabled ?? 1
+  userForm.avatar = row.avatar || ''
   userForm.changePassword = false
   dialogVisible.value = true
 }
 
 // 重置密码
-function handleResetPassword(row) {
+function handleResetPassword(row: User) {
   passwordForm.id = row.id
   passwordForm.username = row.username
   passwordForm.password = ''
@@ -197,16 +198,16 @@ async function confirmResetPassword() {
     return
   }
   try {
-    await resetUserPassword(passwordForm.id, passwordForm.password)
+    await resetUserPassword(passwordForm.id!, passwordForm.password)
     ElMessage.success('密码重置成功')
     passwordDialogVisible.value = false
-  } catch (error) {
+  } catch {
     ElMessage.error('密码重置失败')
   }
 }
 
 // 删除用户
-function handleDelete(row) {
+function handleDelete(row: User) {
   ElMessageBox.confirm(
     `确定要删除用户「${row.username}」吗？删除后不可恢复。`,
     '删除确认',
@@ -220,7 +221,7 @@ function handleDelete(row) {
       await deleteUser(row.id)
       ElMessage.success('用户删除成功')
       loadUserList()
-    } catch (error) {
+    } catch {
       ElMessage.error('用户删除失败')
     }
   }).catch(() => {})
@@ -234,25 +235,25 @@ async function handleSaveUser() {
     if (!valid) return
 
     try {
-      if (isEdit.value) {
-        const updateData = {
+      if (isEdit.value && userForm.id !== null) {
+        const updateData: UpdateUserParams = {
           name: userForm.name,
           gender: userForm.gender,
           phone: userForm.phone,
           email: userForm.email,
           department: userForm.department,
           position: userForm.position,
-          roleId: userForm.roleId,
+          roleId: userForm.roleId ?? undefined,
           enabled: userForm.enabled,
           avatar: userForm.avatar
         }
         if (userForm.changePassword && userForm.password) {
-          updateData.password = userForm.password
+          (updateData as unknown as { password?: string }).password = userForm.password
         }
         await updateUser(userForm.id, updateData)
         ElMessage.success('用户更新成功')
       } else {
-        await createUser({
+        const createData: CreateUserParams = {
           username: userForm.username,
           password: userForm.password,
           name: userForm.name,
@@ -261,15 +262,16 @@ async function handleSaveUser() {
           email: userForm.email,
           department: userForm.department,
           position: userForm.position,
-          roleId: userForm.roleId,
+          roleId: userForm.roleId ?? undefined,
           enabled: userForm.enabled,
           avatar: userForm.avatar
-        })
+        }
+        await createUser(createData)
         ElMessage.success('用户创建成功')
       }
       dialogVisible.value = false
       loadUserList()
-    } catch (error) {
+    } catch {
       ElMessage.error(isEdit.value ? '用户更新失败' : '用户创建失败')
     }
   })
@@ -296,21 +298,21 @@ function resetUserForm() {
 }
 
 // 格式化性别
-function formatGender(gender) {
+function formatGender(gender: number | undefined) {
   return gender === 1 ? '男' : '女'
 }
 
 // 格式化状态
-function formatStatus(enabled) {
+function formatStatus(enabled: number | undefined) {
   return enabled === 1 ? '启用' : '禁用'
 }
 
 // 状态切换
-async function handleStatusChange(row) {
+async function handleStatusChange(row: User) {
   try {
-    await updateUserStatus(row.id, row.enabled)
+    await updateUserStatus(row.id, row.enabled!)
     ElMessage.success(row.enabled === 1 ? '用户已启用' : '用户已禁用')
-  } catch (error) {
+  } catch {
     // 恢复原状态
     row.enabled = row.enabled === 1 ? 0 : 1
     ElMessage.error('状态更新失败')
@@ -321,13 +323,13 @@ async function handleStatusChange(row) {
 onMounted(async () => {
   loadUserList()
   loadRoles()
-  const editId = route.query.editId
+  const editId = route.query.editId as string | undefined
   if (editId) {
     try {
-      const res = await getUserDetail(editId)
+      const res = await getUserDetail(Number(editId))
       handleEdit(res.data)
       router.replace({ path: '/system/user' })
-    } catch (error) {
+    } catch {
       ElMessage.error('加载用户信息失败')
     }
   }
