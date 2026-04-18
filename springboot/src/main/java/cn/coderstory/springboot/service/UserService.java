@@ -1,14 +1,15 @@
 package cn.coderstory.springboot.service;
 
 import cn.coderstory.springboot.entity.User;
+import cn.coderstory.springboot.vo.UserVO;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 public interface UserService {
     
     IPage<User> getUserPage(Page<User> page, String username, String name, String department, Integer enabled, String phone);
-    
-    User getUserById(Long id);
+
+    UserVO getUserById(Long id);
     
     boolean saveUser(User user, String rawPassword);
     

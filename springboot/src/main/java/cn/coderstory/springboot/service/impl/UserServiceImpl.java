@@ -4,6 +4,7 @@ import cn.coderstory.springboot.entity.User;
 import cn.coderstory.springboot.mapper.UserMapper;
 import cn.coderstory.springboot.security.PasswordEncoder;
 import cn.coderstory.springboot.service.UserService;
+import cn.coderstory.springboot.vo.UserVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -15,10 +16,10 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    
+
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    
+
     @Override
     public IPage<User> getUserPage(Page<User> page, String username, String name, String department, Integer enabled, String phone) {
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
@@ -40,10 +41,10 @@ public class UserServiceImpl implements UserService {
         wrapper.orderByDesc(User::getCreateTime);
         return userMapper.selectPage(page, wrapper);
     }
-    
+
     @Override
-    public User getUserById(Long id) {
-        return userMapper.selectById(id);
+    public UserVO getUserById(Long id) {
+        return userMapper.selectUserWithRoleName(id);
     }
     
     @Override

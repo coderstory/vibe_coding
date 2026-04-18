@@ -41,6 +41,7 @@ onMounted(() => {
       <el-descriptions-item label="邮箱">{{ user.email }}</el-descriptions-item>
       <el-descriptions-item label="部门">{{ user.department }}</el-descriptions-item>
       <el-descriptions-item label="岗位">{{ user.position }}</el-descriptions-item>
+      <el-descriptions-item label="角色">{{ user.roleName }}</el-descriptions-item>
       <el-descriptions-item label="状态">
         <el-tag :type="user.enabled === 1 ? 'success' : 'info'">
           {{ user.enabled === 1 ? '启用' : '禁用' }}
