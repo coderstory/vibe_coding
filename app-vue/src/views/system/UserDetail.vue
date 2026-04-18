@@ -25,6 +25,10 @@ function goBack() {
   router.push('/system/user')
 }
 
+function goToEdit() {
+  router.push({ path: '/system/user', query: { editId: route.params.id } })
+}
+
 onMounted(() => {
   loadUser()
 })
@@ -34,6 +38,7 @@ onMounted(() => {
   <div class="page-container" v-loading="loading">
     <h2 class="page-title">用户详情</h2>
     <el-button @click="goBack">返回列表</el-button>
+    <el-button type="primary" @click="goToEdit">编辑</el-button>
     <el-descriptions v-if="user" :column="2" border style="margin-top: 20px">
       <el-descriptions-item label="用户名">{{ user.username }}</el-descriptions-item>
       <el-descriptions-item label="姓名">{{ user.name }}</el-descriptions-item>

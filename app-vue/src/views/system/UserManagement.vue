@@ -1,10 +1,11 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getUserList, createUser, updateUser, deleteUser, resetUserPassword, getAllRoles, updateUserStatus } from '@/api/user'
+import { getUserList, getUserDetail, createUser, updateUser, deleteUser, resetUserPassword, getAllRoles, updateUserStatus } from '@/api/user'
 
 const router = useRouter()
+const route = useRoute()
 
 // 搜索表单
 const searchForm = reactive({
@@ -38,19 +39,23 @@ const userForm = reactive({
   password: '',
   name: '',
   gender: 1,
+  phone: '',
   email: '',
   department: '',
   position: '',
   roleId: null,
   enabled: 1,
-  avatar: ''
+  avatar: '',
+  changePassword: false
 })
 const userFormRef = ref(null)
 const userFormRules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
   name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
-  roleId: [{ required: true, message: '请选择角色', trigger: 'change' }]
+  roleId: [{ required: true, message: '请选择角色', trigger: 'change' }],
+  phone: [{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号格式', trigger: 'blur' }],
+  email: [{ pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: '请输入正确的邮箱格式', trigger: 'blur' }]
 }
 const isEdit = ref(false)
 
@@ -165,12 +170,14 @@ function handleEdit(row) {
   userForm.password = ''
   userForm.name = row.name
   userForm.gender = row.gender
+  userForm.phone = row.phone || ''
   userForm.email = row.email
   userForm.department = row.department
   userForm.position = row.position
   userForm.roleId = row.roleId
   userForm.enabled = row.enabled
   userForm.avatar = row.avatar
+  userForm.changePassword = false
   dialogVisible.value = true
 }
 
@@ -222,22 +229,27 @@ function handleDelete(row) {
 // 保存用户
 async function handleSaveUser() {
   if (!userFormRef.value) return
-  
+
   await userFormRef.value.validate(async (valid) => {
     if (!valid) return
-    
+
     try {
       if (isEdit.value) {
-        await updateUser(userForm.id, {
+        const updateData = {
           name: userForm.name,
           gender: userForm.gender,
+          phone: userForm.phone,
           email: userForm.email,
           department: userForm.department,
           position: userForm.position,
           roleId: userForm.roleId,
           enabled: userForm.enabled,
           avatar: userForm.avatar
-        })
+        }
+        if (userForm.changePassword && userForm.password) {
+          updateData.password = userForm.password
+        }
+        await updateUser(userForm.id, updateData)
         ElMessage.success('用户更新成功')
       } else {
         await createUser({
@@ -245,6 +257,7 @@ async function handleSaveUser() {
           password: userForm.password,
           name: userForm.name,
           gender: userForm.gender,
+          phone: userForm.phone,
           email: userForm.email,
           department: userForm.department,
           position: userForm.position,
@@ -269,12 +282,14 @@ function resetUserForm() {
   userForm.password = ''
   userForm.name = ''
   userForm.gender = 1
+  userForm.phone = ''
   userForm.email = ''
   userForm.department = ''
   userForm.position = ''
   userForm.roleId = null
   userForm.enabled = 1
   userForm.avatar = ''
+  userForm.changePassword = false
   if (userFormRef.value) {
     userFormRef.value.clearValidate()
   }
@@ -303,9 +318,19 @@ async function handleStatusChange(row) {
 }
 
 // 初始化
-onMounted(() => {
+onMounted(async () => {
   loadUserList()
   loadRoles()
+  const editId = route.query.editId
+  if (editId) {
+    try {
+      const res = await getUserDetail(editId)
+      handleEdit(res.data)
+      router.replace({ path: '/system/user' })
+    } catch (error) {
+      ElMessage.error('加载用户信息失败')
+    }
+  }
 })
 </script>
 
@@ -407,6 +432,12 @@ onMounted(() => {
         <el-form-item v-if="!isEdit" label="密码" prop="password">
           <el-input v-model="userForm.password" type="password" show-password placeholder="请输入密码" />
         </el-form-item>
+        <el-form-item v-if="isEdit && userForm.changePassword" label="密码" prop="password">
+          <el-input v-model="userForm.password" type="password" show-password placeholder="请输入新密码" />
+        </el-form-item>
+        <el-form-item v-if="isEdit" label="">
+          <el-checkbox v-model="userForm.changePassword">修改密码</el-checkbox>
+        </el-form-item>
         <el-form-item label="姓名" prop="name">
           <el-input v-model="userForm.name" placeholder="请输入姓名" />
         </el-form-item>
@@ -419,6 +450,9 @@ onMounted(() => {
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="userForm.email" placeholder="请输入邮箱" />
+        </el-form-item>
+        <el-form-item label="手机" prop="phone">
+          <el-input v-model="userForm.phone" placeholder="请输入手机号" />
         </el-form-item>
         <el-form-item label="部门" prop="department">
           <el-input v-model="userForm.department" placeholder="请输入部门" />
