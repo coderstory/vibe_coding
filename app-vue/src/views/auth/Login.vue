@@ -55,7 +55,7 @@ function handleKeydown(e) {
     <el-card class="login-card">
       <template #header>
         <div class="login-header">
-          <h1>管理系统</h1>
+          <h1>AI驱动的管理系统</h1>
           <p>请登录以继续</p>
         </div>
       </template>

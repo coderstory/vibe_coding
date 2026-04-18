@@ -35,7 +35,7 @@ function toggleCollapse() {
         <div class="wave-layer wave-layer-3"></div>
       </div>
       <div class="logo">
-        <span v-if="!collapsed">管理系统</span>
+        <span v-if="!collapsed">AI驱动的管理系统</span>
         <span v-else>M</span>
       </div>
       <AppMenu :collapsed="collapsed" />
