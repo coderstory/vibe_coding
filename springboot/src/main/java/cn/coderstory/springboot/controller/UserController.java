@@ -4,6 +4,7 @@ import cn.coderstory.springboot.entity.Role;
 import cn.coderstory.springboot.entity.User;
 import cn.coderstory.springboot.mapper.RoleMapper;
 import cn.coderstory.springboot.service.UserService;
+import cn.coderstory.springboot.vo.UserVO;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +55,7 @@ public class UserController {
     
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> getUserById(@PathVariable Long id) {
-        User user = userService.getUserById(id);
+        UserVO user = userService.getUserById(id);
         
         Map<String, Object> response = new HashMap<>();
         response.put("code", 200);
