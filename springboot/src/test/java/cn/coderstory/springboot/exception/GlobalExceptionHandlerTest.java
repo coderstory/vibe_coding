@@ -1,11 +1,10 @@
 package cn.coderstory.springboot.exception;
 
+import cn.coderstory.springboot.vo.ApiResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DuplicateKeyException;
-
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -83,80 +82,80 @@ class GlobalExceptionHandlerTest {
         @DisplayName("处理 BusinessException")
         void handleBusinessException() {
             BusinessException ex = BusinessException.conflict("用户名已存在");
-            Map<String, Object> result = handler.handleBusinessException(ex);
+            ApiResponse<Void> result = handler.handleBusinessException(ex);
 
-            assertEquals(409, result.get("code"));
-            assertEquals("用户名已存在", result.get("message"));
+            assertEquals(409, result.getCode());
+            assertEquals("用户名已存在", result.getMessage());
         }
 
         @Test
         @DisplayName("处理 DuplicateKeyException - username")
         void handleDuplicateKeyUsername() {
             DuplicateKeyException ex = new DuplicateKeyException("Duplicate entry 'admin' for key 'username'");
-            Map<String, Object> result = handler.handleDuplicateKeyException(ex);
+            ApiResponse<Void> result = handler.handleDuplicateKeyException(ex);
 
-            assertEquals(409, result.get("code"));
-            assertEquals("用户名已存在", result.get("message"));
+            assertEquals(409, result.getCode());
+            assertEquals("用户名已存在", result.getMessage());
         }
 
         @Test
         @DisplayName("处理 DuplicateKeyException - phone")
         void handleDuplicateKeyPhone() {
             DuplicateKeyException ex = new DuplicateKeyException("Duplicate entry '13800138000' for key 'phone'");
-            Map<String, Object> result = handler.handleDuplicateKeyException(ex);
+            ApiResponse<Void> result = handler.handleDuplicateKeyException(ex);
 
-            assertEquals(409, result.get("code"));
-            assertEquals("手机号已存在", result.get("message"));
+            assertEquals(409, result.getCode());
+            assertEquals("手机号已存在", result.getMessage());
         }
 
         @Test
         @DisplayName("处理 DuplicateKeyException - email")
         void handleDuplicateKeyEmail() {
             DuplicateKeyException ex = new DuplicateKeyException("Duplicate entry 'test@example.com' for key 'email'");
-            Map<String, Object> result = handler.handleDuplicateKeyException(ex);
+            ApiResponse<Void> result = handler.handleDuplicateKeyException(ex);
 
-            assertEquals(409, result.get("code"));
-            assertEquals("邮箱已存在", result.get("message"));
+            assertEquals(409, result.getCode());
+            assertEquals("邮箱已存在", result.getMessage());
         }
 
         @Test
         @DisplayName("处理 DuplicateKeyException - 默认消息")
         void handleDuplicateKeyDefault() {
             DuplicateKeyException ex = new DuplicateKeyException("Duplicate entry 'something' for key 'idx_xxx'");
-            Map<String, Object> result = handler.handleDuplicateKeyException(ex);
+            ApiResponse<Void> result = handler.handleDuplicateKeyException(ex);
 
-            assertEquals(409, result.get("code"));
-            assertEquals("数据已存在，请检查是否重复", result.get("message"));
+            assertEquals(409, result.getCode());
+            assertEquals("数据已存在，请检查是否重复", result.getMessage());
         }
 
         @Test
         @DisplayName("处理 NullPointerException")
         void handleNullPointerException() {
             NullPointerException ex = new NullPointerException("something is null");
-            Map<String, Object> result = handler.handleNullPointerException(ex);
+            ApiResponse<Void> result = handler.handleNullPointerException(ex);
 
-            assertEquals(500, result.get("code"));
-            assertEquals("系统错误，请稍后重试", result.get("message"));
+            assertEquals(500, result.getCode());
+            assertEquals("系统错误，请稍后重试", result.getMessage());
         }
 
         @Test
         @DisplayName("处理 IllegalArgumentException")
         void handleIllegalArgumentException() {
             IllegalArgumentException ex = new IllegalArgumentException("年龄不能为负数");
-            Map<String, Object> result = handler.handleIllegalArgumentException(ex);
+            ApiResponse<Void> result = handler.handleIllegalArgumentException(ex);
 
-            assertEquals(400, result.get("code"));
-            assertTrue(((String) result.get("message")).contains("年龄不能为负数"));
+            assertEquals(400, result.getCode());
+            assertTrue(result.getMessage().contains("年龄不能为负数"));
         }
 
         @Test
         @DisplayName("处理通用 Exception")
         void handleGenericException() {
             Exception ex = new RuntimeException("未知错误");
-            Map<String, Object> result = handler.handleException(ex);
+            ApiResponse<Void> result = handler.handleException(ex);
 
-            assertEquals(500, result.get("code"));
-            assertEquals("系统错误，请稍后重试", result.get("message"));
+            assertEquals(500, result.getCode());
+            assertEquals("系统错误，请稍后重试", result.getMessage());
         }
     }
 }

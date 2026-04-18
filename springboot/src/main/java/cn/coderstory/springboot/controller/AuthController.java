@@ -3,6 +3,7 @@ package cn.coderstory.springboot.controller;
 import cn.coderstory.springboot.entity.User;
 import cn.coderstory.springboot.security.JwtTokenProvider;
 import cn.coderstory.springboot.service.AuthService;
+import cn.coderstory.springboot.vo.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -17,84 +18,61 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    
+
     private final AuthService authService;
     private final JwtTokenProvider jwtTokenProvider;
-    
+
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(
+    public ResponseEntity<ApiResponse<Map<String, Object>>> login(
             @RequestBody Map<String, String> request,
             HttpServletRequest httpRequest) {
-        try {
-            String username = request.get("username");
-            String password = request.get("password");
-            String ipAddress = getClientIp(httpRequest);
-            
-            Map<String, Object> data = authService.login(username, password, ipAddress);
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("code", 200);
-            response.put("message", "success");
-            response.put("data", data);
-            
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("code", 401);
-            response.put("message", e.getMessage());
-            return ResponseEntity.status(401).body(response);
-        }
+        String username = request.get("username");
+        String password = request.get("password");
+        String ipAddress = getClientIp(httpRequest);
+
+        Map<String, Object> data = authService.login(username, password, ipAddress);
+        return ResponseEntity.ok(ApiResponse.success(data));
     }
-    
+
     @PostMapping("/logout")
-    public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request) {
         String token = getTokenFromRequest(request);
-        Map<String, Object> response = new HashMap<>();
-        
+
         if (token != null && jwtTokenProvider.validateToken(token)) {
             Long userId = jwtTokenProvider.getUserIdFromToken(token);
             String username = jwtTokenProvider.getUsernameFromToken(token);
             String ipAddress = getClientIp(request);
-            
+
             authService.logout(userId, username, ipAddress);
         }
-        
-        response.put("code", 200);
-        response.put("message", "success");
-        return ResponseEntity.ok(response);
+
+        return ResponseEntity.ok(ApiResponse.success());
     }
-    
+
     @GetMapping("/current")
-    public ResponseEntity<Map<String, Object>> getCurrentUser(HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getCurrentUser(HttpServletRequest request) {
         String token = getTokenFromRequest(request);
-        Map<String, Object> response = new HashMap<>();
-        
+
         if (token == null || !jwtTokenProvider.validateToken(token)) {
-            response.put("code", 401);
-            response.put("message", "未登录");
-            return ResponseEntity.status(401).body(response);
+            return ResponseEntity.status(401).body(ApiResponse.unauthorized("未登录"));
         }
-        
+
         Long userId = jwtTokenProvider.getUserIdFromToken(token);
         User user = authService.getCurrentUser(userId);
-        
+
         if (user == null) {
-            response.put("code", 401);
-            response.put("message", "用户不存在");
-            return ResponseEntity.status(401).body(response);
+            return ResponseEntity.status(401).body(ApiResponse.unauthorized("用户不存在"));
         }
-        
+
         Map<String, Object> data = new HashMap<>();
         data.put("id", user.getId());
         data.put("username", user.getUsername());
         data.put("name", user.getName());
         data.put("roleId", user.getRoleId());
-        
-        response.put("code", 200);
-        response.put("data", data);
-        return ResponseEntity.ok(response);
+
+        return ResponseEntity.ok(ApiResponse.success(data));
     }
-    
+
     private String getTokenFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
@@ -102,7 +80,7 @@ public class AuthController {
         }
         return null;
     }
-    
+
     private String getClientIp(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");
         if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
