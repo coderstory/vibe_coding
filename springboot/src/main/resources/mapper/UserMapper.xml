@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.coderstory.springboot.mapper.UserMapper">
+
+    <resultMap id="UserVO" type="cn.coderstory.springboot.vo.UserVO">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="nickname" property="nickname"/>
+        <result column="email" property="email"/>
+        <result column="phone" property="phone"/>
+        <result column="avatar" property="avatar"/>
+        <result column="status" property="status"/>
+        <result column="role_id" property="roleId"/>
+        <result column="role_name" property="roleName"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <select id="selectUserWithRoleName" resultMap="UserVO">
+        SELECT u.*, r.role_name as roleName
+        FROM sys_user u
+        LEFT JOIN sys_role r ON u.role_id = r.id
+        WHERE u.id = #{id} AND u.deleted = 0
+    </select>
+
+    <select id="findByUsername" resultType="cn.coderstory.springboot.entity.User">
+        SELECT *
+        FROM sys_user
+        WHERE username = #{username} AND deleted = 0
+    </select>
+
+</mapper>
