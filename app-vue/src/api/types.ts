@@ -180,3 +180,134 @@ export interface Knowledge {
   createTime: string
   updateTime: string
 }
+
+/**
+ * 角色查询参数
+ */
+export interface RoleQueryParams extends PageParams {
+  roleName?: string
+  enabled?: number
+}
+
+/**
+ * 创建角色参数
+ */
+export interface CreateRoleParams {
+  roleName: string
+  roleCode?: string
+  description?: string
+  enabled?: number
+}
+
+/**
+ * 更新角色参数
+ */
+export interface UpdateRoleParams {
+  roleName?: string
+  roleCode?: string
+  description?: string
+  enabled?: number
+}
+
+/**
+ * 审计日志查询参数
+ */
+export interface AuditLogQueryParams extends PageParams {
+  username?: string
+  action?: string
+  startDate?: string
+  endDate?: string
+}
+
+/**
+ * 知识库分类
+ */
+export interface KnowledgeCategory {
+  id: number
+  name: string
+  parentId?: number
+  sortOrder?: number
+  children?: KnowledgeCategory[]
+}
+
+/**
+ * 创建分类参数
+ */
+export interface CreateCategoryParams {
+  name: string
+  parentId?: number
+  sortOrder?: number
+}
+
+/**
+ * 更新分类参数
+ */
+export interface UpdateCategoryParams {
+  name?: string
+  parentId?: number
+  sortOrder?: number
+}
+
+/**
+ * 知识库文章
+ */
+export interface KnowledgeArticle {
+  id: number
+  title: string
+  content: string
+  categoryId?: number
+  categoryName?: string
+  tags?: string[]
+  createTime: string
+  updateTime: string
+}
+
+/**
+ * 文章查询参数
+ */
+export interface ArticleQueryParams extends PageParams {
+  title?: string
+  categoryId?: number
+  tag?: string
+}
+
+/**
+ * 创建文章参数
+ */
+export interface CreateArticleParams {
+  title: string
+  content: string
+  categoryId?: number
+  tags?: string[]
+}
+
+/**
+ * 更新文章参数
+ */
+export interface UpdateArticleParams {
+  title?: string
+  content?: string
+  categoryId?: number
+  tags?: string[]
+}
+
+/**
+ * 知识库标签
+ */
+export interface KnowledgeTag {
+  id: number
+  name: string
+  articleCount?: number
+}
+
+/**
+ * 文章文件
+ */
+export interface ArticleFile {
+  id: number
+  articleId: number
+  fileName: string
+  fileSize: number
+  downloadUrl: string
+  createTime: string
+}
