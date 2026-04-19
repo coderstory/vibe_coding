@@ -66,7 +66,8 @@ function toggleCollapse() {
 
 <style scoped>
 .layout-container {
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .layout-aside {

@@ -175,15 +175,14 @@ onBeforeUnmount(() => {
   <el-dialog
     v-model="visible"
     :title="isEdit ? '编辑知识' : '新建知识'"
-    width="90%"
-    fullscreen
+    width="80%"
     :close-on-click-modal="false"
+    class="article-editor-dialog"
   >
     <el-form :model="form" label-width="80px">
       <el-form-item label="标题">
-        <el-input v-model="form.title" placeholder="请输入标题" maxlength="200" show-word-limit style="width: 400px" />
-      </el-form-item>
-      <el-form-item label="标签">
+        <el-input v-model="form.title" placeholder="请输入标题" maxlength="200" show-word-limit style="width: 300px" />
+        <span style="margin: 0 16px">标签</span>
         <el-select
           v-model="form.tagIds"
           multiple
@@ -198,14 +197,14 @@ onBeforeUnmount(() => {
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="内容">
-        <div style="border: 1px solid #dcdfe6; border-radius: 4px; height: 500px">
+      <el-form-item class="editor-form-item">
+        <div class="editor-container">
           <Toolbar :editor="editorRef" :default-config="toolbarConfig" mode="default" />
           <Editor
             v-model="editorData"
             :default-config="editorConfig"
             mode="default"
-            style="height: calc(100% - 40px)"
+            class="editor-content"
             @onCreated="handleCreated"
           />
         </div>
@@ -217,3 +216,58 @@ onBeforeUnmount(() => {
     </template>
   </el-dialog>
 </template>
+
+<style scoped>
+.article-editor-dialog {
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.article-editor-dialog :deep(.el-dialog) {
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.article-editor-dialog :deep(.el-dialog__body) {
+  flex: 1;
+  overflow-y: hidden;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.editor-form-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+.editor-form-item :deep(.el-form-item__content) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.editor-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  min-height: 300px;
+  max-height: 55vh;
+}
+
+.editor-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.editor-content :deep(.w-e-text-area) {
+  min-height: 200px;
+}
+</style>

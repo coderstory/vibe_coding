@@ -50,7 +50,7 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '菜单管理', requiresAuth: true }
       },
       {
-        path: 'audit',
+        path: 'system/audit',
         name: 'AuditLog',
         component: () => import('@/views/audit/AuditLog.vue'),
         meta: { title: '审计日志', requiresAuth: true }

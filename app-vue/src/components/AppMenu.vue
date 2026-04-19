@@ -26,10 +26,8 @@ const menuItems = ref<MenuItem[]>([])
 
 async function loadMenus() {
   try {
-    // 从后端获取菜单树
     const res = await getMenuTree()
     const menus: Menu[] = res.data || []
-    // 转换后端菜单格式为前端格式
     menuItems.value = convertToMenuItems(menus)
   } catch (error) {
     console.error('获取菜单失败', error)
@@ -38,53 +36,45 @@ async function loadMenus() {
 }
 
 function convertToMenuItems(menus: Menu[]): MenuItem[] {
-  const menuMap = new Map<number, MenuItem>()
-  const rootMenus: MenuItem[] = []
-
-  // 先创建所有菜单项
-  menus.forEach(menu => {
-    // 根据路径格式判断是顶级菜单还是子菜单
-    let fullPath = menu.path || ''
-    if (fullPath && !fullPath.startsWith('/dashboard')) {
-      if (fullPath.startsWith('/')) {
-        fullPath = `/dashboard${fullPath}`
+  // 后端返回的已经是嵌套的树形结构，直接递归转换
+  function convertMenu(menu: Menu): MenuItem {
+    // 构建完整路径
+    let fullPath = ''
+    if (menu.path) {
+      // 首页 path 是 /dashboard，不需要再拼接
+      if (menu.path === '/dashboard') {
+        fullPath = '/dashboard'
+      } else if (menu.path.startsWith('/')) {
+        // 其他路径拼接 /dashboard 前缀
+        fullPath = `/dashboard${menu.path}`
       } else {
-        fullPath = `/dashboard/${fullPath}`
+        fullPath = `/dashboard/${menu.path}`
       }
-    } else if (!fullPath) {
-      fullPath = '/dashboard'
     }
 
-    menuMap.set(menu.id, {
+    // 递归转换子菜单
+    const children = menu.children?.map(child => convertMenu(child)) || []
+
+    return {
       id: menu.id,
       path: fullPath,
       title: menu.name,
       icon: menu.icon || 'Folder',
-      parentId: menu.parentId
-    })
-  })
-
-  // 构建树形结构
-  menus.forEach(menu => {
-    const menuItem = menuMap.get(menu.id)!
-    if (menu.parentId === 0 || !menu.parentId) {
-      rootMenus.push(menuItem)
-    } else {
-      const parent = menuMap.get(menu.parentId)
-      if (parent) {
-        if (!parent.children) {
-          parent.children = []
-        }
-        parent.children.push(menuItem)
-      }
+      parentId: menu.parentId,
+      children: children.length > 0 ? children : undefined
     }
-  })
+  }
 
-  return rootMenus
+  // 转换所有一级菜单
+  const result = menus.map(menu => convertMenu(menu))
+  console.log('转换后的菜单:', result)
+  return result
 }
 
-function handleSelect(path: string) {
-  router.push(path)
+function handleSelect(index: string) {
+  if (index.startsWith('/')) {
+    router.push(index)
+  }
 }
 
 function getIconColor(icon: string): string {
@@ -113,15 +103,15 @@ onMounted(() => {
     class="app-menu"
     @select="handleSelect"
   >
-    <template v-for="item in menuItems" :key="item.path">
-      <el-sub-menu v-if="item.children && item.children.length > 0">
+    <template v-for="item in menuItems" :key="item.id">
+      <el-sub-menu v-if="item.children && item.children.length > 0" :index="String(item.id)">
         <template #title>
           <el-icon><component :is="item.icon" /></el-icon>
           <span>{{ item.title }}</span>
         </template>
         <el-menu-item
           v-for="child in item.children"
-          :key="child.path"
+          :key="child.id"
           :index="child.path"
         >
           <el-icon><component :is="child.icon" /></el-icon>

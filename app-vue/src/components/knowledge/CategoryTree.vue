@@ -107,7 +107,7 @@ defineExpose({ loadTree, flatCategories })
           <span>{{ node.label }}</span>
           <span class="node-actions">
             <el-button text size="small" @click.stop="handleAddChild(data)">+</el-button>
-            <el-button text size="small" type="danger" @click.stop="handleDelete(data)">×</el-button>
+            <el-button text size="small" @click.stop="handleDelete(data)">×</el-button>
           </span>
         </span>
       </template>
@@ -146,6 +146,11 @@ defineExpose({ loadTree, flatCategories })
 .tree-node:hover .node-actions {
   display: flex;
   gap: 4px;
+}
+
+.node-actions :deep(.el-button) {
+  width: 20px;
+  padding: 0;
 }
 
 @media (max-width: 768px) {

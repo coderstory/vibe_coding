@@ -269,3 +269,10 @@ GSD 会替你处理：
 
 
 ---
+npm config set registry https://registry.npmmirror.com
+
+npm install -g @playwright/cli@latest
+
+playwright-cli install --skills
+
+
