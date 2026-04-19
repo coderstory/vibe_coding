@@ -114,7 +114,7 @@ onMounted(() => {
     @select="handleSelect"
   >
     <template v-for="item in menuItems" :key="item.path">
-      <el-sub-menu v-if="item.children && item.children.length > 0" :index="String(item.id)">
+      <el-sub-menu v-if="item.children && item.children.length > 0">
         <template #title>
           <el-icon><component :is="item.icon" /></el-icon>
           <span>{{ item.title }}</span>
