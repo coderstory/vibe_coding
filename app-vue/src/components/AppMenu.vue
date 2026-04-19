@@ -109,13 +109,14 @@ onMounted(() => {
   <el-menu
     :default-active="defaultActive"
     :collapse="collapsed"
+    :router="false"
     class="app-menu"
     @select="handleSelect"
   >
     <template v-for="item in menuItems" :key="item.path">
-      <el-sub-menu v-if="item.children && item.children.length > 0" :index="item.path">
+      <el-sub-menu v-if="item.children && item.children.length > 0" :index="String(item.id)">
         <template #title>
-          <el-icon :class="getIconColor(item.icon)"><component :is="item.icon" /></el-icon>
+          <el-icon><component :is="item.icon" /></el-icon>
           <span>{{ item.title }}</span>
         </template>
         <el-menu-item
@@ -123,13 +124,13 @@ onMounted(() => {
           :key="child.path"
           :index="child.path"
         >
-          <el-icon :class="getIconColor(child.icon)"><component :is="child.icon" /></el-icon>
+          <el-icon><component :is="child.icon" /></el-icon>
           <span>{{ child.title }}</span>
         </el-menu-item>
       </el-sub-menu>
 
       <el-menu-item v-else :index="item.path">
-        <el-icon :class="getIconColor(item.icon)"><component :is="item.icon" /></el-icon>
+        <el-icon><component :is="item.icon" /></el-icon>
         <span>{{ item.title }}</span>
       </el-menu-item>
     </template>
