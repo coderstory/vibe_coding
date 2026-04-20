@@ -275,4 +275,9 @@ npm install -g @playwright/cli@latest
 
 playwright-cli install --skills
 
+npx superpowers-zh
 
+
+npm install -g @gitlawb/openclaude
+
+https://skillhub.cn/
