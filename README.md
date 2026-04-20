@@ -5,6 +5,8 @@
 > 目前使用minimax官方的2.7模块，配合opencode客户端开发。
 > 
 > 主要使用[superpower](https://github.com/obra/superpowers)和[GSD](https://github.com/gsd-2/get-shit-done)技能链完成需求分析到功能验收的完整闭环
+> 
+> 当前使用`Trae CN`作为`IDE`
 
 ## 开发目的
 
