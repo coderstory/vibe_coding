@@ -71,6 +71,48 @@ const routes: RouteRecordRaw[] = [
         name: 'BusinessData',
         component: () => import('@/views/business/BusinessData.vue'),
         meta: { title: '业务数据', requiresAuth: true }
+      },
+      {
+        path: '/seckill',
+        name: 'SeckillIndex',
+        component: () => import('@/views/seckill/SeckillIndex.vue'),
+        meta: { title: '秒杀首页', requiresAuth: true }
+      },
+      {
+        path: '/seckill/detail/:id',
+        name: 'SeckillDetail',
+        component: () => import('@/views/seckill/SeckillDetail.vue'),
+        meta: { title: '秒杀详情', requiresAuth: true }
+      },
+      {
+        path: '/seckill/record',
+        name: 'SeckillRecord',
+        component: () => import('@/views/seckill/SeckillRecord.vue'),
+        meta: { title: '抢购记录', requiresAuth: true }
+      },
+      {
+        path: '/seckill/cart',
+        name: 'SeckillCart',
+        component: () => import('@/views/seckill/SeckillCart.vue'),
+        meta: { title: '秒杀购物车', requiresAuth: true }
+      },
+      {
+        path: '/order/list',
+        name: 'OrderList',
+        component: () => import('@/views/order/OrderList.vue'),
+        meta: { title: '订单列表', requiresAuth: true }
+      },
+      {
+        path: '/order/confirm',
+        name: 'OrderConfirm',
+        component: () => import('@/views/order/OrderConfirm.vue'),
+        meta: { title: '订单确认', requiresAuth: true }
+      },
+      {
+        path: '/monitor',
+        name: 'MonitorDashboard',
+        component: () => import('@/views/monitor/MonitorDashboard.vue'),
+        meta: { title: '监控大盘', requiresAuth: true }
       }
     ]
   },
