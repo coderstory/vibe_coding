@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS cart (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL COMMENT '用户ID',
+    goods_id BIGINT NOT NULL COMMENT '商品ID',
+    quantity INT DEFAULT 1 COMMENT '购买数量',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted TINYINT DEFAULT 0,
+    UNIQUE KEY uk_user_goods (user_id, goods_id),
+    INDEX idx_user (user_id)
+) COMMENT='购物车表';

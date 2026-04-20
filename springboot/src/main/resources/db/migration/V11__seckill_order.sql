@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS seckill_order (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '订单ID',
+    order_no VARCHAR(64) NOT NULL UNIQUE COMMENT '订单号',
+    user_id BIGINT NOT NULL COMMENT '用户ID',
+    goods_id BIGINT NOT NULL COMMENT '商品ID',
+    activity_id BIGINT NOT NULL COMMENT '活动ID',
+    quantity INT DEFAULT 1 COMMENT '购买数量',
+    price DECIMAL(10,2) NOT NULL COMMENT '购买价格',
+    status TINYINT DEFAULT 0 COMMENT '状态: 0-待支付 1-已支付 2-已取消 3-超时取消',
+    queue_id VARCHAR(64) COMMENT '队列ID',
+    payment_time DATETIME COMMENT '支付时间',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted TINYINT DEFAULT 0,
+    INDEX idx_user (user_id),
+    INDEX idx_goods (goods_id),
+    INDEX idx_order_no (order_no),
+    INDEX idx_status (status),
+    INDEX idx_create_time (create_time)
+) COMMENT='秒杀订单表';
