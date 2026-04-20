@@ -1,3 +1,5 @@
+package cn.coderstory.springboot;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class Test {

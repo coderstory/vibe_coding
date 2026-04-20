@@ -6,7 +6,8 @@ import cn.coderstory.springboot.mapper.UserMapper;
 import cn.coderstory.springboot.security.PasswordEncoder;
 import cn.coderstory.springboot.service.impl.UserServiceImpl;
 import cn.coderstory.springboot.vo.UserVO;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.junit.jupiter.api.BeforeEach;
@@ -112,8 +113,9 @@ class UserServiceImplTest {
 
         @Test
         @DisplayName("用户名已存在时抛出异常")
+        @SuppressWarnings("unchecked")
         void whenUsernameExists_throwsException() {
-            when(userMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(1L);
+            when(userMapper.selectCount(any(Wrapper.class))).thenReturn(1L);
 
             BusinessException exception = assertThrows(BusinessException.class,
                 () -> userService.saveUser(testUser, "password123"));
@@ -124,8 +126,9 @@ class UserServiceImplTest {
 
         @Test
         @DisplayName("创建用户成功返回true")
+        @SuppressWarnings("unchecked")
         void whenValid_returnsTrue() {
-            when(userMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(0L);
+            when(userMapper.selectCount(any(Wrapper.class))).thenReturn(0L);
             when(passwordEncoder.encode("password123")).thenReturn("encoded_password");
             when(userMapper.insert(any(User.class))).thenReturn(1);
 
@@ -283,19 +286,20 @@ class UserServiceImplTest {
 
         @Test
         @DisplayName("分页查询返回结果")
+        @SuppressWarnings("unchecked")
         void returnsPageResult() {
             Page<User> pageParam = new Page<>(1, 20);
             Page<User> resultPage = new Page<>();
             resultPage.setRecords(java.util.List.of(testUser));
             resultPage.setTotal(1);
 
-            when(userMapper.selectPage(any(Page.class), any(LambdaQueryWrapper.class))).thenReturn(resultPage);
+            when(userMapper.selectPage(any(Page.class), any(Wrapper.class))).thenReturn(resultPage);
 
             IPage<User> result = userService.getUserPage(pageParam, "test", null, null, null, null);
 
             assertNotNull(result);
             assertEquals(1, result.getRecords().size());
-            verify(userMapper).selectPage(any(Page.class), any(LambdaQueryWrapper.class));
+            verify(userMapper).selectPage(any(Page.class), any(Wrapper.class));
         }
     }
 }

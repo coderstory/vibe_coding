@@ -2,7 +2,6 @@ package cn.coderstory.springboot.util;
 
 import com.github.luben.zstd.Zstd;
 import lombok.extern.slf4j.Slf4j;
-import java.nio.charset.StandardCharsets;
 
 @Slf4j
 public class ZstdUtil {
