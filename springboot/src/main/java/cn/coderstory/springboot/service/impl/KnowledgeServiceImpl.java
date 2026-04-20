@@ -163,7 +163,7 @@ public class KnowledgeServiceImpl implements KnowledgeService {
         if (tagIds.isEmpty()) {
             return new ArrayList<>();
         }
-        return tagMapper.selectBatchIds(tagIds);
+        return tagMapper.selectByIds(tagIds);
     }
     
     @Override
