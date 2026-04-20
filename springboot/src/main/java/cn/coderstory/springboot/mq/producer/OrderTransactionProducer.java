@@ -17,13 +17,16 @@ import java.util.UUID;
 @Component
 public class OrderTransactionProducer {
 
-    @Autowired
-    private RocketMQTemplate rocketMQTemplate;
+    private final RocketMQTemplate rocketMQTemplate;
 
-    @Autowired
-    private OrderMapper orderMapper;
+    private final OrderMapper orderMapper;
 
     private TransactionMQProducer transactionProducer;
+
+    public OrderTransactionProducer(RocketMQTemplate rocketMQTemplate, OrderMapper orderMapper) {
+        this.rocketMQTemplate = rocketMQTemplate;
+        this.orderMapper = orderMapper;
+    }
 
     @PostConstruct
     public void init() {
