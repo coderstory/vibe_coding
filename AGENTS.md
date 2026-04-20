@@ -29,24 +29,53 @@
 
 ```
 vibe coding/
-├── app-vue/                      # Vue 3 前端应用
+├── app-vue/                          # Vue 3 前端应用
 │   ├── src/
-│   │   ├── assets/              # 静态资源 (CSS, SVG)
-│   │   ├── components/          # Vue 组件
-│   │   │   └── icons/          # 图标组件
-│   │   ├── App.vue             # 根组件
-│   │   └── main.js             # 入口文件
-│   ├── public/                  # 公共静态文件
-│   ├── index.html              # HTML 模板
-│   ├── vite.config.js          # Vite 配置
-│   └── package.json            # Node 依赖
+│   │   ├── api/                    # API 服务层
+│   │   │   ├── request.ts          # Axios 封装（拦截器、token 刷新）
+│   │   │   ├── types.ts            # 全部 API 类型定义
+│   │   │   ├── auth.ts / user.ts / role.ts / menu.ts / audit.ts / knowledge.ts
+│   │   │   └── __tests__/          # API 测试
+│   │   ├── components/             # 公共组件
+│   │   │   ├── AppHeader.vue       # 顶部导航栏
+│   │   │   ├── AppMenu.vue         # 侧边菜单（后端动态加载）
+│   │   │   ├── AppTabs.vue         # 标签页导航
+│   │   │   └── knowledge/          # 知识库组件
+│   │   ├── composables/            # 组合式函数
+│   │   ├── router/index.ts         # 路由配置 + 导航守卫
+│   │   ├── store/user.ts           # Pinia 用户状态
+│   │   ├── views/                  # 页面视图
+│   │   │   ├── auth/               # 登录页
+│   │   │   ├── layout/             # 主布局（侧边栏+头部+标签页+内容区）
+│   │   │   ├── dashboard/          # 首页
+│   │   │   ├── system/             # 系统管理（用户/角色/菜单）
+│   │   │   ├── audit/              # 审计日志
+│   │   │   ├── business/           # 业务数据
+│   │   │   └── error/              # 404
+│   │   ├── assets/                 # 静态资源 + 主题 CSS
+│   │   ├── App.vue
+│   │   └── main.ts
+│   ├── vitest.config.js            # Vitest 测试配置
+│   ├── eslint.config.js
+│   └── vite.config.js              # 含 /api 代理到 localhost:8080
 │
-└── springboot/                  # Spring Boot 后端
-    ├── src/
-    │   ├── main/java/          # 源代码 (cn.coderstory.springboot.*)
-    │   └── test/java/          # 测试代码
-    ├── pom.xml                 # Maven 配置
-    └── mvnw                    # Maven Wrapper
+└── springboot/                      # Spring Boot 后端
+    ├── src/main/java/cn/coderstory/springboot/
+    │   ├── config/                 # 配置（Security、CORS、Web）
+    │   ├── security/               # JWT 认证（Filter + TokenProvider + PasswordEncoder）
+    │   ├── controller/             # REST 控制器
+    │   ├── service/                # 服务接口 + 实现类（impl/ 子包）
+    │   ├── mapper/                 # MyBatis Plus Mapper 接口
+    │   ├── entity/                 # 数据实体（@TableName + @TableLogic 逻辑删除）
+    │   ├── vo/                     # 视图对象（ApiResponse、ResultResponse、UserVO）
+    │   ├── aspect/                 # AOP 切面（AuditAspect 审计日志）
+    │   ├── exception/              # 全局异常处理（BusinessException + GlobalExceptionHandler）
+    │   └── util/                   # 工具类（ZstdUtil 文件压缩）
+    ├── src/main/resources/
+    │   ├── application.yaml        # 单一配置文件
+    │   ├── mapper/*.xml            # MyBatis XML 映射
+    │   └── db/migration/           # Flyway 迁移脚本 (V1~V7)
+    └── pom.xml
 ```
 
 ---
@@ -55,13 +84,13 @@ vibe coding/
 
 ### 前端 (app-vue)
 
-```bash
+```powershell
 cd app-vue
 
 # 安装依赖
 npm install
 
-# 开发模式 (热重载)
+# 开发模式 (热重载, 端口 5173)
 npm run dev
 
 # 生产构建
@@ -69,31 +98,39 @@ npm run build
 
 # 预览生产构建
 npm run preview
+
+# 运行前端单元测试 (Vitest + jsdom)
+npx vitest
+
+# 运行单个测试文件
+npx vitest src/api/__tests__/user.test.ts
+
+# Lint 检查
+npx eslint src/
 ```
 
 ### 后端 (springboot)
 
-```bash
+```powershell
 cd springboot
 
-# 运行应用
-mvnw.cmd spring-boot:run        # Windows
-./mvnw spring-boot:run          # Linux/macOS
+# 运行应用（需要本地 MySQL, 数据库 admin_system）
+mvnw.cmd spring-boot:run
 
 # 编译打包
-mvn package
+mvnw.cmd package
 
 # 运行所有测试
-mvn test
+mvnw.cmd test
 
 # 运行单个测试类
-mvn test -Dtest=SpringbootApplicationTests
+mvnw.cmd test -Dtest=SpringbootApplicationTests
 
 # 运行单个测试方法
-mvn test -Dtest=SpringbootApplicationTests#contextLoads
+mvnw.cmd test -Dtest=SpringbootApplicationTests#contextLoads
 
-# 跳过测试
-mvn package -DskipTests
+# 跳过测试打包
+mvnw.cmd package -DskipTests
 ```
 
 ---
@@ -167,7 +204,8 @@ function handleUpdate() {
 - 使用 `ref()` 和 `reactive()` 管理响应式状态
 - 优先使用 `@` 路径别名而非相对路径
 - 外部链接添加 `rel="noopener"`
-- 无 TypeScript，使用 JSDoc 注释类型
+- 使用 TypeScript (`<script setup lang="ts">`)，类型定义集中在 `api/types.ts`
+- API 调用统一通过 `api/request.ts` 的 Axios 实例，不要直接使用 axios
 
 ---
 
@@ -175,25 +213,24 @@ function handleUpdate() {
 
 ### 类结构
 
+Service 层采用接口+实现模式，实现类放在 `impl/` 子包：
+
 ```java
-package cn.coderstory.springboot.service;
+// 接口: service/UserService.java
+public interface UserService {
+    IPage<User> getUserPage(Page<User> page, String username, ...);
+    UserVO getUserById(Long id);
+    boolean saveUser(User user, String rawPassword);
+}
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
+// 实现: service/impl/UserServiceImpl.java
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserService {
-
-    private final UserRepository userRepository;
-
-    public User findById(Long id) {
-        log.info("查找用户: {}", id);
-        return userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("用户不存在"));
-    }
+public class UserServiceImpl implements UserService {
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+    // ...
 }
 ```
 
@@ -206,30 +243,61 @@ public class UserService {
 | 常量 | UPPER_SNAKE_CASE | `MAX_RETRY_COUNT` |
 | 包名 | 全小写 | `cn.coderstory.springboot` |
 | Controller | `*Controller` | `UserController` |
-| Service | `*Service` | `UserService` |
-| Repository | `*Repository` | `UserRepository` |
+| Service 接口 | `*Service` | `UserService` |
+| Service 实现 | `*ServiceImpl` | `UserServiceImpl` |
+| Mapper | `*Mapper` | `UserMapper` |
+| 实体 | `*` (与表名对应) | `User`, `KnowledgeArticle` |
 
 ### Spring Boot 约定
 
-- 使用 Lombok 注解 (`@Data`, `@Service`, `@Repository`)
-- 构造器注入优先于字段注入
-- REST 控制器使用 `@RestController`
-- 使用 `@GetMapping`, `@PostMapping` 等
-- 测试放在 `src/test/java/` 对应包下
+- 使用 Lombok 注解 (`@Data`, `@Slf4j`, `@RequiredArgsConstructor`)
+- 构造器注入优先于字段注入（`@RequiredArgsConstructor` + `private final`）
+- REST 控制器使用 `@RestController` + `@RequestMapping("/api/xxx")`
+- 实体使用 `@TableName("表名")` + `@TableId(type = IdType.AUTO)` + `@TableLogic` 逻辑删除
+- 分页使用 MyBatis Plus 的 `Page<T>` + `IPage<T>`，响应格式为 `{records, total, size, current, pages}`
+- 异常使用 `BusinessException`（含 `badRequest`/`unauthorized`/`notFound`/`conflict` 静态方法），由 `GlobalExceptionHandler` 统一处理
+- API 响应统一使用 `ApiResponse<T>` 封装，格式 `{code, message, data}`
+- Mapper 的复杂 SQL 写在 `resources/mapper/*.xml` 中，不在接口注解上
 
 ### 错误处理
 
 ```java
-@RestController
-@RequiredArgsConstructor
-public class UserController {
+// 抛出业务异常
+throw BusinessException.notFound("用户不存在");
+throw BusinessException.badRequest("密码不能为空");
+throw BusinessException.conflict("用户名已存在");
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleError(RuntimeException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
-    }
-}
+// 全局异常处理器自动捕获，返回 ApiResponse 格式
 ```
+
+---
+
+## 前后端连接与认证
+
+### 代理配置
+前端开发服务器（5173）通过 Vite proxy 将 `/api` 请求代理到后端（8080）。
+
+### 认证流程
+1. 前端登录调用 `POST /api/auth/login`，返回 `{token, refreshToken, user}`
+2. Token 存储在 `localStorage`，每次请求通过 `Authorization: Bearer <token>` 携带
+3. 后端 `JwtAuthenticationFilter`（OncePerRequestFilter）解析 token 设置 SecurityContext
+4. Token 过期（401）时前端自动调用 `POST /api/auth/refresh` 刷新，含并发请求队列机制
+5. 安全白名单配置在 `application.yaml` 的 `security.whitelist`，目前为 `/api/auth/**` 和 `/api/knowledge/files/**`
+
+### 状态管理
+- 仅一个 Pinia Store：`useUserStore`（Composition API 风格 `defineStore`）
+- 持久化方式：手动读写 `localStorage` 的 `token`、`refreshToken`、`user` 三个键
+
+---
+
+## 审计日志系统
+
+后端通过 AOP 切面 `AuditAspect` 自动记录写操作审计日志：
+- 切点：`cn.coderstory.springboot.service..*`（排除 `AuditService` 自身）
+- 根据方法名前缀推断操作类型：`save/create/add/insert` → 新增，`update/edit` → 编辑，`delete/remove` → 删除等
+- 使用 `ThreadLocal` 防止同一线程重复记录
+- 审计日志通过 `AuditService` 异步写入（`@Async`）
+- 读操作不记录审计日志
 
 ---
 
@@ -282,13 +350,15 @@ class UserServiceTest {
 
 - 使用 `@SpringBootTest` 进行集成测试
 - 使用 `@Test` 标注测试方法
-- 使用 Mockito 模拟依赖
 - 遵循 Given-When-Then 模式
 
-### 前端测试 (未配置)
+### 前端测试 (Vitest)
 
-- 推荐 Vitest 进行单元测试
-- 推荐 Playwright 进行 E2E 测试
+- 测试框架：Vitest + jsdom 环境
+- 配置文件：`vitest.config.js`，`@` 路径别名已配置
+- 测试文件位置：`src/**/*.{test,spec}.{js,ts}`
+- 已有测试：`src/api/__tests__/user.test.ts`（API 错误处理测试）
+- 运行命令：`npx vitest`
 
 ---
 
@@ -326,7 +396,10 @@ git push
 
 - **前端**: Node.js v20.19+ 或 v22.12+
 - **后端**: Java 21+
+- **数据库**: MySQL（数据库名 `admin_system`，本地默认 root/123456）
 - **前端路径别名**: `@` 映射到 `src/`
+- **后端端口**: 8080
+- **前端开发端口**: 5173
 
  
 
@@ -366,8 +439,11 @@ ALTER TABLE sys_user ADD COLUMN phone VARCHAR(20) COMMENT '手机号' AFTER name
 ---
 
 ## 编程规范
-1. 后端的SQL写道mapper.xml中，而不是接口类上
-2. 后端数据库操作尽可能复用mybatis plus的特性，比如使用basesevice简化增删改查
+1. 后端的 SQL 写在 mapper.xml 中，而不是接口类注解上
+2. 后端数据库操作尽可能复用 MyBatis Plus 的特性，比如使用 `BaseMapper` / `IService` 简化增删改查
+3. 新增数据库表或字段必须创建 Flyway 迁移脚本，禁止直接修改已执行的脚本
+4. 前端 API 类型定义集中在 `api/types.ts`，新增类型同步更新
+5. 前端组件使用 `<script setup lang="ts">`
  
 
  
@@ -376,3 +452,4 @@ ALTER TABLE sys_user ADD COLUMN phone VARCHAR(20) COMMENT '手机号' AFTER name
 - **2024**: 初始创建
 - **改进**: 优化代码风格指南，添加更详细的测试命令和 API 设计约定
 - **2026-04-02**: 集成 Flyway 数据库迁移工具，添加数据库迁移规范
+- **2026-04-20**: 更新目录结构、补充认证流程/审计系统架构、修正代码风格与实际一致、更新前端测试配置
