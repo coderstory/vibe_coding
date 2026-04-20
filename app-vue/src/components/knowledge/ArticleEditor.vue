@@ -185,6 +185,8 @@ onBeforeUnmount(() => {
     :title="isEdit ? '编辑知识' : '新建知识'"
     width="80%"
     :close-on-click-modal="false"
+    lock-scroll
+    append-to-body
     class="article-editor-dialog"
   >
     <el-form :model="form" label-width="80px">
@@ -226,23 +228,16 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-.article-editor-dialog {
-  max-height: 85vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
 .article-editor-dialog :deep(.el-dialog) {
-  max-height: 100%;
+  max-height: 85vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  margin-top: 5vh !important;
 }
 
 .article-editor-dialog :deep(.el-dialog__body) {
   flex: 1;
-  overflow-y: hidden;
+  overflow-y: auto;
   padding-top: 20px;
   padding-bottom: 20px;
 }
@@ -267,7 +262,7 @@ onBeforeUnmount(() => {
   border: 1px solid #dcdfe6;
   border-radius: 4px;
   min-height: 300px;
-  max-height: 55vh;
+  max-height: 50vh;
 }
 
 .editor-content {
