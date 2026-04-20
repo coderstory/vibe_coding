@@ -42,4 +42,8 @@
 
 ## 技能
 1. GSD 是直接安装到了.opencode目录下 `npx gsd-opencode@latest`
-2. superpower是配置到的opencode.json的plugin的属性内，会自动安装
+2. superpower 汉化版本 `npx superpowers-zh`
+3. 浏览器访问能力 `npm install -g @playwright/cli@latest` `playwright-cli install --skills`
+## 特殊说明
+1. 配置npm镜像仓库，避免下载插件失败 `npm config set registry https://registry.npmmirror.com`
+2. [国内的一个技能仓库](https://skillhub.cn/)

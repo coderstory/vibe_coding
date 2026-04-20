@@ -131,12 +131,6 @@
 ```
 
 
-### 快速模式
-
-
-
-## 为什么它有效
-
 ### 上下文工程
 
 Claude Code 非常强大，前提是你把它需要的上下文给对。大多数人做不到。
@@ -266,18 +260,3 @@ GSD 会替你处理：
 | `/gsd:stats` | 显示项目统计——阶段、计划、需求、git 指标 |
 | `/gsd:profile-user [--questionnaire] [--refresh]` | 从会话分析生成开发者行为档案，用于个性化响应 |
 
-
-
----
-npm config set registry https://registry.npmmirror.com
-
-npm install -g @playwright/cli@latest
-
-playwright-cli install --skills
-
-npx superpowers-zh
-
-
-npm install -g @gitlawb/openclaude
-
-https://skillhub.cn/
