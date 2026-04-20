@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/knowledge")
@@ -69,13 +70,19 @@ public class KnowledgeController {
 
     @PostMapping("/articles")
     public ResponseEntity<ApiResponse<KnowledgeArticle>> createArticle(@RequestBody KnowledgeArticle article) {
-        KnowledgeArticle created = knowledgeService.createArticle(article, null);
+        List<Integer> tagIds = article.getTags() != null
+                ? article.getTags().stream().map(Long::intValue).collect(Collectors.toList())
+                : null;
+        KnowledgeArticle created = knowledgeService.createArticle(article, tagIds);
         return ResponseEntity.ok(ApiResponse.success(created));
     }
 
     @PutMapping("/articles/{id}")
     public ResponseEntity<ApiResponse<KnowledgeArticle>> updateArticle(@PathVariable Long id, @RequestBody KnowledgeArticle article) {
-        KnowledgeArticle updated = knowledgeService.updateArticle(id, article, null);
+        List<Integer> tagIds = article.getTags() != null
+                ? article.getTags().stream().map(Long::intValue).collect(Collectors.toList())
+                : null;
+        KnowledgeArticle updated = knowledgeService.updateArticle(id, article, tagIds);
         return ResponseEntity.ok(ApiResponse.success(updated));
     }
 
