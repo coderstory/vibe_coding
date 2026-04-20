@@ -12,7 +12,7 @@ vi.mock('element-plus', async () => {
 })
 
 // Import after mocking
-const { getUserList, getUserDetail, createUser, updateUser, deleteUser } = await import('../user.ts')
+await import('../user.ts')
 
 describe('User API Error Handling', () => {
   beforeEach(() => {
