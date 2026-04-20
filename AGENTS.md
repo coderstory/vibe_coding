@@ -357,28 +357,6 @@ throw BusinessException.conflict("用户名已存在");
 
 ---
 
-## 知识库模块
-
-### 实体关系
-- `KnowledgeArticle`: 知识文章主表
-- `KnowledgeCategory`: 分类表（支持树形结构 parentId）
-- `KnowledgeTag`: 标签表
-- `KnowledgeFile`: 附件表（Zstd 压缩存储）
-- `KnowledgeArticleTag`: 文章-标签关联表
-
-### 核心功能
-- 文章管理：CRUD、富文本编辑（WangEditor）、标签选择
-- 分类管理：树形分类、层级结构
-- 标签管理：支持创建时指定颜色
-- 文件上传：支持图片上传到编辑器、附件上传（Zstd 压缩）
-
-### ArticleEditor.vue 弹窗规范
-- 添加 `lock-scroll` 属性锁定背景滚动
-- 添加 `append-to-body` 属性确保正确渲染
-- 设置 `max-height: 85vh` 限制弹窗高度
-- 编辑器容器设置 `max-height: 50vh` 防止溢出
-
----
 
 ## API 设计约定
 
