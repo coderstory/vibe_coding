@@ -268,7 +268,7 @@ export interface KnowledgeArticle {
   content: string
   categoryId?: number
   categoryName?: string
-  tags?: string[]
+  tags?: number[]
   createTime: string
   updateTime: string
 }
@@ -289,7 +289,7 @@ export interface CreateArticleParams {
   title: string
   content: string
   categoryId?: number
-  tags?: string[]
+  tags?: number[]
 }
 
 /**
@@ -299,7 +299,7 @@ export interface UpdateArticleParams {
   title?: string
   content?: string
   categoryId?: number
-  tags?: string[]
+  tags?: number[]
 }
 
 /**

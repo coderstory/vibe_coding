@@ -10,53 +10,53 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/',
-    redirect: '/dashboard'
+    redirect: '/index'
   },
   {
-    path: '/dashboard',
+    path: '/',
     name: 'Dashboard',
     component: () => import('@/views/layout/Layout.vue'),
-    redirect: '/dashboard/index',
+    redirect: '/index',
     meta: { requiresAuth: true },
     children: [
       {
-        path: 'index',
+        path: '/index',
         name: 'DashboardIndex',
         component: () => import('@/views/dashboard/DashboardIndex.vue'),
         meta: { title: '首页', requiresAuth: true }
       },
       {
-        path: 'system/user',
+        path: '/system/user',
         name: 'UserManage',
         component: () => import('@/views/system/UserManagement.vue'),
         meta: { title: '用户管理', requiresAuth: true }
       },
       {
-        path: 'system/user/:id',
+        path: '/system/user/:id',
         name: 'UserDetail',
         component: () => import('@/views/system/UserDetail.vue'),
         meta: { title: '用户详情', requiresAuth: true }
       },
       {
-        path: 'system/role',
+        path: '/system/role',
         name: 'RoleManage',
         component: () => import('@/views/system/RoleManage.vue'),
         meta: { title: '角色管理', requiresAuth: true }
       },
       {
-        path: 'system/menu',
+        path: '/system/menu',
         name: 'MenuManage',
         component: () => import('@/views/system/MenuManage.vue'),
         meta: { title: '菜单管理', requiresAuth: true }
       },
       {
-        path: 'system/audit',
+        path: '/system/audit',
         name: 'AuditLog',
         component: () => import('@/views/audit/AuditLog.vue'),
         meta: { title: '审计日志', requiresAuth: true }
       },
       {
-        path: 'business',
+        path: '/business',
         name: 'BusinessData',
         component: () => import('@/views/business/BusinessData.vue'),
         meta: { title: '业务数据', requiresAuth: true }
@@ -85,7 +85,7 @@ router.beforeEach((to, from, next) => {
   if (requiresAuth && !userStore.isLoggedIn) {
     next('/login')
   } else if (to.path === '/login' && userStore.isLoggedIn) {
-    next('/dashboard')
+    next('/index')
   } else {
     next()
   }
