@@ -93,7 +93,7 @@ public class KnowledgeServiceImpl implements KnowledgeService {
     
     @Override
     @Transactional
-    public KnowledgeArticle createArticle(KnowledgeArticle article, List<Integer> tagIds) {
+    public KnowledgeArticle createArticle(KnowledgeArticle article, List<Long> tagIds) {
         articleMapper.insert(article);
         if (tagIds != null && !tagIds.isEmpty()) {
             saveArticleTags(article.getId(), tagIds);
@@ -103,12 +103,12 @@ public class KnowledgeServiceImpl implements KnowledgeService {
     
     @Override
     @Transactional
-    public KnowledgeArticle updateArticle(Long id, KnowledgeArticle article, List<Integer> tagIds) {
+    public KnowledgeArticle updateArticle(Long id, KnowledgeArticle article, List<Long> tagIds) {
         article.setId(id);
         articleMapper.updateById(article);
         List<Long> currentTagIds = articleTagMapper.selectTagIdsByArticleId(id);
-        Set<Integer> currentSet = new java.util.HashSet<>(currentTagIds.stream().map(Long::intValue).toList());
-        Set<Integer> newSet = tagIds != null ? new java.util.HashSet<>(tagIds) : new java.util.HashSet<>();
+        Set<Long> currentSet = new java.util.HashSet<>(currentTagIds);
+        Set<Long> newSet = tagIds != null ? new java.util.HashSet<>(tagIds) : new java.util.HashSet<>();
         if (!currentSet.equals(newSet)) {
             articleTagMapper.deleteByArticleId(id);
             if (tagIds != null && !tagIds.isEmpty()) {
@@ -118,11 +118,11 @@ public class KnowledgeServiceImpl implements KnowledgeService {
         return article;
     }
     
-    private void saveArticleTags(Long articleId, List<Integer> tagIds) {
-        for (Integer tagId : tagIds) {
+    private void saveArticleTags(Long articleId, List<Long> tagIds) {
+        for (Long tagId : tagIds) {
             KnowledgeArticleTag at = new KnowledgeArticleTag();
             at.setArticleId(articleId);
-            at.setTagId(tagId.longValue());
+            at.setTagId(tagId);
             articleTagMapper.insert(at);
         }
     }

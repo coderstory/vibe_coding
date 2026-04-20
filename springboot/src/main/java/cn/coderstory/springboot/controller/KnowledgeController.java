@@ -70,18 +70,14 @@ public class KnowledgeController {
 
     @PostMapping("/articles")
     public ResponseEntity<ApiResponse<KnowledgeArticle>> createArticle(@RequestBody KnowledgeArticle article) {
-        List<Integer> tagIds = article.getTags() != null
-                ? article.getTags().stream().map(Long::intValue).collect(Collectors.toList())
-                : null;
+        List<Long> tagIds = article.getTags() != null ? article.getTags() : null;
         KnowledgeArticle created = knowledgeService.createArticle(article, tagIds);
         return ResponseEntity.ok(ApiResponse.success(created));
     }
 
     @PutMapping("/articles/{id}")
     public ResponseEntity<ApiResponse<KnowledgeArticle>> updateArticle(@PathVariable Long id, @RequestBody KnowledgeArticle article) {
-        List<Integer> tagIds = article.getTags() != null
-                ? article.getTags().stream().map(Long::intValue).collect(Collectors.toList())
-                : null;
+        List<Long> tagIds = article.getTags() != null ? article.getTags() : null;
         KnowledgeArticle updated = knowledgeService.updateArticle(id, article, tagIds);
         return ResponseEntity.ok(ApiResponse.success(updated));
     }

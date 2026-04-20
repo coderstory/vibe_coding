@@ -21,9 +21,9 @@ public interface KnowledgeService {
     
     KnowledgeArticle getArticleById(Long id);
     
-    KnowledgeArticle createArticle(KnowledgeArticle article, List<Integer> tagIds);
+    KnowledgeArticle createArticle(KnowledgeArticle article, List<Long> tagIds);
     
-    KnowledgeArticle updateArticle(Long id, KnowledgeArticle article, List<Integer> tagIds);
+    KnowledgeArticle updateArticle(Long id, KnowledgeArticle article, List<Long> tagIds);
     
     boolean deleteArticle(Long id);
     
