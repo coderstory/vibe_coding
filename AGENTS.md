@@ -511,6 +511,10 @@ ALTER TABLE sys_user ADD COLUMN phone VARCHAR(20) COMMENT '手机号' AFTER name
 5. 前端组件使用 `<script setup lang="ts">`
 6. 标签ID类型使用 Long，避免 Integer 可能的数据丢失
 7. API 参数传递时注意空值检查，避免 NPE
+8. 绝对不能使用@SuppressWarnings等方案规避问题
+9. 代码需要编写必要的注释
+10. 复杂业务核心使用TDD模式开发
+11. 使用构造函数注入依赖
 
 ---
 
