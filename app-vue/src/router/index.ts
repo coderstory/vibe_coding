@@ -1,17 +1,28 @@
+/**
+ * 路由配置
+ * 定义应用的所有路由规则和导航守卫
+ */
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useUserStore } from '@/store/user'
 
+/**
+ * 路由配置
+ * 使用懒加载模式优化首屏加载性能
+ */
 const routes: RouteRecordRaw[] = [
+  // 登录页 - 无需认证
   {
     path: '/login',
     name: 'Login',
     component: () => import('@/views/auth/Login.vue'),
     meta: { requiresAuth: false }
   },
+  // 根路径重定向
   {
     path: '/',
     redirect: '/index'
   },
+  // 主布局 - 需要认证
   {
     path: '/',
     name: 'Dashboard',
@@ -63,6 +74,7 @@ const routes: RouteRecordRaw[] = [
       }
     ]
   },
+  // 404 页面
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
@@ -71,20 +83,29 @@ const routes: RouteRecordRaw[] = [
   }
 ]
 
+/**
+ * 创建路由实例
+ */
 const router = createRouter({
   history: createWebHistory(),
   routes
 })
 
+/**
+ * 导航守卫
+ * 实现登录拦截和页面访问控制
+ */
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
   userStore.initFromStorage()
 
   const requiresAuth = to.meta.requiresAuth !== false
 
+  // 需要认证但未登录，重定向到登录页
   if (requiresAuth && !userStore.isLoggedIn) {
     next('/login')
   } else if (to.path === '/login' && userStore.isLoggedIn) {
+    // 已登录访问登录页，重定向到首页
     next('/index')
   } else {
     next()

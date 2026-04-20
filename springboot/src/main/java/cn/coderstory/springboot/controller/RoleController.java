@@ -15,6 +15,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 角色管理控制器
+ * 提供角色 CRUD 及权限分配操作
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/roles")
@@ -23,6 +27,9 @@ public class RoleController {
 
     private final RoleService roleService;
 
+    /**
+     * 分页查询角色列表
+     */
     @GetMapping
     public ResponseEntity<ApiResponse<Map<String, Object>>> getRolePage(
             @RequestParam(required = false) String roleName,
@@ -42,12 +49,18 @@ public class RoleController {
         return ResponseEntity.ok(ApiResponse.success(data));
     }
 
+    /**
+     * 获取角色详情
+     */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Role>> getRoleById(@PathVariable Long id) {
         Role role = roleService.getById(id);
         return ResponseEntity.ok(ApiResponse.success(role));
     }
 
+    /**
+     * 创建角色
+     */
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> createRole(@RequestBody Role role) {
         boolean success = roleService.saveRole(role);
@@ -58,6 +71,9 @@ public class RoleController {
         }
     }
 
+    /**
+     * 更新角色
+     */
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> updateRole(@PathVariable Long id, @RequestBody Role role) {
         role.setId(id);
@@ -69,6 +85,9 @@ public class RoleController {
         }
     }
 
+    /**
+     * 删除角色
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteRole(@PathVariable Long id) {
         boolean success = roleService.deleteRole(id);
@@ -79,12 +98,20 @@ public class RoleController {
         }
     }
 
+    /**
+     * 获取角色的菜单权限
+     * 返回该角色被授权的所有菜单 ID 列表
+     */
     @GetMapping("/{id}/menus")
     public ResponseEntity<ApiResponse<List<Menu>>> getRoleMenus(@PathVariable Long id) {
         List<Menu> menus = roleService.getMenusByRoleId(id);
         return ResponseEntity.ok(ApiResponse.success(menus));
     }
 
+    /**
+     * 分配菜单权限
+     * 全量替换：该角色的所有菜单权限将被新列表覆盖
+     */
     @PutMapping("/{id}/menus")
     public ResponseEntity<ApiResponse<Void>> assignMenus(
             @PathVariable Long id,

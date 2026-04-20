@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * 侧边栏菜单组件
+ * 从后端加载菜单树，支持折叠和动态路由
+ */
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getMenuTree } from '@/api/menu'
@@ -20,10 +24,15 @@ const props = defineProps<{
 const route = useRoute()
 const router = useRouter()
 
+// 当前激活的菜单路径
 const defaultActive = computed(() => route.path)
 
+// 菜单数据
 const menuItems = ref<MenuItem[]>([])
 
+/**
+ * 加载菜单数据
+ */
 async function loadMenus() {
   try {
     const res = await getMenuTree()
@@ -35,8 +44,10 @@ async function loadMenus() {
   }
 }
 
+/**
+ * 将后端菜单转换为前端菜单格式
+ */
 function convertToMenuItems(menus: Menu[]): MenuItem[] {
-  // 后端返回的已经是嵌套的树形结构，直接递归转换
   function convertMenu(menu: Menu): MenuItem {
     // 构建完整路径
     let fullPath = ''
@@ -70,23 +81,13 @@ function convertToMenuItems(menus: Menu[]): MenuItem[] {
   return result
 }
 
+/**
+ * 处理菜单选择
+ */
 function handleSelect(index: string) {
   if (index.startsWith('/')) {
     router.push(index)
   }
-}
-
-function getIconColor(icon: string): string {
-  const colorMap: Record<string, string> = {
-    House: 'icon-dashboard',
-    Setting: 'icon-system',
-    Document: 'icon-audit',
-    Folder: 'icon-business',
-    User: 'icon-user',
-    Key: 'icon-role',
-    Menu: 'icon-menu'
-  }
-  return colorMap[icon] || 'icon-settings'
 }
 
 onMounted(() => {
@@ -103,6 +104,7 @@ onMounted(() => {
     @select="handleSelect"
   >
     <template v-for="item in menuItems" :key="item.id">
+      <!-- 有子菜单的菜单项 -->
       <el-sub-menu v-if="item.children && item.children.length > 0" :index="String(item.id)">
         <template #title>
           <el-icon><component :is="item.icon" /></el-icon>
@@ -118,6 +120,7 @@ onMounted(() => {
         </el-menu-item>
       </el-sub-menu>
 
+      <!-- 无子菜单的菜单项 -->
       <el-menu-item v-else :index="item.path">
         <el-icon><component :is="item.icon" /></el-icon>
         <span>{{ item.title }}</span>
