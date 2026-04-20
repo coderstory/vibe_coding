@@ -1,19 +1,24 @@
 package cn.coderstory.springboot.stock.service;
 
 import cn.coderstory.springboot.SpringbootApplication;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import cn.coderstory.springboot.stock.entity.Stock;
+import cn.coderstory.springboot.stock.mapper.StockMapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * StockService 集成测试
  *
- * 使用 @SpringBootTest 进行集成测试
+ * 使用 @SpringBootTest 进行集成测试，连接实际 Redis 和 MySQL
+ * 测试数据会在 @AfterEach 中清理
  *
  * @author system
  * @version 1.0
@@ -21,101 +26,133 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @SpringBootTest(classes = SpringbootApplication.class)
 @DisplayName("StockService 集成测试")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class StockServiceTest {
 
     @Autowired
     private StockService stockService;
 
     @Autowired
+    private StockMapper stockMapper;
+
+    @Autowired
     private StringRedisTemplate redisTemplate;
 
-    private Long testGoodsId = 200L;
+    private final Set<Long> testGoodsIds = new HashSet<>();
+    private final Set<String> testRedisKeys = new HashSet<>();
 
-    @BeforeEach
-    void setUp() {
-        // 清理测试数据
-        redisTemplate.delete("seckill:stock:" + testGoodsId);
+    @AfterEach
+    void tearDown() {
+        testGoodsIds.forEach(goodsId -> {
+            try {
+                stockMapper.delete(new LambdaQueryWrapper<Stock>().eq(Stock::getGoodsId, goodsId));
+            } catch (Exception ignored) {
+            }
+        });
+        testGoodsIds.clear();
+
+        if (!testRedisKeys.isEmpty()) {
+            redisTemplate.delete(testRedisKeys);
+            testRedisKeys.clear();
+        }
     }
 
-    /**
-     * 测试用例：初始化库存
-     */
+    private Long generateTestGoodsId() {
+        long id = System.currentTimeMillis() % 100000;
+        testGoodsIds.add(id);
+        return id;
+    }
+
+    private String addRedisKey(String key) {
+        testRedisKeys.add(key);
+        return key;
+    }
+
     @Test
+    @Order(1)
     @DisplayName("应能正确初始化库存")
     void shouldInitializeStock() {
-        boolean result = stockService.initStock(testGoodsId, 100);
+        Long goodsId = generateTestGoodsId();
+        addRedisKey("seckill:stock:" + goodsId);
+
+        boolean result = stockService.initStock(goodsId, 100);
 
         assertTrue(result);
-        assertEquals(100, stockService.getAvailableStock(testGoodsId));
+        assertEquals(100, stockService.getAvailableStock(goodsId));
     }
 
-    /**
-     * 测试用例：获取库存
-     */
     @Test
+    @Order(2)
     @DisplayName("应能正确获取库存")
     void shouldGetCorrectStock() {
-        stockService.initStock(testGoodsId, 100);
+        Long goodsId = generateTestGoodsId();
+        addRedisKey("seckill:stock:" + goodsId);
 
-        int availableStock = stockService.getAvailableStock(testGoodsId);
+        stockService.initStock(goodsId, 100);
+
+        int availableStock = stockService.getAvailableStock(goodsId);
 
         assertEquals(100, availableStock);
     }
 
-    /**
-     * 测试用例：扣减库存
-     */
     @Test
+    @Order(3)
     @DisplayName("应能正确扣减库存")
     void shouldDeductStock() {
-        stockService.initStock(testGoodsId, 100);
+        Long goodsId = generateTestGoodsId();
+        addRedisKey("seckill:stock:" + goodsId);
 
-        boolean result = stockService.deductStock(testGoodsId, 10);
+        stockService.initStock(goodsId, 100);
+
+        boolean result = stockService.deductStock(goodsId, 10);
 
         assertTrue(result);
-        assertEquals(90, stockService.getAvailableStock(testGoodsId));
+        assertEquals(90, stockService.getAvailableStock(goodsId));
     }
 
-    /**
-     * 测试用例：库存不足扣减失败
-     */
     @Test
+    @Order(4)
     @DisplayName("库存不足时应扣减失败")
     void shouldFailWhenInsufficientStock() {
-        stockService.initStock(testGoodsId, 5);
+        Long goodsId = generateTestGoodsId();
+        addRedisKey("seckill:stock:" + goodsId);
 
-        boolean result = stockService.deductStock(testGoodsId, 10);
+        stockService.initStock(goodsId, 5);
+
+        boolean result = stockService.deductStock(goodsId, 10);
 
         assertFalse(result);
-        assertEquals(5, stockService.getAvailableStock(testGoodsId));
+        assertEquals(5, stockService.getAvailableStock(goodsId));
     }
 
-    /**
-     * 测试用例：回滚库存
-     */
     @Test
+    @Order(5)
     @DisplayName("应能正确回滚库存")
     void shouldRollbackStock() {
-        stockService.initStock(testGoodsId, 100);
+        Long goodsId = generateTestGoodsId();
+        addRedisKey("seckill:stock:" + goodsId);
 
-        boolean deductResult = stockService.deductStock(testGoodsId, 20);
+        stockService.initStock(goodsId, 100);
+
+        boolean deductResult = stockService.deductStock(goodsId, 20);
         assertTrue(deductResult);
 
-        boolean rollbackResult = stockService.rollbackStock(testGoodsId, 20);
+        boolean rollbackResult = stockService.rollbackStock(goodsId, 20);
         assertTrue(rollbackResult);
 
-        assertEquals(100, stockService.getAvailableStock(testGoodsId));
+        assertEquals(100, stockService.getAvailableStock(goodsId));
     }
 
-    /**
-     * 测试用例：库存归零
-     */
     @Test
+    @Order(6)
     @DisplayName("库存为零时应扣减失败")
     void shouldFailWhenStockIsZero() {
-        stockService.initStock(testGoodsId, 0);
+        Long goodsId = generateTestGoodsId();
+        addRedisKey("seckill:stock:" + goodsId);
 
-        boolean result = stockService.deductStock(testGoodsId, 1);
+        stockService.initStock(goodsId, 0);
+
+        boolean result = stockService.deductStock(goodsId, 1);
 
         assertFalse(result);
     }

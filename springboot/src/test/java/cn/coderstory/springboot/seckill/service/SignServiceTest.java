@@ -1,47 +1,59 @@
 package cn.coderstory.springboot.seckill.service;
 
-import cn.coderstory.springboot.seckill.service.impl.SignServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import cn.coderstory.springboot.SpringbootApplication;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 
 /**
- * SignService 单元测试
+ * SignService 集成测试
  *
- * 使用 Mockito 进行纯单元测试，不需要启动 Spring 上下文
+ * 使用 @SpringBootTest 进行集成测试，连接实际 Redis
+ * 测试数据会在 @AfterEach 中清理
  *
  * @author system
  * @version 1.0
  * @since 2026-04-20
  */
-@DisplayName("SignService 单元测试")
+@SpringBootTest(classes = SpringbootApplication.class)
+@DisplayName("SignService 集成测试")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class SignServiceTest {
 
-    private SignServiceImpl signService;
-    private StringRedisTemplate redisTemplate;
-    private ValueOperations<String, String> valueOperations;
+    @Autowired
+    private SignService signService;
 
-    @BeforeEach
-    void setUp() {
-        redisTemplate = mock(StringRedisTemplate.class);
-        valueOperations = mock(ValueOperations.class);
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        signService = new SignServiceImpl(redisTemplate);
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    private final Set<String> testKeys = new HashSet<>();
+
+    @AfterEach
+    void tearDown() {
+        if (!testKeys.isEmpty()) {
+            redisTemplate.delete(testKeys);
+            testKeys.clear();
+        }
     }
 
-    /**
-     * 测试用例：生成签名
-     */
+    private String generateTestKey(String prefix) {
+        String key = prefix + System.currentTimeMillis();
+        testKeys.add(key);
+        return key;
+    }
+
     @Test
+    @Order(1)
     @DisplayName("应生成有效签名")
     void shouldGenerateValidSignature() {
         SignService.SignResult result = signService.generateSign(1L, 1L, "test-secret-key");
+        testKeys.add(result.getSign());
 
         assertNotNull(result);
         assertNotNull(result.getSign());
@@ -49,48 +61,44 @@ class SignServiceTest {
         assertTrue(result.getTimestamp() > 0);
     }
 
-    /**
-     * 测试用例：不同参数生成不同签名
-     */
     @Test
+    @Order(2)
     @DisplayName("不同用户应生成不同签名")
     void differentUsersShouldGenerateDifferentSignatures() {
         SignService.SignResult result1 = signService.generateSign(1L, 1L, "test-secret-key");
         SignService.SignResult result2 = signService.generateSign(2L, 1L, "test-secret-key");
+        testKeys.add(result1.getSign());
+        testKeys.add(result2.getSign());
 
         assertNotEquals(result1.getSign(), result2.getSign());
     }
 
-    /**
-     * 测试用例：不同商品生成不同签名
-     */
     @Test
+    @Order(3)
     @DisplayName("不同商品应生成不同签名")
     void differentGoodsShouldGenerateDifferentSignatures() {
         SignService.SignResult result1 = signService.generateSign(1L, 1L, "test-secret-key");
         SignService.SignResult result2 = signService.generateSign(1L, 2L, "test-secret-key");
+        testKeys.add(result1.getSign());
+        testKeys.add(result2.getSign());
 
         assertNotEquals(result1.getSign(), result2.getSign());
     }
 
-    /**
-     * 测试用例：验证有效签名
-     */
     @Test
+    @Order(4)
     @DisplayName("应验证正确签名")
     void shouldVerifyCorrectSignature() {
         SignService.SignResult result = signService.generateSign(1L, 1L, "test-secret-key");
-        when(valueOperations.get(anyString())).thenReturn(result.getSign());
+        testKeys.add(result.getSign());
 
         boolean verifyResult = signService.verifySign(result.getSign(), result.getTimestamp());
 
         assertTrue(verifyResult);
     }
 
-    /**
-     * 测试用例：拒绝过期签名
-     */
     @Test
+    @Order(5)
     @DisplayName("应拒绝过期签名")
     void shouldRejectExpiredSignature() {
         long expiredTimestamp = System.currentTimeMillis() - 600000;
@@ -100,27 +108,21 @@ class SignServiceTest {
         assertFalse(verifyResult);
     }
 
-    /**
-     * 测试用例：拒绝未存在的签名
-     */
     @Test
+    @Order(6)
     @DisplayName("应拒绝未存在的签名")
     void shouldRejectNonExistentSignature() {
-        when(valueOperations.get(anyString())).thenReturn(null);
-
         boolean verifyResult = signService.verifySign("non-existent-signature", System.currentTimeMillis());
 
         assertFalse(verifyResult);
     }
 
-    /**
-     * 测试用例：签名只能使用一次
-     */
     @Test
+    @Order(7)
     @DisplayName("签名只能验证一次")
     void signatureShouldBeUsableOnlyOnce() {
         SignService.SignResult result = signService.generateSign(1L, 1L, "test-secret-key");
-        when(valueOperations.get(anyString())).thenReturn(result.getSign());
+        testKeys.add(result.getSign());
 
         boolean firstVerify = signService.verifySign(result.getSign(), result.getTimestamp());
         boolean secondVerify = signService.verifySign(result.getSign(), result.getTimestamp());

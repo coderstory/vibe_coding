@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
-@MapperScan("cn.coderstory.springboot.mapper")
+@MapperScan("cn.coderstory.springboot.**.mapper")
 @EnableAsync
 public class SpringbootApplication {
 

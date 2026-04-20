@@ -1,12 +1,14 @@
 package cn.coderstory.springboot.lock;
 
 import cn.coderstory.springboot.SpringbootApplication;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,7 +18,8 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * DistributedLockService 集成测试
  *
- * 使用 @SpringBootTest 进行集成测试
+ * 使用 @SpringBootTest 进行集成测试，连接实际 Redis
+ * 测试数据会在 @AfterEach 中清理
  *
  * @author system
  * @version 1.0
@@ -24,31 +27,53 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @SpringBootTest(classes = SpringbootApplication.class)
 @DisplayName("DistributedLockService 集成测试")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class DistributedLockServiceTest {
 
     @Autowired
     private DistributedLockService distributedLockService;
 
-    /**
-     * 测试用例：获取锁
-     */
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    private final Set<String> testLockKeys = new HashSet<>();
+
+    @AfterEach
+    void tearDown() {
+        testLockKeys.forEach(key -> {
+            try {
+                RLock lock = distributedLockService.getLock(key);
+                if (lock != null && lock.isHeldByCurrentThread()) {
+                    lock.unlock();
+                }
+            } catch (Exception ignored) {
+            }
+        });
+        testLockKeys.clear();
+    }
+
+    private String addTestLockKey(String prefix) {
+        String key = prefix + System.currentTimeMillis();
+        testLockKeys.add(key);
+        return key;
+    }
+
     @Test
+    @Order(1)
     @DisplayName("应能获取锁")
     void shouldAcquireLock() {
-        String lockKey = "test:lock:" + System.currentTimeMillis();
+        String lockKey = addTestLockKey("test:lock:");
 
         RLock lock = distributedLockService.getLock(lockKey);
 
         assertNotNull(lock);
     }
 
-    /**
-     * 测试用例：尝试获取锁
-     */
     @Test
+    @Order(2)
     @DisplayName("应能尝试获取锁")
     void shouldTryAcquireLock() throws InterruptedException {
-        String lockKey = "test:tryLock:" + System.currentTimeMillis();
+        String lockKey = addTestLockKey("test:tryLock:");
 
         boolean acquired = distributedLockService.tryLock(lockKey, 5, TimeUnit.SECONDS);
 
@@ -57,13 +82,11 @@ class DistributedLockServiceTest {
         distributedLockService.unlock(lockKey);
     }
 
-    /**
-     * 测试用例：释放锁
-     */
     @Test
+    @Order(3)
     @DisplayName("应能释放锁")
     void shouldUnlock() throws InterruptedException {
-        String lockKey = "test:unlock:" + System.currentTimeMillis();
+        String lockKey = addTestLockKey("test:unlock:");
 
         boolean acquired = distributedLockService.tryLock(lockKey, 5, TimeUnit.SECONDS);
         assertTrue(acquired);
@@ -74,13 +97,11 @@ class DistributedLockServiceTest {
         assertFalse(isLocked);
     }
 
-    /**
-     * 测试用例：执行带锁业务
-     */
     @Test
+    @Order(4)
     @DisplayName("应能执行带锁业务")
     void shouldExecuteWithLock() {
-        String lockKey = "test:execute:" + System.currentTimeMillis();
+        String lockKey = addTestLockKey("test:execute:");
         AtomicInteger counter = new AtomicInteger(0);
 
         String result = distributedLockService.executeWithLock(lockKey, () -> {
@@ -92,13 +113,11 @@ class DistributedLockServiceTest {
         assertEquals(1, counter.get());
     }
 
-    /**
-     * 测试用例：带锁执行时锁被占用
-     */
     @Test
+    @Order(5)
     @DisplayName("锁被占用时带锁执行应返回null")
     void shouldReturnNullWhenLockNotAvailable() throws InterruptedException {
-        String lockKey = "test:blocked:" + System.currentTimeMillis();
+        String lockKey = addTestLockKey("test:blocked:");
 
         boolean firstLock = distributedLockService.tryLock(lockKey, 5, TimeUnit.SECONDS);
         assertTrue(firstLock);
@@ -119,29 +138,12 @@ class DistributedLockServiceTest {
         distributedLockService.unlock(lockKey);
     }
 
-    /**
-     * 测试用例：锁键前缀生成
-     */
     @Test
+    @Order(6)
     @DisplayName("锁键前缀应正确生成")
     void lockKeyPrefixShouldBeCorrect() {
-        assertEquals("seckill:activity:123",
-                getActivityLockKey(123L));
-        assertEquals("seckill:stock:456",
-                getStockLockKey(456L));
-        assertEquals("seckill:order:1:100",
-                getOrderLockKey(1L, 100L));
-    }
-
-    private String getActivityLockKey(Long activityId) {
-        return "seckill:activity:" + activityId;
-    }
-
-    private String getStockLockKey(Long goodsId) {
-        return "seckill:stock:" + goodsId;
-    }
-
-    private String getOrderLockKey(Long userId, Long goodsId) {
-        return "seckill:order:" + userId + ":" + goodsId;
+        assertEquals("seckill:activity:123", "seckill:activity:" + 123L);
+        assertEquals("seckill:stock:456", "seckill:stock:" + 456L);
+        assertEquals("seckill:order:1:100", "seckill:order:" + 1L + ":" + 100L);
     }
 }
