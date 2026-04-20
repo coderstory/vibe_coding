@@ -16,6 +16,12 @@
   </a>
 </p>
 
+## 📸 登录页面预览
+
+<p align="center">
+  <img src="./docs/images/login-page.png" alt="登录页面" width="80%">
+</p>
+
 ## 📋 项目简介
 
 这是一个基于 Spring Boot 4 和 Vue 3 的现代化后台管理系统，使用 AI 编程工具完成开发。
@@ -86,6 +92,7 @@ vibe coding/
 │   │   └── store/      # 状态管理
 │   └── vite.config.js  # Vite配置
 ├── docs/               # 项目文档
+│   └── images/         # 项目图片
 ├── springboot/         # 后端源码目录
 │   ├── src/            # 源代码
 │   │   ├── main/java/  # Java代码
