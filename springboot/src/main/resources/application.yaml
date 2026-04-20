@@ -4,6 +4,8 @@
 spring:
   application:
     name: admin-system
+
+  # 文件上传配置
   servlet:
     multipart:
       max-file-size: 20MB
@@ -36,64 +38,59 @@ spring:
 
   # ===========================================
   # Redis 配置
-  # - 用于缓存、限流、分布式锁
   # ===========================================
   data:
     redis:
-      host: localhost              # Redis 服务器地址
-      port: 6379                   # Redis 端口
-      password:                    # Redis 密码（无密码留空）
-      database: 0                  # 使用的数据库编号
-      timeout: 3000ms              # 连接超时时间
+      host: localhost
+      port: 6379
+      password:
+      database: 0
+      timeout: 3000ms
       lettuce:
         pool:
-          max-active: 20           # 最大连接数
-          max-idle: 10             # 最大空闲连接数
-          min-idle: 5              # 最小空闲连接数
-          max-wait: 3000ms         # 最大等待时间
+          max-active: 20
+          max-idle: 10
+          min-idle: 5
+          max-wait: 3000ms
 
-# ===========================================
-# RocketMQ 5.3.2 配置
-# - 用于异步消息处理和事务消息
-# ===========================================
-rocketmq:
-  name-server: localhost:9876     # RocketMQ NameServer 地址（集群用分号分隔）
-  producer:
-    group: seckill_producer_group  # 生产者组名
-    send-message-timeout: 3000    # 发送消息超时时间(ms)
+  # ===========================================
+  # RocketMQ 5.3.2 配置
+  # ===========================================
+  rocketmq:
+    name-server: localhost:9876
+    producer:
+      group: seckill_producer_group
+      send-message-timeout: 3000
 
-# ===========================================
-# Redisson 单机模式配置
-# - 用于分布式锁
-# ===========================================
-redisson:
-  single-server-config:
-    address: redis://localhost:6379  # Redis 连接地址
-    connection-minimum-idle-size: 5  # 最小空闲连接数
-    connection-pool-size: 20         # 连接池大小
-    idle-connection-timeout: 10000  # 空闲连接超时时间(ms)
-    connect-timeout: 10000           # 连接超时时间(ms)
-    timeout: 3000                   # 命令执行超时时间(ms)
+  # ===========================================
+  # Redisson 配置
+  # ===========================================
+  redisson:
+    single-server-config:
+      address: redis://localhost:6379
+      connection-minimum-idle-size: 5
+      connection-pool-size: 20
+      idle-connection-timeout: 10000
+      connect-timeout: 10000
+      timeout: 3000
+      retry-attempts: 3
+      retry-interval: 1500
 
 # ===========================================
 # 秒杀业务专用配置
 # ===========================================
 seckill:
-  # 限流器配置
   limiter:
-    qps: 1000          # 每秒允许请求数（QPS限制）
-    concurrency: 500   # 最大并发处理数
-    ip-rate: 100       # 每IP每秒最大请求数
-  # 分布式锁配置
+    qps: 1000
+    concurrency: 500
+    ip-rate: 100
   lock:
-    wait-time: 5       # 等待获取锁时间(秒)
-    lease-time: 10     # 锁持有时间(秒)，自动释放
-  # 订单配置
+    wait-time: 5
+    lease-time: 10
   order:
-    timeout: 900       # 订单超时时间(秒)，默认15分钟
-  # SSE 配置
+    timeout: 900
   sse:
-    timeout: 300000    # SSE 连接超时时间(ms)，默认5分钟
+    timeout: 300000
 
 # ===========================================
 # MyBatis Plus 配置

@@ -32,7 +32,7 @@ import org.springframework.context.annotation.Configuration;
  * </pre>
  *
  * @author system
- * @version 1.0
+ * @version 1.1
  * @since 2026-04-20
  */
 @Data
@@ -77,6 +77,16 @@ public class RedissonConfig {
          * 命令执行超时时间(ms)
          */
         private int timeout = 3000;
+
+        /**
+         * 重试次数
+         */
+        private int retryAttempts = 3;
+
+        /**
+         * 重试间隔(ms)
+         */
+        private int retryInterval = 1500;
     }
 
     /**
@@ -89,6 +99,7 @@ public class RedissonConfig {
      * @return RedissonClient 实例
      */
     @Bean(destroyMethod = "shutdown")
+    @SuppressWarnings("deprecation")
     public RedissonClient redissonClient() {
         Config config = new Config();
 
@@ -97,7 +108,7 @@ public class RedissonConfig {
             ? singleServerConfig.getAddress()
             : "redis://localhost:6379";
 
-        config.useSingleServer()
+        var serverConfig = config.useSingleServer()
             .setAddress(address)
             .setConnectionMinimumIdleSize(
                 singleServerConfig != null ? singleServerConfig.getConnectionMinimumIdleSize() : 5
@@ -114,8 +125,12 @@ public class RedissonConfig {
             .setTimeout(
                 singleServerConfig != null ? singleServerConfig.getTimeout() : 3000
             )
-            .setRetryAttempts(3)
-            .setRetryInterval(1500);
+            .setRetryAttempts(
+                singleServerConfig != null ? singleServerConfig.getRetryAttempts() : 3
+            )
+            .setRetryInterval(
+                singleServerConfig != null ? singleServerConfig.getRetryInterval() : 1500
+            );
 
         return Redisson.create(config);
     }
