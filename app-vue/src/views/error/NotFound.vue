@@ -1,15 +1,21 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const countdown = ref(5)
 
-setInterval(() => {
-  if (countdown.value > 0) {
-    countdown.value--
+const timer = setInterval(() => {
+  countdown.value--
+  if (countdown.value <= 0) {
+    clearInterval(timer)
+    router.push('/')
   }
 }, 1000)
+
+onBeforeUnmount(() => {
+  clearInterval(timer)
+})
 
 function goHome() {
   router.push('/')

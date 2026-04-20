@@ -101,10 +101,14 @@ async function loadArticle() {
   try {
     const res = await getArticleDetail(props.articleId as number)
     const article = res.data
+    // article.tags 已经是标签 ID 数组，只保留已存在的标签
+    const tagIds = (article.tags || []).filter((tagId: number) => {
+      return allTags.value.some(t => t.id === tagId)
+    })
     form.value = {
       title: article.title,
       categoryId: article.categoryId,
-      tagIds: article.tags || [],
+      tagIds,
       status: article.status
     }
     editorData.value = article.content || ''
@@ -134,6 +138,7 @@ async function handleSave() {
   }
 
   try {
+    // 将 tagIds 中的新标签名称（string）转为已创建的标签 ID
     let tagIds = [...form.value.tagIds]
     const newTagNames = tagIds.filter(id => typeof id === 'string') as string[]
     for (const name of newTagNames) {
@@ -142,11 +147,14 @@ async function handleSave() {
       allTags.value.push(res.data)
     }
 
+    // 只保留数字 ID
+    const tags = tagIds.filter(id => typeof id === 'number') as number[]
+
     const data = {
       title: form.value.title,
       categoryId: form.value.categoryId,
       content: editorData.value,
-      tags: tagIds.filter(id => typeof id === 'number') as number[],
+      tags,
       status: form.value.status
     }
 

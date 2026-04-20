@@ -34,7 +34,7 @@ async function handleLogin() {
     try {
       await userStore.login(loginForm.username, loginForm.password)
       ElMessage.success('登录成功')
-      router.push('/dashboard')
+      router.push('/index')
     } catch (error: unknown) {
       const err = error as Error
       ElMessage.error(err.message || '用户名或密码错误')

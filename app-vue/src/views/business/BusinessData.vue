@@ -127,11 +127,6 @@ onMounted(() => {
 
       <el-table :data="articleList" stripe class="article-table">
         <el-table-column prop="title" label="标题" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="categoryName" label="分类" width="120">
-          <template #default="{ row }">
-            {{ row.categoryId }}
-          </template>
-        </el-table-column>
         <el-table-column prop="tags" label="标签" width="150">
           <template #default="{ row }">
             <el-tag v-for="tag in row.tags" :key="tag" size="small" class="tag-item">

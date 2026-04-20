@@ -41,14 +41,13 @@ function convertToMenuItems(menus: Menu[]): MenuItem[] {
     // 构建完整路径
     let fullPath = ''
     if (menu.path) {
-      // 首页 path 是 /dashboard，不需要再拼接
+      // 后端返回 /dashboard 作为首页，实际路由是 /index
       if (menu.path === '/dashboard') {
-        fullPath = '/dashboard'
+        fullPath = '/index'
       } else if (menu.path.startsWith('/')) {
-        // 其他路径拼接 /dashboard 前缀
-        fullPath = `/dashboard${menu.path}`
+        fullPath = menu.path
       } else {
-        fullPath = `/dashboard/${menu.path}`
+        fullPath = `/${menu.path}`
       }
     }
 

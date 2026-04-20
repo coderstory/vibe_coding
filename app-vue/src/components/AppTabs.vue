@@ -11,13 +11,13 @@ const route = useRoute()
 const router = useRouter()
 
 const tabs = ref<Tab[]>([
-  { path: '/dashboard/index', title: '首页' }
+  { path: '/index', title: '首页' }
 ])
 
-const activeTab = ref('/dashboard/index')
+const activeTab = ref('/index')
 
 watch(() => route.path, (newPath) => {
-  if (newPath.startsWith('/dashboard/') && newPath !== '/dashboard') {
+  if (newPath.startsWith('/') && newPath !== '/') {
     const title = (route.meta?.title as string) || newPath.split('/').pop() || ''
     const existing = tabs.value.find(t => t.path === newPath)
     if (!existing) {
@@ -32,7 +32,7 @@ function handleTabClick(tab: { props: { name: string } }) {
 }
 
 function handleTabClose(path: string) {
-  if (path === '/dashboard/index') return
+  if (path === '/index') return
 
   const index = tabs.value.findIndex(t => t.path === path)
   tabs.value.splice(index, 1)
@@ -57,7 +57,7 @@ function handleTabClose(path: string) {
         :key="tab.path"
         :label="tab.title"
         :name="tab.path"
-        :closable="tab.path !== '/dashboard/index'"
+        :closable="tab.path !== '/index'"
       />
     </el-tabs>
   </div>
