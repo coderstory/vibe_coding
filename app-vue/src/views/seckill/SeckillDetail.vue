@@ -360,13 +360,22 @@ onUnmounted(() => {
         <!-- 操作按钮 -->
         <div class="action-buttons">
           <el-button
-            v-if="activity.status === 1 && activity.goods"
+            v-if="activity.status === 1 && activity.goods && stock > 0"
             type="danger"
             size="large"
             :loading="seckilling"
             @click="handleSeckill"
           >
             {{ seckilling ? '正在抢购...' : '立即抢购' }}
+          </el-button>
+
+          <el-button
+            v-else-if="activity.status === 1 && activity.goods && stock <= 0"
+            type="info"
+            size="large"
+            disabled
+          >
+            库存不足
           </el-button>
 
           <el-button
