@@ -9,4 +9,5 @@ public class SeckillRequest {
     private String sign;
     private Long timestamp;
     private String idempotentKey;
+    private String queueId; // 前端传入，用于SSE通知
 }

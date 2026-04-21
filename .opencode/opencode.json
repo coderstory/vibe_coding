@@ -1,6 +1,7 @@
 {
   "plugin": [
-    "superpowers@git+https://github.com/obra/superpowers.git"
+    "superpowers@git+https://github.com/obra/superpowers.git",
+    "oh-my-openagent@latest"
   ],
   "$schema": "https://opencode.ai/config.json",
   "permission": {

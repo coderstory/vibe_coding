@@ -49,6 +49,7 @@ import request from './request'
  * @property sign - 签名（可选，用于后端验证请求合法性）
  * @property timestamp - 时间戳（配合签名使用）
  * @property idempotentKey - 幂等键（防止重复提交）
+ * @property queueId - 队列ID（前端生成，用于SSE通知）
  */
 export interface SeckillRequest {
   /** 商品ID */
@@ -61,6 +62,8 @@ export interface SeckillRequest {
   timestamp?: number
   /** 幂等键（格式: user_{userId}_{activityId}_{timestamp}） */
   idempotentKey?: string
+  /** 队列ID（前端生成，用于SSE通知） */
+  queueId?: string
 }
 
 /**

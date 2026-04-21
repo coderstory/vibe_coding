@@ -170,10 +170,15 @@ async function handleSeckill() {
   seckilling.value = true
 
   try {
-    // 1. 生成幂等键
+    // 1. 生成幂等键和队列ID
     const idempotentKey = `user_${Date.now()}_${activity.value.id}`
+    const queueId = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
 
-    // 2. 获取签名（防止请求被篡改）
+    // 2. 先建立 SSE 连接，确保能收到通知
+    queueing.value = true  // 显示排队模态窗
+    subscribeSeckillResult(queueId)
+
+    // 3. 获取签名（防止请求被篡改）
     let sign: string | undefined
     let timestamp: number | undefined
     try {
@@ -183,29 +188,35 @@ async function handleSeckill() {
     } catch (e) {
       console.error('获取签名失败', e)
       ElMessage.error('获取签名失败，请刷新页面重试')
+      eventSource?.close()
+      eventSource = null
+      queueing.value = false
       return
     }
 
-    // 3. 调用抢购接口
+    // 4. 调用抢购接口（携带queueId确保SSE通知能送达）
     const res = await seckillApi.buy({
       goodsId: activity.value.goods.id,
       activityId: activity.value.id,
       sign,
       timestamp,
-      idempotentKey
+      idempotentKey,
+      queueId  // 传入前端生成的queueId
     })
 
-    // 4. 处理响应
-    if (res.code === 200 && res.data.queueId) {
-      // 抢购请求入队成功，开始 SSE 订阅等待结果
-      queueing.value = true  // 显示排队模态窗
-      subscribeSeckillResult(res.data.queueId)
-    } else {
+    // 5. 处理响应（等待SSE通知即可）
+    if (res.code !== 200) {
       ElMessage.error(res.message || '抢购失败')
+      eventSource?.close()
+      eventSource = null
+      queueing.value = false
     }
   } catch (error) {
     console.error('抢购失败', error)
     ElMessage.error('抢购失败，请稍后重试')
+    eventSource?.close()
+    eventSource = null
+    queueing.value = false
   } finally {
     seckilling.value = false
   }

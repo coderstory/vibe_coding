@@ -136,8 +136,10 @@ public class SeckillServiceImpl implements SeckillService {
      */
     @Override
     public SeckillResponse seckill(SeckillRequest request, Long userId) {
-        // 生成唯一队列ID，用于追踪请求状态
-        String queueId = UUID.randomUUID().toString();
+        // 优先使用前端传入的 queueId，否则自动生成
+        String queueId = request.getQueueId() != null && !request.getQueueId().isEmpty()
+                ? request.getQueueId()
+                : UUID.randomUUID().toString();
         log.info("开始处理秒杀请求: userId={}, goodsId={}, activityId={}, queueId={}",
                 userId, request.getGoodsId(), request.getActivityId(), queueId);
 
