@@ -12,6 +12,7 @@ import cn.coderstory.springboot.seckill.entity.SeckillActivity;
 import cn.coderstory.springboot.seckill.mapper.SeckillActivityMapper;
 import cn.coderstory.springboot.seckill.service.SignService;
 import cn.coderstory.springboot.seckill.service.SeckillService;
+import cn.coderstory.springboot.sse.SeckillSseService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -100,6 +101,9 @@ public class SeckillServiceImpl implements SeckillService {
 
     /** 订单事务消息生产者 */
     private final OrderTransactionProducer orderTransactionProducer;
+
+    /** SSE 服务，用于实时推送秒杀结果 */
+    private final SeckillSseService sseService;
 
     /** 分布式锁服务 */
     private final DistributedLockService distributedLockService;
@@ -220,6 +224,9 @@ public class SeckillServiceImpl implements SeckillService {
                 // 注意：这里不直接返回失败，因为 Redis 库存已经扣减
                 // 需要依赖 MQ 的回查机制或者定时对账来保证一致性
             }
+
+            // 发送排队中状态，前端可以建立 SSE 连接等待结果
+            sseService.sendWaiting(queueId, "请求已接收，正在处理中");
 
             // 返回排队中状态，前端可以通过 queueId 查询结果
             return SeckillResponse.queued(queueId);
