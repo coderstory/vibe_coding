@@ -136,10 +136,12 @@ public class SeckillServiceImpl implements SeckillService {
      */
     @Override
     public SeckillResponse seckill(SeckillRequest request, Long userId) {
-        // 优先使用前端传入的 queueId，否则自动生成
-        String queueId = request.getQueueId() != null && !request.getQueueId().isEmpty()
-                ? request.getQueueId()
-                : UUID.randomUUID().toString();
+        // 前端必须提供 queueId，用于 SSE 通知
+        if (request.getQueueId() == null || request.getQueueId().isEmpty()) {
+            log.warn("缺少queueId，前端未建立SSE连接，拒绝执行秒杀");
+            return SeckillResponse.failed("请求参数错误");
+        }
+        String queueId = request.getQueueId();
         log.info("开始处理秒杀请求: userId={}, goodsId={}, activityId={}, queueId={}",
                 userId, request.getGoodsId(), request.getActivityId(), queueId);
 
