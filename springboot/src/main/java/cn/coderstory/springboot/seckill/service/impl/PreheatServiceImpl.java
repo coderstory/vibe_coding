@@ -102,8 +102,9 @@ public class PreheatServiceImpl implements PreheatService {
         status.put("activityId", activityId);
 
         String activityKey = ACTIVITY_KEY_PREFIX + activityId;
-        String activityStatus = redisTemplate.opsForValue().get(activityKey);
-        status.put("activityPreheat", activityStatus != null);
+        // 使用 opsForHash().hasKey() 检查 Hash key 是否存在，而不是 opsForValue().get()
+        Boolean hasKey = redisTemplate.opsForHash().hasKey(activityKey);
+        status.put("activityPreheat", Boolean.TRUE.equals(hasKey));
 
         LambdaQueryWrapper<SeckillGoods> goodsQuery = new LambdaQueryWrapper<>();
         goodsQuery.eq(SeckillGoods::getActivityId, activityId);
