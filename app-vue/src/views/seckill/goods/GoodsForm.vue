@@ -32,7 +32,7 @@ const activityList = ref<any[]>([])
 async function loadActivities() {
   try {
     const res = await activityApi.list()
-    activityList.value = res.data || []
+    activityList.value = res.data?.records || []
   } catch (e) {
     console.error('加载活动列表失败', e)
   }

@@ -7,7 +7,7 @@
  * - 支持按状态筛选
  * - 新增/编辑/删除/发布活动
  */
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onActivated } from 'vue'
 import { activityApi } from '@/api/seckill'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
@@ -72,8 +72,9 @@ async function handlePublish(id: number) {
     ElMessage.success('发布成功')
     loadActivities()
   } catch (e) {
-    if (e !== 'cancel') {
-      ElMessage.error('发布失败')
+    // 错误消息已由 axios 拦截器通过 ElMessage 显示，此处无需重复处理
+    if (e === 'cancel') {
+      // 用户取消确认对话框，不做任何处理
     }
   }
 }
@@ -87,8 +88,9 @@ async function handleEnd(id: number) {
     ElMessage.success('结束成功')
     loadActivities()
   } catch (e) {
-    if (e !== 'cancel') {
-      ElMessage.error('结束失败')
+    // 错误消息已由 axios 拦截器通过 ElMessage 显示，此处无需重复处理
+    if (e === 'cancel') {
+      // 用户取消确认对话框，不做任何处理
     }
   }
 }
@@ -102,8 +104,9 @@ async function handleDelete(id: number) {
     ElMessage.success('删除成功')
     loadActivities()
   } catch (e) {
-    if (e !== 'cancel') {
-      ElMessage.error('删除失败')
+    // 错误消息已由 axios 拦截器通过 ElMessage 显示，此处无需重复处理
+    if (e === 'cancel') {
+      // 用户取消确认对话框，不做任何处理
     }
   }
 }
@@ -120,6 +123,11 @@ function handleSizeChange(size: number) {
 }
 
 onMounted(() => {
+  loadActivities()
+})
+
+// keep-alive 缓存激活时刷新数据
+onActivated(() => {
   loadActivities()
 })
 </script>

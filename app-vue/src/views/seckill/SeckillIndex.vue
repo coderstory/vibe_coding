@@ -10,8 +10,7 @@
  * @description 秒杀活动入口页面
  */
 import { ref, onMounted } from 'vue'
-import { activityApi } from '@/api/activity'
-import type { Activity } from '@/api/activity'
+import { activityApi, type Activity } from '@/api/seckill'
 
 /** 活动列表数据 */
 const activities = ref<Activity[]>([])
@@ -24,6 +23,9 @@ const loading = ref(false)
 onMounted(async () => {
   loading.value = true
   try {
+    const res = await activityApi.list()
+    activities.value = res.data?.records || []
+  } catch {
     activities.value = []
   } finally {
     loading.value = false

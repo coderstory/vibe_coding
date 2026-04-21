@@ -209,13 +209,13 @@ export const seckillApi = {
   },
 
   /**
-   * 获取商品当前库存
+   * 获取活动总库存（从 Redis 获取预热数据）
    *
-   * @param goodsId 商品ID
+   * @param activityId 活动ID
    * @returns 库存数量
    */
-  getStock(goodsId: number) {
-    return request.get<{ stock: number }>(`/seckill/stock/${goodsId}`)
+  getStock(activityId: number) {
+    return request.get<{ stock: number }>(`/seckill/activity/${activityId}/stock`)
   }
 }
 

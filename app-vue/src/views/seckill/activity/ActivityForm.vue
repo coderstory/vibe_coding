@@ -7,7 +7,7 @@
  * - 表单验证
  * - 保存后返回列表
  */
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { activityApi } from '@/api/seckill'
 import { ElMessage } from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
@@ -91,12 +91,37 @@ function handleCancel() {
 }
 
 onMounted(() => {
+  checkRouteAndInit()
+})
+
+// 监听路由变化，解决新增页面保留编辑数据的问题
+watch(
+  () => route.params.id,
+  () => {
+    checkRouteAndInit()
+  }
+)
+
+function checkRouteAndInit() {
   const id = route.params.id
   if (id) {
     isEdit.value = true
     loadActivity(Number(id))
+  } else {
+    // 新增模式，重置表单
+    isEdit.value = false
+    form.value = {
+      name: '',
+      description: '',
+      startTime: '',
+      endTime: '',
+      status: 0,
+      perLimit: 1,
+      enableCaptcha: true,
+      enableIpLimit: true
+    }
   }
-})
+}
 </script>
 
 <template>

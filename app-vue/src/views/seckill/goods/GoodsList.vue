@@ -8,7 +8,7 @@
  * - 支持搜索
  * - 新增/编辑/删除商品
  */
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onActivated } from 'vue'
 import { goodsApi, type SeckillGoods } from '@/api/goods'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
@@ -52,8 +52,9 @@ async function handleDelete(id: number) {
     ElMessage.success('删除成功')
     loadGoods()
   } catch (e) {
-    if (e !== 'cancel') {
-      ElMessage.error('删除失败')
+    // 错误消息已由 axios 拦截器通过 ElMessage 显示，此处无需重复处理
+    if (e === 'cancel') {
+      // 用户取消确认对话框，不做任何处理
     }
   }
 }
@@ -70,6 +71,11 @@ function handleSizeChange(size: number) {
 }
 
 onMounted(() => {
+  loadGoods()
+})
+
+// keep-alive 缓存激活时刷新数据
+onActivated(() => {
   loadGoods()
 })
 </script>
