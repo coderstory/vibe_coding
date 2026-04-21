@@ -79,6 +79,15 @@ async function handlePublish(id: number) {
   }
 }
 
+async function handlePreheat(id: number) {
+  try {
+    await activityApi.preheat(id)
+    ElMessage.success('预热成功，Redis数据已更新')
+  } catch (e) {
+    // 错误由拦截器处理
+  }
+}
+
 async function handleEnd(id: number) {
   try {
     await ElMessageBox.confirm('确定结束该活动吗？', '提示', {
@@ -163,7 +172,7 @@ onActivated(() => {
             {{ row.perLimit }} 件/人
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="250" fixed="right">
+        <el-table-column label="操作" width="300" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleEdit(row.id!)">编辑</el-button>
             <el-button
@@ -181,6 +190,13 @@ onActivated(() => {
               @click="handleEnd(row.id!)"
             >
               结束
+            </el-button>
+            <el-button
+              type="info"
+              link
+              @click="handlePreheat(row.id!)"
+            >
+              预热
             </el-button>
             <el-button type="danger" link @click="handleDelete(row.id!)">删除</el-button>
           </template>
