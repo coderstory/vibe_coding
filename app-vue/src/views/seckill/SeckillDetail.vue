@@ -198,7 +198,6 @@ async function handleSeckill() {
     // 4. 处理响应
     if (res.code === 200 && res.data.queueId) {
       // 抢购请求入队成功，开始 SSE 订阅等待结果
-      ElMessage.info('正在处理您的请求，请稍候...')
       queueing.value = true  // 显示排队模态窗
       subscribeSeckillResult(res.data.queueId)
     } else {

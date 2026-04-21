@@ -74,7 +74,7 @@ public class OrderTransactionProducer {
                     order.setCreateTime(java.time.LocalDateTime.now());
                     orderMapper.insert(order);
 
-                    sendStockDeductMsg(goodsId, 1);
+                    sendStockDeductMsg(goodsId, 1, queueId);
 
                     return org.apache.rocketmq.client.producer.LocalTransactionState.COMMIT_MESSAGE;
                 } catch (Exception e) {
@@ -112,8 +112,8 @@ public class OrderTransactionProducer {
         transactionProducer.sendMessageInTransaction(msg, null);
     }
 
-    public void sendStockDeductMsg(Long goodsId, Integer quantity) {
-        String message = goodsId + ":" + quantity;
+    public void sendStockDeductMsg(Long goodsId, Integer quantity, String queueId) {
+        String message = goodsId + ":" + quantity + ":" + queueId;
         log.info("发送库存扣减消息: {}", message);
         rocketMQTemplate.convertAndSend(STOCK_DEDUCT_TOPIC, message);
     }
