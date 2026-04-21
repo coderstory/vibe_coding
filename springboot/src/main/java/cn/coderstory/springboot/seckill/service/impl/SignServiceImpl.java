@@ -5,11 +5,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.time.Duration;
 import java.util.Base64;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -17,29 +19,47 @@ import java.util.concurrent.TimeUnit;
 public class SignServiceImpl implements SignService {
     private final StringRedisTemplate redisTemplate;
     private static final long SIGN_EXPIRE_MS = 5 * 60 * 1000;
+    private static final String BITMAP_KEY_PREFIX = "seckill:sign:bitmap:";
 
     @Override
     public SignResult generateSign(Long userId, Long goodsId, String activitySignKey) {
         long timestamp = System.currentTimeMillis();
         String content = userId + ":" + goodsId + ":" + timestamp;
         String sign = hmacSHA256(content, activitySignKey);
-        String signKey = "seckill:sign:" + sign;
-        redisTemplate.opsForValue().set(signKey, "1", 5, TimeUnit.MINUTES);
         return new SignResult(sign, timestamp);
     }
 
     @Override
-    public boolean verifySign(String sign, long timestamp) {
+    public boolean verifySign(String sign, long timestamp, Long activityId, Duration duration) {
         if (System.currentTimeMillis() - timestamp > SIGN_EXPIRE_MS) {
             return false;
         }
-        String signKey = "seckill:sign:" + sign;
-        Boolean used = redisTemplate.hasKey(signKey);
-        if (Boolean.TRUE.equals(used)) {
+
+        String bitmapKey = BITMAP_KEY_PREFIX + activityId;
+        long bitOffset = hashToBitOffset(sign);
+
+        Boolean existed = redisTemplate.opsForValue().getBit(bitmapKey, bitOffset);
+        if (Boolean.TRUE.equals(existed)) {
             return false;
         }
-        redisTemplate.opsForValue().set(signKey, "used", 1, TimeUnit.MINUTES);
+
+        redisTemplate.opsForValue().setBit(bitmapKey, bitOffset, true);
+        redisTemplate.expire(bitmapKey, duration);
         return true;
+    }
+
+    private long hashToBitOffset(String sign) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] digest = md.digest(sign.getBytes(StandardCharsets.UTF_8));
+            long hash = 0;
+            for (int i = 0; i < 4; i++) {
+                hash = (hash << 8) | (digest[i] & 0xFF);
+            }
+            return Math.abs(hash);
+        } catch (Exception e) {
+            throw new RuntimeException("MD5计算失败", e);
+        }
     }
 
     private String hmacSHA256(String data, String key) {

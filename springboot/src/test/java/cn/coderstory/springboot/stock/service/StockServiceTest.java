@@ -14,16 +14,6 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * StockService 集成测试
- *
- * 使用 @SpringBootTest 进行集成测试，连接实际 Redis 和 MySQL
- * 测试数据会在 @AfterEach 中清理
- *
- * @author system
- * @version 1.0
- * @since 2026-04-20
- */
 @SpringBootTest(classes = SpringbootApplication.class)
 @DisplayName("StockService 集成测试")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -73,7 +63,7 @@ class StockServiceTest {
     @DisplayName("应能正确初始化库存")
     void shouldInitializeStock() {
         Long goodsId = generateTestGoodsId();
-        addRedisKey("seckill:stock:" + goodsId);
+        addRedisKey("seckill:stock:cache:" + goodsId);
 
         boolean result = stockService.initStock(goodsId, 100);
 
@@ -86,7 +76,7 @@ class StockServiceTest {
     @DisplayName("应能正确获取库存")
     void shouldGetCorrectStock() {
         Long goodsId = generateTestGoodsId();
-        addRedisKey("seckill:stock:" + goodsId);
+        addRedisKey("seckill:stock:cache:" + goodsId);
 
         stockService.initStock(goodsId, 100);
 
@@ -100,7 +90,7 @@ class StockServiceTest {
     @DisplayName("应能正确扣减库存")
     void shouldDeductStock() {
         Long goodsId = generateTestGoodsId();
-        addRedisKey("seckill:stock:" + goodsId);
+        addRedisKey("seckill:stock:cache:" + goodsId);
 
         stockService.initStock(goodsId, 100);
 
@@ -115,7 +105,7 @@ class StockServiceTest {
     @DisplayName("库存不足时应扣减失败")
     void shouldFailWhenInsufficientStock() {
         Long goodsId = generateTestGoodsId();
-        addRedisKey("seckill:stock:" + goodsId);
+        addRedisKey("seckill:stock:cache:" + goodsId);
 
         stockService.initStock(goodsId, 5);
 
@@ -130,7 +120,7 @@ class StockServiceTest {
     @DisplayName("应能正确回滚库存")
     void shouldRollbackStock() {
         Long goodsId = generateTestGoodsId();
-        addRedisKey("seckill:stock:" + goodsId);
+        addRedisKey("seckill:stock:cache:" + goodsId);
 
         stockService.initStock(goodsId, 100);
 
@@ -148,7 +138,7 @@ class StockServiceTest {
     @DisplayName("库存为零时应扣减失败")
     void shouldFailWhenStockIsZero() {
         Long goodsId = generateTestGoodsId();
-        addRedisKey("seckill:stock:" + goodsId);
+        addRedisKey("seckill:stock:cache:" + goodsId);
 
         stockService.initStock(goodsId, 0);
 

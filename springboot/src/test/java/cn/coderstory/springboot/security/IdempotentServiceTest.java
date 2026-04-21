@@ -12,16 +12,6 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * IdempotentService 集成测试
- *
- * 使用 @SpringBootTest 进行集成测试，连接实际 Redis
- * 测试数据会在 @AfterEach 中清理
- *
- * @author system
- * @version 1.0
- * @since 2026-04-20
- */
 @SpringBootTest(classes = SpringbootApplication.class)
 @DisplayName("IdempotentService 集成测试")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -44,7 +34,7 @@ class IdempotentServiceTest {
     }
 
     private String addTestKey(String key) {
-        testKeys.add(key);
+        testKeys.add("seckill:idempotent:semaphore:" + key);
         return key;
     }
 
