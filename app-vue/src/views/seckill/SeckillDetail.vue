@@ -122,10 +122,10 @@ async function loadActivity() {
  * 响应数据格式：直接是数字，不是 { stock: number }
  */
 async function loadStock() {
-  // 使用商品的ID查询库存
-  if (!activity.value?.goods?.id) return
+  // 使用活动的ID查询库存（后端接口期望 activityId）
+  if (!activity.value?.id) return
   try {
-    const res = await seckillApi.getStock(activity.value.goods.id)
+    const res = await seckillApi.getStock(activity.value.id)
     if (res.code === 200) {
       stock.value = res.data // 直接是库存数字
     }
