@@ -326,9 +326,10 @@ export interface Goods {
 }
 
 /**
- * 活动详情数据结构（包含商品列表）
+ * 活动详情数据结构（包含商品信息）
  *
- * 用于秒杀详情页，显示活动信息及关联的所有商品
+ * 用于秒杀详情页，显示活动信息及关联的商品
+ * 一个活动只关联一个商品
  */
 export interface ActivityDetail {
   /** 活动ID */
@@ -355,8 +356,8 @@ export interface ActivityDetail {
   createTime: string
   /** 更新时间 */
   updateTime: string
-  /** 关联的商品列表 */
-  goodsList: Goods[]
+  /** 关联的商品 */
+  goods: Goods
 }
 
 /**

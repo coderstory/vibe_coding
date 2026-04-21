@@ -118,25 +118,21 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     /**
-     * 获取活动详情（包含商品列表）
+     * 获取活动详情（包含商品信息）
      *
-     * 用于秒杀详情页，返回活动信息及所有关联商品
-     * 商品信息用于展示和用户选择要抢购的商品
+     * 用于秒杀详情页，返回活动信息及关联的商品
+     * 一个活动只关联一个商品
      *
      * @param activityId 活动ID
-     * @return 活动详情（含商品列表）
+     * @return 活动详情（含商品信息）
      */
     @Override
     public ActivityDetailVO getActivityDetail(Long activityId) {
         // 先获取活动基本信息（带缓存）
         SeckillActivity activity = getActivity(activityId);
 
-        // 查询关联的商品列表
-        List<SeckillGoods> goodsList = goodsService.getGoodsListByActivity(
-                new LambdaQueryWrapper<SeckillGoods>()
-                        .eq(SeckillGoods::getActivityId, activityId)
-                        .orderByDesc(SeckillGoods::getCreateTime)
-        );
+        // 查询关联的商品（一个活动只关联一个商品）
+        SeckillGoods goods = goodsService.getGoodsByActivityId(activityId);
 
         // 构建 VO 对象
         ActivityDetailVO detailVO = new ActivityDetailVO();
@@ -152,7 +148,7 @@ public class ActivityServiceImpl implements ActivityService {
         detailVO.setSignKey(activity.getSignKey());
         detailVO.setCreateTime(activity.getCreateTime());
         detailVO.setUpdateTime(activity.getUpdateTime());
-        detailVO.setGoodsList(goodsList);
+        detailVO.setGoods(goods);
 
         return detailVO;
     }

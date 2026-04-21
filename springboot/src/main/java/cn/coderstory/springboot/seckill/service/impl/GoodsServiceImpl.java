@@ -76,6 +76,13 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
+    public SeckillGoods getGoodsByActivityId(Long activityId) {
+        return goodsMapper.selectOne(new LambdaQueryWrapper<SeckillGoods>()
+                .eq(SeckillGoods::getActivityId, activityId)
+                .last("LIMIT 1"));
+    }
+
+    @Override
     public List<SeckillGoods> getGoodsListByActivity(LambdaQueryWrapper<SeckillGoods> wrapper) {
         return goodsMapper.selectList(wrapper);
     }

@@ -30,11 +30,8 @@ const router = useRouter()
 
 // ==================== 响应式数据 ====================
 
-/** 活动详情（从后端获取，包含商品列表） */
+/** 活动详情（从后端获取，包含商品信息） */
 const activity = ref<ActivityDetail | null>(null)
-
-/** 当前选中的商品 */
-const selectedGoods = ref<Goods | null>(null)
 
 /** 商品库存（从 Redis 获取，显示实时库存） */
 const stock = ref(0)
@@ -103,10 +100,6 @@ async function loadActivity() {
     const res = await activityApi.getDetail(id)
     if (res.code === 200) {
       activity.value = res.data
-      // 默认选中第一个商品
-      if (res.data.goodsList && res.data.goodsList.length > 0) {
-        selectedGoods.value = res.data.goodsList[0]
-      }
       // 活动信息加载成功后，获取库存
       await loadStock()
     } else {
@@ -129,24 +122,16 @@ async function loadActivity() {
  * 响应数据格式：直接是数字，不是 { stock: number }
  */
 async function loadStock() {
-  // 使用选中的商品ID查询库存
-  if (!selectedGoods.value?.id) return
+  // 使用商品的ID查询库存
+  if (!activity.value?.goods?.id) return
   try {
-    const res = await seckillApi.getStock(selectedGoods.value.id)
+    const res = await seckillApi.getStock(activity.value.goods.id)
     if (res.code === 200) {
       stock.value = res.data // 直接是库存数字
     }
   } catch (error) {
     console.error('加载库存失败', error)
   }
-}
-
-/**
- * 选择商品时更新库存显示
- */
-function selectGoods(goods: Goods) {
-  selectedGoods.value = goods
-  loadStock()
 }
 
 // ==================== 抢购流程 ====================
@@ -167,8 +152,8 @@ async function handleSeckill() {
     return
   }
 
-  if (!selectedGoods.value) {
-    ElMessage.warning('请先选择要抢购的商品')
+  if (!activity.value.goods) {
+    ElMessage.warning('商品信息加载中，请稍后')
     return
   }
 
@@ -191,7 +176,7 @@ async function handleSeckill() {
     let sign: string | undefined
     let timestamp: number | undefined
     try {
-      const signRes = await seckillApi.getSign(activity.value.id)
+      const signRes = await seckillApi.getSign(activity.value.goods.id)
       if (signRes.code === 200) {
         sign = signRes.data.sign
         timestamp = signRes.data.timestamp
@@ -200,10 +185,10 @@ async function handleSeckill() {
       console.warn('获取签名失败，使用无签名模式', e)
     }
 
-    // 3. 调用抢购接口（使用用户选择的商品ID）
+    // 3. 调用抢购接口（使用商品的ID）
     const res = await seckillApi.buy({
-      goodsId: selectedGoods.value.id,   // 使用选中的商品ID
-      activityId: activity.value.id,   // 活动ID
+      goodsId: activity.value.goods.id,   // 使用商品的ID
+      activityId: activity.value.id,      // 活动ID
       sign,
       timestamp,
       idempotentKey
@@ -345,27 +330,19 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- 商品列表 -->
-        <div v-if="activity.goodsList && activity.goodsList.length > 0" class="goods-section">
+        <!-- 商品信息 -->
+        <div v-if="activity.goods" class="goods-section">
           <h3>秒杀商品</h3>
-          <div class="goods-list">
-            <div
-              v-for="goods in activity.goodsList"
-              :key="goods.id"
-              class="goods-item"
-              :class="{ selected: selectedGoods?.id === goods.id }"
-              @click="selectGoods(goods)"
-            >
-              <img v-if="goods.imageUrl" :src="goods.imageUrl" class="goods-image" />
-              <div v-else class="goods-image goods-image-placeholder">暂无图片</div>
-              <div class="goods-info">
-                <div class="goods-name">{{ goods.name }}</div>
-                <div class="goods-price">
-                  <span class="seckill-price">￥{{ goods.seckillPrice }}</span>
-                  <span class="original-price">￥{{ goods.originalPrice }}</span>
-                </div>
-                <div class="goods-stock">库存：{{ goods.stock }}</div>
+          <div class="goods-card">
+            <img v-if="activity.goods.imageUrl" :src="activity.goods.imageUrl" class="goods-image" />
+            <div v-else class="goods-image goods-image-placeholder">暂无图片</div>
+            <div class="goods-info">
+              <div class="goods-name">{{ activity.goods.name }}</div>
+              <div class="goods-price">
+                <span class="seckill-price">￥{{ activity.goods.seckillPrice }}</span>
+                <span class="original-price">￥{{ activity.goods.originalPrice }}</span>
               </div>
+              <div class="goods-stock">库存：{{ activity.goods.stock }}</div>
             </div>
           </div>
         </div>
@@ -380,7 +357,7 @@ onUnmounted(() => {
         <!-- 操作按钮 -->
         <div class="action-buttons">
           <el-button
-            v-if="activity.status === 1 && selectedGoods"
+            v-if="activity.status === 1 && activity.goods"
             type="danger"
             size="large"
             :loading="seckilling"
@@ -495,36 +472,20 @@ onUnmounted(() => {
   color: #333;
 }
 
-.goods-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
-}
-
-.goods-item {
-  border: 2px solid #eee;
+.goods-card {
+  display: flex;
+  gap: 20px;
+  padding: 16px;
+  border: 1px solid #eee;
   border-radius: 8px;
-  padding: 12px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.goods-item:hover {
-  border-color: #ddd;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.goods-item.selected {
-  border-color: #f56c6c;
-  background: #fff5f5;
+  background: #fafafa;
 }
 
 .goods-image {
-  width: 100%;
-  height: 120px;
+  width: 200px;
+  height: 200px;
   object-fit: cover;
-  border-radius: 4px;
-  margin-bottom: 8px;
+  border-radius: 8px;
 }
 
 .goods-image-placeholder {
@@ -533,42 +494,42 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   color: #999;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .goods-info {
-  text-align: center;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .goods-name {
-  font-size: 14px;
+  font-size: 20px;
   font-weight: 500;
   color: #333;
-  margin-bottom: 8px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .goods-price {
-  margin-bottom: 4px;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
 }
 
 .seckill-price {
-  font-size: 18px;
+  font-size: 28px;
   color: #f56c6c;
   font-weight: bold;
-  margin-right: 8px;
 }
 
 .original-price {
-  font-size: 12px;
+  font-size: 16px;
   color: #999;
   text-decoration: line-through;
 }
 
 .goods-stock {
-  font-size: 12px;
+  font-size: 16px;
   color: #666;
 }
 

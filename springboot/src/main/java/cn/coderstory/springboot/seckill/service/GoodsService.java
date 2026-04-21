@@ -26,6 +26,15 @@ public interface GoodsService {
     long countByActivityId(Long activityId);
 
     /**
+     * 获取活动关联的商品
+     * 一个活动只关联一个商品
+     *
+     * @param activityId 活动ID
+     * @return 商品信息，不存在返回 null
+     */
+    SeckillGoods getGoodsByActivityId(Long activityId);
+
+    /**
      * 获取活动关联的商品列表
      *
      * @param wrapper 查询条件（应包含 activityId 条件）
