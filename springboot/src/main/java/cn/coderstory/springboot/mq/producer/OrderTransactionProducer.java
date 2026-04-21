@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 import jakarta.annotation.PostConstruct;
 import cn.coderstory.springboot.order.entity.Order;
 import cn.coderstory.springboot.order.mapper.OrderMapper;
+import cn.coderstory.springboot.seckill.entity.SeckillGoods;
+import cn.coderstory.springboot.seckill.mapper.SeckillGoodsMapper;
 import java.util.UUID;
 
 @Slf4j
@@ -20,14 +22,16 @@ public class OrderTransactionProducer {
 
     private final RocketMQTemplate rocketMQTemplate;
     private final OrderMapper orderMapper;
+    private final SeckillGoodsMapper goodsMapper;
     private TransactionMQProducer transactionProducer;
 
     @Value("${rocketmq.name-server}")
     private String nameServer;
 
-    public OrderTransactionProducer(RocketMQTemplate rocketMQTemplate, OrderMapper orderMapper) {
+    public OrderTransactionProducer(RocketMQTemplate rocketMQTemplate, OrderMapper orderMapper, SeckillGoodsMapper goodsMapper) {
         this.rocketMQTemplate = rocketMQTemplate;
         this.orderMapper = orderMapper;
+        this.goodsMapper = goodsMapper;
     }
 
     @PostConstruct
@@ -58,6 +62,13 @@ public class OrderTransactionProducer {
                     order.setActivityId(activityId);
                     order.setQueueId(queueId);
                     order.setQuantity(1);
+
+                    // 查询商品价格
+                    SeckillGoods goods = goodsMapper.selectById(goodsId);
+                    if (goods != null) {
+                        order.setPrice(goods.getSeckillPrice());
+                    }
+
                     order.setStatus(0);
                     order.setCreateTime(java.time.LocalDateTime.now());
                     orderMapper.insert(order);
