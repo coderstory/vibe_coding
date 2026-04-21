@@ -32,6 +32,8 @@ public class StockConsumer implements RocketMQListener<String> {
         boolean success = stockService.deductStock(goodsId, quantity);
         if (success) {
             log.info("库存扣减成功: goodsId={}, quantity={}", goodsId, quantity);
+            // 通知前端抢购成功（库存扣减成功意味着整个流程成功）
+            sseService.sendSuccess(queueId, null, "抢购成功");
         } else {
             log.error("库存扣减失败: goodsId={}, quantity={}", goodsId, quantity);
             // 通知前端库存扣减失败
