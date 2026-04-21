@@ -122,15 +122,12 @@ async function loadActivity() {
  * 响应数据格式：直接是数字，不是 { stock: number }
  */
 async function loadStock() {
-  // 使用活动的ID查询库存（后端接口期望 activityId）
   if (!activity.value?.id) {
     ElMessage.warning('活动信息加载中')
     return
   }
   try {
-    console.log('正在加载库存, activityId:', activity.value.id)
     const res = await seckillApi.getStock(activity.value.id)
-    console.log('库存数据:', res.data)
     stock.value = res.data
   } catch (error) {
     console.error('加载库存失败', error)
@@ -170,14 +167,27 @@ async function handleSeckill() {
 
   try {
     // 1. 生成幂等键
-    // 格式: user_{userId}_{activityId}_{timestamp}
-    // 后端用这个键做幂等校验，防止用户重复提交
     const idempotentKey = `user_${Date.now()}_${activity.value.id}`
 
-    // 2. 调用抢购接口（签名是可选的，后端会自动跳过验证）
+    // 2. 获取签名（防止请求被篡改）
+    let sign: string | undefined
+    let timestamp: number | undefined
+    try {
+      const signRes = await seckillApi.getSign(activity.value.goods.id)
+      sign = signRes.data.sign
+      timestamp = signRes.data.timestamp
+    } catch (e) {
+      console.error('获取签名失败', e)
+      ElMessage.error('获取签名失败，请刷新页面重试')
+      return
+    }
+
+    // 3. 调用抢购接口
     const res = await seckillApi.buy({
-      goodsId: activity.value.goods.id,   // 使用商品的ID
-      activityId: activity.value.id,      // 活动ID
+      goodsId: activity.value.goods.id,
+      activityId: activity.value.id,
+      sign,
+      timestamp,
       idempotentKey
     })
 

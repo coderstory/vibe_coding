@@ -1,8 +1,14 @@
 package cn.coderstory.springboot.seckill.controller;
 
+import cn.coderstory.springboot.exception.BusinessException;
 import cn.coderstory.springboot.seckill.dto.SeckillRequest;
 import cn.coderstory.springboot.seckill.dto.SeckillResponse;
+import cn.coderstory.springboot.seckill.entity.SeckillActivity;
+import cn.coderstory.springboot.seckill.entity.SeckillGoods;
+import cn.coderstory.springboot.seckill.mapper.SeckillActivityMapper;
+import cn.coderstory.springboot.seckill.mapper.SeckillGoodsMapper;
 import cn.coderstory.springboot.seckill.service.SeckillService;
+import cn.coderstory.springboot.seckill.service.SignService;
 import cn.coderstory.springboot.security.IdempotentService;
 import cn.coderstory.springboot.vo.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +40,9 @@ public class SeckillController {
 
     private final SeckillService seckillService;
     private final IdempotentService idempotentService;
+    private final SignService signService;
+    private final SeckillGoodsMapper goodsMapper;
+    private final SeckillActivityMapper activityMapper;
 
     /**
      * 秒杀下单接口
@@ -78,6 +87,33 @@ public class SeckillController {
             .status(0)
             .message("排队中")
             .build());
+    }
+
+    /**
+     * 获取秒杀签名
+     *
+     * 用于防止请求被篡改和重放攻击
+     *
+     * @param goodsId 商品ID
+     * @param userId 用户ID（从请求头获取）
+     * @return 签名结果 { sign: 签名, timestamp: 时间戳 }
+     */
+    @GetMapping("/sign/{goodsId}")
+    public ApiResponse<SignService.SignResult> getSign(
+            @PathVariable Long goodsId,
+            @RequestHeader("X-User-Id") Long userId) {
+        // 通过商品ID找到活动ID和签名密钥
+        SeckillGoods goods = goodsMapper.selectById(goodsId);
+        if (goods == null) {
+            throw BusinessException.notFound("商品不存在");
+        }
+        SeckillActivity activity = activityMapper.selectById(goods.getActivityId());
+        if (activity == null || activity.getSignKey() == null) {
+            throw BusinessException.notFound("活动不存在或未发布");
+        }
+        // 生成签名
+        SignService.SignResult result = signService.generateSign(userId, goodsId, activity.getSignKey());
+        return ApiResponse.success(result);
     }
 
     /**
