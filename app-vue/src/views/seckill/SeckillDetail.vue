@@ -23,6 +23,7 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { Loading } from '@element-plus/icons-vue'
 import { seckillApi, activityApi, type ActivityDetail, type Goods, type SeckillResponse } from '@/api/seckill'
 
 const route = useRoute()
@@ -44,6 +45,9 @@ const seckilling = ref(false)
 
 /** SSE 连接实例（用于取消连接） */
 let eventSource: EventSource | null = null
+
+/** 是否正在排队中（显示模态窗） */
+const queueing = ref(false)
 
 // ==================== 计算属性 ====================
 
@@ -195,6 +199,7 @@ async function handleSeckill() {
     if (res.code === 200 && res.data.queueId) {
       // 抢购请求入队成功，开始 SSE 订阅等待结果
       ElMessage.info('正在处理您的请求，请稍候...')
+      queueing.value = true  // 显示排队模态窗
       subscribeSeckillResult(res.data.queueId)
     } else {
       ElMessage.error(res.message || '抢购失败')
@@ -235,6 +240,7 @@ function subscribeSeckillResult(queueId: string) {
     queueId,
     // 消息回调：处理秒杀结果
     (data: SeckillResponse) => {
+      queueing.value = false  // 关闭模态窗
       if (data.status === 1) {
         // status=1: 抢购成功
         ElMessage.success('恭喜！抢购成功！')
@@ -254,6 +260,7 @@ function subscribeSeckillResult(queueId: string) {
     },
     // 错误回调：处理连接异常
     (error: Event) => {
+      queueing.value = false  // 关闭模态窗
       console.error('SSE 连接错误', error)
       ElMessage.warning('实时通知连接中断，请刷新页面重试')
     }
@@ -399,6 +406,23 @@ onUnmounted(() => {
         <el-button type="primary" @click="loadActivity">重新加载</el-button>
       </div>
     </el-card>
+
+    <!-- 排队中模态窗 -->
+    <el-dialog
+      v-model="queueing"
+      title="正在处理您的请求"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :show-close="false"
+      width="300px"
+      center
+    >
+      <div style="text-align: center; padding: 20px 0;">
+        <el-icon class="is-loading" size="48"><Loading /></el-icon>
+        <p style="margin-top: 16px; color: #666;">排队中，请稍候...</p>
+        <p style="margin-top: 8px; color: #999; font-size: 12px;">请勿关闭页面或刷新</p>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
