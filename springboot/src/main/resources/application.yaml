@@ -1,136 +1,144 @@
 # ===========================================
-# RocketMQ 5.3.2 配置
+# RocketMQ 消息队列配置
+# 用于秒杀订单的异步消息处理
 # ===========================================
 rocketmq:
-  name-server: localhost:9876
+  name-server: localhost:9876          # RocketMQ NameServer 地址
   producer:
-    group: seckill_producer_group
-    send-message-timeout: 3000
+    group: seckill_producer_group    # 生产者组名称
+    send-message-timeout: 3000       # 发送消息超时时间（毫秒）
+
 # ===========================================
-# 应用基础配置
+# Spring Boot 应用配置
 # ===========================================
 spring:
   application:
-    name: admin-system
+    name: admin-system                # 应用名称
 
   # 文件上传配置
   servlet:
     multipart:
-      max-file-size: 20MB
-      max-request-size: 20MB
+      max-file-size: 20MB           # 单个文件最大大小
+      max-request-size: 20MB         # 请求最大大小
 
   # ===========================================
   # Flyway 数据库迁移配置
   # ===========================================
   flyway:
-    enabled: true
-    baseline-on-migrate: true
-    baseline-description: "init"
-    baseline-version: "0"
-    locations: classpath:db/migration
+    enabled: true                   # 启用 Flyway 自动迁移
+    baseline-on-migrate: true       # 新数据库自动创建基线
+    baseline-version: "0"            # 基线版本号
+    locations: classpath:db/migration # 迁移脚本路径
 
   # ===========================================
-  # 数据源配置 (MySQL)
+  # 数据源配置（MySQL）
   # ===========================================
   datasource:
     url: jdbc:mysql://localhost:3306/admin_system?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
-    username: root
-    password: "123456"
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 连接参数说明：
+    # - useUnicode=true: 使用 Unicode 字符集
+    # - characterEncoding=utf-8: 字符编码为 UTF-8
+    # - serverTimezone=Asia/Shanghai: 服务器时区设为上海
+    # - allowPublicKeyRetrieval=true: 允许获取公钥（MySQL 8.x 兼容）
+    # - useSSL=false: 禁用 SSL 连接
+    username: root                   # 数据库用户名
+    password: 123456                # 数据库密码
+    driver-class-name: com.mysql.cj.jdbc.Driver  # MySQL 驱动类
     hikari:
-      minimum-idle: 5
-      maximum-pool-size: 20
-      idle-timeout: 600000
-      max-lifetime: 1800000
-      connection-timeout: 30000
+      minimum-idle: 5              # 最小空闲连接数
+      maximum-pool-size: 20         # 最大连接池大小
+      idle-timeout: 600000          # 空闲连接超时（毫秒）
+      max-lifetime: 1800000         # 连接最大生命周期（毫秒）
+      connection-timeout: 30000      # 获取连接超时时间（毫秒）
 
   # ===========================================
   # Redis 配置
+  # 用于缓存、分布式锁、限流等
   # ===========================================
   data:
     redis:
-      host: localhost
-      port: 6379
-      password:
-      database: 0
-      timeout: 3000ms
+      host: localhost               # Redis 服务器地址
+      port: 6379                   # Redis 端口
+      password: ""                   # Redis 密码（为空表示无密码）
+      database: 0                    # 使用的数据库编号
+      timeout: 3000ms                # 操作超时时间
       lettuce:
         pool:
-          max-active: 20
-          max-idle: 10
-          min-idle: 5
-          max-wait: 3000ms
-
-
-
-  # ===========================================
-  # Redisson 配置
-  # ===========================================
-  redisson:
-    single-server-config:
-      address: redis://localhost:6379
-      connection-minimum-idle-size: 5
-      connection-pool-size: 20
-      idle-connection-timeout: 10000
-      connect-timeout: 10000
-      timeout: 3000
-      retry-attempts: 3
-      retry-interval: 1500
+          max-active: 20            # 最大活跃连接数
+          max-idle: 10               # 最大空闲连接数
+          min-idle: 5                # 最小空闲连接数
+          max-wait: 3000ms           # 获取连接最大等待时间
 
 # ===========================================
-# 秒杀业务专用配置
+# Redisson 分布式锁配置
+# Redisson 是 Redis 的高级客户端，提供分布式锁等数据结构
+# ===========================================
+redisson:
+  single-server-config:
+    address: redis://localhost:6379  # Redis 服务器地址
+    connection-minimum-idle-size: 5  # 最小空闲连接数
+    connection-pool-size: 20         # 连接池大小
+    idle-connection-timeout: 10000    # 空闲连接超时（毫秒）
+    connect-timeout: 10000           # 连接超时（毫秒）
+    timeout: 3000                    # 操作超时（毫秒）
+    retry-attempts: 3                # 重试次数
+    retry-interval: 1500             # 重试间隔（毫秒）
+
+# ===========================================
+# 秒杀业务配置
 # ===========================================
 seckill:
   limiter:
-    qps: 1000
-    concurrency: 500
-    ip-rate: 100
+    qps: 1000                      # 全局 QPS 限制（每秒请求数）
+    concurrency: 500               # 最大并发数
+    ip-rate: 100                   # 单个 IP 的 QPS 限制
   lock:
-    wait-time: 5
-    lease-time: 10
+    wait-time: 5                  # 获取锁最大等待时间（秒）
+    lease-time: 10                 # 锁自动释放时间（秒）
   order:
-    timeout: 900
+    timeout: 900                   # 订单支付超时时间（秒），默认 15 分钟
   sse:
-    timeout: 300000
+    timeout: 300000               # SSE 连接超时时间（毫秒），约 5 分钟
 
 # ===========================================
 # MyBatis Plus 配置
 # ===========================================
 mybatis-plus:
   configuration:
-    map-underscore-to-camel-case: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-  mapper-locations: classpath:mapper/*.xml
+    map-underscore-to-camel-case: true  # 开启下划线转驼峰命名
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # SQL 日志输出到控制台
+  mapper-locations: classpath:mapper/*.xml  # Mapper XML 文件路径
   global-config:
     db-config:
-      logic-delete-field: deleted
-      logic-delete-value: 1
-      logic-not-delete-value: 0
+      logic-delete-field: deleted    # 逻辑删除字段名
+      logic-delete-value: 1         # 删除标记值
+      logic-not-delete-value: 0      # 未删除标记值
 
 # ===========================================
 # 服务器配置
 # ===========================================
 server:
-  port: 8080
+  port: 8080                       # 服务端口号
 
 # ===========================================
 # 安全配置
 # ===========================================
 security:
   whitelist: /api/auth/**,/api/knowledge/files/**
+  # 无需认证的接口路径（多个用逗号分隔）
 
 # ===========================================
-# JWT 配置
+# JWT 认证配置
 # ===========================================
 jwt:
-  secret: mySecretKeyForJwtTokenGeneration123456789
-  expiration: 86400000
-  refresh-expiration: 604800000
+  secret: mySecretKeyForJwtTokenGeneration123456789  # JWT 签名密钥（生产环境应使用更复杂的密钥）
+  expiration: 86400000         # Access Token 过期时间（毫秒），24 小时
+  refresh-expiration: 604800000 # Refresh Token 过期时间（毫秒），7 天
 
 # ===========================================
 # 日志配置
 # ===========================================
 logging:
   level:
-    cn.coderstory: debug
-    org.flywaydb: DEBUG
+    cn.coderstory: DEBUG           # 应用日志级别
+    org.flywaydb: DEBUG           # Flyway 数据库迁移日志级别
