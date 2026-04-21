@@ -14,8 +14,8 @@ import java.util.function.Supplier;
  * - 提供便捷的带锁执行模板方法
  *
  * 锁键命名规范：
- * - 秒杀活动锁: seckill:activity:{activityId}
- * - 商品库存锁: seckill:stock:{goodsId}
+ * - 秒杀活动锁: seckill:lock:activity:{activityId}
+ * - 商品库存锁: seckill:lock:stock:{goodsId}
  * - 用户订单锁: seckill:order:{userId}:{goodsId}
  *
  * @author system
@@ -32,7 +32,7 @@ public interface DistributedLockService {
      *
      * @example
      * <pre>
-     *     RLock lock = lockService.getLock("seckill:stock:1");
+     *     RLock lock = lockService.getLock("seckill:lock:stock:1");
      *     if (lock != null && lock.tryLock()) {
      *         try {
      *             // 业务逻辑
@@ -80,7 +80,7 @@ public interface DistributedLockService {
      *
      * @example
      * <pre>
-     *     lockService.unlock("seckill:stock:1");
+     *     lockService.unlock("seckill:lock:stock:1");
      * </pre>
      */
     void unlock(String lockKey);
@@ -102,7 +102,7 @@ public interface DistributedLockService {
      *
      * @example
      * <pre>
-     *     String result = lockService.executeWithLock("seckill:stock:1", () -> {
+     *     String result = lockService.executeWithLock("seckill:lock:stock:1", () -> {
      *         // 库存扣减业务逻辑
      *         return stockService.deductStock(goodsId, quantity);
      *     });

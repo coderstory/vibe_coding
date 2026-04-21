@@ -59,7 +59,7 @@ public class DistributedLockServiceImpl implements DistributedLockService {
     private static final String ACTIVITY_LOCK_PREFIX = "seckill:lock:activity:";
 
     /** 商品库存锁前缀 */
-    private static final String STOCK_LOCK_PREFIX = "seckill:stock:";
+    private static final String STOCK_LOCK_PREFIX = "seckill:lock:stock:";
 
     /** 用户订单锁前缀 */
     private static final String ORDER_LOCK_PREFIX = "seckill:order:";

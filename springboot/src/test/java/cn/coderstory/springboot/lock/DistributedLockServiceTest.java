@@ -142,8 +142,8 @@ class DistributedLockServiceTest {
     @Order(6)
     @DisplayName("锁键前缀应正确生成")
     void lockKeyPrefixShouldBeCorrect() {
-        assertEquals("seckill:activity:123", "seckill:activity:" + 123L);
-        assertEquals("seckill:stock:456", "seckill:stock:" + 456L);
+        assertEquals("seckill:lock:activity:123", "seckill:lock:activity:" + 123L);
+        assertEquals("seckill:lock:stock:456", "seckill:lock:stock:" + 456L);
         assertEquals("seckill:order:1:100", "seckill:order:" + 1L + ":" + 100L);
     }
 }
