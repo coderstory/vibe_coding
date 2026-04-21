@@ -31,6 +31,7 @@ public class OrderTransactionProducer {
     @PostConstruct
     public void init() {
         transactionProducer = new TransactionMQProducer("seckill_order_producer");
+        transactionProducer.setNamesrvAddr("localhost:9876");
         transactionProducer.setTransactionListener(new TransactionListener() {
             @Override
             public org.apache.rocketmq.client.producer.LocalTransactionState executeLocalTransaction(Message msg, Object arg) {
@@ -77,6 +78,14 @@ public class OrderTransactionProducer {
                 return org.apache.rocketmq.client.producer.LocalTransactionState.COMMIT_MESSAGE;
             }
         });
+
+        // 启动生产者
+        try {
+            transactionProducer.start();
+            log.info("TransactionMQProducer 启动成功");
+        } catch (Exception e) {
+            log.error("TransactionMQProducer 启动失败", e);
+        }
     }
 
     private static final String ORDER_CREATE_TOPIC = "seckill_order_create";
