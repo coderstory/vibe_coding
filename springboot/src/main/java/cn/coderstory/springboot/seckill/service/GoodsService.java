@@ -13,4 +13,12 @@ public interface GoodsService {
     SeckillGoods updateGoods(Long id, SeckillGoods goods);
 
     boolean deleteGoods(Long id);
+
+    /**
+     * 统计活动关联的商品数量
+     *
+     * @param activityId 活动ID
+     * @return 商品数量
+     */
+    long countByActivityId(Long activityId);
 }

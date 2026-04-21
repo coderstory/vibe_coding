@@ -67,4 +67,10 @@ public class GoodsServiceImpl implements GoodsService {
     public boolean deleteGoods(Long id) {
         return goodsMapper.deleteById(id) > 0;
     }
+
+    @Override
+    public long countByActivityId(Long activityId) {
+        return goodsMapper.selectCount(new LambdaQueryWrapper<SeckillGoods>()
+                .eq(SeckillGoods::getActivityId, activityId));
+    }
 }
