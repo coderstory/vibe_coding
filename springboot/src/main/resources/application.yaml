@@ -15,6 +15,14 @@ spring:
   application:
     name: admin-system                # 应用名称
 
+  # ===========================================
+  # 虚拟线程配置（Java 21+）
+  # 虚拟线程可以大幅减少线程内存开销，支持海量并发连接
+  # ===========================================
+  threads:
+    virtual:
+      enabled: true                 # 启用虚拟线程
+
   # 文件上传配置
   servlet:
     multipart:
