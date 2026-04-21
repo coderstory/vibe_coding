@@ -228,7 +228,7 @@ export const seckillApi = {
   ): EventSource {
     // 建立 SSE 连接
     // 路径格式: /api/seckill/subscribe/{queueId}
-    const eventSource = new EventSource(`/seckill/subscribe/${queueId}`)
+    const eventSource = new EventSource(`/api/seckill/subscribe/${queueId}`)
 
     // 连接成功
     eventSource.onopen = () => {
