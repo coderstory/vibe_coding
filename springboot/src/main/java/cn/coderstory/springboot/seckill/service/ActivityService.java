@@ -19,4 +19,12 @@ public interface ActivityService {
     boolean endActivity(Long activityId);
 
     boolean publishActivity(Long activityId);
+
+    /**
+     * 获取活动总库存（所有关联商品的库存之和）
+     *
+     * @param activityId 活动ID
+     * @return 总库存数量
+     */
+    int getActivityStock(Long activityId);
 }

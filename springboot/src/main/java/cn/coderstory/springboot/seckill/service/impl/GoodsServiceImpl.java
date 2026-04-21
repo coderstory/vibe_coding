@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -72,5 +73,10 @@ public class GoodsServiceImpl implements GoodsService {
     public long countByActivityId(Long activityId) {
         return goodsMapper.selectCount(new LambdaQueryWrapper<SeckillGoods>()
                 .eq(SeckillGoods::getActivityId, activityId));
+    }
+
+    @Override
+    public List<SeckillGoods> getGoodsListByActivity(LambdaQueryWrapper<SeckillGoods> wrapper) {
+        return goodsMapper.selectList(wrapper);
     }
 }

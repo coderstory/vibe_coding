@@ -45,4 +45,15 @@ public class SeckillActivityController {
     public ApiResponse<Boolean> publishActivity(@PathVariable Long id) {
         return ApiResponse.success(activityService.publishActivity(id));
     }
+
+    /**
+     * 获取活动总库存
+     *
+     * @param id 活动ID
+     * @return 活动总库存数量
+     */
+    @GetMapping("/{id}/stock")
+    public ApiResponse<Integer> getActivityStock(@PathVariable Long id) {
+        return ApiResponse.success(activityService.getActivityStock(id));
+    }
 }
