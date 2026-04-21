@@ -9,15 +9,15 @@ export interface Cart {
 
 export const cartApi = {
   getMyCart() {
-    return request.get<Cart[]>('/api/cart/my')
+    return request.get<Cart[]>('/cart/my')
   },
   addToCart(goodsId: number, quantity: number = 1) {
-    return request.post('/api/cart/add', null, { params: { goodsId, quantity } })
+    return request.post('/cart/add', null, { params: { goodsId, quantity } })
   },
   removeFromCart(goodsId: number) {
-    return request.delete<Boolean>(`/api/cart/${goodsId}`)
+    return request.delete<Boolean>(`/cart/${goodsId}`)
   },
   clearCart() {
-    return request.delete('/api/cart/clear')
+    return request.delete('/cart/clear')
   }
 }

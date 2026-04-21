@@ -75,7 +75,7 @@ export const seckillApi = {
    * ```
    */
   buy(data: SeckillRequest) {
-    return request.post<SeckillResponse>('/api/seckill/buy', data)
+    return request.post<SeckillResponse>('/seckill/buy', data)
   },
 
   /**
@@ -97,7 +97,7 @@ export const seckillApi = {
    * ```
    */
   getResult(queueId: string) {
-    return request.get<SeckillResponse>(`/api/seckill/result/${queueId}`)
+    return request.get<SeckillResponse>(`/seckill/result/${queueId}`)
   },
 
   /**
@@ -122,7 +122,7 @@ export const seckillApi = {
    * ```
    */
   getSign(goodsId: number) {
-    return request.get<{ sign: string; timestamp: number }>(`/api/seckill/sign/${goodsId}`)
+    return request.get<{ sign: string; timestamp: number }>(`/seckill/sign/${goodsId}`)
   },
 
   /**
@@ -161,7 +161,7 @@ export const seckillApi = {
     onMessage?: (data: SeckillResponse) => void,
     onError?: (error: Event) => void
   ): EventSource {
-    const eventSource = new EventSource(`/api/seckill/subscribe/${queueId}`)
+    const eventSource = new EventSource(`/seckill/subscribe/${queueId}`)
 
     // 连接成功
     eventSource.onopen = () => {
@@ -215,7 +215,7 @@ export const seckillApi = {
    * @returns 库存数量
    */
   getStock(goodsId: number) {
-    return request.get<{ stock: number }>(`/api/seckill/stock/${goodsId}`)
+    return request.get<{ stock: number }>(`/seckill/stock/${goodsId}`)
   }
 }
 
@@ -235,12 +235,14 @@ export interface Activity {
 
 export const activityApi = {
   /**
-   * 获取活动列表
+   * 获取活动分页列表
    *
-   * @returns 秒杀活动列表
+   * @param page 页码
+   * @param size 每页数量
+   * @returns 分页后的活动列表
    */
-  list() {
-    return request.get<Activity[]>('/api/activity/list')
+  list(page: number = 1, size: number = 20) {
+    return request.get<{ records: Activity[]; total: number }>(`/seckill/activity`, { params: { page, size } })
   },
 
   /**
@@ -250,7 +252,48 @@ export const activityApi = {
    * @returns 活动详情
    */
   get(id: number) {
-    return request.get<Activity>(`/api/activity/${id}`)
+    return request.get<Activity>(`/seckill/activity/${id}`)
+  },
+
+  /**
+   * 创建活动
+   *
+   * @param data 活动参数
+   * @returns 创建的活动
+   */
+  create(data: Partial<Activity>) {
+    return request.post<Activity>('/seckill/activity', data)
+  },
+
+  /**
+   * 更新活动
+   *
+   * @param id 活动ID
+   * @param data 活动参数
+   * @returns 更新后的活动
+   */
+  update(id: number, data: Partial<Activity>) {
+    return request.put<Activity>(`/seckill/activity/${id}`, data)
+  },
+
+  /**
+   * 删除活动
+   *
+   * @param id 活动ID
+   * @returns 删除结果
+   */
+  delete(id: number) {
+    return request.delete<boolean>(`/seckill/activity/${id}`)
+  },
+
+  /**
+   * 发布活动
+   *
+   * @param id 活动ID
+   * @returns 发布结果
+   */
+  publish(id: number) {
+    return request.post<boolean>(`/seckill/activity/${id}/publish`)
   },
 
   /**
@@ -259,7 +302,7 @@ export const activityApi = {
    * @param id 活动ID
    */
   start(id: number) {
-    return request.post<void>(`/api/activity/${id}/start`)
+    return request.post<boolean>(`/activity/${id}/start`)
   },
 
   /**
@@ -268,7 +311,7 @@ export const activityApi = {
    * @param id 活动ID
    */
   end(id: number) {
-    return request.post<void>(`/api/activity/${id}/end`)
+    return request.post<boolean>(`/activity/${id}/end`)
   },
 
   /**
@@ -277,6 +320,15 @@ export const activityApi = {
    * @param activityId 活动ID
    */
   reserve(activityId: number) {
-    return request.post<void>(`/api/activity/${activityId}/reserve`)
+    return request.post<void>(`/activity/${activityId}/reserve`)
+  },
+
+  /**
+   * 预热活动数据
+   *
+   * @param activityId 活动ID
+   */
+  preheat(activityId: number) {
+    return request.post<any>(`/seckill/preheat/${activityId}`)
   }
 }

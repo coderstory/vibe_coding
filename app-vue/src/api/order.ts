@@ -15,12 +15,12 @@ export interface Order {
 
 export const orderApi = {
   getMyOrders() {
-    return request.get<Order[]>('/api/order/my')
+    return request.get<Order[]>('/order/my')
   },
   payOrder(orderNo: string) {
-    return request.post<Boolean>(`/api/order/${orderNo}/pay`)
+    return request.post<Boolean>(`/order/${orderNo}/pay`)
   },
   cancelOrder(orderNo: string) {
-    return request.post<Boolean>(`/api/order/${orderNo}/cancel`)
+    return request.post<Boolean>(`/order/${orderNo}/cancel`)
   }
 }

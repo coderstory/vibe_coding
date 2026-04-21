@@ -32,13 +32,25 @@ function onTokenRefreshed(token: string) {
 }
 
 /**
- * 请求拦截器 - 添加 token
+ * 请求拦截器 - 添加 token 和用户 ID
  */
 request.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = localStorage.getItem('token')
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`
+    }
+    // 添加用户 ID 到请求头，供后端获取当前用户
+    const userStr = localStorage.getItem('user')
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr)
+        if (user.id) {
+          config.headers['X-User-Id'] = String(user.id)
+        }
+      } catch (e) {
+        // 忽略解析错误
+      }
     }
     return config
   },

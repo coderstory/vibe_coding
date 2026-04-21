@@ -13,12 +13,12 @@ export interface GoodsStockInfo {
 
 export const monitorApi = {
   getMetrics() {
-    return request.get<MonitorMetrics>('/api/monitor/metrics')
+    return request.get<MonitorMetrics>('/monitor/metrics')
   },
   getGoodsStock(goodsId: number) {
-    return request.get<GoodsStockInfo>(`/api/monitor/stock/${goodsId}`)
+    return request.get<GoodsStockInfo>(`/monitor/stock/${goodsId}`)
   },
   health() {
-    return request.get<{ status: string }>('/api/monitor/health')
+    return request.get<{ status: string }>('/monitor/health')
   }
 }

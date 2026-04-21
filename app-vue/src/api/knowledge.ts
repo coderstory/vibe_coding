@@ -4,7 +4,7 @@
  * 模块说明：
  * 提供知识库文章的 CRUD、分类管理、标签管理、文件管理等功能接口
  *
- * API 端点前缀：/api/knowledge
+ * API 端点前缀：/api/knowledge（已在 request.ts 的 baseURL 中配置）
  *
  * @module api/knowledge
  */
@@ -65,7 +65,7 @@ export function deleteCategory(id: number) {
  * @returns 分页后的文章列表
  */
 export function getArticlePage(params: ArticleQueryParams) {
-  return request.get<ApiResponse<PageResult<KnowledgeArticle>>>('/knowledge/articles', { params })
+  return request.get<ApiResponse<PageResult<KnowledgeArticle>>>(`/knowledge/articles`, { params })
 }
 
 /**

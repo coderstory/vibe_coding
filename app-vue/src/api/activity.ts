@@ -4,7 +4,7 @@
  * 模块说明：
  * 提供秒杀活动的 CRUD 操作接口
  *
- * API 端点前缀：/api/activity
+ * API 端点前缀：/api/activity（已在 request.ts 的 baseURL 中配置）
  *
  * @module api/activity
  */
@@ -41,7 +41,7 @@ export const activityApi = {
    * @returns 秒杀活动列表
    */
   getActivity(id: number) {
-    return request.get<Activity>(`/api/activity/${id}`)
+    return request.get<Activity>(`/activity/${id}`)
   },
 
   /**
@@ -49,7 +49,7 @@ export const activityApi = {
    * @param id - 活动 ID
    */
   startActivity(id: number) {
-    return request.post<Boolean>(`/api/activity/${id}/start`)
+    return request.post<Boolean>(`/activity/${id}/start`)
   },
 
   /**
@@ -57,6 +57,6 @@ export const activityApi = {
    * @param id - 活动 ID
    */
   endActivity(id: number) {
-    return request.post<Boolean>(`/api/activity/${id}/end`)
+    return request.post<Boolean>(`/activity/${id}/end`)
   }
 }
