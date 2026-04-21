@@ -133,7 +133,7 @@ server:
 # 安全配置
 # ===========================================
 security:
-  whitelist: /api/auth/**,/api/knowledge/files/**
+  whitelist: /api/auth/**,/api/knowledge/files/**,/api/seckill/subscribe/**,/api/seckill/unsubscribe/**
   # 无需认证的接口路径（多个用逗号分隔）
 
 # ===========================================
