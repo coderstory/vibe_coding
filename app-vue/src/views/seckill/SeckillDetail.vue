@@ -75,16 +75,16 @@ async function loadActivity() {
  * 加载商品库存
  */
 async function loadStock() {
-  if (!activity.value?.id) return
-  try {
-    const res = await seckillApi.getStock(activity.value.id)
-    if (res.code === 200) {
-      stock.value = res.data.stock
+    if (!activity.value?.id) return
+    try {
+      const res = await seckillApi.getStock(activity.value.id)
+      if (res.code === 200) {
+        stock.value = res.data // data 直接是库存数字，不是 { stock: number }
+      }
+    } catch (error) {
+      console.error('加载库存失败', error)
     }
-  } catch (error) {
-    console.error('加载库存失败', error)
   }
-}
 
 /**
  * 执行秒杀抢购
