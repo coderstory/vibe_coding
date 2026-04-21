@@ -55,8 +55,8 @@ public class DistributedLockServiceImpl implements DistributedLockService {
 
     // ==================== 锁键前缀常量 ====================
 
-    /** 秒杀活动锁前缀 */
-    private static final String ACTIVITY_LOCK_PREFIX = "seckill:activity:";
+    /** 秒杀活动锁前缀（与活动数据key区分） */
+    private static final String ACTIVITY_LOCK_PREFIX = "seckill:lock:activity:";
 
     /** 商品库存锁前缀 */
     private static final String STOCK_LOCK_PREFIX = "seckill:stock:";
