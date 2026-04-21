@@ -38,6 +38,7 @@ public class OrderTransactionProducer {
     public void init() {
         transactionProducer = new TransactionMQProducer("seckill_order_producer");
         transactionProducer.setNamesrvAddr(nameServer);
+        transactionProducer.setTransactionListener(new TransactionListener() {
             @Override
             public org.apache.rocketmq.client.producer.LocalTransactionState executeLocalTransaction(Message msg, Object arg) {
                 byte[] payload = msg.getBody();
