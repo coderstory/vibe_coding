@@ -174,27 +174,10 @@ async function handleSeckill() {
     // 后端用这个键做幂等校验，防止用户重复提交
     const idempotentKey = `user_${Date.now()}_${activity.value.id}`
 
-    // 2. 获取签名（可选增强安全性）
-    // 签名 = HMAC(activityId + userId + timestamp, signKey)
-    // 后端会验证签名是否正确、是否过期
-    let sign: string | undefined
-    let timestamp: number | undefined
-    try {
-      const signRes = await seckillApi.getSign(activity.value.goods.id)
-      if (signRes.code === 200) {
-        sign = signRes.data.sign
-        timestamp = signRes.data.timestamp
-      }
-    } catch (e) {
-      console.warn('获取签名失败，使用无签名模式', e)
-    }
-
-    // 3. 调用抢购接口（使用商品的ID）
+    // 2. 调用抢购接口（签名是可选的，后端会自动跳过验证）
     const res = await seckillApi.buy({
       goodsId: activity.value.goods.id,   // 使用商品的ID
       activityId: activity.value.id,      // 活动ID
-      sign,
-      timestamp,
       idempotentKey
     })
 
