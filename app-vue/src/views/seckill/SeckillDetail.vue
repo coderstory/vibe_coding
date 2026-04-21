@@ -123,14 +123,18 @@ async function loadActivity() {
  */
 async function loadStock() {
   // 使用活动的ID查询库存（后端接口期望 activityId）
-  if (!activity.value?.id) return
+  if (!activity.value?.id) {
+    ElMessage.warning('活动信息加载中')
+    return
+  }
   try {
+    console.log('正在加载库存, activityId:', activity.value.id)
     const res = await seckillApi.getStock(activity.value.id)
-    if (res.code === 200) {
-      stock.value = res.data // 直接是库存数字
-    }
+    console.log('库存数据:', res.data)
+    stock.value = res.data
   } catch (error) {
     console.error('加载库存失败', error)
+    ElMessage.error('加载库存失败，请重试')
   }
 }
 
