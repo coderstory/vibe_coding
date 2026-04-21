@@ -206,6 +206,8 @@ public class SeckillServiceImpl implements SeckillService {
 
             if (lockAcquired == null || !lockAcquired) {
                 log.warn("库存扣减失败或未获取到锁: goodsId={}", request.getGoodsId());
+                // 发送 SSE 失败通知
+                sseService.sendFailed(queueId, "库存不足");
                 return SeckillResponse.failed("库存不足");
             }
 
