@@ -177,7 +177,13 @@ public class SeckillServiceImpl implements SeckillService {
             // ========== 第五层：签名验证 ==========
             // 验证请求签名，防止非法请求
             if (request.getSign() != null && !request.getSign().isEmpty()) {
-                if (!signService.verifySign(request.getSign(), request.getTimestamp())) {
+                // 计算活动剩余时间作为签名过期时间
+                java.time.Duration duration = java.time.Duration.between(
+                    java.time.LocalDateTime.now(), activity.getEndTime());
+                if (duration.isNegative() || duration.isZero()) {
+                    duration = java.time.Duration.ofHours(2);
+                }
+                if (!signService.verifySign(request.getSign(), request.getTimestamp(), request.getActivityId(), duration)) {
                     log.warn("签名验证失败: userId={}, goodsId={}", userId, request.getGoodsId());
                     return SeckillResponse.failed("签名无效");
                 }
