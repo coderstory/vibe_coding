@@ -1,0 +1,15 @@
+{
+  "plugin": [
+    "superpowers@git+https://github.com/obra/superpowers.git"
+  ],
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "read": {
+      "D:/Data/桌面/vibe coding/.opencode/get-shit-done/*": "allow"
+    },
+    "external_directory": {
+      "D:/Data/桌面/vibe coding/.opencode/get-shit-done/*": "allow"
+    }
+  },
+  "mcp": {}
+}
