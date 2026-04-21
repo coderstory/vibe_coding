@@ -2,11 +2,22 @@
 /**
  * 秒杀详情页面
  *
- * 功能说明：
- * 1. 显示商品详细信息
- * 2. 显示活动倒计时
- * 3. 执行秒杀抢购
- * 4. SSE 实时接收结果
+ * 页面功能：
+ * 1. 展示秒杀活动的基本信息（名称、描述、时间、状态等）
+ * 2. 展示活动当前库存（从 Redis 实时读取）
+ * 3. 提供抢购按钮，参与秒杀活动
+ * 4. 支持 SSE 实时接收抢购结果
+ * 5. 支持活动预约（活动未开始时）
+ *
+ * 数据流向：
+ * - 活动详情: activityApi.get(id) -> 后端 ActivityService.getActivity()
+ * - 活动库存: seckillApi.getStock(id) -> 后端 PreheatService.getActivityStock()
+ * - 抢购结果: seckillApi.subscribeSeckillResult() -> SSE 推送
+ *
+ * 状态机：
+ * - status=0 (未开始): 显示"预约提醒"按钮
+ * - status=1 (进行中): 显示"立即抢购"按钮
+ * - status=2 (已结束): 按钮禁用，显示"活动已结束"
  */
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -16,19 +27,28 @@ import { seckillApi, activityApi, type Activity, type SeckillResponse } from '@/
 const route = useRoute()
 const router = useRouter()
 
-/** 活动详情 */
+// ==================== 响应式数据 ====================
+
+/** 活动详情（从后端获取） */
 const activity = ref<Activity | null>(null)
-/** 商品库存 */
+
+/** 商品库存（从 Redis 获取，显示实时库存） */
 const stock = ref(0)
-/** 加载状态 */
+
+/** 页面加载状态（控制 v-loading） */
 const loading = ref(false)
-/** 抢购中状态 */
+
+/** 抢购按钮加载状态（防止重复点击） */
 const seckilling = ref(false)
-/** SSE 连接 */
+
+/** SSE 连接实例（用于取消连接） */
 let eventSource: EventSource | null = null
+
+// ==================== 计算属性 ====================
 
 /**
  * 活动状态文本
+ * 用于页面展示，如"未开始"、"进行中"、"已结束"
  */
 const statusText = computed(() => {
   if (!activity.value) return '加载中'
@@ -37,7 +57,11 @@ const statusText = computed(() => {
 })
 
 /**
- * 活动状态类型（用于标签颜色）
+ * 活动状态类型
+ * 用于 Element Plus 标签组件的颜色映射
+ * - warning: 未开始（黄色）
+ * - success: 进行中（绿色）
+ * - info: 已结束（灰色）
  */
 const statusType = computed(() => {
   if (!activity.value) return 'info'
@@ -45,15 +69,27 @@ const statusType = computed(() => {
   return map[activity.value.status] || 'info'
 })
 
+// ==================== 工具函数 ====================
+
 /**
- * 格式化时间
+ * 格式化时间字符串为可读格式
+ *
+ * @param time ISO 格式时间字符串（如 "2024-01-15T10:30:00"）
+ * @returns 中文格式时间字符串（如 "2024/1/15 上午10:30:00"）
  */
 function formatTime(time: string) {
   return new Date(time).toLocaleString('zh-CN')
 }
 
+// ==================== 数据加载 ====================
+
 /**
  * 加载活动详情
+ *
+ * 流程：
+ * 1. 从 URL 参数获取活动 ID
+ * 2. 调用 activityApi.get() 获取活动信息
+ * 3. 活动信息加载成功后，再调用 loadStock() 获取库存
  */
 async function loadActivity() {
   loading.value = true
@@ -62,32 +98,50 @@ async function loadActivity() {
     const res = await activityApi.get(id)
     if (res.code === 200) {
       activity.value = res.data
+      // 活动信息加载成功后，获取库存
       await loadStock()
+    } else {
+      ElMessage.error(res.message || '加载活动详情失败')
     }
   } catch (error) {
-    ElMessage.error('加载活动详情失败')
+    console.error('加载活动详情失败', error)
+    ElMessage.error('加载活动详情失败，请重试')
   } finally {
     loading.value = false
   }
 }
 
 /**
- * 加载商品库存
+ * 加载活动库存
+ *
+ * 库存数据来自 Redis（预热时写入），不是数据库
+ * 这样可以支撑高并发的库存查询
+ *
+ * 响应数据格式：直接是数字，不是 { stock: number }
  */
 async function loadStock() {
-    if (!activity.value?.id) return
-    try {
-      const res = await seckillApi.getStock(activity.value.id)
-      if (res.code === 200) {
-        stock.value = res.data // data 直接是库存数字，不是 { stock: number }
-      }
-    } catch (error) {
-      console.error('加载库存失败', error)
+  if (!activity.value?.id) return
+  try {
+    const res = await seckillApi.getStock(activity.value.id)
+    if (res.code === 200) {
+      stock.value = res.data // 直接是库存数字
     }
+  } catch (error) {
+    console.error('加载库存失败', error)
   }
+}
+
+// ==================== 抢购流程 ====================
 
 /**
  * 执行秒杀抢购
+ *
+ * 完整流程：
+ * 1. 前端生成幂等键（防止重复提交）
+ * 2. 获取活动签名（可选，用于后端验证请求合法性）
+ * 3. 调用抢购接口 seckillApi.buy()
+ * 4. 如果返回 queueId，建立 SSE 连接监听结果
+ * 5. 根据 SSE 推送的结果显示成功/失败提示
  */
 async function handleSeckill() {
   if (!activity.value) {
@@ -103,10 +157,14 @@ async function handleSeckill() {
   seckilling.value = true
 
   try {
-    // 生成幂等键
+    // 1. 生成幂等键
+    // 格式: user_{userId}_{activityId}_{timestamp}
+    // 后端用这个键做幂等校验，防止用户重复提交
     const idempotentKey = `user_${Date.now()}_${activity.value.id}`
 
-    // 获取签名（可选）
+    // 2. 获取签名（可选增强安全性）
+    // 签名 = HMAC(activityId + userId + timestamp, signKey)
+    // 后端会验证签名是否正确、是否过期
     let sign: string | undefined
     let timestamp: number | undefined
     try {
@@ -119,7 +177,7 @@ async function handleSeckill() {
       console.warn('获取签名失败，使用无签名模式', e)
     }
 
-    // 调用秒杀接口
+    // 3. 调用抢购接口
     const res = await seckillApi.buy({
       goodsId: activity.value.id,
       activityId: activity.value.id,
@@ -128,8 +186,9 @@ async function handleSeckill() {
       idempotentKey
     })
 
+    // 4. 处理响应
     if (res.code === 200 && res.data.queueId) {
-      // 抢购请求成功，开始 SSE 订阅
+      // 抢购请求入队成功，开始 SSE 订阅等待结果
       ElMessage.info('正在处理您的请求，请稍候...')
       subscribeSeckillResult(res.data.queueId)
     } else {
@@ -144,46 +203,63 @@ async function handleSeckill() {
 }
 
 /**
- * 订阅秒杀结果（SSE）
+ * 订阅秒杀结果（SSE - Server-Sent Events）
  *
- * @param queueId 队列ID
+ * 为什么用 SSE 而不是轮询？
+ * - SSE 是服务端推送，实时性更好
+ * - 比轮询更省资源，不需要频繁发请求
+ *
+ * SSE 事件类型：
+ * - seckill_result: 最终结果（成功/失败）
+ * - seckill_status: 状态更新（如排队中、处理中）
+ * - heartbeat: 心跳（保持连接）
+ * - completed: 连接完成
+ *
+ * @param queueId 队列ID（从抢购接口返回）
  */
 function subscribeSeckillResult(queueId: string) {
-  // 关闭已有连接
+  // 关闭已有连接（如果用户重复点击）
   if (eventSource) {
     eventSource.close()
+    eventSource = null
   }
 
   // 建立 SSE 连接
+  // 格式: /api/seckill/subscribe/{queueId}
   eventSource = seckillApi.subscribeSeckillResult(
     queueId,
+    // 消息回调：处理秒杀结果
     (data: SeckillResponse) => {
       if (data.status === 1) {
-        // 抢购成功
+        // status=1: 抢购成功
         ElMessage.success('恭喜！抢购成功！')
-        // 跳转到购物车或订单页面
+        // 跳转到订单确认页面
         router.push('/order/confirm')
       } else if (data.status === 2) {
-        // 抢购失败
+        // status=2: 抢购失败
         ElMessage.error(data.message || '抢购失败')
       } else {
-        // 其他状态
+        // status=0: 排队中或其他状态
         ElMessage.info(data.message || '处理中...')
       }
 
-      // 关闭 SSE 连接
+      // 处理完毕，关闭连接
       eventSource?.close()
       eventSource = null
     },
+    // 错误回调：处理连接异常
     (error: Event) => {
       console.error('SSE 连接错误', error)
-      ElMessage.warning('实时通知连接中断，请刷新页面')
+      ElMessage.warning('实时通知连接中断，请刷新页面重试')
     }
   )
 }
 
 /**
- * 预约活动
+ * 预约活动（活动未开始时）
+ *
+ * 用户预约后，活动开始前会收到通知
+ * 预约信息存储在 Redis Set 中（seckill:reservation:{activityId}）
  */
 async function handleReserve() {
   if (!activity.value) return
@@ -192,22 +268,25 @@ async function handleReserve() {
     await activityApi.reserve(activity.value.id)
     ElMessage.success('预约成功，活动开始前会通知您')
   } catch (error) {
-    ElMessage.error('预约失败')
+    console.error('预约失败', error)
+    ElMessage.error('预约失败，请重试')
   }
 }
 
+// ==================== 生命周期 ====================
+
 /**
- * 组件挂载时
+ * 组件挂载时：加载活动详情
  */
 onMounted(() => {
   loadActivity()
 })
 
 /**
- * 组件卸载时
+ * 组件卸载时：清理 SSE 连接
+ * 防止用户切换页面后连接仍在，造成资源浪费
  */
 onUnmounted(() => {
-  // 关闭 SSE 连接
   if (eventSource) {
     eventSource.close()
     eventSource = null
