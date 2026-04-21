@@ -1,10 +1,22 @@
 package cn.coderstory.springboot.seckill.service;
 
 import cn.coderstory.springboot.seckill.entity.SeckillActivity;
+import cn.coderstory.springboot.seckill.vo.ActivityDetailVO;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
 public interface ActivityService {
     SeckillActivity getActivity(Long activityId);
+
+    /**
+     * 获取活动详情（包含商品列表）
+     *
+     * 用于秒杀详情页，展示活动信息及关联商品
+     * 一个活动可以关联多个商品
+     *
+     * @param activityId 活动ID
+     * @return 活动详情（含商品列表）
+     */
+    ActivityDetailVO getActivityDetail(Long activityId);
 
     IPage<SeckillActivity> getActivityPage(int page, int size);
 

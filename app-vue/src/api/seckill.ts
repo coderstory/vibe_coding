@@ -302,6 +302,64 @@ export const seckillApi = {
 // ==================== 活动管理接口 ====================
 
 /**
+ * 商品数据结构
+ *
+ * 与后端 SeckillGoods 实体对应
+ */
+export interface Goods {
+  /** 商品ID（自增） */
+  id: number
+  /** 关联的活动ID */
+  activityId: number
+  /** 商品名称 */
+  name: string
+  /** 商品原价 */
+  originalPrice: number
+  /** 秒杀价格 */
+  seckillPrice: number
+  /** 库存数量 */
+  stock: number
+  /** 已售数量 */
+  sold: number
+  /** 商品图片URL */
+  imageUrl: string
+}
+
+/**
+ * 活动详情数据结构（包含商品列表）
+ *
+ * 用于秒杀详情页，显示活动信息及关联的所有商品
+ */
+export interface ActivityDetail {
+  /** 活动ID */
+  id: number
+  /** 活动名称 */
+  name: string
+  /** 活动描述 */
+  description: string
+  /** 开始时间 */
+  startTime: string
+  /** 结束时间 */
+  endTime: string
+  /** 活动状态（0=未开始, 1=进行中, 2=已结束） */
+  status: number
+  /** 每人限购数量 */
+  perLimit: number
+  /** 是否启用验证码 */
+  enableCaptcha: boolean
+  /** 是否启用IP限制 */
+  enableIpLimit: boolean
+  /** 签名密钥 */
+  signKey: string
+  /** 创建时间 */
+  createTime: string
+  /** 更新时间 */
+  updateTime: string
+  /** 关联的商品列表 */
+  goodsList: Goods[]
+}
+
+/**
  * 活动数据结构
  *
  * 与后端 SeckillActivity 实体对应
@@ -392,6 +450,28 @@ export const activityApi = {
    */
   get(id: number) {
     return request.get<Activity>(`/seckill/activity/${id}`)
+  },
+
+  /**
+   * 获取活动详情（包含商品列表）
+   *
+   * 用于秒杀详情页，返回活动信息及关联的所有商品
+   * 用户可以选择要抢购的商品
+   *
+   * @param id 活动ID
+   * @returns 活动详情（含商品列表）
+   *
+   * @example
+   * ```typescript
+   * const res = await activityApi.getDetail(1)
+   * if (res.code === 200) {
+   *   console.log(res.data.name)  // 活动名称
+   *   console.log(res.data.goodsList) // 商品列表
+   * }
+   * ```
+   */
+  getDetail(id: number) {
+    return request.get<ActivityDetail>(`/seckill/activity/${id}/detail`)
   },
 
   /**

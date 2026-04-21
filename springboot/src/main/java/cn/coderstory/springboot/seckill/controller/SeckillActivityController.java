@@ -2,6 +2,7 @@ package cn.coderstory.springboot.seckill.controller;
 
 import cn.coderstory.springboot.seckill.entity.SeckillActivity;
 import cn.coderstory.springboot.seckill.service.ActivityService;
+import cn.coderstory.springboot.seckill.vo.ActivityDetailVO;
 import cn.coderstory.springboot.vo.ApiResponse;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,20 @@ public class SeckillActivityController {
     @GetMapping("/{id}")
     public ApiResponse<SeckillActivity> getActivity(@PathVariable Long id) {
         return ApiResponse.success(activityService.getActivity(id));
+    }
+
+    /**
+     * 获取活动详情（包含商品列表）
+     *
+     * 用于秒杀详情页，返回活动信息及关联的所有商品
+     * 用户可以选择要抢购的商品
+     *
+     * @param id 活动ID
+     * @return 活动详情（含商品列表）
+     */
+    @GetMapping("/{id}/detail")
+    public ApiResponse<ActivityDetailVO> getActivityDetail(@PathVariable Long id) {
+        return ApiResponse.success(activityService.getActivityDetail(id));
     }
 
     @PostMapping

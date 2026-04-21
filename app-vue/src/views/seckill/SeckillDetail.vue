@@ -4,13 +4,14 @@
  *
  * 页面功能：
  * 1. 展示秒杀活动的基本信息（名称、描述、时间、状态等）
- * 2. 展示活动当前库存（从 Redis 实时读取）
- * 3. 提供抢购按钮，参与秒杀活动
- * 4. 支持 SSE 实时接收抢购结果
- * 5. 支持活动预约（活动未开始时）
+ * 2. 展示活动关联的商品列表（用户选择要抢购的商品）
+ * 3. 展示商品库存（从 Redis 实时读取）
+ * 4. 提供抢购按钮，参与秒杀活动
+ * 5. 支持 SSE 实时接收抢购结果
+ * 6. 支持活动预约（活动未开始时）
  *
  * 数据流向：
- * - 活动详情: activityApi.get(id) -> 后端 ActivityService.getActivity()
+ * - 活动详情: activityApi.getDetail(id) -> 后端 ActivityService.getActivityDetail()
  * - 活动库存: seckillApi.getStock(id) -> 后端 PreheatService.getActivityStock()
  * - 抢购结果: seckillApi.subscribeSeckillResult() -> SSE 推送
  *
@@ -22,15 +23,18 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { seckillApi, activityApi, type Activity, type SeckillResponse } from '@/api/seckill'
+import { seckillApi, activityApi, type ActivityDetail, type Goods, type SeckillResponse } from '@/api/seckill'
 
 const route = useRoute()
 const router = useRouter()
 
 // ==================== 响应式数据 ====================
 
-/** 活动详情（从后端获取） */
-const activity = ref<Activity | null>(null)
+/** 活动详情（从后端获取，包含商品列表） */
+const activity = ref<ActivityDetail | null>(null)
+
+/** 当前选中的商品 */
+const selectedGoods = ref<Goods | null>(null)
 
 /** 商品库存（从 Redis 获取，显示实时库存） */
 const stock = ref(0)
@@ -88,16 +92,21 @@ function formatTime(time: string) {
  *
  * 流程：
  * 1. 从 URL 参数获取活动 ID
- * 2. 调用 activityApi.get() 获取活动信息
- * 3. 活动信息加载成功后，再调用 loadStock() 获取库存
+ * 2. 调用 activityApi.getDetail() 获取活动信息（含商品列表）
+ * 3. 活动信息加载成功后，默认选中第一个商品
+ * 4. 调用 loadStock() 获取库存
  */
 async function loadActivity() {
   loading.value = true
   try {
     const id = Number(route.params.id)
-    const res = await activityApi.get(id)
+    const res = await activityApi.getDetail(id)
     if (res.code === 200) {
       activity.value = res.data
+      // 默认选中第一个商品
+      if (res.data.goodsList && res.data.goodsList.length > 0) {
+        selectedGoods.value = res.data.goodsList[0]
+      }
       // 活动信息加载成功后，获取库存
       await loadStock()
     } else {
@@ -120,15 +129,24 @@ async function loadActivity() {
  * 响应数据格式：直接是数字，不是 { stock: number }
  */
 async function loadStock() {
-  if (!activity.value?.id) return
+  // 使用选中的商品ID查询库存
+  if (!selectedGoods.value?.id) return
   try {
-    const res = await seckillApi.getStock(activity.value.id)
+    const res = await seckillApi.getStock(selectedGoods.value.id)
     if (res.code === 200) {
       stock.value = res.data // 直接是库存数字
     }
   } catch (error) {
     console.error('加载库存失败', error)
   }
+}
+
+/**
+ * 选择商品时更新库存显示
+ */
+function selectGoods(goods: Goods) {
+  selectedGoods.value = goods
+  loadStock()
 }
 
 // ==================== 抢购流程 ====================
@@ -146,6 +164,11 @@ async function loadStock() {
 async function handleSeckill() {
   if (!activity.value) {
     ElMessage.warning('活动信息加载中，请稍后')
+    return
+  }
+
+  if (!selectedGoods.value) {
+    ElMessage.warning('请先选择要抢购的商品')
     return
   }
 
@@ -177,10 +200,10 @@ async function handleSeckill() {
       console.warn('获取签名失败，使用无签名模式', e)
     }
 
-    // 3. 调用抢购接口
+    // 3. 调用抢购接口（使用用户选择的商品ID）
     const res = await seckillApi.buy({
-      goodsId: activity.value.id,
-      activityId: activity.value.id,
+      goodsId: selectedGoods.value.id,   // 使用选中的商品ID
+      activityId: activity.value.id,   // 活动ID
       sign,
       timestamp,
       idempotentKey
@@ -322,6 +345,31 @@ onUnmounted(() => {
           </div>
         </div>
 
+        <!-- 商品列表 -->
+        <div v-if="activity.goodsList && activity.goodsList.length > 0" class="goods-section">
+          <h3>秒杀商品</h3>
+          <div class="goods-list">
+            <div
+              v-for="goods in activity.goodsList"
+              :key="goods.id"
+              class="goods-item"
+              :class="{ selected: selectedGoods?.id === goods.id }"
+              @click="selectGoods(goods)"
+            >
+              <img v-if="goods.imageUrl" :src="goods.imageUrl" class="goods-image" />
+              <div v-else class="goods-image goods-image-placeholder">暂无图片</div>
+              <div class="goods-info">
+                <div class="goods-name">{{ goods.name }}</div>
+                <div class="goods-price">
+                  <span class="seckill-price">￥{{ goods.seckillPrice }}</span>
+                  <span class="original-price">￥{{ goods.originalPrice }}</span>
+                </div>
+                <div class="goods-stock">库存：{{ goods.stock }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- 库存信息 -->
         <div class="stock-info">
           <div class="stock-label">当前库存</div>
@@ -332,7 +380,7 @@ onUnmounted(() => {
         <!-- 操作按钮 -->
         <div class="action-buttons">
           <el-button
-            v-if="activity.status === 1"
+            v-if="activity.status === 1 && selectedGoods"
             type="danger"
             size="large"
             :loading="seckilling"
@@ -433,6 +481,94 @@ onUnmounted(() => {
 
 .activity-time p {
   margin: 4px 0;
+  color: #666;
+}
+
+.goods-section {
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+}
+
+.goods-section h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.goods-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.goods-item {
+  border: 2px solid #eee;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.goods-item:hover {
+  border-color: #ddd;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.goods-item.selected {
+  border-color: #f56c6c;
+  background: #fff5f5;
+}
+
+.goods-image {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.goods-image-placeholder {
+  background: #f5f7fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 12px;
+}
+
+.goods-info {
+  text-align: center;
+}
+
+.goods-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.goods-price {
+  margin-bottom: 4px;
+}
+
+.seckill-price {
+  font-size: 18px;
+  color: #f56c6c;
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.original-price {
+  font-size: 12px;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.goods-stock {
+  font-size: 12px;
   color: #666;
 }
 

@@ -4,10 +4,12 @@ import cn.coderstory.springboot.exception.BusinessException;
 import cn.coderstory.springboot.lock.DistributedLockService;
 import cn.coderstory.springboot.lock.impl.DistributedLockServiceImpl;
 import cn.coderstory.springboot.seckill.entity.SeckillActivity;
+import cn.coderstory.springboot.seckill.entity.SeckillGoods;
 import cn.coderstory.springboot.seckill.mapper.SeckillActivityMapper;
 import cn.coderstory.springboot.seckill.service.ActivityService;
 import cn.coderstory.springboot.seckill.service.GoodsService;
 import cn.coderstory.springboot.seckill.service.PreheatService;
+import cn.coderstory.springboot.seckill.vo.ActivityDetailVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -112,6 +115,46 @@ public class ActivityServiceImpl implements ActivityService {
             throw BusinessException.notFound("活动不存在");
         }
         return result;
+    }
+
+    /**
+     * 获取活动详情（包含商品列表）
+     *
+     * 用于秒杀详情页，返回活动信息及所有关联商品
+     * 商品信息用于展示和用户选择要抢购的商品
+     *
+     * @param activityId 活动ID
+     * @return 活动详情（含商品列表）
+     */
+    @Override
+    public ActivityDetailVO getActivityDetail(Long activityId) {
+        // 先获取活动基本信息（带缓存）
+        SeckillActivity activity = getActivity(activityId);
+
+        // 查询关联的商品列表
+        List<SeckillGoods> goodsList = goodsService.getGoodsListByActivity(
+                new LambdaQueryWrapper<SeckillGoods>()
+                        .eq(SeckillGoods::getActivityId, activityId)
+                        .orderByDesc(SeckillGoods::getCreateTime)
+        );
+
+        // 构建 VO 对象
+        ActivityDetailVO detailVO = new ActivityDetailVO();
+        detailVO.setId(activity.getId());
+        detailVO.setName(activity.getName());
+        detailVO.setDescription(activity.getDescription());
+        detailVO.setStartTime(activity.getStartTime());
+        detailVO.setEndTime(activity.getEndTime());
+        detailVO.setStatus(activity.getStatus());
+        detailVO.setPerLimit(activity.getPerLimit());
+        detailVO.setEnableCaptcha(activity.getEnableCaptcha());
+        detailVO.setEnableIpLimit(activity.getEnableIpLimit());
+        detailVO.setSignKey(activity.getSignKey());
+        detailVO.setCreateTime(activity.getCreateTime());
+        detailVO.setUpdateTime(activity.getUpdateTime());
+        detailVO.setGoodsList(goodsList);
+
+        return detailVO;
     }
 
     /**
