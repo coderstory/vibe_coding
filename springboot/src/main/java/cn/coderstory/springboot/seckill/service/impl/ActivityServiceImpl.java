@@ -58,7 +58,8 @@ public class ActivityServiceImpl implements ActivityService {
                     }
                     // 查数据库
                     SeckillActivity activity = activityMapper.selectById(activityId);
-                    if (activity == null) {
+                    // 检查数据库返回的数据是否有效
+                    if (activity == null || activity.getId() == null) {
                         return null;
                     }
                     // 回填缓存
