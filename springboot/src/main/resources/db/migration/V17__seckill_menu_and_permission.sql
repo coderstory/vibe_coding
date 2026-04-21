@@ -3,15 +3,15 @@
 
 USE admin_system;
 
--- 插入秒杀系统父菜单（id=8）
+-- 插入秒杀系统父菜单（id=15）
 INSERT IGNORE INTO sys_menu (id, parent_id, name, path, icon, sort_order) VALUES
-(8, 0, '秒杀系统', '', 'Lightning', 3);
+(15, 0, '秒杀系统', '', 'Lightning', 3);
 
 -- 插入秒杀系统子菜单
 INSERT IGNORE INTO sys_menu (id, parent_id, name, path, icon, sort_order) VALUES
-(9, 8, '秒杀首页', '/seckill', 'Shop', 1),
-(10, 8, '抢购记录', '/seckill/record', 'Document', 2),
-(11, 8, '秒杀购物车', '/seckill/cart', 'ShoppingCart', 3);
+(9, 15, '秒杀首页', '/seckill', 'Shop', 1),
+(10, 15, '抢购记录', '/seckill/record', 'Document', 2),
+(11, 15, '秒杀购物车', '/seckill/cart', 'ShoppingCart', 3);
 
 -- 插入订单管理菜单（id=12）
 INSERT IGNORE INTO sys_menu (id, parent_id, name, path, icon, sort_order) VALUES
@@ -27,4 +27,4 @@ INSERT IGNORE INTO sys_menu (id, parent_id, name, path, icon, sort_order) VALUES
 
 -- 为超级管理员角色分配所有秒杀系统菜单权限
 INSERT IGNORE INTO sys_role_menu (role_id, menu_id) VALUES
-(1, 8), (1, 9), (1, 10), (1, 11), (1, 12), (1, 13), (1, 14);
+(1, 15), (1, 9), (1, 10), (1, 11), (1, 12), (1, 13), (1, 14);
