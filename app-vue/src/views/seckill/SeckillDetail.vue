@@ -342,7 +342,6 @@ onUnmounted(() => {
                 <span class="seckill-price">￥{{ activity.goods.seckillPrice }}</span>
                 <span class="original-price">￥{{ activity.goods.originalPrice }}</span>
               </div>
-              <div class="goods-stock">库存：{{ activity.goods.stock }}</div>
             </div>
           </div>
         </div>
@@ -526,11 +525,6 @@ onUnmounted(() => {
   font-size: 16px;
   color: #999;
   text-decoration: line-through;
-}
-
-.goods-stock {
-  font-size: 16px;
-  color: #666;
 }
 
 .stock-info {
