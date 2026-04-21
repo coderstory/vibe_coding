@@ -2,6 +2,7 @@ package cn.coderstory.springboot.seckill.service.impl;
 
 import cn.coderstory.springboot.exception.BusinessException;
 import cn.coderstory.springboot.lock.DistributedLockService;
+import cn.coderstory.springboot.lock.impl.DistributedLockServiceImpl;
 import cn.coderstory.springboot.seckill.entity.SeckillActivity;
 import cn.coderstory.springboot.seckill.mapper.SeckillActivityMapper;
 import cn.coderstory.springboot.seckill.service.ActivityService;
@@ -77,13 +78,14 @@ public class ActivityServiceImpl implements ActivityService {
      */
     private SeckillActivity getActivityFromCache(Long activityId) {
         String activityKey = ACTIVITY_KEY_PREFIX + activityId;
-        Map<Object, Object> cacheData = redisTemplate.opsForHash().entries(activityKey);
-
-        if (cacheData.isEmpty()) {
-            return null;
-        }
 
         try {
+            Map<Object, Object> cacheData = redisTemplate.opsForHash().entries(activityKey);
+
+            if (cacheData.isEmpty()) {
+                return null;
+            }
+
             SeckillActivity activity = new SeckillActivity();
             activity.setId(parseLong(cacheData.get("id")));
             activity.setName((String) cacheData.get("name"));
@@ -97,7 +99,13 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setSignKey((String) cacheData.get("signKey"));
             return activity;
         } catch (Exception e) {
-            log.warn("解析活动缓存数据失败: activityId={}, error={}", activityId, e.getMessage());
+            // 处理 key 类型错误（旧数据可能是 String 类型）
+            if (e.getMessage() != null && e.getMessage().contains("WRONGTYPE")) {
+                log.warn("活动缓存类型错误，删除旧数据: activityId={}", activityId);
+                redisTemplate.delete(activityKey);
+            } else {
+                log.warn("解析活动缓存数据失败: activityId={}, error={}", activityId, e.getMessage());
+            }
             return null;
         }
     }
