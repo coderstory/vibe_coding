@@ -390,6 +390,15 @@ public class ActivityServiceImpl implements ActivityService {
 
     /**
      * 结束活动（手动结束）
+     *
+     * 结束流程：
+     * 1. 更新数据库状态为已结束（status=2）
+     * 2. 删除 Redis 活动缓存（强制后续请求从 DB 读取最新状态）
+     * 3. 已获取锁的请求会继续完成（避免订单状态不一致）
+     * 4. 新请求会因活动状态非进行中而被拒绝
+     *
+     * @param activityId 活动ID
+     * @return true 成功
      */
     @Override
     public boolean endActivity(Long activityId) {
@@ -397,8 +406,16 @@ public class ActivityServiceImpl implements ActivityService {
         if (activity == null) {
             return false;
         }
+
+        // 1. 更新数据库状态
         activity.setStatus(2);
         activityMapper.updateById(activity);
+
+        // 2. 删除 Redis 活动缓存（强制后续请求读取最新状态）
+        String activityKey = ACTIVITY_KEY_PREFIX + activityId;
+        redisTemplate.delete(activityKey);
+        log.info("活动 {} 已结束，Redis缓存已清理", activityId);
+
         return true;
     }
 
