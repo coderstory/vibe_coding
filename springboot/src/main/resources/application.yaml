@@ -37,6 +37,7 @@ spring:
     baseline-on-migrate: true       # 新数据库自动创建基线
     baseline-version: "0"            # 基线版本号
     locations: classpath:db/migration # 迁移脚本路径
+    baseline-description: "init"
 
   # ===========================================
   # 数据源配置（MySQL）

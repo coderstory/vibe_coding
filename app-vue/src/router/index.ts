@@ -79,6 +79,42 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '秒杀首页', requiresAuth: true }
       },
       {
+        path: '/seckill/goods',
+        name: 'GoodsList',
+        component: () => import('@/views/seckill/goods/GoodsList.vue'),
+        meta: { title: '商品管理', requiresAuth: true }
+      },
+      {
+        path: '/seckill/goods/add',
+        name: 'GoodsAdd',
+        component: () => import('@/views/seckill/goods/GoodsForm.vue'),
+        meta: { title: '新增商品', requiresAuth: true }
+      },
+      {
+        path: '/seckill/goods/:id',
+        name: 'GoodsEdit',
+        component: () => import('@/views/seckill/goods/GoodsForm.vue'),
+        meta: { title: '编辑商品', requiresAuth: true }
+      },
+      {
+        path: '/seckill/activity',
+        name: 'ActivityList',
+        component: () => import('@/views/seckill/activity/ActivityList.vue'),
+        meta: { title: '活动管理', requiresAuth: true }
+      },
+      {
+        path: '/seckill/activity/add',
+        name: 'ActivityAdd',
+        component: () => import('@/views/seckill/activity/ActivityForm.vue'),
+        meta: { title: '新增活动', requiresAuth: true }
+      },
+      {
+        path: '/seckill/activity/:id',
+        name: 'ActivityEdit',
+        component: () => import('@/views/seckill/activity/ActivityForm.vue'),
+        meta: { title: '编辑活动', requiresAuth: true }
+      },
+      {
         path: '/seckill/detail/:id',
         name: 'SeckillDetail',
         component: () => import('@/views/seckill/SeckillDetail.vue'),
