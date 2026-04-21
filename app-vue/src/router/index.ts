@@ -127,6 +127,12 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '抢购记录', requiresAuth: true }
       },
       {
+        path: '/seckill/reservations',
+        name: 'MyReservations',
+        component: () => import('@/views/seckill/MyReservations.vue'),
+        meta: { title: '我的预约', requiresAuth: true }
+      },
+      {
         path: '/seckill/cart',
         name: 'SeckillCart',
         component: () => import('@/views/seckill/SeckillCart.vue'),

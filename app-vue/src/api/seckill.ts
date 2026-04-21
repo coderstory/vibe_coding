@@ -326,6 +326,28 @@ export interface Activity {
 }
 
 /**
+ * 预约记录数据结构
+ *
+ * 与后端 SeckillReservation 实体对应
+ */
+export interface Reservation {
+  /** 预约ID */
+  id: number
+  /** 用户ID */
+  userId: number
+  /** 活动ID */
+  activityId: number
+  /** 预约时间 */
+  reserveTime: string
+  /** 状态（0=预约中, 1=已提醒, 2=已过期） */
+  status: number
+  /** 是否已发送提醒 */
+  notified: boolean
+  /** 提醒时间 */
+  notifyTime: string | null
+}
+
+/**
  * 活动 API 对象
  *
  * 提供活动的 CRUD、发布、预热等功能
@@ -464,7 +486,16 @@ export const activityApi = {
    * @param activityId 活动ID
    */
   reserve(activityId: number) {
-    return request.post<void>(`/activity/${activityId}/reserve`)
+    return request.post<void>(`/reservation/${activityId}`)
+  },
+
+  /**
+   * 获取我的预约列表
+   *
+   * @returns 预约列表
+   */
+  getMyReservations() {
+    return request.get<Reservation[]>('/reservation/my')
   },
 
   /**

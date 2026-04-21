@@ -2,6 +2,7 @@ package cn.coderstory.springboot.seckill.service.impl;
 
 import cn.coderstory.springboot.seckill.entity.SeckillActivity;
 import cn.coderstory.springboot.seckill.entity.SeckillGoods;
+import cn.coderstory.springboot.seckill.entity.SeckillReservation;
 import cn.coderstory.springboot.seckill.mapper.SeckillActivityMapper;
 import cn.coderstory.springboot.seckill.mapper.SeckillGoodsMapper;
 import cn.coderstory.springboot.seckill.mapper.SeckillReservationMapper;
@@ -118,12 +119,55 @@ public class PreheatServiceImpl implements PreheatService {
         // 一次性写入整个 Hash
         redisTemplate.opsForHash().putAll(activityKey, activityData);
 
-        // 5. 设置过期时间：活动结束时间 + 1小时
+        // 5. 预热预约用户到 Redis Set
+        preheatReservations(activityId);
+
+        // 6. 设置过期时间：活动结束时间 + 1小时
         // 这样活动结束后，缓存还会保留1小时，用于查询已结束的活动
         long expireSeconds = calculateExpireSeconds(activity.getEndTime(), ACTIVITY_CACHE_EXPIRE_HOURS);
         redisTemplate.expire(activityKey, expireSeconds, TimeUnit.SECONDS);
 
         log.info("活动 {} 预热完成: {} 个商品, 缓存有效期 {} 秒", activityId, goodsList.size(), expireSeconds);
+    }
+
+    /**
+     * 预热活动的预约用户到 Redis Set
+     *
+     * Redis Set 用于快速判断用户是否已预约
+     * - SISMEMBER: O(1) 判断用户是否已预约
+     * - SCARD: O(1) 获取预约人数
+     *
+     * @param activityId 活动ID
+     */
+    private void preheatReservations(Long activityId) {
+        // 查询该活动的所有预约用户
+        LambdaQueryWrapper<SeckillReservation> reservationQuery = new LambdaQueryWrapper<>();
+        reservationQuery.eq(SeckillReservation::getActivityId, activityId);
+        List<SeckillReservation> reservations = reservationMapper.selectList(reservationQuery);
+
+        if (reservations.isEmpty()) {
+            log.debug("活动 {} 没有预约用户", activityId);
+            return;
+        }
+
+        String reservationKey = RESERVATION_KEY_PREFIX + activityId;
+
+        // 将所有预约用户的 ID 添加到 Redis Set
+        // 使用 SADD 批量添加
+        for (SeckillReservation reservation : reservations) {
+            if (reservation.getUserId() != null) {
+                redisTemplate.opsForSet().add(reservationKey, String.valueOf(reservation.getUserId()));
+            }
+        }
+
+        // 设置过期时间（与活动缓存一致）
+        long expireSeconds = calculateExpireSeconds(
+                activityMapper.selectById(activityId).getEndTime(),
+                ACTIVITY_CACHE_EXPIRE_HOURS
+        );
+        redisTemplate.expire(reservationKey, expireSeconds, TimeUnit.SECONDS);
+
+        log.info("活动 {} 预热预约用户 {} 人", activityId, reservations.size());
     }
 
     /**
@@ -191,6 +235,9 @@ public class PreheatServiceImpl implements PreheatService {
             status.put("activityStatus", activity.getStatus());
         }
 
+        // 补充预约人数
+        status.put("reservationCount", getReservationCount(activityId));
+
         return status;
     }
 
@@ -227,5 +274,51 @@ public class PreheatServiceImpl implements PreheatService {
             }
         }
         return totalStock;
+    }
+
+    /**
+     * 获取活动预约人数
+     *
+     * 从 Redis Set 获取基数（SCARD）
+     *
+     * @param activityId 活动ID
+     * @return 预约人数
+     */
+    @Override
+    public long getReservationCount(Long activityId) {
+        String reservationKey = RESERVATION_KEY_PREFIX + activityId;
+        Long count = redisTemplate.opsForSet().size(reservationKey);
+        return count != null ? count : 0;
+    }
+
+    /**
+     * 检查用户是否已预约
+     *
+     * 使用 SISMEMBER 命令，O(1) 时间复杂度
+     *
+     * @param activityId 活动ID
+     * @param userId 用户ID
+     * @return true=已预约，false=未预约
+     */
+    @Override
+    public boolean isUserReserved(Long activityId, Long userId) {
+        String reservationKey = RESERVATION_KEY_PREFIX + activityId;
+        Boolean isMember = redisTemplate.opsForSet().isMember(reservationKey, String.valueOf(userId));
+        return Boolean.TRUE.equals(isMember);
+    }
+
+    /**
+     * 添加用户到活动的预约集合
+     *
+     * 当用户预约成功时，调用此方法将用户ID添加到 Redis Set
+     *
+     * @param activityId 活动ID
+     * @param userId 用户ID
+     */
+    @Override
+    public void addReservation(Long activityId, Long userId) {
+        String reservationKey = RESERVATION_KEY_PREFIX + activityId;
+        redisTemplate.opsForSet().add(reservationKey, String.valueOf(userId));
+        log.debug("用户 {} 已添加到活动 {} 的预约集合", userId, activityId);
     }
 }
