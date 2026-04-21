@@ -43,9 +43,16 @@ async function loadGoods(id: number) {
   try {
     const res = await goodsApi.getGoods(id)
     form.value = res.data
+    // 如果商品关联的活动在列表中不存在，保留原活动ID供后续处理
+    if (form.value.activityId) {
+      const activityExists = activityList.value.some(a => a.id === form.value.activityId)
+      if (!activityExists) {
+        ElMessage.warning('该商品关联的活动已不存在或已下架')
+      }
+    }
   } catch (e) {
-    ElMessage.error('加载商品失败')
-    router.back()
+    ElMessage.error('加载商品失败，但您仍可以编辑表单')
+    // 不关闭页面，让用户可以继续编辑
   } finally {
     loading.value = false
   }
