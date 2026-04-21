@@ -14,7 +14,7 @@ import java.util.Collections;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@RocketMQMessageListener(topic = "seckill_stock_deduct", consumerGroup = "seckill_stock_consumer")
+// @RocketMQMessageListener(topic = "seckill_stock_deduct", consumerGroup = "seckill_stock_consumer")
 public class StockConsumer implements RocketMQListener<String> {
     private final SeckillSseService sseService;
     private final StringRedisTemplate redisTemplate;

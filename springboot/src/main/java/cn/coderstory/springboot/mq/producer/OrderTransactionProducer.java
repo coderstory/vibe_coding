@@ -1,5 +1,10 @@
 package cn.coderstory.springboot.mq.producer;
 
+import cn.coderstory.springboot.order.entity.Order;
+import cn.coderstory.springboot.order.mapper.OrderMapper;
+import cn.coderstory.springboot.seckill.entity.SeckillGoods;
+import cn.coderstory.springboot.seckill.mapper.SeckillGoodsMapper;
+import cn.coderstory.springboot.sse.SeckillSseService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.producer.TransactionListener;
 import org.apache.rocketmq.client.producer.TransactionMQProducer;
@@ -10,10 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import jakarta.annotation.PostConstruct;
-import cn.coderstory.springboot.order.entity.Order;
-import cn.coderstory.springboot.order.mapper.OrderMapper;
-import cn.coderstory.springboot.seckill.entity.SeckillGoods;
-import cn.coderstory.springboot.seckill.mapper.SeckillGoodsMapper;
 import java.util.UUID;
 
 @Slf4j
@@ -23,15 +24,17 @@ public class OrderTransactionProducer {
     private final RocketMQTemplate rocketMQTemplate;
     private final OrderMapper orderMapper;
     private final SeckillGoodsMapper goodsMapper;
+    private final SeckillSseService sseService;
     private TransactionMQProducer transactionProducer;
 
     @Value("${rocketmq.name-server}")
     private String nameServer;
 
-    public OrderTransactionProducer(RocketMQTemplate rocketMQTemplate, OrderMapper orderMapper, SeckillGoodsMapper goodsMapper) {
+    public OrderTransactionProducer(RocketMQTemplate rocketMQTemplate, OrderMapper orderMapper, SeckillGoodsMapper goodsMapper, SeckillSseService sseService) {
         this.rocketMQTemplate = rocketMQTemplate;
         this.orderMapper = orderMapper;
         this.goodsMapper = goodsMapper;
+        this.sseService = sseService;
     }
 
     @PostConstruct
@@ -74,7 +77,8 @@ public class OrderTransactionProducer {
                     order.setCreateTime(java.time.LocalDateTime.now());
                     orderMapper.insert(order);
 
-                    sendStockDeductMsg(goodsId, 1, queueId);
+                    // 订单创建成功，通知前端抢购成功
+                    sseService.sendSuccess(queueId, order.getId(), "抢购成功");
 
                     return org.apache.rocketmq.client.producer.LocalTransactionState.COMMIT_MESSAGE;
                 } catch (Exception e) {
@@ -113,8 +117,7 @@ public class OrderTransactionProducer {
     }
 
     public void sendStockDeductMsg(Long goodsId, Integer quantity, String queueId) {
-        String message = goodsId + ":" + quantity + ":" + queueId;
-        log.info("发送库存扣减消息: {}", message);
-        rocketMQTemplate.convertAndSend(STOCK_DEDUCT_TOPIC, message);
+        // 不再发送库存扣减消息，因为秒杀时已经扣减了 Redis 库存
+        log.info("跳过库存扣减消息: goodsId={}, quantity={}, queueId={} (Redis 库存已在秒杀时扣减)", goodsId, quantity, queueId);
     }
 }
