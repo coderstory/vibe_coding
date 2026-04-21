@@ -82,12 +82,19 @@ public class ActivityServiceImpl implements ActivityService {
         try {
             Map<Object, Object> cacheData = redisTemplate.opsForHash().entries(activityKey);
 
+            // 检查缓存是否存在且有有效数据
             if (cacheData.isEmpty()) {
                 return null;
             }
 
+            // 检查 id 字段是否有有效值（避免缓存空数据）
+            Object idValue = cacheData.get("id");
+            if (idValue == null || idValue.toString().isEmpty()) {
+                return null;
+            }
+
             SeckillActivity activity = new SeckillActivity();
-            activity.setId(parseLong(cacheData.get("id")));
+            activity.setId(parseLong(idValue));
             activity.setName((String) cacheData.get("name"));
             activity.setDescription((String) cacheData.get("description"));
             activity.setStartTime(parseLocalDateTime(cacheData.get("startTime")));
