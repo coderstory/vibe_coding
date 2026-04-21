@@ -8,7 +8,7 @@
  * - 保存后返回列表
  */
 import { ref, onMounted } from 'vue'
-import { seckillApi } from '@/api/seckill'
+import { activityApi } from '@/api/seckill'
 import { ElMessage } from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
 
@@ -31,7 +31,7 @@ const form = ref({
 async function loadActivity(id: number) {
   loading.value = true
   try {
-    const res = await seckillApi.get(id)
+    const res = await activityApi.get(id)
     const data = res.data
     form.value = {
       name: data.name,
@@ -72,10 +72,10 @@ async function handleSubmit() {
   loading.value = true
   try {
     if (isEdit.value) {
-      await seckillApi.update(route.params.id as string, form.value)
+      await activityApi.update(Number(route.params.id), form.value)
       ElMessage.success('更新成功')
     } else {
-      await seckillApi.create(form.value)
+      await activityApi.create(form.value)
       ElMessage.success('创建成功')
     }
     router.push('/seckill/activity')

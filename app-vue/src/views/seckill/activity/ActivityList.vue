@@ -8,7 +8,7 @@
  * - 新增/编辑/删除/发布活动
  */
 import { ref, onMounted } from 'vue'
-import { seckillApi } from '@/api/seckill'
+import { activityApi } from '@/api/seckill'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
 
@@ -23,9 +23,9 @@ const pageSize = ref(20)
 async function loadActivities() {
   loading.value = true
   try {
-    const res = await seckillApi.list()
-    activityList.value = res.data || []
-    total.value = res.data?.total || res.data?.length || 0
+    const res = await activityApi.list()
+    activityList.value = res.data?.records || []
+    total.value = res.data?.total || 0
   } catch (e) {
     ElMessage.error('加载活动列表失败')
   } finally {
@@ -68,7 +68,7 @@ async function handlePublish(id: number) {
     await ElMessageBox.confirm('发布活动将自动预热数据到Redis，确定发布吗？', '提示', {
       type: 'warning'
     })
-    await seckillApi.start(id)
+    await activityApi.publish(id)
     ElMessage.success('发布成功')
     loadActivities()
   } catch (e) {
@@ -83,7 +83,7 @@ async function handleEnd(id: number) {
     await ElMessageBox.confirm('确定结束该活动吗？', '提示', {
       type: 'warning'
     })
-    await seckillApi.end(id)
+    await activityApi.end(id)
     ElMessage.success('结束成功')
     loadActivities()
   } catch (e) {
@@ -98,7 +98,7 @@ async function handleDelete(id: number) {
     await ElMessageBox.confirm('确定删除该活动吗？', '提示', {
       type: 'warning'
     })
-    await seckillApi.delete(id)
+    await activityApi.delete(id)
     ElMessage.success('删除成功')
     loadActivities()
   } catch (e) {
