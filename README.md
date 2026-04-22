@@ -16,11 +16,14 @@
   </a>
 </p>
 
-## 📸 登录页面预览
+## 📸 页面预览
 
 <p align="center">
   <img src="./docs/images/login-page.png" alt="登录页面" width="80%">
+  <img src="./docs/images/view-page-2.png" alt="登录页面" width="80%">
+ 
 </p>
+
 
 ## 📋 项目简介
 
