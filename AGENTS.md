@@ -8,7 +8,10 @@
 
 1. 处理所有问题时，**全程思考过程必须使用中文**（包括需求分析、逻辑拆解、方案选择、步骤推导等所有内部推理环节）。
 2. 最终输出的所有回答内容（包括文字解释、代码注释、步骤说明等）**必须全部使用中文**，仅代码语法本身的英文关键词除外。
-3. 操作系统为 Windows 10，生成的 shell 命令必须是 powershell 命令，不能是 sh 或 bash 命令。
+3. 操作系统为 Windows 10，生成的 shell 命令必须是 powershell 7命令，不能是 sh 或 bash 命令。
+   - powershell主程序路径：`C:\Program Files\PowerShell\7\pwsh.exe`
+   - **注意**：OpenCode 的 bash 工具默认调用 PowerShell 5.1，必须使用 `pwsh -Command "your command"` 格式调用 PowerShell 7
+   - 示例：`pwsh -Command "Get-Date"` 而不是 `Get-Date`
 4. 回复简洁直接
 5. 不确定的主动询问，不要编造答案
 
