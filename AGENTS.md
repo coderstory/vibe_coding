@@ -505,6 +505,52 @@ ALTER TABLE sys_user ADD COLUMN phone VARCHAR(20) COMMENT '手机号' AFTER name
 
 ---
 
+## 浏览器自动化（动态网页获取）
+
+### 工具选择
+
+| 工具 | 适用场景 | 限制 |
+|------|----------|------|
+| **webfetch** | 静态网页、API JSON | 无法处理动态渲染（CSR） |
+| **/playwright** | 动态渲染页面 | 需要 Chrome 浏览器（国内通常只有 msedge） |
+| **Node.js + msedge** | 动态渲染页面（无 Chrome） | 需要临时脚本 |
+
+### 判断是否需要浏览器
+
+以下类型页面**必须**用浏览器工具：
+- Next.js / Nuxt.js 应用
+- React / Vue SPA
+- 右键"查看网页源代码"内容很少，但浏览器显示很多 → 动态渲染
+
+### 使用 msedge 方案
+
+当 `/playwright` 报 Chrome 找不到错误时，使用 msedge：
+
+```powershell
+# 1. 安装 playwright
+npm install playwright
+
+# 2. 创建 fetch 脚本 fetch-page.js
+@"
+const { chromium } = require('playwright');
+(async () => {
+  const browser = await chromium.launch({ channel: 'msedge' });
+  const page = await browser.newPage();
+  await page.goto(process.argv[2]);
+  await page.waitForLoadState('networkidle');
+  console.log(await page.content());
+  await browser.close();
+})();
+"@ | Out-File -FilePath fetch-page.js -Encoding UTF8
+
+# 3. 执行
+node fetch-page.js https://example.com
+```
+
+详细说明见：`docs/browser-automation-guide.md`
+
+---
+
 ## 编程规范
 
 1. 后端的 SQL 写在 mapper.xml 中，而不是接口类注解上
