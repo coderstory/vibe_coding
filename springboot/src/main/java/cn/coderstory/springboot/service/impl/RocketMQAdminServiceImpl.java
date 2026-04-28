@@ -6,8 +6,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.common.TopicConfig;
 import org.apache.rocketmq.remoting.protocol.admin.ConsumeStats;
+import org.apache.rocketmq.remoting.protocol.body.ClusterInfo;
 import org.apache.rocketmq.remoting.protocol.body.SubscriptionGroupWrapper;
 import org.apache.rocketmq.remoting.protocol.body.TopicList;
+import org.apache.rocketmq.remoting.protocol.route.BrokerData;
 import org.apache.rocketmq.remoting.protocol.route.TopicRouteData;
 import org.apache.rocketmq.remoting.protocol.subscription.SubscriptionGroupConfig;
 import org.apache.rocketmq.tools.admin.DefaultMQAdminExt;
@@ -37,6 +39,13 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
         try {
             TopicList topicList = defaultMQAdminExt.fetchAllTopicList();
             Set<String> topicSet = topicList.getTopicList();
+
+            // 获取集群中第一个 Broker 地址用于查询
+            String brokerAddr = getFirstBrokerAddr();
+            if (brokerAddr == null) {
+                throw BusinessException.badRequest("未找到可用的 Broker");
+            }
+
             List<Map<String, Object>> result = new ArrayList<>();
 
             for (String topicName : topicSet) {
@@ -58,9 +67,9 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
                 Map<String, Object> item = new HashMap<>();
                 item.put("topicName", topicName);
 
-                // 获取 Topic 配置信息
+                // 获取 Topic 配置信息 - 使用 Broker 地址
                 try {
-                    TopicConfig topicConfig = defaultMQAdminExt.examineTopicConfig(nameServer, topicName);
+                    TopicConfig topicConfig = defaultMQAdminExt.examineTopicConfig(brokerAddr, topicName);
                     if (topicConfig != null) {
                         item.put("queueCount", topicConfig.getWriteQueueNums());
                         item.put("status", "ACTIVE");
@@ -98,8 +107,14 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
         try {
             Map<String, Object> detail = new HashMap<>();
 
-            // Topic 配置
-            TopicConfig topicConfig = defaultMQAdminExt.examineTopicConfig(nameServer, topicName);
+            // 获取 Broker 地址
+            String brokerAddr = getFirstBrokerAddr();
+            if (brokerAddr == null) {
+                throw BusinessException.badRequest("未找到可用的 Broker");
+            }
+
+            // Topic 配置 - 使用 Broker 地址
+            TopicConfig topicConfig = defaultMQAdminExt.examineTopicConfig(brokerAddr, topicName);
             if (topicConfig == null) {
                 throw BusinessException.notFound("Topic 不存在: " + topicName);
             }
@@ -143,9 +158,13 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
                 throw BusinessException.badRequest("Topic 名称不能包含特殊字符，仅支持字母、数字、下划线和连字符");
             }
 
-            // 检查 Topic 是否已存在
+            // 检查 Topic 是否已存在 - 使用 Broker 地址
+            String checkBrokerAddr = getFirstBrokerAddr();
+            if (checkBrokerAddr == null) {
+                throw BusinessException.badRequest("未找到可用的 Broker");
+            }
             try {
-                TopicConfig existing = defaultMQAdminExt.examineTopicConfig(nameServer, topicName);
+                TopicConfig existing = defaultMQAdminExt.examineTopicConfig(checkBrokerAddr, topicName);
                 if (existing != null) {
                     throw BusinessException.conflict("Topic 已存在: " + topicName);
                 }
@@ -155,14 +174,46 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
                 // Topic 不存在，可以创建
             }
 
+            // 创建 TopicConfig
             TopicConfig topicConfig = new TopicConfig();
             topicConfig.setTopicName(topicName);
             topicConfig.setWriteQueueNums(queueCount);
             topicConfig.setReadQueueNums(queueCount);
             topicConfig.setPerm(parsePerm(perm));
 
-            defaultMQAdminExt.createAndUpdateTopicConfig(nameServer, topicConfig);
-            log.info("创建 Topic 成功: {}, queueCount: {}, perm: {}", topicName, queueCount, perm);
+            // 获取所有 Broker 地址（Master）
+            ClusterInfo clusterInfo = defaultMQAdminExt.examineBrokerClusterInfo();
+            Map<String, BrokerData> brokerAddrTable = clusterInfo.getBrokerAddrTable();
+
+            if (brokerAddrTable.isEmpty()) {
+                throw BusinessException.badRequest("未找到可用的 Broker");
+            }
+
+            // 遍历所有 Broker，在每个 Master 上创建 Topic
+            int successCount = 0;
+            for (BrokerData brokerData : brokerAddrTable.values()) {
+                // 获取 Master 地址 (brokerId = 0)
+                String brokerAddr = brokerData.selectBrokerAddr();
+                if (brokerAddr == null || brokerAddr.isEmpty()) {
+                    log.warn("Broker {} 没有有效的 Master 地址", brokerData.getBrokerName());
+                    continue;
+                }
+
+                try {
+                    defaultMQAdminExt.createAndUpdateTopicConfig(brokerAddr, topicConfig);
+                    log.info("在 Broker {} ({}) 创建 Topic 成功", brokerData.getBrokerName(), brokerAddr);
+                    successCount++;
+                } catch (Exception e) {
+                    log.error("在 Broker {} 创建 Topic 失败: {}", brokerAddr, e.getMessage());
+                }
+            }
+
+            if (successCount == 0) {
+                throw BusinessException.badRequest("创建 Topic 失败：没有可用的 Broker");
+            }
+
+            log.info("创建 Topic 成功: {}, queueCount: {}, perm: {}, 成功创建 Broker 数: {}",
+                    topicName, queueCount, perm, successCount);
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
@@ -174,15 +225,39 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
     @Override
     public void deleteTopic(String topicName) {
         try {
-            // 检查 Topic 是否存在
-            TopicConfig existing = defaultMQAdminExt.examineTopicConfig(nameServer, topicName);
+            // 获取 Broker 地址
+            String brokerAddr = getFirstBrokerAddr();
+            if (brokerAddr == null) {
+                throw BusinessException.badRequest("未找到可用的 Broker");
+            }
+
+            // 检查 Topic 是否存在 - 使用 Broker 地址
+            TopicConfig existing = defaultMQAdminExt.examineTopicConfig(brokerAddr, topicName);
             if (existing == null) {
                 throw BusinessException.notFound("Topic 不存在: " + topicName);
             }
 
-            // 使用正确的 API: deleteTopicInBroker(Set<String> addrs, String topic)
+            // 获取所有 Broker 地址（Master）
+            ClusterInfo clusterInfo = defaultMQAdminExt.examineBrokerClusterInfo();
+            Map<String, BrokerData> brokerAddrTable = clusterInfo.getBrokerAddrTable();
+
+            if (brokerAddrTable.isEmpty()) {
+                throw BusinessException.badRequest("未找到可用的 Broker");
+            }
+
+            // 遍历所有 Broker，在每个 Master 上删除 Topic
             Set<String> brokerAddrs = new HashSet<>();
-            brokerAddrs.add(nameServer);
+            for (BrokerData brokerData : brokerAddrTable.values()) {
+                String brokerAddr2 = brokerData.selectBrokerAddr();
+                if (brokerAddr2 != null && !brokerAddr2.isEmpty()) {
+                    brokerAddrs.add(brokerAddr2);
+                }
+            }
+
+            if (brokerAddrs.isEmpty()) {
+                throw BusinessException.badRequest("没有可用的 Broker");
+            }
+
             defaultMQAdminExt.deleteTopicInBroker(brokerAddrs, topicName);
             log.info("删除 Topic 成功: {}", topicName);
         } catch (BusinessException e) {
@@ -218,12 +293,40 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
         };
     }
 
+    /**
+     * 获取第一个可用的 Broker 地址（Master）
+     */
+    private String getFirstBrokerAddr() {
+        try {
+            ClusterInfo clusterInfo = defaultMQAdminExt.examineBrokerClusterInfo();
+            Map<String, BrokerData> brokerAddrTable = clusterInfo.getBrokerAddrTable();
+            if (brokerAddrTable != null && !brokerAddrTable.isEmpty()) {
+                for (BrokerData brokerData : brokerAddrTable.values()) {
+                    String addr = brokerData.selectBrokerAddr();
+                    if (addr != null && !addr.isEmpty()) {
+                        return addr;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("获取 Broker 地址失败", e);
+        }
+        return null;
+    }
+
     // ==================== Consumer Group 管理 ====================
 
     @Override
     public List<Map<String, Object>> getConsumerGroupList(String keyword) {
         try {
-            SubscriptionGroupWrapper wrapper = defaultMQAdminExt.getAllSubscriptionGroup(nameServer, 3000);
+            // 获取 Broker 地址
+            String brokerAddr = getFirstBrokerAddr();
+            if (brokerAddr == null) {
+                throw BusinessException.badRequest("未找到可用的 Broker");
+            }
+
+            // 使用 Broker 地址获取订阅组列表
+            SubscriptionGroupWrapper wrapper = defaultMQAdminExt.getAllSubscriptionGroup(brokerAddr, 3000);
             Set<String> groupSet = wrapper.getSubscriptionGroupTable().keySet();
             List<Map<String, Object>> result = new ArrayList<>();
 
@@ -268,10 +371,7 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
                     item.put("status", "OFFLINE");
                 }
                     item.put("status", "OK");
-                } catch (Exception e) {
-                    item.put("groupType", "UNKNOWN");
-                    item.put("status", "OFFLINE");
-                }
+
 
                 result.add(item);
             }
@@ -291,6 +391,12 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
         try {
             Map<String, Object> detail = new HashMap<>();
             detail.put("group", groupName);
+
+            // 获取 Broker 地址
+            String brokerAddr = getFirstBrokerAddr();
+            if (brokerAddr == null) {
+                throw BusinessException.badRequest("未找到可用的 Broker");
+            }
 
             // 消费统计 - RocketMQ 5.x API
             try {
@@ -312,8 +418,8 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
                 log.debug("获取消费统计失败: {}", e.getMessage());
             }
 
-            // 订阅关系配置 - RocketMQ 5.x API
-            SubscriptionGroupWrapper wrapper = defaultMQAdminExt.getAllSubscriptionGroup(nameServer, 3000);
+            // 订阅关系配置 - 使用 Broker 地址
+            SubscriptionGroupWrapper wrapper = defaultMQAdminExt.getAllSubscriptionGroup(brokerAddr, 3000);
             SubscriptionGroupConfig config = wrapper.getSubscriptionGroupTable().get(groupName);
             if (config != null) {
                 boolean isBroadcast = config.isConsumeBroadcastEnable();
@@ -348,8 +454,14 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
     @Override
     public void resetConsumerOffset(String topic, String groupName, long timestamp) {
         try {
+            // 获取 Broker 地址
+            String brokerAddr = getFirstBrokerAddr();
+            if (brokerAddr == null) {
+                throw BusinessException.badRequest("未找到可用的 Broker");
+            }
+
             // 检查 Group 类型
-            SubscriptionGroupWrapper wrapper = defaultMQAdminExt.getAllSubscriptionGroup(nameServer, 3000);
+            SubscriptionGroupWrapper wrapper = defaultMQAdminExt.getAllSubscriptionGroup(brokerAddr, 3000);
             SubscriptionGroupConfig config = wrapper.getSubscriptionGroupTable().get(groupName);
             if (config != null && config.isConsumeBroadcastEnable()) {
                 throw BusinessException.badRequest("广播模式不支持位点重置");
