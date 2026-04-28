@@ -171,7 +171,9 @@ vibe_coding/
 本项目使用基于 GSD（Get Shit Done）的开发流程：
 
 1. **提出问题**：初步分析 `/gsd:new-project`
-2. **拆解问题**：讨论方案，产出需求 `/gsd:discuss-phase N`
+2. **拆解问题**：讨论技术方案，产出需求 `/gsd:discuss-phase N`
+3. **技术分析**：发现标准技术栈、架构模式、常见陷阱。`/gsd-research-phase N`
+3. **拆解问题**：讨论UI方案，产出需求 `/gsd-ui-phase N`
 3. **详细设计**：针对单个需求进行设计 `/gsd:plan-phase N`
 4. **执行编码**：实现功能 `/gsd:execute-phase N`
 5. **功能测试**：验证功能正确性 `/gsd:verify-work N`

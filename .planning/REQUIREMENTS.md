@@ -1,47 +1,36 @@
-# Requirements: Ocean Breeze Admin
+# Requirements: Ocean Breeze Admin - RocketMQ 管理
 
-**Defined:** 2026-04-18
+**Defined:** 2026-04-28
 **Core Value:** 提供清晰、高效的企业级管理后台界面，通过夏日海滩风主题营造清爽专业的视觉体验。
 
 ## v1 Requirements
 
-### USR-LIST: 用户列表页
+### MQ-TOPIC: Topic 管理
 
-- [ ] **LIST-01**: 用户列表页面展示（表格形式）
-- [ ] **LIST-02**: 按用户名模糊筛选
-- [ ] **LIST-03**: 按手机号精确筛选
-- [ ] **LIST-04**: 按用户状态筛选（启用/禁用）
-- [ ] **LIST-05**: 分页展示（可配置每页条数）
-- [ ] **LIST-06**: 点击行查看用户详情
+- [ ] **TOPIC-01**: 查看 Topic 列表（名称、队列数、状态、消息数量）
+- [ ] **TOPIC-02**: 查看 Topic 详情（配置信息、路由信息）
+- [ ] **TOPIC-03**: 创建 Topic（名称、队列数、权限设置）
+- [ ] **TOPIC-04**: 删除 Topic（确认提示）
 
-### USR-DETAIL: 用户详情页
+### MQ-CONS: Consumer Group 管理
 
-- [ ] **DETAIL-01**: 用户详情页面路由
-- [ ] **DETAIL-02**: 显示用户基本信息（用户名、手机、邮箱、状态、创建时间）
-- [ ] **DETAIL-03**: 显示用户角色信息
-- [ ] **DETAIL-04**: 返回列表页功能
+- [ ] **CONS-01**: 查看 Consumer Group 列表（Group名、类型、状态）
+- [ ] **CONS-02**: 查看 Consumer Group 详情（消费进度、订阅关系、位点信息）
+- [ ] **CONS-03**: 重置消费位点（按时间戳/位点）
 
-### USR-CRUD: 用户增删改
+### MQ-MSG: 消息管理
 
-- [ ] **CRUD-01**: 新增用户表单
-- [ ] **CRUD-02**: 编辑用户表单（预填充现有数据）
-- [ ] **CRUD-03**: 删除用户（确认提示）
-- [ ] **CRUD-04**: 表单验证（用户名必填、手机号格式、邮箱格式）
+- [ ] **MSG-01**: 按 Topic 和时间范围查询消息列表
+- [ ] **MSG-02**: 查看消息详情（消息ID、内容、属性、Key、Tag）
+- [ ] **MSG-03**: 消息轨迹追踪（生产→消费全链路）
 
-### USR-STATUS: 用户状态管理
+### MQ-MON: 监控面板
 
-- [ ] **STATUS-01**: 启用用户
-- [ ] **STATUS-02**: 禁用用户
-- [ ] **STATUS-03**: 状态变更前端反馈
-
-### USR-API: 后端 API
-
-- [ ] **API-01**: GET /api/users - 分页查询用户列表（支持筛选）
-- [ ] **API-02**: GET /api/users/{id} - 获取用户详情
-- [ ] **API-03**: POST /api/users - 创建用户
-- [ ] **API-04**: PUT /api/users/{id} - 更新用户
-- [ ] **API-05**: DELETE /api/users/{id} - 删除用户
-- [ ] **API-06**: PATCH /api/users/{id}/status - 更新用户状态
+- [ ] **MON-01**: 集群概览（Broker数量、Topic数量、Consumer数量、堆积总量）
+- [ ] **MON-02**: Broker 状态监控（在线/离线、版本、运行时间）
+- [ ] **MON-03**: 消息堆积监控（各 Topic 堆积量）
+- [ ] **MON-04**: 实时 QPS 监控图表（生产/消费）
+- [ ] **MON-05**: 延迟统计（发送延迟、消费延迟）
 
 ## v2 Requirements
 
@@ -51,44 +40,36 @@
 
 | Feature | Reason |
 |---------|--------|
-| 批量启用/禁用 | 单个操作足够满足初期需求 |
-| 用户导入/导出 | 后期考虑 |
-| 发送短信/邮件通知 | 后期考虑 |
-| OAuth 第三方登录 | Email/password 足够 |
+| 消息重发/补偿 | 需要业务场景确认，风险较高 |
+| 死信队列管理 | 后期根据实际需求添加 |
+| 多集群管理 | 单集群足够满足当前需求 |
+| 消息内容修改 | 修改消息内容有风险，保留只读 |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| LIST-01 | Phase 6 | Pending |
-| LIST-02 | Phase 6 | Pending |
-| LIST-03 | Phase 6 | Pending |
-| LIST-04 | Phase 6 | Pending |
-| LIST-05 | Phase 6 | Pending |
-| LIST-06 | Phase 6 | Pending |
-| DETAIL-01 | Phase 7 | Pending |
-| DETAIL-02 | Phase 7 | Pending |
-| DETAIL-03 | Phase 7 | Pending |
-| DETAIL-04 | Phase 7 | Pending |
-| CRUD-01 | Phase 8 | Pending |
-| CRUD-02 | Phase 8 | Pending |
-| CRUD-03 | Phase 8 | Pending |
-| CRUD-04 | Phase 8 | Pending |
-| STATUS-01 | Phase 8 | Pending |
-| STATUS-02 | Phase 8 | Pending |
-| STATUS-03 | Phase 6 | Pending |
-| API-01 | Phase 5 | Pending |
-| API-02 | Phase 5 | Pending |
-| API-03 | Phase 5 | Pending |
-| API-04 | Phase 5 | Pending |
-| API-05 | Phase 5 | Pending |
-| API-06 | Phase 5 | Pending |
+| TOPIC-01 | Phase 1 | Pending |
+| TOPIC-02 | Phase 1 | Pending |
+| TOPIC-03 | Phase 1 | Pending |
+| TOPIC-04 | Phase 1 | Pending |
+| CONS-01 | Phase 2 | Pending |
+| CONS-02 | Phase 2 | Pending |
+| CONS-03 | Phase 2 | Pending |
+| MSG-01 | Phase 3 | Pending |
+| MSG-02 | Phase 3 | Pending |
+| MSG-03 | Phase 3 | Pending |
+| MON-01 | Phase 4 | Pending |
+| MON-02 | Phase 4 | Pending |
+| MON-03 | Phase 4 | Pending |
+| MON-04 | Phase 4 | Pending |
+| MON-05 | Phase 4 | Pending |
 
 **Coverage:**
-- v1 requirements: 23 total
-- Mapped to phases: 23
+- v1 requirements: 15 total
+- Mapped to phases: 15
 - Unmapped: 0 ✓
 
 ---
-*Requirements defined: 2026-04-18*
-*Last updated: 2026-04-18 after initial definition*
+*Requirements defined: 2026-04-28*
+*Last updated: 2026-04-28 after initial definition*

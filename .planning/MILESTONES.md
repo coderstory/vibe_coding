@@ -31,4 +31,35 @@
 - UI-04: 调整配色（阳光金→琥珀色）
 - UI-05: 确保视觉风格统一
 
+**Status:** Completed
+
+---
+
+## v1.2 — 用户管理模块
+
+**Date:** 2026-04-18
+
+**Goal:** 开发独立用户管理模块，包含用户列表页和用户详情页
+
+**Delivered:**
+- 用户列表页（筛选+分页+状态切换）
+- 用户详情页
+- 用户 CRUD API
+
+**Status:** Completed
+
+---
+
+## v1.3 — RocketMQ 管理功能
+
+**Date:** 2026-04-28
+
+**Goal:** 在现有管理后台中集成 RocketMQ 管理和监控功能
+
+**Target features:**
+- Topic 管理：创建、删除、配置查看
+- Consumer Group 管理：消费进度、状态查看
+- 消息管理：查看消息内容
+- 监控面板：连接数、延迟、堆积量等
+
 **Status:** In Progress

@@ -1,107 +1,101 @@
 # Ocean Breeze Admin - 路线图
 
 > **创建日期:** 2026-04-03
-> **更新日期:** 2026-04-18
-> **当前里程碑:** v1.2 用户管理模块
-> **目标:** 完成用户管理模块的完整前后端功能
+> **更新日期:** 2026-04-28
+> **当前里程碑:** v1.3 RocketMQ 管理功能
+> **目标:** 在现有管理后台中集成 RocketMQ 管理和监控功能
 
 ---
 
 ## Phases
 
-- [x] **Phase 5: 后端API基础设施** - 实现用户管理RESTful API
-- [x] **Phase 6: 用户列表与状态功能** - 用户列表页、筛选、分页、状态切换
-- [x] **Phase 7: 用户详情页** - 用户详情展示、角色信息
-- [x] **Phase 8: 用户增删改表单** - 新增/编辑/删除用户、表单验证
+- [ ] **Phase 9: Topic 管理** - Topic 列表、详情、创建、删除
+- [ ] **Phase 10: Consumer Group 管理** - Group 列表、详情、重置位点
+- [ ] **Phase 11: 消息管理** - 消息查询、详情、轨迹追踪
+- [ ] **Phase 12: 监控面板** - 集群概览、Broker状态、堆积监控、QPS图表
 
 ---
 
 ## Phase Details
 
-### Phase 5: 后端API基础设施
+### Phase 9: Topic 管理
 
-**Goal:** 用户管理模块的RESTful API后端实现
+**Goal:** 实现 Topic 的查看、创建、删除功能
 
 **Depends on:** 无
 
-**Requirements:** API-01, API-02, API-03, API-04, API-05, API-06
+**Requirements:** TOPIC-01, TOPIC-02, TOPIC-03, TOPIC-04
 
 **Success Criteria** (what must be TRUE):
-1. 前端能通过GET /api/users获取分页用户列表（支持筛选参数）
-2. 前端能通过GET /api/users/{id}获取单个用户详情
-3. 前端能通过POST /api/users创建新用户
-4. 前端能通过PUT /api/users/{id}更新用户信息
-5. 前端能通过DELETE /api/users/{id}删除用户
-6. 前端能通过PATCH /api/users/{id}/status切换用户状态
+1. 用户可以在表格中看到所有 Topic 的名称、队列数、状态、消息数量
+2. 用户可以点击 Topic 查看详细信息（配置、路由）
+3. 用户可以创建新的 Topic（填写名称、队列数）
+4. 用户可以删除 Topic（需确认提示）
 
 **Plans:** 1 plan
-- [x] 05-01-PLAN.md — 用户管理RESTful API实现
-
----
-
-### Phase 6: 用户列表与状态功能
-
-**Goal:** 用户列表页面完整功能，包括筛选、分页、状态切换
-
-**Depends on:** Phase 5
-
-**Requirements:** LIST-01, LIST-02, LIST-03, LIST-04, LIST-05, LIST-06, STATUS-03
-
-**Success Criteria** (what must be TRUE):
-1. 用户可以在表格中看到所有用户的用户名、手机、状态、创建时间
-2. 用户可以输入用户名进行模糊搜索
-3. 用户可以输入手机号精确筛选
-4. 用户可以按下拉筛选启用/禁用状态
-5. 用户可以切换每页显示条数并翻页
-6. 用户点击表格行能导航到用户详情页
-7. 用户切换用户状态后能看到明确的成功/失败反馈
-
-**Plans:** 1 plan
-- [x] 06-01-PLAN.md — 用户列表页面增强
+- [ ] 09-01-PLAN.md — Topic 管理功能实现
 
 **UI hint:** yes
 
 ---
 
-### Phase 7: 用户详情页
+### Phase 10: Consumer Group 管理
 
-**Goal:** 用户详情页面完整展示
+**Goal:** 实现 Consumer Group 的查看和位点重置功能
 
-**Depends on:** Phase 5
+**Depends on:** Phase 9
 
-**Requirements:** DETAIL-01, DETAIL-02, DETAIL-03, DETAIL-04
+**Requirements:** CONS-01, CONS-02, CONS-03
 
 **Success Criteria** (what must be TRUE):
-1. 用户访问 /users/:id 能看到详情页面
-2. 用户能看到用户名、手机号、邮箱、状态、创建时间
-3. 用户能看到该用户的角色信息列表
-4. 用户能点击返回按钮回到用户列表页
+1. 用户可以在表格中看到所有 Consumer Group 的名称、类型、状态
+2. 用户可以点击 Group 查看详细信息（消费进度、订阅关系、位点）
+3. 用户可以重置消费位点（按时间戳或指定位点）
 
 **Plans:** 1 plan
-- [x] 07-01-PLAN.md — 用户详情页实现
+- [ ] 10-01-PLAN.md — Consumer Group 管理功能实现
 
 **UI hint:** yes
 
 ---
 
-### Phase 8: 用户增删改表单
+### Phase 11: 消息管理
 
-**Goal:** 用户创建、编辑、删除功能完整可用
+**Goal:** 实现消息查询、详情查看和轨迹追踪
 
-**Depends on:** Phase 5, Phase 6, Phase 7
+**Depends on:** Phase 9
 
-**Requirements:** CRUD-01, CRUD-02, CRUD-03, CRUD-04, STATUS-01, STATUS-02
+**Requirements:** MSG-01, MSG-02, MSG-03
 
 **Success Criteria** (what must be TRUE):
-1. 用户可以填写表单创建新用户（用户名必填、手机号格式正确、邮箱格式正确）
-2. 用户可以编辑已有用户信息，表单预填充现有数据
-3. 用户删除用户前会看到确认提示
-4. 用户可以启用被禁用的用户
-5. 用户可以禁用已启用的用户
-6. 表单验证失败时显示清晰的错误提示
+1. 用户可以按 Topic 和时间范围查询消息列表
+2. 用户可以点击消息查看详情（ID、内容、属性、Key、Tag）
+3. 用户可以追踪消息的生产→消费全链路
 
 **Plans:** 1 plan
-- [x] 08-01-PLAN.md — 用户增删改表单实现
+- [ ] 11-01-PLAN.md — 消息管理功能实现
+
+**UI hint:** yes
+
+---
+
+### Phase 12: 监控面板
+
+**Goal:** 实现集群监控、Broker 状态、堆积监控和实时图表
+
+**Depends on:** Phase 9
+
+**Requirements:** MON-01, MON-02, MON-03, MON-04, MON-05
+
+**Success Criteria** (what must be TRUE):
+1. 用户可以看到集群概览（Broker数量、Topic数量、Consumer数量、堆积总量）
+2. 用户可以查看各 Broker 的状态（在线/离线、版本、运行时间）
+3. 用户可以查看各 Topic 的消息堆积量
+4. 用户可以查看实时 QPS 监控图表（生产/消费）
+5. 用户可以查看延迟统计（发送延迟、消费延迟）
+
+**Plans:** 1 plan
+- [ ] 12-01-PLAN.md — 监控面板功能实现
 
 **UI hint:** yes
 
@@ -111,59 +105,50 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 5. Backend API | 1/1 | Completed | 2026-04-18 |
-| 6. User List | 1/1 | Completed | 2026-04-18 |
-| 7. User Detail | 1/1 | Completed | 2026-04-18 |
-| 8. User CRUD | 1/1 | Completed | 2026-04-18 |
+| 9. Topic 管理 | 0/1 | Pending | — |
+| 10. Consumer Group | 0/1 | Pending | — |
+| 11. 消息管理 | 0/1 | Pending | — |
+| 12. 监控面板 | 0/1 | Pending | — |
 
 ---
 
 ## Coverage Map
 
 ```
-API-01 → Phase 5
-API-02 → Phase 5
-API-03 → Phase 5
-API-04 → Phase 5
-API-05 → Phase 5
-API-06 → Phase 5
-LIST-01 → Phase 6
-LIST-02 → Phase 6
-LIST-03 → Phase 6
-LIST-04 → Phase 6
-LIST-05 → Phase 6
-LIST-06 → Phase 6
-STATUS-03 → Phase 6
-DETAIL-01 → Phase 7
-DETAIL-02 → Phase 7
-DETAIL-03 → Phase 7
-DETAIL-04 → Phase 7
-CRUD-01 → Phase 8
-CRUD-02 → Phase 8
-CRUD-03 → Phase 8
-CRUD-04 → Phase 8
-STATUS-01 → Phase 8
-STATUS-02 → Phase 8
+TOPIC-01 → Phase 9
+TOPIC-02 → Phase 9
+TOPIC-03 → Phase 9
+TOPIC-04 → Phase 9
+CONS-01 → Phase 10
+CONS-02 → Phase 10
+CONS-03 → Phase 10
+MSG-01 → Phase 11
+MSG-02 → Phase 11
+MSG-03 → Phase 11
+MON-01 → Phase 12
+MON-02 → Phase 12
+MON-03 → Phase 12
+MON-04 → Phase 12
+MON-05 → Phase 12
 
-Mapped: 23/23 ✓
+Mapped: 15/15 ✓
 ```
 
 ---
 
-## v1.2 执行顺序
+## v1.3 执行顺序
 
 ```
-Phase 5 (API) → Phase 6 (List) ─┬─→ Phase 7 (Detail)
-                                 │          ↓
-                                 └────────→ Phase 8 (CRUD)
+Phase 9 (Topic) → Phase 10 (Consumer) ─┬─→ Phase 11 (消息)
+                                       │           ↓
+                                       └────────→ Phase 12 (监控)
 ```
 
 **说明:**
-- Phase 5 独立，是后续所有阶段的基础
-- Phase 6、7、8 可并行开发（都依赖 Phase 5）
-- Phase 8 依赖 Phase 6 和 Phase 7（需要列表和详情的上下文）
+- Phase 9 独立，是后续所有阶段的基础
+- Phase 10、11、12 可并行开发（都依赖 Phase 9 的 Topic API）
 
 ---
 
-*路线图创建完成: 2026-04-18*
+*路线图创建完成: 2026-04-28*
 *等待用户批准后开始执行*
