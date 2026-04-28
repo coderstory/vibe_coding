@@ -20,21 +20,21 @@ See: .planning/MILESTONES.md
 
 | Phase | Directory | Status |
 |-------|-----------|--------|
-| Phase 1 | TBD | Pending |
-| Phase 2 | TBD | Pending |
-| Phase 3 | TBD | Pending |
-| Phase 4 | TBD | Pending |
+| Phase 9 | 09-topic-mgmt | Completed |
+| Phase 10 | 10-consumer-group-mgmt | Discussed |
+| Phase 11 | TBD | Pending |
+| Phase 12 | TBD | Pending |
 
 ## Roadmap Summary
 
 | Phase | 名称 | 任务数 | 状态 |
 |-------|------|--------|------|
-| Phase 1 | TBD | - | Pending |
-| Phase 2 | TBD | - | Pending |
-| Phase 3 | TBD | - | Pending |
-| Phase 4 | TBD | - | Pending |
+| Phase 9 | Topic 管理 | - | Completed |
+| Phase 10 | Consumer Group 管理 | - | Discussed |
+| Phase 11 | TBD | - | Pending |
+| Phase 12 | TBD | - | Pending |
 
-**v1.3 进行中：4 phases (TBD)**
+**v1.3 进行中：4 phases (2 completed, 2 pending)**
 
 ## Key Decisions Made
 
