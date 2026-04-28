@@ -36,4 +36,29 @@ public interface RocketMQAdminService {
      * @param topicName Topic 名称
      */
     void deleteTopic(String topicName);
+
+    // ==================== Consumer Group 管理 ====================
+
+    /**
+     * 获取所有 Consumer Group 列表
+     * @param keyword 关键字筛选（可选，模糊匹配）
+     * @return Consumer Group 列表
+     */
+    List<Map<String, Object>> getConsumerGroupList(String keyword);
+
+    /**
+     * 获取 Consumer Group 详情
+     * @param groupName Group 名称
+     * @return Group 详细信息（消费进度、订阅关系、位点）
+     */
+    Map<String, Object>> getConsumerGroupDetail(String groupName);
+
+    /**
+     * 重置消费位点（按时间戳）
+     * @param topic Topic 名称
+     * @param groupName Group 名称
+     * @param timestamp 重置时间戳（毫秒）
+     * @throws BusinessException 如果是广播模式或消费者不在线
+     */
+    void resetConsumerOffset(String topic, String groupName, long timestamp);
 }

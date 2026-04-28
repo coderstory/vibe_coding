@@ -5,6 +5,9 @@ import cn.coderstory.springboot.service.RocketMQAdminService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.common.TopicConfig;
+import org.apache.rocketmq.common.protocol.body.ConsumeStats;
+import org.apache.rocketmq.common.protocol.body.SubscriptionGroupConfig;
+import org.apache.rocketmq.common.protocol.body.SubscriptionGroupWrapper;
 import org.apache.rocketmq.remoting.protocol.body.TopicList;
 import org.apache.rocketmq.remoting.protocol.route.TopicRouteData;
 import org.apache.rocketmq.tools.admin.DefaultMQAdminExt;
@@ -213,5 +216,122 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
             case "READ_WRITE" -> 6;
             default -> 4; // READ
         };
+    }
+
+    // ==================== Consumer Group 管理 ====================
+
+    @Override
+    public List<Map<String, Object>> getConsumerGroupList(String keyword) {
+        try {
+            SubscriptionGroupWrapper wrapper = defaultMQAdminExt.getAllSubscriptionGroup(nameServer, 3000);
+            Set<String> groupSet = wrapper.getSubscriptionGroupTable().keySet();
+            List<Map<String, Object>> result = new ArrayList<>();
+
+            for (String group : groupSet) {
+                // 过滤关键字
+                if (keyword != null && !keyword.isEmpty()
+                        && !group.toLowerCase().contains(keyword.toLowerCase())) {
+                    continue;
+                }
+
+                Map<String, Object> item = new HashMap<>();
+                item.put("group", group);
+
+                // 获取消费统计
+                try {
+                    ConsumeStats stats = defaultMQAdminExt.getConsumeStats(null, group, 3000);
+                    item.put("consumerCount", stats.getConsumerList() != null ? stats.getConsumerList().size() : 0);
+                    item.put("accumulatedDiff", stats.getTotalDiff());
+                } catch (Exception e) {
+                    item.put("consumerCount", 0);
+                    item.put("accumulatedDiff", 0L);
+                    log.debug("获取 Consumer Group {} 消费统计失败: {}", group, e.getMessage());
+                }
+
+                // 获取 Group 配置（类型）
+                try {
+                    SubscriptionGroupConfig config = wrapper.getSubscriptionGroupTable().get(group);
+                    if (config != null) {
+                        // GroupType: 0 = BROADCASTING, 其他 = CLUSTERING
+                        item.put("groupType", config.getGroupType() == 0 ? "BROADCASTING" : "CLUSTERING");
+                    } else {
+                        item.put("groupType", "UNKNOWN");
+                    }
+                    item.put("status", "OK");
+                } catch (Exception e) {
+                    item.put("groupType", "UNKNOWN");
+                    item.put("status", "OFFLINE");
+                }
+
+                result.add(item);
+            }
+
+            // 按名称排序
+            result.sort(Comparator.comparing(a -> (String) a.get("group")));
+
+            return result;
+        } catch (Exception e) {
+            log.error("获取 Consumer Group 列表失败", e);
+            throw BusinessException.badRequest("获取数据失败，请稍后重试");
+        }
+    }
+
+    @Override
+    public Map<String, Object> getConsumerGroupDetail(String groupName) {
+        try {
+            Map<String, Object> detail = new HashMap<>();
+            detail.put("group", groupName);
+
+            // 消费统计
+            ConsumeStats stats = defaultMQAdminExt.getConsumeStats(null, groupName, 3000);
+            detail.put("consumerCount", stats.getConsumerList() != null ? stats.getConsumerList().size() : 0);
+            detail.put("totalDiff", stats.getTotalDiff());
+
+            // 订阅关系配置
+            SubscriptionGroupWrapper wrapper = defaultMQAdminExt.getAllSubscriptionGroup(nameServer, 3000);
+            SubscriptionGroupConfig config = wrapper.getSubscriptionGroupTable().get(groupName);
+            if (config != null) {
+                detail.put("groupType", config.getGroupType() == 0 ? "BROADCASTING" : "CLUSTERING");
+                detail.put("subscriptions", config.getSubscriptionDataList());
+            }
+
+            // 位点表
+            Map<String, Long> offsetTable = new HashMap<>();
+            if (stats.getOffsetTable() != null) {
+                stats.getOffsetTable().forEach((mq, ow) -> {
+                    String key = mq.getTopic() + "-" + mq.getQueueId();
+                    offsetTable.put(key, ow.getConsumerOffset());
+                });
+            }
+            detail.put("offsetTable", offsetTable);
+
+            return detail;
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("获取 Consumer Group 详情失败: {}", groupName, e);
+            throw BusinessException.badRequest("获取数据失败，请稍后重试");
+        }
+    }
+
+    @Override
+    public void resetConsumerOffset(String topic, String groupName, long timestamp) {
+        try {
+            // 检查 Group 类型
+            SubscriptionGroupWrapper wrapper = defaultMQAdminExt.getAllSubscriptionGroup(nameServer, 3000);
+            SubscriptionGroupConfig config = wrapper.getSubscriptionGroupTable().get(groupName);
+            if (config != null && config.getGroupType() == 0) {
+                throw BusinessException.badRequest("广播模式不支持位点重置");
+            }
+
+            // 执行重置
+            defaultMQAdminExt.resetOffsetByTimestamp(topic, groupName, timestamp);
+            log.info("位点重置成功: topic={}, group={}, timestamp={}", topic, groupName, timestamp);
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("位点重置失败: topic={}, group={}", topic, groupName, e);
+            throw BusinessException.badRequest("位点重置失败: " + e.getMessage());
+        }
     }
 }

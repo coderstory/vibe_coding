@@ -12,22 +12,24 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * RocketMQ Topic 管理控制器
- * 提供 Topic 的查看、创建、删除等 RESTful API
+ * RocketMQ 管理控制器
+ * 提供 Topic 和 Consumer Group 的 RESTful API
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/rocketmq/topics")
+@RequestMapping("/api/rocketmq")
 @RequiredArgsConstructor
 public class RocketMQController {
 
     private final RocketMQAdminService rocketMQAdminService;
 
+    // ==================== Topic 管理 ====================
+
     /**
      * 获取 Topic 列表
      * GET /api/rocketmq/topics?keyword=xxx
      */
-    @GetMapping
+    @GetMapping("/topics")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getTopicList(
             @RequestParam(required = false) String keyword) {
         List<Map<String, Object>> list = rocketMQAdminService.getTopicList(keyword);
@@ -43,7 +45,7 @@ public class RocketMQController {
      * 获取 Topic 详情
      * GET /api/rocketmq/topics/{topicName}
      */
-    @GetMapping("/{topicName}")
+    @GetMapping("/topics/{topicName}")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getTopicDetail(
             @PathVariable String topicName) {
         Map<String, Object> detail = rocketMQAdminService.getTopicDetail(topicName);
@@ -55,7 +57,7 @@ public class RocketMQController {
      * POST /api/rocketmq/topics
      * Body: { "topicName": "xxx", "queueCount": 8, "perm": "READ" }
      */
-    @PostMapping
+    @PostMapping("/topics")
     public ResponseEntity<ApiResponse<Void>> createTopic(@RequestBody Map<String, Object> request) {
         String topicName = (String) request.get("topicName");
         Integer queueCount = 8;
@@ -76,9 +78,55 @@ public class RocketMQController {
      * 删除 Topic
      * DELETE /api/rocketmq/topics/{topicName}
      */
-    @DeleteMapping("/{topicName}")
+    @DeleteMapping("/topics/{topicName}")
     public ResponseEntity<ApiResponse<Void>> deleteTopic(@PathVariable String topicName) {
         rocketMQAdminService.deleteTopic(topicName);
         return ResponseEntity.ok(ApiResponse.success("Topic 删除成功", null));
+    }
+
+    // ==================== Consumer Group 管理 ====================
+
+    /**
+     * 获取 Consumer Group 列表
+     * GET /api/rocketmq/consumer-groups?keyword=xxx
+     */
+    @GetMapping("/consumer-groups")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getConsumerGroupList(
+            @RequestParam(required = false) String keyword) {
+        List<Map<String, Object>> list = rocketMQAdminService.getConsumerGroupList(keyword);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("records", list);
+        data.put("total", list.size());
+
+        return ResponseEntity.ok(ApiResponse.success(data));
+    }
+
+    /**
+     * 获取 Consumer Group 详情
+     * GET /api/rocketmq/consumer-groups/{group}
+     */
+    @GetMapping("/consumer-groups/{group}")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getConsumerGroupDetail(
+            @PathVariable String group) {
+        Map<String, Object> detail = rocketMQAdminService.getConsumerGroupDetail(group);
+        return ResponseEntity.ok(ApiResponse.success(detail));
+    }
+
+    /**
+     * 重置消费位点
+     * POST /api/rocketmq/consumer-groups/{group}/reset-offset
+     * Body: { "topic": "xxx", "timestamp": 1715000000000 }
+     */
+    @PostMapping("/consumer-groups/{group}/reset-offset")
+    public ResponseEntity<ApiResponse<Void>> resetConsumerOffset(
+            @PathVariable String group,
+            @RequestBody Map<String, Object> request) {
+        String topic = (String) request.get("topic");
+        Long timestamp = ((Number) request.get("timestamp")).longValue();
+
+        rocketMQAdminService.resetConsumerOffset(topic, group, timestamp);
+
+        return ResponseEntity.ok(ApiResponse.success("位点重置成功", null));
     }
 }
