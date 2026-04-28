@@ -9,7 +9,7 @@
 | 项目 | 版本 |
 |------|------|
 | Spring Boot | 4.0.5 |
-| Java | 21 |
+| Java | 26 |
 | MyBatis Plus | 3.5.x |
 | Flyway | 数据库迁移 |
 | JWT | 认证 |
@@ -42,7 +42,7 @@ mvn package -DskipTests
 
 | 技术 | 用途 | 备注 |
 |------|------|------|
-| Spring Boot 4 | 核心框架 | Java 21 |
+| Spring Boot 4 | 核心框架 | Java 26 |
 | MyBatis Plus | ORM | 使用 BaseMapper 简化 CRUD |
 | Flyway | 数据库迁移 | 脚本位于 `src/main/resources/db/migration/` |
 | Spring Security | 安全框架 | JWT 认证 |

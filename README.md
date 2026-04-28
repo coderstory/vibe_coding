@@ -28,7 +28,7 @@
 这是一个基于 Spring Boot 4 和 Vue 3 的现代化后台管理系统，使用 AI 编程工具完成开发。
 
 - **前端**：Vue 3.5 + Vite 8 + TypeScript
-- **后端**：Spring Boot 4.0.5 + Java 21 + MyBatis Plus
+- **后端**：Spring Boot 4.0.5 + Java 26 + MyBatis Plus
 - **数据库**：MySQL + Flyway 数据库迁移
 - **认证**：JWT 令牌认证
 - **UI 组件**：Element Plus
@@ -39,7 +39,7 @@
 ### 环境要求
 
 - **前端**：Node.js v20.19+ 或 v22.12+
-- **后端**：Java 21+
+- **后端**：Java 26+
 - **数据库**：MySQL（数据库名 `admin_system`，本地默认 root/123456）
 - **缓存**：Redis 8.0+（秒杀系统必需）
 - **消息队列**：RocketMQ 5.3.2（秒杀系统必需）
@@ -192,7 +192,7 @@ vibe_coding/
 | **路由** | Vue Router | - |
 | **HTTP客户端** | Axios | - |
 | **后端框架** | Spring Boot | 4.0.5 |
-| **语言** | Java | 21 |
+| **语言** | Java | 26 |
 | **ORM** | MyBatis Plus | - |
 | **缓存** | Redis | 8.0+ |
 | **消息队列** | RocketMQ | 5.3.2 |
