@@ -1,0 +1,28 @@
+spring:
+  profiles:
+    active: test
+
+  # 测试数据源配置
+  datasource:
+    url: jdbc:mysql://localhost:3306/admin_system?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+
+  # 禁用 Flyway 测试
+  flyway:
+    enabled: false
+
+  # 测试环境安全配置
+  security:
+    filter:
+      order: 1
+
+# RocketMQ 测试配置 (mock)
+rocketmq:
+  name-server: localhost:9876
+
+# 日志级别
+logging:
+  level:
+    root: WARN
+    cn.coderstory: DEBUG
