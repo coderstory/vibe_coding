@@ -161,6 +161,12 @@ const routes: RouteRecordRaw[] = [
         name: 'TopicList',
         component: () => import('@/views/rocketmq/TopicList.vue'),
         meta: { title: 'Topic 管理', requiresAuth: true }
+      },
+      {
+        path: '/rocketmq/consumer-groups',
+        name: 'ConsumerGroupList',
+        component: () => import('@/views/rocketmq/ConsumerGroupList.vue'),
+        meta: { title: 'Consumer Group 管理', requiresAuth: true }
       }
     ]
   },
