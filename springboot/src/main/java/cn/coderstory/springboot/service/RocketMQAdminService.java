@@ -51,7 +51,7 @@ public interface RocketMQAdminService {
      * @param groupName Group 名称
      * @return Group 详细信息（消费进度、订阅关系、位点）
      */
-    Map<String, Object>> getConsumerGroupDetail(String groupName);
+    Map<String, Object> getConsumerGroupDetail(String groupName);
 
     /**
      * 重置消费位点（按时间戳）
