@@ -331,6 +331,11 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
             List<Map<String, Object>> result = new ArrayList<>();
 
             for (String group : groupSet) {
+                // 过滤系统 Consumer Group
+                if (group.startsWith("%RETRY%") || group.startsWith("%DLQ%")) {
+                    continue;
+                }
+
                 // 过滤关键字
                 if (keyword != null && !keyword.isEmpty()
                         && !group.toLowerCase().contains(keyword.toLowerCase())) {
@@ -350,9 +355,10 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
                     }
                     item.put("accumulatedDiff", 0L);
                 } catch (Exception e) {
+                    // 忽略消费统计查询失败（可能是 topic 不存在等）
                     item.put("consumerCount", 0);
                     item.put("accumulatedDiff", 0L);
-                    log.debug("获取 Consumer Group {} 消费统计失败: {}", group, e.getMessage(),e);
+                    log.debug("获取 Consumer Group {} 消费统计失败: {}", group, e.getMessage());
                 }
 
 // 获取 Group 配置（类型）- RocketMQ 5.x API
