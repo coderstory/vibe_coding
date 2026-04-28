@@ -174,8 +174,8 @@ onMounted(() => {
       border
       style="width: 100%"
     >
-      <el-table-column type="index" label="序号" width="60" align="center" />
-      <el-table-column prop="topicName" label="Topic 名称" min-width="200" show-overflow-tooltip />
+      <el-table-column type="index" label="序号" width="80" align="center" />
+      <el-table-column prop="topicName" label="Topic 名称" min-width="120" show-overflow-tooltip />
       <el-table-column prop="queueCount" label="队列数" width="100" align="center" />
       <el-table-column prop="status" label="状态" width="100" align="center">
         <template #default="{ row }">

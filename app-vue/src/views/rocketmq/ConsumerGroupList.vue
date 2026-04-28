@@ -20,8 +20,8 @@ const currentGroup = ref('')
 
 // 表格列定义
 const columns = [
-  { prop: 'index', label: '序号', width: 60, align: 'center' as const },
-  { prop: 'group', label: 'Group 名称', minWidth: 200 },
+  { prop: 'index', label: '序号', width: 80, align: 'center' as const },
+  { prop: 'group', label: 'Group 名称', minWidth: 120 },
   { prop: 'groupType', label: '类型', width: 100, align: 'center' as const },
   { prop: 'status', label: '状态', width: 100, align: 'center' as const },
   { prop: 'consumerCount', label: '消费者数', width: 100, align: 'center' as const },
