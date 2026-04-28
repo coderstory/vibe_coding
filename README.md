@@ -1,8 +1,6 @@
 # 后台管理系统
 
-<p align="center">
-  <img src="./docs/images/view-page-2.png" alt="后台管理系统" width="80%">
-</p>
+
 
 <p align="center">
   <a href="#">
@@ -17,7 +15,9 @@
 </p>
 
 ## 📸 页面预览
-
+<p align="center">
+  <img src="./docs/images/view-page-2.png" alt="后台管理系统" width="80%">
+</p>
 <p align="center">
   <img src="./docs/images/login-page.png" alt="登录页面" width="80%">
 </p>
