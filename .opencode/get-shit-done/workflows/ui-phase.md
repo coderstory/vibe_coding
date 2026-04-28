@@ -1,15 +1,15 @@
-<purpose>
+<objective>
 Generate a UI design contract (UI-SPEC.md) for frontend phases. Orchestrates gsd-ui-researcher and gsd-ui-checker with a revision loop. Inserts between discuss-phase and plan-phase in the lifecycle.
 
 UI-SPEC.md locks spacing, typography, color, copywriting, and design system decisions before the planner creates tasks. This prevents design debt caused by ad-hoc styling decisions during execution.
-</purpose>
+</objective>
 
 <required_reading>
-@D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/ui-brand.md
+@./.opencode/get-shit-done/references/ui-brand.md
 </required_reading>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-ui-researcher — Researches UI/UX approaches
 - gsd-ui-checker — Reviews UI implementation quality
 </available_agent_types>
@@ -21,8 +21,8 @@ Valid GSD subagent types (use exact names — do not fall back to 'general-purpo
 ```bash
 INIT=$(gsd-sdk query init.plan-phase "$PHASE")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_UI=$(gsd-sdk query agent-skills gsd-ui-researcher 2>/dev/null)
-AGENT_SKILLS_UI_CHECKER=$(gsd-sdk query agent-skills gsd-ui-checker 2>/dev/null)
+AGENT_SKILLS_UI=$(gsd-sdk query agent-skills gsd-ui-researcher)
+AGENT_SKILLS_UI_CHECKER=$(gsd-sdk query agent-skills gsd-ui-checker)
 ```
 
 Parse JSON for: `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded_phase`, `has_context`, `has_research`, `commit_docs`.
@@ -31,7 +31,7 @@ Parse JSON for: `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded
 
 Detect sketch findings:
 ```bash
-SKETCH_FINDINGS_PATH=$(ls ./.opencode/skills/sketch-findings-*/SKILL.md 2>/dev/null | head -1)
+SKETCH_FINDINGS_PATH=$(ls ./.claude/skills/sketch-findings-*/SKILL.md 2>/dev/null | head -1)
 ```
 
 Resolve UI agent models:
@@ -96,7 +96,7 @@ UI_SPEC_FILE=$(ls "${PHASE_DIR}"/*-UI-SPEC.md 2>/dev/null | head -1)
 ```
 
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 **If exists:** Use question:
 - header: "Existing UI-SPEC"
 - question: "UI-SPEC.md already exists for Phase {N}. What would you like to do?"
@@ -123,7 +123,7 @@ Display:
 Build prompt:
 
 ```markdown
-Read D:/Data/桌面/vibe_coding/.opencode/agents/gsd-ui-researcher.md for instructions.
+read ./.opencode/agents/gsd-ui-researcher.md for instructions.
 
 <objective>
 Create UI design contract for Phase {phase_number}: {phase_name}
@@ -142,8 +142,8 @@ Answer: "What visual and interaction contracts does this phase need?"
 ${AGENT_SKILLS_UI}
 
 <output>
-Write to: {phase_dir}/{padded_phase}-UI-SPEC.md
-Template: D:/Data/桌面/vibe_coding/.opencode/get-shit-done/templates/UI-SPEC.md
+write to: {phase_dir}/{padded_phase}-UI-SPEC.md
+Template: ./.opencode/get-shit-done/templates/UI-SPEC.md
 </output>
 
 <config>
@@ -156,12 +156,7 @@ padded_phase: {padded_phase}
 Omit null file paths from `<files_to_read>`.
 
 ```
-Task(
-  prompt=ui_research_prompt,
-  subagent_type="gsd-ui-researcher",
-  model="{UI_RESEARCHER_MODEL}",
-  description="UI Design Contract Phase {N}"
-)
+@gsd-ui-researcher ui_research_prompt
 ```
 
 ## 6. Handle Researcher Return
@@ -186,7 +181,7 @@ Display:
 Build prompt:
 
 ```markdown
-Read D:/Data/桌面/vibe_coding/.opencode/agents/gsd-ui-checker.md for instructions.
+read ./.opencode/agents/gsd-ui-checker.md for instructions.
 
 <objective>
 Validate UI design contract for Phase {phase_number}: {phase_name}
@@ -207,12 +202,7 @@ ui_safety_gate: {ui_safety_gate config value}
 ```
 
 ```
-Task(
-  prompt=ui_checker_prompt,
-  subagent_type="gsd-ui-checker",
-  model="{UI_CHECKER_MODEL}",
-  description="Verify UI-SPEC Phase {N}"
-)
+@gsd-ui-checker ui_checker_prompt
 ```
 
 ## 8. Handle Checker Return
@@ -238,7 +228,7 @@ The UI checker found issues with the current UI-SPEC.md.
 ### Issues to Fix
 {paste blocking issues from checker return}
 
-Read the existing UI-SPEC.md, fix ONLY the listed issues, re-write the file.
+read the existing UI-SPEC.md, fix ONLY the listed issues, re-write the file.
 Do NOT re-ask the user questions that are already answered.
 </revision>
 ```
@@ -253,7 +243,7 @@ Max revision iterations reached. Remaining issues:
 
 Options:
 1. Force approve — proceed with current UI-SPEC (FLAGs become accepted)
-2. Edit manually — open UI-SPEC.md in editor, re-run /gsd-ui-phase
+2. edit manually — open UI-SPEC.md in editor, re-run /gsd-ui-phase
 3. Abandon — exit without approving
 ```
 
@@ -279,12 +269,12 @@ Dimensions: 6/6 passed
 {If CONTEXT.md exists for this phase:}
 **Plan Phase {N}** — planner will use UI-SPEC.md as design context
 
-`/clear` then: `/gsd-plan-phase {N}`
+`/new` then: `/gsd-plan-phase {N}`
 
 {If CONTEXT.md does NOT exist:}
 **Discuss Phase {N}** — gather implementation context before planning
 
-`/clear` then: `/gsd-discuss-phase {N}`
+`/new` then: `/gsd-discuss-phase {N}`
 
 (or `/gsd-plan-phase {N}` to skip discussion)
 

@@ -134,11 +134,11 @@ function cmdVerifyPlanStructure(cwd, filePath, raw) {
     const hasVerify = /<verify>/.test(taskContent);
     const hasDone = /<done>/.test(taskContent);
 
-    if (!nameMatch) errors.push('Task missing <name> element');
-    if (!hasAction) errors.push(`Task '${taskName}' missing <action>`);
-    if (!hasVerify) warnings.push(`Task '${taskName}' missing <verify>`);
-    if (!hasDone) warnings.push(`Task '${taskName}' missing <done>`);
-    if (!hasFiles) warnings.push(`Task '${taskName}' missing <files>`);
+    if (!nameMatch) errors.push('task missing <name> element');
+    if (!hasAction) errors.push(`task '${taskName}' missing <action>`);
+    if (!hasVerify) warnings.push(`task '${taskName}' missing <verify>`);
+    if (!hasDone) warnings.push(`task '${taskName}' missing <done>`);
+    if (!hasFiles) warnings.push(`task '${taskName}' missing <files>`);
 
     tasks.push({ name: taskName, hasFiles, hasAction, hasVerify, hasDone });
   }
@@ -655,7 +655,7 @@ function cmdValidateHealth(cwd, options, raw) {
     } catch { /* intentionally empty */ }
   }
 
-  // ─── Read phase directories once for checks 6, 7, 7b, and 8 (#1973) ──────
+  // ─── read phase directories once for checks 6, 7, 7b, and 8 (#1973) ──────
   let phaseDirEntries = [];
   const phaseDirFiles = new Map(); // phase dir name → file list
   try {
@@ -706,19 +706,19 @@ function cmdValidateHealth(cwd, options, raw) {
   }
 
   // ─── Check 7c: Agent installation (#1371) ──────────────────────────────────
-  // Verify GSD agents are installed. Missing agents cause Task(subagent_type=...)
+  // Verify GSD agents are installed. Missing agents cause task(subagent_type=...)
   // to silently fall back to general-purpose, losing specialized instructions.
   try {
     const agentStatus = checkAgentsInstalled();
     if (!agentStatus.agents_installed) {
       if (agentStatus.installed_agents.length === 0) {
         addIssue('warning', 'W010',
-          `No GSD agents found in ${agentStatus.agents_dir} — Task(subagent_type="gsd-*") will fall back to general-purpose`,
-          'Run the GSD installer: npx get-shit-done-cc@latest');
+          `No GSD agents found in ${agentStatus.agents_dir} — task(subagent_type="gsd-*") will fall back to general-purpose`,
+          'Run the GSD installer: npx gsd-opencode@latest');
       } else {
         addIssue('warning', 'W010',
           `Missing ${agentStatus.missing_agents.length} GSD agents: ${agentStatus.missing_agents.join(', ')} — affected workflows will fall back to general-purpose`,
-          'Run the GSD installer: npx get-shit-done-cc@latest');
+          'Run the GSD installer: npx gsd-opencode@latest');
       }
     }
   } catch { /* intentionally empty — agent check is non-blocking */ }

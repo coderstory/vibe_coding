@@ -14,9 +14,9 @@ Parse from JSON: `phase_dir`, `phase_slug`, `padded_phase`, `phase_name`.
 
 ## Sub-step 1: Load prior context
 
-Read project-level and prior phase context to avoid re-asking decided questions.
+read project-level and prior phase context to avoid re-asking decided questions.
 
-**Read project files:**
+**read project files:**
 
 ```bash
 cat .planning/PROJECT.md 2>/dev/null || true
@@ -29,15 +29,15 @@ Extract from these:
 - **REQUIREMENTS.md** — Acceptance criteria, constraints, must-haves vs nice-to-haves
 - **STATE.md** — Current progress, decisions logged so far
 
-**Read all prior CONTEXT.md files:**
+**read all prior CONTEXT.md files:**
 
 ```bash
 (find .planning/phases -name "*-CONTEXT.md" 2>/dev/null || true) | sort
 ```
 
 For each CONTEXT.md where phase number < current phase:
-- Read the `<decisions>` section — these are locked preferences
-- Read `<specifics>` — particular references or "I want it like X" moments
+- read the `<decisions>` section — these are locked preferences
+- read `<specifics>` — particular references or "I want it like X" moments
 - Note patterns (e.g., "user consistently prefers minimal UI", "user rejected verbose output")
 
 **Build internal prior_decisions context** (do not write to file):
@@ -69,7 +69,7 @@ Lightweight codebase scan to inform grey area identification and proposals. Keep
 ls .planning/codebase/*.md 2>/dev/null || true
 ```
 
-**If codebase maps exist:** Read the most relevant ones (CONVENTIONS.md, STRUCTURE.md, STACK.md based on phase type). Extract reusable components, established patterns, integration points. Skip to building context below.
+**If codebase maps exist:** read the most relevant ones (CONVENTIONS.md, STRUCTURE.md, STACK.md based on phase type). Extract reusable components, established patterns, integration points. Skip to building context below.
 
 **If no codebase maps, do targeted grep:**
 
@@ -80,7 +80,7 @@ grep -rl "{term1}\|{term2}" src/ app/ --include="*.ts" --include="*.tsx" --inclu
 ls src/components/ src/hooks/ src/lib/ src/utils/ 2>/dev/null || true
 ```
 
-Read the 3-5 most relevant files to understand existing patterns.
+read the 3-5 most relevant files to understand existing patterns.
 
 **Build internal codebase_context** (do not write to file):
 - **Reusable assets** — existing components, hooks, utilities usable in this phase
@@ -114,7 +114,7 @@ Phase ${PHASE_NUM}: Infrastructure phase — skipping discuss, writing minimal c
 
 Use these defaults for the CONTEXT.md:
 - `<domain>`: Phase boundary from ROADMAP goal
-- `<decisions>`: Single "### the agent's Discretion" subsection — "All implementation choices are at the agent's discretion — pure infrastructure phase"
+- `<decisions>`: Single "### OpenCode's Discretion" subsection — "All implementation choices are at OpenCode's discretion — pure infrastructure phase"
 - `<code_context>`: Whatever the codebase scout found
 - `<specifics>`: "No specific requirements — infrastructure phase"
 - `<deferred>`: "None"
@@ -146,7 +146,7 @@ Display a table:
 ```
 ### Grey Area {M}/{N}: {Area Name}
 
-| # | Question | ✅ Recommended | Alternative(s) |
+| # | question | ✅ Recommended | Alternative(s) |
 |---|----------|---------------|-----------------|
 | 1 | {question} | {answer} — {rationale} | {alt1}; {alt2} |
 | 2 | {question} | {answer} — {rationale} | {alt1} |
@@ -164,7 +164,7 @@ Then prompt the user via **question**:
 **On "Change QN":** Use question with the alternatives for that specific question:
 - **header:** "{Area Name}"
 - **question:** "Q{N}: {question text}"
-- **options:** List the 1-2 alternatives plus "You decide" (maps to the agent's Discretion)
+- **options:** List the 1-2 alternatives plus "You decide" (maps to OpenCode's Discretion)
 
 Record the user's choice. Re-display the updated table with the change reflected. Re-present the full acceptance prompt so the user can make additional changes or accept.
 
@@ -190,7 +190,7 @@ Track deferred ideas internally for inclusion in CONTEXT.md.
 
 ---
 
-## Sub-step 5: Write CONTEXT.md
+## Sub-step 5: write CONTEXT.md
 
 After all areas are resolved (or infrastructure skip), write the CONTEXT.md file.
 
@@ -225,8 +225,8 @@ Use **exactly** this structure (identical to discuss-phase output):
 - {Accepted/chosen answer for Q2}
 ...
 
-### the agent's Discretion
-{Any "You decide" answers collected — note the agent has flexibility here}
+### OpenCode's Discretion
+{Any "You decide" answers collected — note OpenCode has flexibility here}
 
 </decisions>
 
@@ -261,7 +261,7 @@ Use **exactly** this structure (identical to discuss-phase output):
 </deferred>
 ```
 
-Write the file.
+write the file.
 
 **Commit:**
 

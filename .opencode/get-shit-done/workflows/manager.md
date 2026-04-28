@@ -1,12 +1,12 @@
-<purpose>
+<objective>
 
 Interactive command center for managing a milestone from a single terminal. Shows a dashboard of all phases with visual status, dispatches discuss inline and plan/execute as background agents, and loops back to the dashboard after each action. Enables parallel phase work from one terminal.
 
-</purpose>
+</objective>
 
 <required_reading>
 
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 
 </required_reading>
 
@@ -23,7 +23,7 @@ INIT=$(gsd-sdk query init.manager)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
-Parse JSON for: `milestone_version`, `milestone_name`, `phase_count`, `completed_count`, `in_progress_count`, `phases`, `recommended_actions`, `all_complete`, `waiting_signal`, `manager_flags`.
+Parse JSON for: `milestone_version`, `milestone_name`, `phase_count`, `completed_count`, `in_progress_count`, `phases`, `recommended_actions`, `all_complete`, `waiting_signal`, `manager_flags`, and the optional trio `queued_milestone_version`, `queued_milestone_name`, `queued_phases` (added in SDK fix `2495-2496-2497` — may be absent on older SDK versions, treat missing as empty).
 
 `manager_flags` contains per-step passthrough flags from config:
 - `manager_flags.discuss` — appended to `/gsd-discuss-phase` args (e.g. `"--auto --analyze"`)
@@ -103,6 +103,28 @@ Example output:
  | 6 | Polish & Final Mail… | 1-5  | · | · | · | · Up next           |
 ```
 
+**Queued section (next milestone preview):**
+
+If `queued_phases` is present and non-empty, render a compact preview of the next milestone's phases directly below the main table. This surfaces upcoming work without cluttering the active-milestone grid. Skip this section entirely when `queued_phases` is empty or missing (e.g. the active milestone is the last one in the roadmap).
+
+Use `queued_milestone_version` and `queued_milestone_name` for the header. Phases render without D/P/E columns since they aren't discussed yet — just number, name (pre-truncated `display_name`), dependencies (`deps_display`), and a fixed `· Queued` status. Phase-name padding should match the active-table column width for visual alignment.
+
+Example:
+
+```
+ ───────────────────────────────────────────────────────────────
+ ◆ Queued — {queued_milestone_version} {queued_milestone_name}  ({queued_phases.length} phases)
+ ───────────────────────────────────────────────────────────────
+ | # | Phase                | Deps | Status       |
+ |---|----------------------|------|--------------|
+ | 31| Email Logs           | —    | · Queued     |
+ | 32| Today's Sheets       | 31   | · Queued     |
+ | 33| Resend Backfill      | 31   | · Queued     |
+ | 34| Business Day Audit   | 31   | · Queued     |
+```
+
+Queued phases are NOT eligible for the Continue action menu — they live in a future milestone and must wait for the current milestone to ship. The preview exists purely for situational awareness.
+
 **Recommendations section:**
 
 If `all_complete` is true:
@@ -118,14 +140,14 @@ All {phase_count} phases done. Ready for final steps:
 ```
 
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 Ask user via question:
 - **question:** "All phases complete. What next?"
 - **options:** "Verify work" / "Complete milestone" / "Exit manager"
 
 Handle responses:
-- "Verify work": `Skill(skill="gsd-verify-work")`  then loop to dashboard.
-- "Complete milestone": `Skill(skill="gsd-complete-milestone")` then exit.
+- "Verify work": `skill(skill="gsd-verify-work")`  then loop to dashboard.
+- "Complete milestone": `skill(skill="gsd-complete-milestone")` then exit.
 - "Exit manager": Go to exit step.
 
 **If NOT all_complete**, build compound options from `recommended_actions`:
@@ -202,7 +224,7 @@ When the user selects a compound option:
 2. **Then run the inline discuss:**
 
 ```
-Skill(skill="gsd-discuss-phase", args="{PHASE_NUM} {manager_flags.discuss}")
+skill(skill="gsd-discuss-phase", args="{PHASE_NUM} {manager_flags.discuss}")
 ```
 
 After discuss completes, loop back to dashboard step (background agents continue running).
@@ -212,33 +234,29 @@ After discuss completes, loop back to dashboard step (background agents continue
 Discussion is interactive — needs user input. Run inline with any configured flags:
 
 ```
-Skill(skill="gsd-discuss-phase", args="{PHASE_NUM} {manager_flags.discuss}")
+skill(skill="gsd-discuss-phase", args="{PHASE_NUM} {manager_flags.discuss}")
 ```
 
 After discuss completes, loop back to dashboard step.
 
 ### Plan Phase N
 
-Planning runs autonomously. Spawn a background agent that delegates to the Skill pipeline with any configured flags:
+Planning runs autonomously. Spawn a background agent that delegates to the skill pipeline with any configured flags:
 
 ```
-Task(
-  description="Plan phase {N}: {phase_name}",
-  run_in_background=true,
-  prompt="You are running the GSD plan-phase workflow for phase {N} of the project.
+@general "You are running the GSD plan-phase workflow for phase {N} of the project.
 
 Working directory: {cwd}
 Phase: {N} — {phase_name}
 Goal: {goal}
 Manager flags: {manager_flags.plan}
 
-Run the plan-phase Skill with any configured manager flags:
-Skill(skill=\"gsd-plan-phase\", args=\"{N} --auto {manager_flags.plan}\")
+Run the plan-phase skill with any configured manager flags:
+skill(skill=\"gsd-plan-phase\", args=\"{N} --auto {manager_flags.plan}\")
 
 This delegates to the full plan-phase pipeline including local patches, research, plan-checker, and all quality gates.
 
 Important: You are running in the background. Do NOT use question — make autonomous decisions based on project context. If you hit a blocker, write it to STATE.md as a blocker and stop. Do NOT silently work around permission or file access errors — let them fail so the manager can surface them with resolution hints. Do NOT use --no-verify on git commits."
-)
 ```
 
 Display:
@@ -251,26 +269,22 @@ Loop back to dashboard step.
 
 ### Execute Phase N
 
-Execution runs autonomously. Spawn a background agent that delegates to the Skill pipeline with any configured flags:
+Execution runs autonomously. Spawn a background agent that delegates to the skill pipeline with any configured flags:
 
 ```
-Task(
-  description="Execute phase {N}: {phase_name}",
-  run_in_background=true,
-  prompt="You are running the GSD execute-phase workflow for phase {N} of the project.
+@general "You are running the GSD execute-phase workflow for phase {N} of the project.
 
 Working directory: {cwd}
 Phase: {N} — {phase_name}
 Goal: {goal}
 Manager flags: {manager_flags.execute}
 
-Run the execute-phase Skill with any configured manager flags:
-Skill(skill=\"gsd-execute-phase\", args=\"{N} {manager_flags.execute}\")
+Run the execute-phase skill with any configured manager flags:
+skill(skill=\"gsd-execute-phase\", args=\"{N} {manager_flags.execute}\")
 
 This delegates to the full execute-phase pipeline including local patches, branching, wave-based execution, verification, and all quality gates.
 
 Important: You are running in the background. Do NOT use question — make autonomous decisions. Do NOT use --no-verify on git commits — let pre-commit hooks run normally. If you hit a permission error, file lock, or any access issue, do NOT work around it — let it fail and write the error to STATE.md as a blocker so the manager can surface it with resolution guidance."
-)
 ```
 
 Display:
@@ -289,7 +303,7 @@ Loop back to dashboard step.
 
 When notified that a background agent completed:
 
-1. Read the result message from the agent.
+1. read the result message from the agent.
 2. Display a brief notification:
 
 ```
@@ -308,8 +322,8 @@ Classify the error:
 - Display the error clearly, then offer to fix it:
   - **question:** "Phase {N} failed — permission denied for `{tool_or_command}`. Want me to add it to settings.local.json so it's allowed?"
   - **options:** "Add permission and retry" / "Run this phase inline instead" / "Skip and continue"
-  - "Add permission and retry": Use `Skill(skill="update-config")` to add the permission to `settings.local.json`, then re-spawn the background agent. Loop to dashboard.
-  - "Run this phase inline instead": Dispatch the same action inline via the appropriate Skill — use `Skill(skill="gsd-plan-phase", args="{N}")` if the failed action was planning, or `Skill(skill="gsd-execute-phase", args="{N}")` if the failed action was execution. Loop to dashboard after.
+  - "Add permission and retry": Use `skill(skill="update-config")` to add the permission to `settings.local.json`, then re-spawn the background agent. Loop to dashboard.
+  - "Run this phase inline instead": Dispatch the same action inline via the appropriate skill — use `skill(skill="gsd-plan-phase", args="{N}")` if the failed action was planning, or `skill(skill="gsd-execute-phase", args="{N}")` if the failed action was execution. Loop to dashboard after.
   - "Skip and continue": Loop to dashboard (phase stays in current state).
 
 **Other errors** (git lock, file conflict, logic error, etc.):
@@ -317,9 +331,9 @@ Classify the error:
   - **question:** "Background agent for Phase {N} encountered an issue: {error}. What next?"
   - **options:** "Retry" / "Run inline instead" / "Skip and continue" / "View details"
   - "Retry": Re-spawn the same background agent. Loop to dashboard.
-  - "Run inline instead": Dispatch the action inline via the appropriate Skill — use `Skill(skill="gsd-plan-phase", args="{N}")` if the failed action was planning, or `Skill(skill="gsd-execute-phase", args="{N}")` if the failed action was execution. Loop to dashboard after.
+  - "Run inline instead": Dispatch the action inline via the appropriate skill — use `skill(skill="gsd-plan-phase", args="{N}")` if the failed action was planning, or `skill(skill="gsd-execute-phase", args="{N}")` if the failed action was execution. Loop to dashboard after.
   - "Skip and continue": Loop to dashboard (phase stays in current state).
-  - "View details": Read STATE.md blockers section, display, then re-present options.
+  - "View details": read STATE.md blockers section, display, then re-present options.
 
 </step>
 
@@ -352,9 +366,9 @@ Display final status with progress bar:
 - [ ] Progress bar shows accurate completion percentage
 - [ ] Dependency resolution: blocked phases show which deps are missing
 - [ ] Recommendations prioritize: execute > plan > discuss
-- [ ] Discuss phases run inline via Skill() — interactive questions work
-- [ ] Plan phases spawn background Task agents — return to dashboard immediately
-- [ ] Execute phases spawn background Task agents — return to dashboard immediately
+- [ ] Discuss phases run inline via skill() — interactive questions work
+- [ ] Plan phases spawn background task agents — return to dashboard immediately
+- [ ] Execute phases spawn background task agents — return to dashboard immediately
 - [ ] Dashboard refreshes pick up changes from background agents via disk state
 - [ ] Background agent completion triggers notification and dashboard refresh
 - [ ] Background agent errors present retry/skip options
@@ -362,4 +376,5 @@ Display final status with progress bar:
 - [ ] Exit shows final status with resume instructions
 - [ ] "Other" free-text input parsed for phase number and action
 - [ ] Manager loop continues until user exits or milestone completes
+- [ ] Queued section renders when `queued_phases` is non-empty; skipped when absent or empty
 </success_criteria>

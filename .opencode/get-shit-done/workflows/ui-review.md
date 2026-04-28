@@ -1,13 +1,13 @@
-<purpose>
+<objective>
 Retroactive 6-pillar visual audit of implemented frontend code. Standalone command that works on any project — GSD-managed or not. Produces scored UI-REVIEW.md with actionable findings.
-</purpose>
+</objective>
 
 <required_reading>
-@D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/ui-brand.md
+@./.opencode/get-shit-done/references/ui-brand.md
 </required_reading>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-ui-auditor — Audits UI against design requirements
 </available_agent_types>
 
@@ -18,7 +18,7 @@ Valid GSD subagent types (use exact names — do not fall back to 'general-purpo
 ```bash
 INIT=$(gsd-sdk query init.phase-op "${PHASE_ARG}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_UI_REVIEWER=$(gsd-sdk query agent-skills gsd-ui-reviewer 2>/dev/null)
+AGENT_SKILLS_UI_REVIEWER=$(gsd-sdk query agent-skills gsd-ui-auditor)
 ```
 
 Parse: `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded_phase`, `commit_docs`.
@@ -45,7 +45,7 @@ UI_REVIEW_FILE=$(ls "${PHASE_DIR}"/*-UI-REVIEW.md 2>/dev/null | head -1)
 **If `SUMMARY_FILES` empty:** Exit — "Phase {N} not executed. Run /gsd-execute-phase {N} first."
 
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 **If `UI_REVIEW_FILE` non-empty:** Use question:
 - header: "Existing UI Review"
 - question: "UI-REVIEW.md already exists for Phase {N}."
@@ -73,7 +73,7 @@ Build file list for auditor:
 Build prompt:
 
 ```markdown
-Read D:/Data/桌面/vibe_coding/.opencode/agents/gsd-ui-auditor.md for instructions.
+read ./.opencode/agents/gsd-ui-auditor.md for instructions.
 
 <objective>
 Conduct 6-pillar visual audit of Phase {phase_number}: {phase_name}
@@ -99,12 +99,7 @@ padded_phase: {padded_phase}
 Omit null file paths.
 
 ```
-Task(
-  prompt=ui_audit_prompt,
-  subagent_type="gsd-ui-auditor",
-  model="{UI_AUDITOR_MODEL}",
-  description="UI Audit Phase {N}"
-)
+@gsd-ui-auditor ui_audit_prompt
 ```
 
 ## 4. Handle Return
@@ -140,7 +135,7 @@ Full review: {path to UI-REVIEW.md}
 
 ## ▶ Next
 
-`/clear` then one of:
+`/new` then one of:
 
 - `/gsd-verify-work {N}` — UAT testing
 - `/gsd-plan-phase {N+1}` — plan next phase

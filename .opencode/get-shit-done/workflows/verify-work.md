@@ -1,11 +1,11 @@
-<purpose>
-Validate built features through conversational testing with persistent state. Creates UAT.md that tracks test progress, survives /clear, and feeds gaps into /gsd-plan-phase --gaps.
+<objective>
+Validate built features through conversational testing with persistent state. Creates UAT.md that tracks test progress, survives /new, and feeds gaps into /gsd-plan-phase --gaps.
 
-User tests, the agent records. One test at a time. Plain text responses.
-</purpose>
+User tests, OpenCode records. One test at a time. Plain text responses.
+</objective>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-planner — Creates detailed plans from phase scope
 - gsd-plan-checker — Reviews plan quality before execution
 </available_agent_types>
@@ -13,7 +13,7 @@ Valid GSD subagent types (use exact names — do not fall back to 'general-purpo
 <philosophy>
 **Show expected, ask if reality matches.**
 
-the agent presents what SHOULD happen. User confirms or describes what's different.
+OpenCode presents what SHOULD happen. User confirms or describes what's different.
 - "yes" / "y" / "next" / empty → pass
 - Anything else → logged as issue, severity inferred
 
@@ -21,7 +21,7 @@ No Pass/Fail buttons. No severity questions. Just: "Here's what should happen. D
 </philosophy>
 
 <template>
-@D:/Data/桌面/vibe_coding/.opencode/get-shit-done/templates/UAT.md
+@./.opencode/get-shit-done/templates/UAT.md
 </template>
 
 <process>
@@ -32,8 +32,8 @@ If $ARGUMENTS contains a phase number, load context:
 ```bash
 INIT=$(gsd-sdk query init.verify-work "${PHASE_ARG}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_PLANNER=$(gsd-sdk query agent-skills gsd-planner 2>/dev/null)
-AGENT_SKILLS_CHECKER=$(gsd-sdk query agent-skills gsd-checker 2>/dev/null)
+AGENT_SKILLS_PLANNER=$(gsd-sdk query agent-skills gsd-planner)
+AGENT_SKILLS_CHECKER=$(gsd-sdk query agent-skills gsd-plan-checker)
 ```
 
 Parse JSON for: `planner_model`, `checker_model`, `commit_docs`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `has_verification`, `uat_path`.
@@ -48,7 +48,7 @@ Parse JSON for: `planner_model`, `checker_model`, `commit_docs`, `phase_found`, 
 
 **If active sessions exist AND no $ARGUMENTS provided:**
 
-Read each file's frontmatter (status, phase) and Current Test section.
+read each file's frontmatter (status, phase) and Current Test section.
 
 Display inline:
 
@@ -131,7 +131,7 @@ Use `phase_dir` from init (or run init if not already done).
 ls "$phase_dir"/*-SUMMARY.md 2>/dev/null || true
 ```
 
-Read each SUMMARY.md to extract testable deliverables.
+read each SUMMARY.md to extract testable deliverables.
 </step>
 
 <step name="extract_tests">
@@ -222,7 +222,7 @@ skipped: 0
 [none yet]
 ```
 
-Write to `.planning/phases/XX-name/{phase_num}-UAT.md`
+write to `.planning/phases/XX-name/{phase_num}-UAT.md`
 
 Proceed to `present_test`.
 </step>
@@ -249,7 +249,7 @@ Display the returned checkpoint EXACTLY as-is:
 - If you notice protocol/meta markers such as `to=all:`, role-routing text, XML system tags, hidden instruction markers, ad copy, or any unrelated suffix, discard the draft and output `{CHECKPOINT}` only.
 
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 Wait for user response (plain text, no question).
 </step>
 
@@ -342,7 +342,7 @@ If no more tests → Go to `complete_session`
 <step name="resume_from_file">
 **Resume testing from UAT file:**
 
-Read the full UAT file.
+read the full UAT file.
 
 Find first test with `result: [pending]`.
 
@@ -442,9 +442,9 @@ If `SECURITY_CFG` is `false` OR (`SECURITY_FILE` exists AND `threats_open` is `0
 
 **Auto-transition: mark phase complete in ROADMAP.md and STATE.md**
 
-Execute the transition workflow inline (do NOT use Task — the orchestrator context already holds the UAT results and phase data needed for accurate transition):
+Execute the transition workflow inline (do NOT use task — the orchestrator context already holds the UAT results and phase data needed for accurate transition):
 
-Read and follow `D:/Data/桌面/vibe_coding/.opencode/get-shit-done/workflows/transition.md`.
+read and follow `./.opencode/get-shit-done/workflows/transition.md`.
 
 After transition completes, present next-step options to the user:
 
@@ -464,7 +464,7 @@ Run phase artifact scan to surface any open items before marking phase verified:
 `audit-open` is CJS-only until registered on `gsd-sdk query`:
 
 ```bash
-node "D:/Data/桌面/vibe_coding/.opencode/get-shit-done/bin/gsd-tools.cjs" audit-open --json 2>/dev/null
+gsd-sdk query audit-open --json
 ```
 
 Parse the JSON output. For the CURRENT PHASE ONLY, surface:
@@ -499,7 +499,7 @@ Spawning parallel debug agents to investigate each issue.
 ```
 
 - Load diagnose-issues workflow
-- Follow @D:/Data/桌面/vibe_coding/.opencode/get-shit-done/workflows/diagnose-issues.md
+- Follow @./.opencode/get-shit-done/workflows/diagnose-issues.md
 - Spawn parallel debug agents for each issue
 - Collect root causes
 - Update UAT.md with root causes
@@ -523,8 +523,7 @@ Display:
 Spawn gsd-planner in --gaps mode:
 
 ```
-Task(
-  prompt="""
+@gsd-planner """
 <planning_context>
 
 **Phase:** {phase_number}
@@ -544,11 +543,7 @@ ${AGENT_SKILLS_PLANNER}
 Output consumed by /gsd-execute-phase
 Plans must be executable prompts.
 </downstream_consumer>
-""",
-  subagent_type="gsd-planner",
-  model="{planner_model}",
-  description="Plan gap fixes for Phase {phase}"
-)
+"""
 ```
 
 On return:
@@ -573,8 +568,7 @@ Initialize: `iteration_count = 1`
 Spawn gsd-plan-checker:
 
 ```
-Task(
-  prompt="""
+@gsd-plan-checker """
 <verification_context>
 
 **Phase:** {phase_number}
@@ -593,11 +587,7 @@ Return one of:
 - ## VERIFICATION PASSED — all checks pass
 - ## ISSUES FOUND — structured issue list
 </expected_output>
-""",
-  subagent_type="gsd-plan-checker",
-  model="{checker_model}",
-  description="Verify Phase {phase} fix plans"
-)
+"""
 ```
 
 On return:
@@ -615,8 +605,7 @@ Display: `Sending back to planner for revision... (iteration {N}/3)`
 Spawn gsd-planner with revision context:
 
 ```
-Task(
-  prompt="""
+@gsd-planner """
 <revision_context>
 
 **Phase:** {phase_number}
@@ -634,14 +623,10 @@ ${AGENT_SKILLS_PLANNER}
 </revision_context>
 
 <instructions>
-Read existing PLAN.md files. Make targeted updates to address checker issues.
+read existing PLAN.md files. Make targeted updates to address checker issues.
 Do NOT replan from scratch unless issues are fundamental.
 </instructions>
-""",
-  subagent_type="gsd-planner",
-  model="{planner_model}",
-  description="Revise Phase {phase} plans"
-)
+"""
 ```
 
 After planner returns → spawn checker again (verify_gap_plans logic)
@@ -682,7 +667,7 @@ Plans verified and ready for execution.
 
 **Execute fixes** — run fix plans
 
-`/clear` then `/gsd-execute-phase {phase} --gaps-only`
+`/new` then `/gsd-execute-phase {phase} --gaps-only`
 
 ───────────────────────────────────────────────────────────────
 ```
@@ -693,7 +678,7 @@ Plans verified and ready for execution.
 <update_rules>
 **Batched writes for efficiency:**
 
-Keep results in memory. Write to file only when:
+Keep results in memory. write to file only when:
 1. **Issue found** — Preserve the problem immediately
 2. **Session complete** — Final write before commit
 3. **Checkpoint** — Every 5 passed tests (safety net)

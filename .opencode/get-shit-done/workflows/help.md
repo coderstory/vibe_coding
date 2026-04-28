@@ -1,11 +1,11 @@
-<purpose>
+<objective>
 Display the complete GSD command reference. Output ONLY the reference content. Do NOT add project-specific analysis, git status, next-step suggestions, or any commentary beyond the reference.
-</purpose>
+</objective>
 
 <reference>
 # GSD Command Reference
 
-**GSD** (Get Shit Done) creates hierarchical project plans optimized for solo agentic development with Claude Code.
+**GSD** (Get Shit Done) creates hierarchical project plans optimized for solo agentic development with OpenCode.
 
 ## Quick Start
 
@@ -18,7 +18,7 @@ Display the complete GSD command reference. Output ONLY the reference content. D
 GSD evolves fast. Update periodically:
 
 ```bash
-npx get-shit-done-cc@latest
+npx gsd-opencode@latest
 ```
 
 ## Core Workflow
@@ -83,10 +83,10 @@ Comprehensive ecosystem research for niche/complex domains.
 Usage: `/gsd-research-phase 3`
 
 **`/gsd-list-phase-assumptions <number>`**
-See what the agent is planning to do before it starts.
+See what OpenCode is planning to do before it starts.
 
-- Shows the agent's intended approach for a phase
-- Lets you course-correct if the agent misunderstood your vision
+- Shows OpenCode's intended approach for a phase
+- Lets you course-correct if OpenCode misunderstood your vision
 - No files created - conversational output only
 
 Usage: `/gsd-list-phase-assumptions 3`
@@ -110,7 +110,7 @@ Result: Creates `.planning/phases/01-foundation/01-01-PLAN.md`
 Execute all plans in a phase, or run a specific wave.
 
 - Groups plans by wave (from frontmatter), executes waves sequentially
-- Plans within each wave run in parallel via Task tool
+- Plans within each wave run in parallel via task tool
 - Optional `--wave N` flag executes only Wave `N` and stops unless the phase is now fully complete
 - Verifies phase goal after all plans complete
 - Updates REQUIREMENTS.md, ROADMAP.md, STATE.md
@@ -270,7 +270,7 @@ Systematic debugging with persistent state across context resets.
 - Gathers symptoms through adaptive questioning
 - Creates `.planning/debug/[slug].md` to track investigation
 - Investigates using scientific method (evidence → hypothesis → test)
-- Survives `/clear` — run `/gsd-debug` with no args to resume
+- Survives `/new` — run `/gsd-debug` with no args to resume
 - Archives resolved issues to `.planning/debug/resolved/`
 
 Usage: `/gsd-debug "login button doesn't work"`
@@ -310,7 +310,7 @@ Package spike findings into a persistent project skill.
 
 - Curates each spike one-at-a-time (include/exclude/partial/UAT)
 - Groups findings by feature area
-- Generates `./.opencode/skills/spike-findings-[project]/` with references and sources
+- Generates `./.claude/skills/spike-findings-[project]/` with references and sources
 - Writes summary to `.planning/spikes/WRAP-UP-SUMMARY.md`
 - Adds auto-load routing line to project AGENTS.md
 
@@ -321,7 +321,7 @@ Package sketch design findings into a persistent project skill.
 
 - Curates each sketch one-at-a-time (include/exclude/partial/revisit)
 - Groups findings by design area
-- Generates `./.opencode/skills/sketch-findings-[project]/` with design decisions, CSS patterns, HTML structures
+- Generates `./.claude/skills/sketch-findings-[project]/` with design decisions, CSS patterns, HTML structures
 - Writes summary to `.planning/sketches/WRAP-UP-SUMMARY.md`
 - Adds auto-load routing line to project AGENTS.md
 
@@ -332,7 +332,7 @@ Usage: `/gsd-sketch-wrap-up`
 **`/gsd-note <text>`**
 Zero-friction idea capture — one command, instant save, no questions.
 
-- Saves timestamped note to `.planning/notes/` (or `D:/Data/桌面/vibe_coding/.opencode/notes/` globally)
+- Saves timestamped note to `.planning/notes/` (or `./.opencode/notes/` globally)
 - Three subcommands: append (default), list, promote
 - Promote converts a note into a structured todo
 - Works without a project (falls back to global scope)
@@ -468,7 +468,7 @@ Usage: `/gsd-plan-milestone-gaps`
 Configure workflow toggles and model profile interactively.
 
 - Toggle researcher, plan checker, verifier agents
-- Select model profile (quality/balanced/budget/inherit)
+- Select model profile (simple/smart/genius/inherit)
 - Updates `.planning/config.json`
 
 Usage: `/gsd-settings`
@@ -505,7 +505,7 @@ Update GSD to latest version with changelog preview.
 - Displays changelog entries for versions you've missed
 - Highlights breaking changes
 - Confirms before running install
-- Better than raw `npx get-shit-done-cc`
+- Better than raw `npx gsd-opencode`
 
 Usage: `/gsd-update`
 
@@ -612,9 +612,9 @@ Example config:
 
 ```
 /gsd-new-project        # Unified flow: questioning → research → requirements → roadmap
-/clear
+/new
 /gsd-plan-phase 1       # Create plans for first phase
-/clear
+/new
 /gsd-execute-phase 1    # Execute all plans in phase
 ```
 
@@ -636,7 +636,7 @@ Example config:
 
 ```
 /gsd-complete-milestone 1.0.0
-/clear
+/new
 /gsd-new-milestone  # Start next milestone (questioning → research → requirements → roadmap)
 ```
 
@@ -654,14 +654,14 @@ Example config:
 ```
 /gsd-debug "form submission fails silently"  # Start debug session
 # ... investigation happens, context fills up ...
-/clear
+/new
 /gsd-debug                                    # Resume from where you left off
 ```
 
 ## Getting Help
 
-- Read `.planning/PROJECT.md` for project vision
-- Read `.planning/STATE.md` for current context
+- read `.planning/PROJECT.md` for project vision
+- read `.planning/STATE.md` for current context
 - Check `.planning/ROADMAP.md` for phase status
 - Run `/gsd-progress` to check where you're up to
 </reference>

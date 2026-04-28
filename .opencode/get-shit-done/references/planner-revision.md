@@ -21,7 +21,7 @@ issues:
   - plan: "16-01"
     dimension: "task_completeness"
     severity: "blocker"
-    description: "Task 2 missing <verify> element"
+    description: "task 2 missing <verify> element"
     fix_hint: "Add verification command for build output"
 ```
 
@@ -40,7 +40,7 @@ Group by plan, dimension, severity.
 
 ### Step 4: Make Targeted Updates
 
-**DO:** Edit specific flagged sections, preserve working parts, update waves if dependencies change.
+**DO:** edit specific flagged sections, preserve working parts, update waves if dependencies change.
 
 **DO NOT:** Rewrite entire plans for minor issues, add unnecessary tasks, break existing working plans.
 
@@ -69,7 +69,7 @@ gsd-sdk query commit "fix($PHASE): revise plans based on checker feedback" .plan
 
 | Plan | Change | Issue Addressed |
 |------|--------|-----------------|
-| 16-01 | Added <verify> to Task 2 | task_completeness |
+| 16-01 | Added <verify> to task 2 | task_completeness |
 | 16-02 | Added logout task | requirement_coverage (AUTH-02) |
 
 ### Files Updated

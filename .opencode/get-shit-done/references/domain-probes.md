@@ -25,7 +25,7 @@ When the user mentions a technology area, use these probes to ask insightful fol
 | "real-time" or "live updates" | WebSockets, SSE, or polling? What specifically needs to be real-time vs. eventual? |
 | "notifications" | Push notifications (browser/mobile), in-app only, or both? Persistence and read receipts? |
 | "collaboration" or "multiplayer" | Conflict resolution strategy? Operational transforms or CRDTs? Expected concurrent users? |
-| "chat" or "messaging" | Message history and search? Typing indicators? Read receipts? |
+| "chat" or "messaging" | Message history and search? Typing indicators? read receipts? |
 | "streaming" | Reconnection strategy? What happens when the connection drops -- queue or discard? |
 
 ---
@@ -62,7 +62,7 @@ When the user mentions a technology area, use these probes to ask insightful fol
 | "ORM" or "queries" | ORM (which one?) or raw queries? Query builder as middle ground? |
 | "migrations" | Migration tool? Rollback strategy? How do you handle data migrations vs. schema migrations? |
 | "seeding" or "test data" | Seed data for development? Realistic fake data or minimal fixtures? |
-| "scale" or "performance" | Read/write ratio? Read replicas? Connection pooling strategy? |
+| "scale" or "performance" | read/write ratio? read replicas? Connection pooling strategy? |
 
 ---
 

@@ -1,10 +1,10 @@
-<purpose>
+<objective>
 Safe git revert workflow. Rolls back GSD phase or plan commits using the phase manifest with dependency checks and a confirmation gate. Uses git revert --no-commit (NEVER git reset) to preserve history.
-</purpose>
+</objective>
 
 <required_reading>
-@D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/ui-brand.md
-@D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/gate-prompts.md
+@./.opencode/get-shit-done/references/ui-brand.md
+@./.opencode/get-shit-done/references/gate-prompts.md
 </required_reading>
 
 <process>
@@ -64,7 +64,7 @@ Recent GSD commits:
 ```
 
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 Use question to ask:
 - question: "Which commits to revert? Enter numbers (e.g., 1,3) or 'all'"
 - header: "Select"
@@ -75,7 +75,7 @@ Parse the user's selection into COMMITS list.
 
 **MODE=phase:**
 
-Read `.planning/.phase-manifest.json` if it exists.
+read `.planning/.phase-manifest.json` if it exists.
 
 If the file exists and `manifest.phases?.[TARGET_PHASE]?.commits` is a non-empty array:
   - Use `manifest.phases[TARGET_PHASE].commits` entries as COMMITS (each entry is a commit hash)
@@ -119,7 +119,7 @@ Skip this step entirely for MODE=last.
 
 **MODE=phase:**
 
-Read `.planning/ROADMAP.md` inline.
+read `.planning/ROADMAP.md` inline.
 
 Search for phases that list a dependency on the target phase. Look for patterns like:
 - "Depends on: Phase ${TARGET_PHASE}"
@@ -143,7 +143,7 @@ If any downstream phase has started work, collect warnings:
 Extract the phase number from TARGET_PLAN (the NN part of NN-MM). Extract the plan number (the MM part).
 
 Look for later plans in the same phase directory (`.planning/phases/${NN}-*/`). For each later plan (plans with number > MM):
-1. Read the later plan's PLAN.md
+1. read the later plan's PLAN.md
 2. Check if its `<files>` sections or `consumes` fields reference outputs from the target plan
 
 If any later plan references the target plan's outputs, collect warnings:
@@ -283,7 +283,7 @@ Show next steps:
 
 **Review state** — verify project is in expected state after revert
 
-/clear then:
+/new then:
 
 /gsd-progress
 

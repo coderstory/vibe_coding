@@ -1,12 +1,12 @@
-<purpose>
+<objective>
 Analyze ROADMAP.md phases for dependency relationships before execution. Detect file overlap between phases, semantic API/data-flow dependencies, and suggest `Depends on` entries to prevent merge conflicts during parallel execution by `/gsd-manager`.
-</purpose>
+</objective>
 
 <process>
 
 ## 1. Load ROADMAP.md
 
-Read `.planning/ROADMAP.md`. If it does not exist, error: "No ROADMAP.md found — run `/gsd-new-project` first."
+read `.planning/ROADMAP.md`. If it does not exist, error: "No ROADMAP.md found — run `/gsd-new-project` first."
 
 Extract all phases. For each phase capture:
 - Phase number and name
@@ -36,7 +36,7 @@ For each pair of phases (A, B), check for dependency signals:
 If phases A and B will both modify files in the same domain or the same specific files, one must run before the other. The phase that *provides* the foundation runs first.
 
 ### Semantic Dependency Detection
-Read each phase's scope/goal for these patterns:
+read each phase's scope/goal for these patterns:
 - Phase B mentions consuming, using, or calling something that Phase A creates/implements
 - Phase B references an "API", "schema", "model", "endpoint", or "interface" that Phase A builds
 - Phase B says "after X is complete", "once X is built", "using the X from Phase N"
@@ -82,7 +82,7 @@ Suggested ROADMAP.md updates:
 
 Ask the user: "Apply these `Depends on` suggestions to ROADMAP.md? (yes / no / edit)"
 
-- **yes** — Write all suggested `Depends on` entries to ROADMAP.md. Confirm each write.
+- **yes** — write all suggested `Depends on` entries to ROADMAP.md. Confirm each write.
 - **no** — Print the suggestions as text only. User updates manually.
 - **edit** — Present each suggestion individually with yes/no/skip per suggestion.
 

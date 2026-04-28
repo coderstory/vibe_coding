@@ -18,7 +18,7 @@ last_calibrated: 2026-03-24
 > issues:
 >   - dimension: task_completeness
 >     severity: BLOCKER
->     finding: "Task T1 action says 'implement the authentication feature' without naming target files, functions to create, or middleware to apply. Executor cannot determine what to build."
+>     finding: "task T1 action says 'implement the authentication feature' without naming target files, functions to create, or middleware to apply. Executor cannot determine what to build."
 >     affected_field: "<action>"
 >     suggested_fix: "Specify: create authMiddleware in src/middleware/auth.js, apply to routes in src/routes/api.js lines 12-45, verify with integration test"
 > ```
@@ -46,7 +46,7 @@ last_calibrated: 2026-03-24
 
 ### Example 1: All dimensions pass when verify commands are missing
 
-**Input:** Plan with 3 tasks. Task T2 has `<verify></verify>` (empty). Task T3 has `<verify>echo "done"</verify>` (trivial, cannot distinguish pass from fail).
+**Input:** Plan with 3 tasks. task T2 has `<verify></verify>` (empty). task T3 has `<verify>echo "done"</verify>` (trivial, cannot distinguish pass from fail).
 
 **Output:**
 

@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Check project progress, summarize recent work and what's ahead, then intelligently route to the next action — either executing an existing plan or creating the next one. Provides situational awareness before continuing work.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -102,7 +102,7 @@ Present:
 # [Project Name]
 
 **Progress:** {PROGRESS_BAR}
-**Profile:** [quality/balanced/budget/inherit]
+**Profile:** [simple/smart/genius/inherit]
 **Discuss mode:** {DISCUSS_MODE}
 
 ## Recent Work
@@ -206,7 +206,7 @@ This is a WARNING, not a blocker — routing proceeds normally. The debt is visi
 **Route A: Unexecuted plan exists**
 
 Find the first PLAN.md without matching SUMMARY.md.
-Read its `<objective>` section.
+read its `<objective>` section.
 
 ```
 ---
@@ -215,7 +215,7 @@ Read its `<objective>` section.
 
 **{phase}-{plan}: [Plan Name]** — [objective summary from PLAN.md]
 
-`/clear` then:
+`/new` then:
 
 `/gsd-execute-phase {phase} ${GSD_WS}`
 
@@ -243,9 +243,9 @@ PHASE_HAS_UI=$(echo "$PHASE_SECTION" | grep -qi "UI hint.*yes" && echo "true" ||
 ## ▶ Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
 
 **Phase {N}: {Name}** — {Goal from ROADMAP.md}
-<sub>✓ Context gathered, ready to plan</sub>
+*✓ Context gathered, ready to plan*
 
-`/clear` then:
+`/new` then:
 
 `/gsd-plan-phase {phase-number} ${GSD_WS}`
 
@@ -261,7 +261,7 @@ PHASE_HAS_UI=$(echo "$PHASE_SECTION" | grep -qi "UI hint.*yes" && echo "true" ||
 
 **Phase {N}: {Name}** — {Goal from ROADMAP.md}
 
-`/clear` then:
+`/new` then:
 
 `/gsd-discuss-phase {phase}` — gather context and clarify approach
 
@@ -270,7 +270,7 @@ PHASE_HAS_UI=$(echo "$PHASE_SECTION" | grep -qi "UI hint.*yes" && echo "true" ||
 **Also available:**
 - `/gsd-ui-phase {phase}` — generate UI design contract (recommended for frontend phases)
 - `/gsd-plan-phase {phase}` — skip discussion, plan directly
-- `/gsd-list-phase-assumptions {phase}` — see the agent's assumptions
+- `/gsd-list-phase-assumptions {phase}` — see OpenCode's assumptions
 
 ---
 ```
@@ -284,7 +284,7 @@ PHASE_HAS_UI=$(echo "$PHASE_SECTION" | grep -qi "UI hint.*yes" && echo "true" ||
 
 **Phase {N}: {Name}** — {Goal from ROADMAP.md}
 
-`/clear` then:
+`/new` then:
 
 `/gsd-discuss-phase {phase} ${GSD_WS}` — gather context and clarify approach
 
@@ -292,7 +292,7 @@ PHASE_HAS_UI=$(echo "$PHASE_SECTION" | grep -qi "UI hint.*yes" && echo "true" ||
 
 **Also available:**
 - `/gsd-plan-phase {phase} ${GSD_WS}` — skip discussion, plan directly
-- `/gsd-list-phase-assumptions {phase} ${GSD_WS}` — see the agent's assumptions
+- `/gsd-list-phase-assumptions {phase} ${GSD_WS}` — see OpenCode's assumptions
 
 ---
 ```
@@ -310,7 +310,7 @@ UAT.md exists with gaps (diagnosed issues). User needs to plan fixes.
 
 **{phase_num}-UAT.md** has {N} gaps requiring fixes.
 
-`/clear` then:
+`/new` then:
 
 `/gsd-plan-phase {phase} --gaps ${GSD_WS}`
 
@@ -336,7 +336,7 @@ UAT.md exists with `status: partial` — testing session ended before all items 
 
 **{phase_num}-UAT.md** has {N} unresolved tests (pending, blocked, or skipped).
 
-`/clear` then:
+`/new` then:
 
 `/gsd-verify-work {phase} ${GSD_WS}` — resume testing from where you left off
 
@@ -353,7 +353,7 @@ UAT.md exists with `status: partial` — testing session ended before all items 
 
 **Step 3: Check milestone status (only when phase complete)**
 
-Read ROADMAP.md and identify:
+read ROADMAP.md and identify:
 1. Current phase number
 2. All phase numbers in the current milestone section
 
@@ -372,7 +372,7 @@ State: "Current phase is {X}. Milestone has {N} phases (highest: {Y})."
 
 **Route C: Phase complete, more phases remain**
 
-Read ROADMAP.md to get the next phase's name and goal.
+read ROADMAP.md to get the next phase's name and goal.
 
 Check if next phase has UI indicators:
 
@@ -392,7 +392,7 @@ NEXT_HAS_UI=$(echo "$NEXT_PHASE_SECTION" | grep -qi "UI hint.*yes" && echo "true
 
 **Phase {Z+1}: {Name}** — {Goal from ROADMAP.md}
 
-`/clear` then:
+`/new` then:
 
 `/gsd-discuss-phase {Z+1}` — gather context and clarify approach
 
@@ -417,7 +417,7 @@ NEXT_HAS_UI=$(echo "$NEXT_PHASE_SECTION" | grep -qi "UI hint.*yes" && echo "true
 
 **Phase {Z+1}: {Name}** — {Goal from ROADMAP.md}
 
-`/clear` then:
+`/new` then:
 
 `/gsd-discuss-phase {Z+1} ${GSD_WS}` — gather context and clarify approach
 
@@ -445,7 +445,7 @@ All {N} phases finished!
 
 **Complete Milestone** — archive and prepare for next
 
-`/clear` then:
+`/new` then:
 
 `/gsd-complete-milestone ${GSD_WS}`
 
@@ -463,7 +463,7 @@ All {N} phases finished!
 
 A milestone was completed and archived. Ready to start the next milestone cycle.
 
-Read MILESTONES.md to find the last completed milestone version.
+read MILESTONES.md to find the last completed milestone version.
 
 ```
 ---
@@ -476,7 +476,7 @@ Ready to plan the next milestone.
 
 **Start Next Milestone** — questioning → research → requirements → roadmap
 
-`/clear` then:
+`/new` then:
 
 `/gsd-new-milestone ${GSD_WS}`
 
@@ -511,7 +511,7 @@ Run each check in order. For each check, emit ✓ (pass) or ⚠ (warning) with c
 
 **Check 1 — STATE vs artifact consistency**
 
-Read STATE.md `status` / `stopped_at` fields (from the STATE snapshot already loaded). Compare against the artifact count from the roadmap analysis. If STATE.md claims the current phase is pending/mid-flight but the artifact count shows it as complete (all PLAN.md files have matching SUMMARY.md files), flag inconsistency. Emit:
+read STATE.md `status` / `stopped_at` fields (from the STATE snapshot already loaded). Compare against the artifact count from the roadmap analysis. If STATE.md claims the current phase is pending/mid-flight but the artifact count shows it as complete (all PLAN.md files have matching SUMMARY.md files), flag inconsistency. Emit:
 - ✓ `STATE.md consistent with artifact count` — if both agree
 - ⚠ `STATE.md claims [status] but artifact count shows phase complete` — with the specific values
 
@@ -525,7 +525,7 @@ Also check `.planning/continue-here.md`.
 
 Emit:
 - ✓ `No orphaned handoff files` — if none found
-- ⚠ `Orphaned handoff files found` — list each file path, add: `→ Work was paused mid-flight. Read the handoff before continuing.`
+- ⚠ `Orphaned handoff files found` — list each file path, add: `→ Work was paused mid-flight. read the handoff before continuing.`
 
 **Check 3 — Deferred scope drift**
 
@@ -598,7 +598,7 @@ Review the flagged items above before acting on the routing suggestion.
 ```
 
 Then for each failed check, add a concrete next action:
-- Check 2 (orphaned handoff): `Read the handoff file(s) and resume from where work was paused: /gsd-resume-work ${GSD_WS}`
+- Check 2 (orphaned handoff): `read the handoff file(s) and resume from where work was paused: /gsd-resume-work ${GSD_WS}`
 - Check 3 (deferred scope): `Add the missing phases to ROADMAP.md or update the deferred references`
 - Check 4 (memory pending): `Review the flagged memory entries and resolve or clear them`
 - Check 5 (blocking todos): `Complete the operational steps in .planning/todos/pending/ before continuing`

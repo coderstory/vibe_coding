@@ -1,11 +1,11 @@
-<purpose>
+<objective>
 Generate unit and E2E tests for a completed phase based on its SUMMARY.md, CONTEXT.md, and implementation. Classifies each changed file into TDD (unit), E2E (browser), or Skip categories, presents a test plan for user approval, then generates tests following RED-GREEN conventions.
 
 Users currently hand-craft `/gsd-quick` prompts for test generation after each phase. This workflow standardizes the process with proper classification, quality gates, and gap reporting.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -46,7 +46,7 @@ Ensure the phase exists in .planning/phases/
 ```
 Exit.
 
-Read the phase artifacts (in order of priority):
+read the phase artifacts (in order of priority):
 1. `${phase_dir}/*-SUMMARY.md` — what was implemented, files changed
 2. `${phase_dir}/CONTEXT.md` — acceptance criteria, decisions
 3. `${phase_dir}/*-VERIFICATION.md` — user-verified scenarios (if UAT was done)
@@ -102,14 +102,14 @@ For each file, classify into one of three categories:
 - Simple CRUD: basic create/read/update/delete with no business logic
 - Type definitions: records, DTOs, interfaces with no logic
 
-Read each file to verify classification. Don't classify based on filename alone.
+read each file to verify classification. Don't classify based on filename alone.
 </step>
 
 <step name="present_classification">
 Present the classification to the user for confirmation before proceeding:
 
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 
 ```
 question(
@@ -216,7 +216,7 @@ For each approved TDD test:
 
 1. **Create test file** following discovered project conventions (directory, naming, imports)
 
-2. **Write test** with clear arrange/act/assert structure:
+2. **write test** with clear arrange/act/assert structure:
    ```
    // Arrange — set up inputs and expected outputs
    // Act — call the function under test

@@ -181,7 +181,7 @@ function buildNewProjectConfig(userChoices) {
     project_code: null,
     phase_naming: 'sequential',
     agent_skills: {},
-    claude_md_path: './CLAUDE.md',
+    claude_md_path: './AGENTS.md',
   };
 
   // Three-level deep merge: hardcoded <- userDefaults <- choices
@@ -343,7 +343,7 @@ function setConfigValue(cwd, keyPath, parsedValue) {
     const previousValue = current[keys[keys.length - 1]]; // Capture previous value before overwriting
     current[keys[keys.length - 1]] = parsedValue;
 
-    // Write back
+    // write back
     try {
       atomicWriteFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
       return { updated: true, key: keyPath, value: parsedValue, previousValue };

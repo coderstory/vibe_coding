@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Create an isolated workspace directory with git repo copies (worktrees or clones) and an independent `.planning/` directory. Supports multi-repo orchestration and single-repo feature branch isolation.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -32,7 +32,7 @@ Extract from $ARGUMENTS:
 **If `--name` is missing and not `--auto`:**
 
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 Use question:
 - header: "Workspace Name"
 - question: "What should this workspace be called?"
@@ -162,9 +162,9 @@ git checkout -b "$BRANCH_NAME" 2>&1
 
 Track results: which repos succeeded, which failed, what branch was used.
 
-## 7. Write WORKSPACE.md
+## 7. write WORKSPACE.md
 
-Write the workspace manifest at `$TARGET_PATH/WORKSPACE.md`:
+write the workspace manifest at `$TARGET_PATH/WORKSPACE.md`:
 
 ```markdown
 # Workspace: $WORKSPACE_NAME

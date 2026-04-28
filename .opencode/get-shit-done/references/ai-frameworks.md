@@ -14,7 +14,7 @@
 | Production RAG / document Q&A | LlamaIndex |
 | Complex stateful workflows with branching | LangGraph |
 | Multi-agent teams with defined roles | CrewAI |
-| Code-aware autonomous agents (Anthropic) | the agent Agent SDK |
+| Code-aware autonomous agents (Anthropic) | OpenCode Agent SDK |
 | "I don't know my requirements yet" | LangChain |
 | Regulated / audit-trail required | LangGraph |
 | Enterprise Microsoft/.NET shops | AutoGen/AG2 |
@@ -34,7 +34,7 @@
 - **Avoid if:** Fine-grained state management, TypeScript, fault-tolerant checkpointing, complex conditional branching
 - **Strengths:** Fastest multi-agent prototyping, 5.76x faster than LangGraph on QA tasks, built-in memory (short/long/entity/contextual), Flows architecture, standalone (no LangChain dep)
 - **Weaknesses:** Limited checkpointing, coarse error handling, Python only
-- **Eval concerns:** Task decomposition accuracy, inter-agent handoff, goal completion rate, loop detection
+- **Eval concerns:** task decomposition accuracy, inter-agent handoff, goal completion rate, loop detection
 
 ### LlamaIndex
 - **Type:** RAG and data ingestion
@@ -80,15 +80,15 @@
 - **Weaknesses:** OpenAI vendor lock-in, no built-in persistent state, younger ecosystem
 - **Eval concerns:** Instruction following, safety guardrails, escalation accuracy, tone consistency
 
-### the agent Agent SDK (Anthropic)
+### OpenCode Agent SDK (Anthropic)
 - **Type:** Code-aware autonomous agent framework
 - **Language:** Python + TypeScript
-- **Model support:** the agent models only
+- **Model support:** OpenCode models only
 - **Learning curve:** Intermediate (18 hook events, MCP, tool decorators)
 - **Best for:** Developer tooling, code generation/review agents, autonomous coding assistants, MCP-heavy architectures, safety-critical applications
 - **Avoid if:** Model flexibility needed, stable/mature API required, use case unrelated to code/tool-use
 - **Strengths:** Deepest MCP integration, built-in filesystem/shell access, 18 lifecycle hooks, automatic context compaction, extended thinking, safety-first design
-- **Weaknesses:** Claude-only vendor lock-in, newer/evolving API, smaller community
+- **Weaknesses:** OpenCode-only vendor lock-in, newer/evolving API, smaller community
 - **Eval concerns:** Tool use correctness, safety, code quality, instruction following
 
 ### AutoGen / AG2 / Microsoft Agent Framework
@@ -133,12 +133,12 @@
 | System Type | Primary Framework(s) | Key Eval Concerns |
 |-------------|---------------------|-------------------|
 | RAG / Knowledge Q&A | LlamaIndex, LangChain | Context faithfulness, hallucination, retrieval precision/recall |
-| Multi-agent orchestration | CrewAI, LangGraph, Google ADK | Task decomposition, handoff quality, goal completion |
-| Conversational assistants | OpenAI Agents SDK, the agent Agent SDK | Tone, safety, instruction following, escalation |
+| Multi-agent orchestration | CrewAI, LangGraph, Google ADK | task decomposition, handoff quality, goal completion |
+| Conversational assistants | OpenAI Agents SDK, OpenCode Agent SDK | Tone, safety, instruction following, escalation |
 | Structured data extraction | LangChain, LlamaIndex | Schema compliance, extraction accuracy |
 | Autonomous task agents | LangGraph, OpenAI Agents SDK | Safety guardrails, tool correctness, cost adherence |
-| Content generation | the agent Agent SDK, OpenAI Agents SDK | Brand voice, factual accuracy, tone |
-| Code automation | the agent Agent SDK | Code correctness, safety, test pass rate |
+| Content generation | OpenCode Agent SDK, OpenAI Agents SDK | Brand voice, factual accuracy, tone |
+| Code automation | OpenCode Agent SDK | Code correctness, safety, test pass rate |
 
 ### By Team Size and Stage
 
@@ -156,7 +156,7 @@
 | Preference | Framework |
 |-----------|-----------|
 | OpenAI-only | OpenAI Agents SDK |
-| Anthropic/Claude-only | the agent Agent SDK |
+| Anthropic/OpenCode-only | OpenCode Agent SDK |
 | Google/Gemini-committed | Google ADK |
 | Model-agnostic (full flexibility) | LangChain, LlamaIndex, CrewAI, LangGraph, Haystack |
 
@@ -171,7 +171,7 @@
 5. **Defaulting to LangChain without evaluating alternatives** — "Everyone uses it" ≠ right for your use case
 6. **Starting a new project on AutoGen (not AG2)** — AutoGen is in maintenance mode; use AG2 or wait for Microsoft Agent Framework GA
 7. **Choosing LangGraph for simple linear flows** — The graph overhead is not worth it; use LangChain chains instead
-8. **Ignoring vendor lock-in** — Provider-native SDKs (OpenAI, the agent) trade flexibility for integration depth; decide consciously
+8. **Ignoring vendor lock-in** — Provider-native SDKs (OpenAI, OpenCode) trade flexibility for integration depth; decide consciously
 
 ---
 
@@ -183,4 +183,4 @@
 | Stateful agent with RAG | LangGraph + LlamaIndex |
 | Multi-agent with tracing | CrewAI + Langfuse |
 | OpenAI agents with evals | OpenAI Agents SDK + Promptfoo or Braintrust |
-| the agent agents with MCP | the agent Agent SDK + LangSmith or Arize Phoenix |
+| OpenCode agents with MCP | OpenCode Agent SDK + LangSmith or Arize Phoenix |

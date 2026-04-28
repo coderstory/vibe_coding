@@ -3,7 +3,7 @@
 ## Overview
 
 The `--ws <name>` flag scopes GSD operations to a specific workstream, enabling
-parallel milestone work by multiple Claude Code instances on the same codebase.
+parallel milestone work by multiple OpenCode instances on the same codebase.
 
 ## Resolution Priority
 
@@ -16,7 +16,7 @@ parallel milestone work by multiple Claude Code instances on the same codebase.
 ## Why session-scoped pointers exist
 
 The shared `.planning/active-workstream` file is fundamentally unsafe when multiple
-the agent/Codex instances are active on the same repo at the same time. One session can
+OpenCode/Codex instances are active on the same repo at the same time. One session can
 silently repoint another session's `STATE.md`, `ROADMAP.md`, and phase paths.
 
 GSD now prefers a session-scoped pointer keyed by runtime/session identity

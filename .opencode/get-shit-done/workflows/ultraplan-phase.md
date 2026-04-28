@@ -1,6 +1,6 @@
 # Ultraplan Phase Workflow [BETA]
 
-Offload GSD's plan phase to Claude Code's ultraplan cloud infrastructure.
+Offload GSD's plan phase to OpenCode's ultraplan cloud infrastructure.
 
 ⚠ **BETA feature.** Ultraplan is in research preview and may change. This workflow is
 intentionally isolated from /gsd-plan-phase so upstream changes to ultraplan cannot
@@ -16,7 +16,7 @@ Display the stage banner:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  GSD ► ULTRAPLAN PHASE  ⚠ BETA
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Ultraplan is in research preview (Claude Code v2.1.91+).
+Ultraplan is in research preview (OpenCode v2.1.91+).
 Use /gsd-plan-phase for stable local planning.
 ```
 
@@ -26,7 +26,7 @@ Use /gsd-plan-phase for stable local planning.
 
 <step name="runtime_gate">
 
-Check that the session is running inside Claude Code:
+Check that the session is running inside OpenCode:
 
 ```bash
 echo "$CLAUDE_CODE_VERSION"
@@ -39,7 +39,7 @@ If the output is empty or unset, display the following error and exit:
 ║  RUNTIME ERROR                                               ║
 ╚══════════════════════════════════════════════════════════════╝
 
-/gsd-ultraplan-phase requires Claude Code.
+/gsd-ultraplan-phase requires OpenCode.
 ultraplan is not available in this runtime.
 
 Use /gsd-plan-phase for local planning instead.
@@ -88,13 +88,13 @@ Phase {N}: {phase name}
 
 Build the ultraplan prompt from GSD context.
 
-1. Read the phase scope from ROADMAP.md — extract the goal, deliverables, and scope for
+1. read the phase scope from ROADMAP.md — extract the goal, deliverables, and scope for
    the target phase.
 
-2. Read REQUIREMENTS.md if it exists (`requirements_path` is not null) — extract a
+2. read REQUIREMENTS.md if it exists (`requirements_path` is not null) — extract a
    concise summary (key requirements relevant to this phase, not the full document).
 
-3. Read RESEARCH.md if it exists (`research_path` is not null) — extract a concise
+3. read RESEARCH.md if it exists (`research_path` is not null) — extract a concise
    summary of technical findings. Including this reduces redundant cloud research.
 
 Construct the prompt:
@@ -157,10 +157,10 @@ When ◆ ultraplan ready appears in your terminal:
 
   1. Open the session link in your browser
   2. Review the plan — use inline comments and emoji reactions to give feedback
-  3. Ask the agent to revise until you're satisfied
+  3. Ask OpenCode to revise until you're satisfied
   4. Click "Approve plan and teleport back to terminal"
   5. At the terminal dialog, choose Cancel  ← saves the plan to a file
-  6. Note the file path the agent prints
+  6. Note the file path OpenCode prints
   7. Run: /gsd-import --from <the file path>
 
 /gsd-import will run conflict detection, convert to GSD format,

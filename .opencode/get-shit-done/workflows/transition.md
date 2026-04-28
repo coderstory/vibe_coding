@@ -16,7 +16,7 @@ verification. Users should never be told to run `/gsd-transition`.
 
 <required_reading>
 
-**Read these files NOW:**
+**read these files NOW:**
 
 1. `.planning/STATE.md`
 2. `.planning/PROJECT.md`
@@ -26,13 +26,13 @@ verification. Users should never be told to run `/gsd-transition`.
 
 </required_reading>
 
-<purpose>
+<objective>
 
 Mark current phase complete and advance to next. This is the natural point where progress tracking and PROJECT.md evolution happen.
 
 "Planning next phase" = "current phase is done"
 
-</purpose>
+</objective>
 
 <process>
 
@@ -188,7 +188,7 @@ The `completed/` subfolder pattern from create-meta-prompts handles archival.
 
 Evolve PROJECT.md to reflect learnings from completed phase.
 
-**Read phase summaries:**
+**read phase summaries:**
 
 ```bash
 cat .planning/phases/XX-current/*-SUMMARY.md
@@ -268,6 +268,28 @@ After (Phase 2 shipped JWT auth, discovered rate limiting needed):
 - [ ] New decisions logged with rationale
 - [ ] "What This Is" updated if product changed
 - [ ] "Last updated" footer reflects this transition
+
+</step>
+
+<step name="graduation_scan">
+
+Scan LEARNINGS.md files from recent phases for recurring patterns and surface promotion candidates to the developer.
+
+**Invoke the graduation helper:**
+
+```text
+@./.opencode/get-shit-done/workflows/graduation.md
+```
+
+This step is fully delegated to `graduation.md`. It handles guard checks (feature flag, window size, threshold), clustering, backlog filtering, HITL prompting, promotion writes, and STATE.md updates.
+
+**This step is always non-blocking:** graduation candidates are surfaced for the developer's decision; no action is required to continue the transition. If the graduation scan produces no qualifying clusters, it prints a single `[graduation: no qualifying clusters]` line and returns.
+
+**Step complete when:**
+
+- [ ] graduation.md guard checks passed (or skipped with silent no-op)
+- [ ] Recurring clusters surfaced (or `[graduation: no qualifying clusters]` printed)
+- [ ] Each cluster resolved as Promote / Defer / Dismiss (or all skipped)
 
 </step>
 
@@ -424,7 +446,7 @@ The remaining entries are **other active workstreams**.
 
 **Route A: More phases remain in milestone**
 
-Read ROADMAP.md to get the next phase's name and goal.
+read ROADMAP.md to get the next phase's name and goal.
 
 **Check if next phase has CONTEXT.md:**
 
@@ -446,7 +468,7 @@ Next: Phase [X+1] — [Name]
 ⚡ Auto-continuing: Plan Phase [X+1] in detail
 ```
 
-Exit skill and invoke skill("/gsd-plan-phase [X+1] --auto ${GSD_WS}")
+Exit skill and invoke command("/gsd-plan-phase [X+1] --auto ${GSD_WS}")
 
 **If CONTEXT.md does NOT exist:**
 
@@ -458,7 +480,7 @@ Next: Phase [X+1] — [Name]
 ⚡ Auto-continuing: Discuss Phase [X+1] first
 ```
 
-Exit skill and invoke skill("/gsd-discuss-phase [X+1] --auto ${GSD_WS}")
+Exit skill and invoke command("/gsd-discuss-phase [X+1] --auto ${GSD_WS}")
 
 </if>
 
@@ -475,7 +497,7 @@ Exit skill and invoke skill("/gsd-discuss-phase [X+1] --auto ${GSD_WS}")
 
 **Phase [X+1]: [Name]** — [Goal from ROADMAP.md]
 
-`/clear` then:
+`/new` then:
 
 `/gsd-discuss-phase [X+1] ${GSD_WS}` — gather context and clarify approach
 
@@ -498,9 +520,9 @@ Exit skill and invoke skill("/gsd-discuss-phase [X+1] --auto ${GSD_WS}")
 ## ▶ Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
 
 **Phase [X+1]: [Name]** — [Goal from ROADMAP.md]
-<sub>✓ Context gathered, ready to plan</sub>
+*✓ Context gathered, ready to plan*
 
-`/clear` then:
+`/new` then:
 
 `/gsd-plan-phase [X+1] ${GSD_WS}`
 
@@ -560,7 +582,7 @@ See overall milestone progress:
 
 `/gsd-workstreams progress ${GSD_WS}`
 
-<sub>Milestone completion will be available once all workstreams finish.</sub>
+*Milestone completion will be available once all workstreams finish.*
 
 ---
 ```
@@ -593,7 +615,7 @@ Phase {X} marked complete.
 ⚡ Auto-continuing: Complete milestone and archive
 ```
 
-Exit skill and invoke skill("/gsd-complete-milestone {version} ${GSD_WS}")
+Exit skill and invoke command("/gsd-complete-milestone {version} ${GSD_WS}")
 
 </if>
 
@@ -610,7 +632,7 @@ Exit skill and invoke skill("/gsd-complete-milestone {version} ${GSD_WS}")
 
 **Complete Milestone {version}** — archive and prepare for next
 
-`/clear` then:
+`/new` then:
 
 `/gsd-complete-milestone {version} ${GSD_WS}`
 

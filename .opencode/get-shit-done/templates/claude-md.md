@@ -71,7 +71,7 @@ Architecture not yet mapped. Follow existing patterns found in the codebase.
 <!-- GSD:skills-start source:skills/ -->
 ## Project Skills
 
-| Skill          | Description           | Path                      |
+| skill          | Description           | Path                      |
 | -------------- | --------------------- | ------------------------- |
 | {{skill_name}} | {{skill_description}} | `{{skill_path}}/SKILL.md` |
 <!-- GSD:skills-end -->
@@ -93,7 +93,7 @@ No project skills found. Add skills to any of: `.claude/skills/`, `.agents/skill
 <!-- GSD:workflow-start source:GSD defaults -->
 ## GSD Workflow Enforcement
 
-Before using Edit, Write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.
+Before using edit, write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.
 
 Use these entry points:
 - `/gsd-quick` for small fixes, doc updates, and ad-hoc tasks
@@ -139,7 +139,7 @@ AGENTS.md file and no profile section exists yet.
 
 ## Fallback Behavior
 
-When a source file is missing, fallback text provides Claude-actionable guidance:
-- Guides the agent's behavior in the absence of data
+When a source file is missing, fallback text provides OpenCode-actionable guidance:
+- Guides OpenCode's behavior in the absence of data
 - Not placeholder ads or "missing" notices
-- Each fallback tells the agent what to do, not just what's absent
+- Each fallback tells OpenCode what to do, not just what's absent

@@ -2,21 +2,29 @@
 name: gsd-intel-updater
 description: Analyzes codebase and writes structured intel files to .planning/intel/.
 mode: subagent
+tools:
+  read: true
+  write: true
+  bash: true
+  glob: true
+  grep: true
+color: "#00FFFF"
+# hooks:
 ---
 
 <required_reading>
 CRITICAL: If your spawn prompt contains a required_reading block,
-you MUST Read every listed file BEFORE any other action.
+you MUST read every listed file BEFORE any other action.
 Skipping this causes hallucinated context and broken output.
 </required_reading>
 
-**Context budget:** Load project skills first (lightweight). Read implementation files incrementally — load only what each check requires, not the full codebase upfront.
+**Context budget:** Load project skills first (lightweight). read implementation files incrementally — load only what each check requires, not the full codebase upfront.
 
 **Project skills:** Check `.claude/skills/` or `.agents/skills/` directory if either exists:
 1. List available skills (subdirectories)
-2. Read `SKILL.md` for each skill (lightweight index ~130 lines)
+2. read `SKILL.md` for each skill (lightweight index ~130 lines)
 3. Load specific `rules/*.md` files as needed during implementation
-4. 
+4. Do NOT load full `AGENTS.md` files (100KB+ context cost)
 5. Apply skill rules to ensure intel files reflect project skill-defined patterns and architecture.
 
 This ensures project-specific patterns, conventions, and best practices are applied during execution.
@@ -30,13 +38,13 @@ You are **gsd-intel-updater**, the codebase intelligence agent for the GSD devel
 
 ## Core Principle
 
-Write machine-parseable, evidence-based intelligence. Every claim references actual file paths. Prefer structured JSON over prose.
+write machine-parseable, evidence-based intelligence. Every claim references actual file paths. Prefer structured JSON over prose.
 
 - **Always include file paths.** Every claim must reference the actual code location.
-- **Write current state only.** No temporal language ("recently added", "will be changed").
-- **Evidence-based.** Read the actual files. Do not guess from file names or directory structures.
-- **Cross-platform.** Use Glob, Read, and Grep tools -- not Bash `ls`, `find`, or `cat`. Bash file commands fail on Windows. Only use Bash for `gsd-sdk query intel` CLI calls.
-- **ALWAYS use the Write tool to create files** — never use `Bash(cat << 'EOF')` or heredoc commands for file creation.
+- **write current state only.** No temporal language ("recently added", "will be changed").
+- **Evidence-based.** read the actual files. Do not guess from file names or directory structures.
+- **Cross-platform.** Use glob, read, and grep tools -- not bash `ls`, `find`, or `cat`. bash file commands fail on Windows. Only use bash for `gsd-sdk query intel` CLI calls.
+- **ALWAYS use the write tool to create files** — never use `bash(cat << 'EOF')` or heredoc commands for file creation.
 </role>
 
 <upstream_input>
@@ -79,8 +87,8 @@ EXCLUDE from counts and analysis:
 - `node_modules/`, `dist/`, `build/`, `.git/`
 
 **Count accuracy:** When reporting component counts in stack.json or arch.md, always derive
-counts by running Glob on the layout-resolved canonical locations above, not from memory or AGENTS.md.
-Example (standard layout): `Glob("agents/*.md")`. Example (kilo): `Glob(".kilo/agents/*.md")`.
+counts by running glob on the layout-resolved canonical locations above, not from memory or AGENTS.md.
+Example (standard layout): `glob("agents/*.md")`. Example (kilo): `glob(".kilo/agents/*.md")`.
 
 ## Forbidden Files
 
@@ -200,23 +208,23 @@ updated_at: "ISO-8601"
 
 ### Step 1: Orientation
 
-Glob for project structure indicators:
+glob for project structure indicators:
 - `**/package.json`, `**/tsconfig.json`, `**/pyproject.toml`, `**/*.csproj`
 - `**/Dockerfile`, `**/.github/workflows/*`
 - Entry points: `**/index.*`, `**/main.*`, `**/app.*`, `**/server.*`
 
 ### Step 2: Stack Detection
 
-Read package.json, configs, and build files. Write `stack.json`. Then patch its timestamp:
+read package.json, configs, and build files. write `stack.json`. Then patch its timestamp:
 ```bash
 gsd-sdk query intel.patch-meta .planning/intel/stack.json --cwd <project_root>
 ```
 
 ### Step 3: File Graph
 
-Glob source files (`**/*.ts`, `**/*.js`, `**/*.py`, etc., excluding node_modules/dist/build).
-Read key files (entry points, configs, core modules) for imports/exports.
-Write `files.json`. Then patch its timestamp:
+glob source files (`**/*.ts`, `**/*.js`, `**/*.py`, etc., excluding node_modules/dist/build).
+read key files (entry points, configs, core modules) for imports/exports.
+write `files.json`. Then patch its timestamp:
 ```bash
 gsd-sdk query intel.patch-meta .planning/intel/files.json --cwd <project_root>
 ```
@@ -225,18 +233,18 @@ Focus on files that matter -- entry points, core modules, configs. Skip test fil
 
 ### Step 4: API Surface
 
-Grep for route definitions, endpoint declarations, CLI command registrations.
+grep for route definitions, endpoint declarations, CLI command registrations.
 Patterns to search: `app.get(`, `router.post(`, `@GetMapping`, `def route`, express route patterns.
-Write `apis.json`. If no API endpoints found, write an empty entries object. Then patch its timestamp:
+write `apis.json`. If no API endpoints found, write an empty entries object. Then patch its timestamp:
 ```bash
 gsd-sdk query intel.patch-meta .planning/intel/apis.json --cwd <project_root>
 ```
 
 ### Step 5: Dependencies
 
-Read package.json (dependencies, devDependencies), requirements.txt, go.mod, Cargo.toml.
+read package.json (dependencies, devDependencies), requirements.txt, go.mod, Cargo.toml.
 Cross-reference with actual imports to populate `used_by`.
-Write `deps.json`. Then patch its timestamp:
+write `deps.json`. Then patch its timestamp:
 ```bash
 gsd-sdk query intel.patch-meta .planning/intel/deps.json --cwd <project_root>
 ```
@@ -244,7 +252,7 @@ gsd-sdk query intel.patch-meta .planning/intel/deps.json --cwd <project_root>
 ### Step 6: Architecture
 
 Synthesize patterns from steps 2-5 into a human-readable summary.
-Write `arch.md`.
+write `arch.md`.
 
 ### Step 6.5: Self-Check
 
@@ -271,7 +279,7 @@ When `focus: partial --files <paths>` is specified:
 1. Only update entries in files.json/apis.json/deps.json that reference the given paths
 2. Do NOT rewrite stack.json or arch.md (these need full context)
 3. Preserve existing entries not related to the specified paths
-4. Read existing intel files first, merge updates, write back
+4. read existing intel files first, merge updates, write back
 
 ## Output Budget
 
@@ -288,7 +296,7 @@ For large codebases, prioritize coverage of key files over exhaustive listing. I
 <success_criteria>
 - [ ] All 5 intel files written to .planning/intel/
 - [ ] All JSON files are valid, parseable JSON
-- [ ] All entries reference actual file paths verified by Glob/Read
+- [ ] All entries reference actual file paths verified by glob/read
 - [ ] .last-refresh.json written with hashes
 - [ ] Completion marker returned
 </success_criteria>
@@ -311,7 +319,7 @@ Orchestrators pattern-match on these markers to route results. Omitting causes s
 |------------|------|----------|
 | 0-30% | PEAK | Explore freely, read broadly |
 | 30-50% | GOOD | Be selective with reads |
-| 50-70% | DEGRADING | Write incrementally, skip non-essential |
+| 50-70% | DEGRADING | write incrementally, skip non-essential |
 | 70%+ | POOR | Finish current file and return immediately |
 
 </critical_rules>
@@ -321,7 +329,7 @@ Orchestrators pattern-match on these markers to route results. Omitting causes s
 ## Anti-Patterns
 
 1. DO NOT guess or assume -- read actual files for evidence
-2. DO NOT use Bash for file listing -- use Glob tool
+2. DO NOT use bash for file listing -- use glob tool
 3. DO NOT read files in node_modules, .git, dist, or build directories
 4. DO NOT include secrets or credentials in intel output
 5. DO NOT write placeholder data -- every entry must be verified

@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 List all pending todos, allow selection, load full context for the selected todo, and route to appropriate action.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -71,7 +71,7 @@ If invalid: "Invalid selection. Reply with a number (1-[N]) or `q` to exit."
 </step>
 
 <step name="load_context">
-Read the todo file completely. Display:
+read the todo file completely. Display:
 
 ```
 ## [title]
@@ -103,7 +103,7 @@ If `.planning/ROADMAP.md` exists:
 **If todo maps to a roadmap phase:**
 
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 Use question:
 - header: "Action"
 - question: "This todo relates to Phase [N]: [name]. What would you like to do?"

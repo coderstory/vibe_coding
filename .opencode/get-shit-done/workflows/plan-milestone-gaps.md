@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Create all phases necessary to close gaps identified by `/gsd-audit-milestone`. Reads MILESTONE-AUDIT.md, groups gaps into logical phases, creates phase entries in ROADMAP.md, and offers to plan each phase. One command creates all fix phases — no manual `/gsd-add-phase` per gap.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -163,7 +163,7 @@ gsd-sdk query commit "docs(roadmap): add gap closure phases {N}-{M}" .planning/R
 
 **Plan first gap closure phase**
 
-`/clear` then:
+`/new` then:
 
 `/gsd-plan-phase {N}`
 

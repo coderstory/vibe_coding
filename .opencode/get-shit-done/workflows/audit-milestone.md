@@ -1,13 +1,13 @@
-<purpose>
+<objective>
 Verify milestone achieved its definition of done by aggregating phase verifications, checking cross-phase integration, and assessing requirements coverage. Reads existing VERIFICATION.md files (phases already verified during execute-phase), aggregates tech debt and deferred gaps, then spawns integration checker for cross-phase wiring.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-integration-checker — Checks cross-phase integration
 </available_agent_types>
 
@@ -18,7 +18,7 @@ Valid GSD subagent types (use exact names — do not fall back to 'general-purpo
 ```bash
 INIT=$(gsd-sdk query init.milestone-op)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_CHECKER=$(gsd-sdk query agent-skills gsd-integration-checker 2>/dev/null)
+AGENT_SKILLS_CHECKER=$(gsd-sdk query agent-skills gsd-integration-checker)
 ```
 
 Extract from init JSON: `milestone_version`, `milestone_name`, `phase_count`, `completed_phases`, `commit_docs`.
@@ -40,7 +40,7 @@ gsd-sdk query phases.list
 - Extract milestone definition of done from ROADMAP.md
 - Extract requirements mapped to this milestone from REQUIREMENTS.md
 
-## 2. Read All Phase Verifications
+## 2. read All Phase Verifications
 
 For each phase directory, read the VERIFICATION.md:
 
@@ -67,8 +67,7 @@ With phase context collected:
 Extract `MILESTONE_REQ_IDS` from REQUIREMENTS.md traceability table — all REQ-IDs assigned to phases in this milestone.
 
 ```
-Task(
-  prompt="Check cross-phase integration and E2E flows.
+@gsd-integration-checker "Check cross-phase integration and E2E flows.
 
 Phases: {phase_dirs}
 Phase exports: {from SUMMARYs}
@@ -80,10 +79,7 @@ Milestone Requirements:
 MUST map each integration finding to affected requirement IDs where applicable.
 
 Verify cross-phase wiring and E2E user flows.
-${AGENT_SKILLS_CHECKER}",
-  subagent_type="gsd-integration-checker",
-  model="{integration_checker_model}"
-)
+${AGENT_SKILLS_CHECKER}"
 ```
 
 ## 4. Collect Results
@@ -229,7 +225,7 @@ All requirements covered. Cross-phase integration verified. E2E flows complete.
 
 **Complete milestone** — archive and tag
 
-/clear then:
+/new then:
 
 /gsd-complete-milestone {version}
 
@@ -274,7 +270,7 @@ Phases needing validation: run `/gsd-validate-phase {N}` for each flagged phase.
 
 **Plan gap closure** — create phases to complete milestone
 
-/clear then:
+/new then:
 
 /gsd-plan-milestone-gaps
 
@@ -316,7 +312,7 @@ All requirements met. No critical blockers. Accumulated tech debt needs review.
 
 **B. Plan cleanup phase** — address debt before completing
 
-/clear then:
+/new then:
 
 /gsd-plan-milestone-gaps
 

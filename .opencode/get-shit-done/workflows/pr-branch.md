@@ -1,11 +1,11 @@
-<purpose>
+<objective>
 Create a clean branch for pull requests by filtering out transient .planning/ commits.
 The PR branch contains only code changes and structural planning state — reviewers
 don't see GSD transient artifacts (PLAN.md, SUMMARY.md, CONTEXT.md, RESEARCH.md, etc.)
 but milestone archives, STATE.md, ROADMAP.md, and PROJECT.md changes are preserved.
 
 Uses git cherry-pick with path filtering to rebuild a clean history.
-</purpose>
+</objective>
 
 <process>
 

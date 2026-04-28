@@ -19,7 +19,7 @@ iteration = 0
 
 LOOP:
   1. Run checker/validator on current output
-  2. Read checker results
+  2. read checker results
   3. If PASSED or only INFO-level issues:
      -> Accept output, exit loop
   4. If BLOCKER or WARNING issues found:

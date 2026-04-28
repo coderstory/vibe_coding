@@ -41,7 +41,7 @@ Most effective systems combine all three.
 | **Policy compliance** | Adherence to business rules, legal requirements, disclaimers | Regulated industries, enterprise deployments |
 | **Tone/style appropriateness** | Match with brand voice, audience expectations, emotional context | Customer-facing systems, content generation |
 | **Output structure validity** | Schema compliance, required fields, format correctness | Structured extraction, API integrations, data pipelines |
-| **Task completion** | Whether the system accomplished the stated goal | Agentic workflows, multi-step tasks |
+| **task completion** | Whether the system accomplished the stated goal | Agentic workflows, multi-step tasks |
 | **Tool use correctness** | Correct selection and invocation of tools | Agent systems with tool calls |
 | **Safety** | Absence of harmful, biased, or inappropriate outputs | All user-facing systems |
 

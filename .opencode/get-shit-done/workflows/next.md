@@ -1,16 +1,16 @@
-<purpose>
+<objective>
 Detect current project state and automatically advance to the next logical GSD workflow step.
 Reads project state to determine: discuss → plan → execute → verify → complete progression.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
 
 <step name="detect_state">
-Read project state to determine current position:
+read project state to determine current position:
 
 ```bash
 # Get state snapshot
@@ -53,7 +53,7 @@ If found:
 `.planning/.continue-here.md` exists — a previous session left
 unfinished work that needs manual review before advancing.
 
-Read the file, resolve the issue, then delete it to continue.
+read the file, resolve the issue, then delete it to continue.
 Use `--force` to bypass this check.
 ```
 Exit (do not route).
@@ -206,7 +206,7 @@ Display the determination:
   [One-line explanation of why this is the next step]
 ```
 
-Then immediately invoke the determined command via skill.
+Then immediately invoke the determined command via command.
 Do not ask for confirmation — the whole point of `/gsd-next` is zero-friction advancement.
 </step>
 

@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Generate a post-session summary document capturing work performed, outcomes achieved, and estimated resource usage. Writes SESSION_REPORT.md to .planning/reports/ for human review and stakeholder sharing.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -24,13 +24,13 @@ git log --oneline --since="24 hours ago" --no-merges 2>/dev/null || echo "No rec
 git diff --stat HEAD~10 HEAD 2>/dev/null | tail -1 || echo "No diff available"
 ```
 
-Read `.planning/STATE.md` to get:
+read `.planning/STATE.md` to get:
 - Current milestone and phase
 - Progress percentage
 - Active blockers
 - Recent decisions
 
-Read `.planning/ROADMAP.md` to get milestone name and goals.
+read `.planning/ROADMAP.md` to get milestone name and goals.
 
 Check for existing reports:
 ```bash
@@ -58,7 +58,7 @@ Create the report directory and file:
 mkdir -p .planning/reports
 ```
 
-Write `.planning/reports/SESSION_REPORT.md` (or `.planning/reports/YYYYMMDD-session-report.md` if previous reports exist):
+write `.planning/reports/SESSION_REPORT.md` (or `.planning/reports/YYYYMMDD-session-report.md` if previous reports exist):
 
 ```markdown
 # GSD Session Report

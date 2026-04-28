@@ -244,7 +244,7 @@ function applyBudget(result, budgetTokens) {
   for (const tier of CONFIDENCE_ORDER) {
     if (estimateTokens({ nodes: result.nodes, edges }) <= budgetTokens) break;
     const before = edges.length;
-    // Check both confidence and confidence_score field names (Open Question 1)
+    // Check both confidence and confidence_score field names (Open question 1)
     edges = edges.filter(e => (e.confidence || e.confidence_score) !== tier);
     omitted += before - edges.length;
   }
@@ -422,7 +422,7 @@ function graphifyBuild(cwd) {
   const graphsDir = path.join(planningDir, 'graphs');
   fs.mkdirSync(graphsDir, { recursive: true });
 
-  // Read build timeout from config -- default 300s per D-02
+  // read build timeout from config -- default 300s per D-02
   const config = safeReadJson(path.join(planningDir, 'config.json')) || {};
   const timeoutSec = (config.graphify && config.graphify.build_timeout) || 300;
 
@@ -438,7 +438,7 @@ function graphifyBuild(cwd) {
 }
 
 /**
- * Write a diff snapshot after successful build (D-06).
+ * write a diff snapshot after successful build (D-06).
  * Reads graph.json from .planning/graphs/ and writes .last-build-snapshot.json
  * using atomicWriteFileSync for crash safety.
  *

@@ -1,4 +1,4 @@
-<purpose>
+<objective>
 Capture a forward-looking idea as a structured seed file with trigger conditions.
 Seeds auto-surface during /gsd-new-milestone when trigger conditions match the
 new milestone's scope.
@@ -8,7 +8,7 @@ Seeds beat deferred items because they:
 - Define WHEN to surface (trigger conditions, not manual scanning)
 - Track breadcrumbs (code references, related decisions)
 - Auto-present at the right time via new-milestone scan
-</purpose>
+</objective>
 
 <process>
 
@@ -33,7 +33,7 @@ mkdir -p .planning/seeds
 Ask focused questions to build a complete seed:
 
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 
 ```
 question(
@@ -98,7 +98,7 @@ Generate slug from idea summary.
 </step>
 
 <step name="write_seed">
-Write `.planning/seeds/SEED-{PADDED}-{slug}.md`:
+write `.planning/seeds/SEED-{PADDED}-{slug}.md`:
 
 ```markdown
 ---

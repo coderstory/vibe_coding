@@ -2,7 +2,7 @@
 
 Evergreen debugging disciplines — applies across every bug, every language, every system. Loaded by `gsd-debugger` via `@file` include.
 
-## User = Reporter, the agent = Investigator
+## User = Reporter, OpenCode = Investigator
 
 The user knows:
 - What they expected to happen
@@ -27,8 +27,8 @@ When debugging code you wrote, you're fighting your own mental model.
 - Familiarity breeds blindness to bugs
 
 **The discipline:**
-1. **Treat your code as foreign** - Read it as if someone else wrote it
-2. **Question your design decisions** - Your implementation decisions are hypotheses, not facts
+1. **Treat your code as foreign** - read it as if someone else wrote it
+2. **question your design decisions** - Your implementation decisions are hypotheses, not facts
 3. **Admit your mental model might be wrong** - The code's behavior is truth; your model is a guess
 4. **Prioritize code you touched** - If you modified 100 lines and something breaks, those are prime suspects
 
@@ -55,7 +55,7 @@ When debugging, return to foundational truths:
 
 **Change one variable:** Make one change, test, observe, document, repeat. Multiple changes = no idea what mattered.
 
-**Complete reading:** Read entire functions, not just "relevant" lines. Read imports, config, tests. Skimming misses crucial details.
+**Complete reading:** read entire functions, not just "relevant" lines. read imports, config, tests. Skimming misses crucial details.
 
 **Embrace not knowing:** "I don't know why this fails" = good (now you can investigate). "It must be X" = dangerous (you've stopped thinking).
 
@@ -70,7 +70,7 @@ Consider starting over when:
 
 **Restart protocol:**
 1. Close all files and terminals
-2. Write down what you know for certain
-3. Write down what you've ruled out
+2. write down what you know for certain
+3. write down what you've ruled out
 4. List new hypotheses (different from before)
 5. Begin again from Phase 1: Evidence Gathering

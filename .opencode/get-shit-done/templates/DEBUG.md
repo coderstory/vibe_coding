@@ -34,7 +34,7 @@ reproduction: [how to trigger]
 started: [when it broke / always broken]
 
 ## Eliminated
-<!-- APPEND only - prevents re-investigating after /clear -->
+<!-- APPEND only - prevents re-investigating after /new -->
 
 - hypothesis: [theory that was wrong]
   evidence: [what disproved it]
@@ -69,8 +69,8 @@ files_changed: []
 
 **Current Focus:**
 - OVERWRITE entirely on each update
-- Always reflects what the agent is doing RIGHT NOW
-- If the agent reads this after /clear, it knows exactly where to resume
+- Always reflects what OpenCode is doing RIGHT NOW
+- If OpenCode reads this after /new, it knows exactly where to resume
 - Fields: hypothesis, test, expecting, next_action, reasoning_checkpoint, tdd_checkpoint
 - `next_action`: must be concrete and actionable — bad: "continue investigating"; good: "Add logging at line 47 of auth.js to observe token value before jwt.verify()"
 - `reasoning_checkpoint`: OVERWRITE before every fix_and_verify — five-field structured reasoning record (hypothesis, confirming_evidence, falsification_test, fix_rationale, blind_spots)
@@ -86,7 +86,7 @@ files_changed: []
 - APPEND only - never remove entries
 - Prevents re-investigating dead ends after context reset
 - Each entry: hypothesis, evidence that disproved it, timestamp
-- Critical for efficiency across /clear boundaries
+- Critical for efficiency across /new boundaries
 
 **Evidence:**
 - APPEND only - never remove entries
@@ -145,15 +145,15 @@ files_changed: []
 
 <resume_behavior>
 
-When the agent reads this file after /clear:
+When OpenCode reads this file after /new:
 
 1. Parse frontmatter → know status
-2. Read Current Focus → know exactly what was happening
-3. Read Eliminated → know what NOT to retry
-4. Read Evidence → know what's been learned
+2. read Current Focus → know exactly what was happening
+3. read Eliminated → know what NOT to retry
+4. read Evidence → know what's been learned
 5. Continue from next_action
 
-The file IS the debugging brain. the agent should be able to resume perfectly from any interruption point.
+The file IS the debugging brain. OpenCode should be able to resume perfectly from any interruption point.
 
 </resume_behavior>
 

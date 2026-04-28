@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Clarify WHAT a phase delivers through a Socratic interview loop with quantitative ambiguity scoring.
 Produces a SPEC.md with falsifiable requirements that discuss-phase treats as locked decisions.
 
 This workflow handles "what" and "why" — discuss-phase handles "how".
-</purpose>
+</objective>
 
 <ambiguity_model>
 Score each dimension 0.0 (completely unclear) to 1.0 (crystal clear):
@@ -56,7 +56,7 @@ Rotate through these perspectives — each naturally surfaces different blindspo
 ## Step 1: Initialize
 
 ```bash
-INIT=$(node "D:/Data/桌面/vibe_coding/.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${PHASE}")
+INIT=$(node "./.opencode/get-shit-done/bin/gsd-tools.cjs" init phase-op "${PHASE}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
@@ -94,12 +94,12 @@ If "Update": Load existing SPEC.md, continue to Step 3.
 
 ## Step 2: Scout Codebase
 
-**Read these files before any questions:**
+**read these files before any questions:**
 - `{requirements_path}` — Project requirements
 - `{state_path}` — Decisions already made, current phase, blockers
 - ROADMAP.md phase entry — Phase description, goals, canonical refs
 
-**Grep the codebase** for code/files relevant to this phase goal. Look for:
+**grep the codebase** for code/files relevant to this phase goal. Look for:
 - Existing implementations of similar functionality
 - Integration points where new code will connect
 - Test coverage gaps relevant to the phase
@@ -170,17 +170,17 @@ If gate passes (ambiguity ≤ 0.20 AND all minimums met):
 
 **If max rounds reached (6) and gate not passed:**
 
-**If `--auto`:** Write SPEC.md anyway — flag unresolved dimensions. Log: `[auto] Max rounds reached. Writing SPEC.md with [N] dimensions below minimum. Planner will need to treat these as assumptions.`
+**If `--auto`:** write SPEC.md anyway — flag unresolved dimensions. Log: `[auto] Max rounds reached. Writing SPEC.md with [N] dimensions below minimum. Planner will need to treat these as assumptions.`
 
 **Otherwise:** question:
 - header: "Max Rounds"
 - question: "After 6 rounds, ambiguity is [score]. [List dimensions still below minimum.] What would you like to do?"
 - options:
-  - "Write SPEC.md anyway — flag gaps" → Write SPEC.md, mark unresolved dimensions in Ambiguity Report
+  - "write SPEC.md anyway — flag gaps" → write SPEC.md, mark unresolved dimensions in Ambiguity Report
   - "Keep talking" → Continue (no round limit from here)
   - "Abandon" → Exit without writing
 
-**If `--auto` mode throughout:** Replace all question calls above with the agent's recommended choice. Log decisions inline. Apply the same logic as `--auto` in discuss-phase.
+**If `--auto` mode throughout:** Replace all question calls above with OpenCode's recommended choice. Log decisions inline. Apply the same logic as `--auto` in discuss-phase.
 
 **Text mode (`workflow.text_mode: true` or `--text` flag):** Use plain-text numbered lists instead of question TUI menus.
 
@@ -188,7 +188,7 @@ If gate passes (ambiguity ≤ 0.20 AND all minimums met):
 
 ## Step 6: Generate SPEC.md
 
-Use the SPEC.md template from @D:/Data/桌面/vibe_coding/.opencode/get-shit-done/templates/spec.md.
+Use the SPEC.md template from @./.opencode/get-shit-done/templates/spec.md.
 
 **Requirements for every requirement entry:**
 - One specific, testable statement
@@ -212,7 +212,7 @@ Use the SPEC.md template from @D:/Data/桌面/vibe_coding/.opencode/get-shit-don
 
 **If any dimensions are below minimum**, mark them in the Ambiguity Report with: `⚠ Below minimum — planner must treat as assumption`.
 
-Write to: `{phase_dir}/{padded_phase}-SPEC.md`
+write to: `{phase_dir}/{padded_phase}-SPEC.md`
 
 ## Step 7: Commit
 

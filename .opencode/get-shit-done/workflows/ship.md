@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Create a pull request from completed phase/milestone work, generate a rich PR body from planning artifacts, optionally run code review, and prepare for merge. Closes the plan → execute → verify → ship loop.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -96,7 +96,7 @@ Phase {phase_number}: {phase_name}
 Or for milestone: `Milestone {version}: {name}`
 
 **2. Summary section:**
-Read ROADMAP.md for phase goal. Read VERIFICATION.md for verification status.
+read ROADMAP.md for phase goal. read VERIFICATION.md for verification status.
 
 ```markdown
 ## Summary
@@ -224,7 +224,7 @@ If `REVIEW_CMD` is non-empty and not `"null"`, run the external review:
 Ask if user wants to trigger a code review:
 
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 
 ```
 question:

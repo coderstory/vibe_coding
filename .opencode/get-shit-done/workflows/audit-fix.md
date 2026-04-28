@@ -1,8 +1,8 @@
-<purpose>
+<objective>
 Autonomous audit-to-fix pipeline. Runs an audit, parses findings, classifies each as
 auto-fixable vs manual-only, spawns executor agents for fixable issues, runs tests
 after each fix, and commits atomically with finding IDs for traceability.
-</purpose>
+</objective>
 
 <available_agent_types>
 - gsd-executor — executes a specific, scoped code change
@@ -36,9 +36,9 @@ INIT=$(gsd-sdk query audit-uat 2>/dev/null || echo "{}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 ```
 
-Read existing UAT and verification files to extract findings:
-- Glob: `.planning/phases/*/*-UAT.md`
-- Glob: `.planning/phases/*/*-VERIFICATION.md`
+read existing UAT and verification files to extract findings:
+- glob: `.planning/phases/*/*-UAT.md`
+- glob: `.planning/phases/*/*-VERIFICATION.md`
 
 Parse each finding into a structured record:
 - **ID** — sequential identifier (F-01, F-02, ...)
@@ -95,15 +95,30 @@ For each **auto-fixable** finding (up to `--max`, ordered by severity desc):
 
 **a. Spawn executor agent:**
 ```
-Task(
-  prompt="Fix finding {ID}: {description}. Files: {file_refs}. Make the minimal change to resolve this specific finding. Do not refactor surrounding code.",
-  subagent_type="gsd-executor"
-)
+@gsd-executor "Fix finding {ID}: {description}. Files: {file_refs}. Make the minimal change to resolve this specific finding. Do not refactor surrounding code."
 ```
 
 **b. Run tests:**
 ```bash
-npm test 2>&1 | tail -20
+AUDIT_TEST_CMD=$(gsd-sdk query config-get workflow.test_command --default "" 2>/dev/null || true)
+if [ -z "$AUDIT_TEST_CMD" ]; then
+  if [ -f "Makefile" ] && grep -q "^test:" Makefile; then
+    AUDIT_TEST_CMD="make test"
+  elif [ -f "Justfile" ] || [ -f "justfile" ]; then
+    AUDIT_TEST_CMD="just test"
+  elif [ -f "package.json" ]; then
+    AUDIT_TEST_CMD="npm test"
+  elif [ -f "Cargo.toml" ]; then
+    AUDIT_TEST_CMD="cargo test"
+  elif [ -f "go.mod" ]; then
+    AUDIT_TEST_CMD="go test ./..."
+  elif [ -f "pyproject.toml" ] || [ -f "requirements.txt" ]; then
+    AUDIT_TEST_CMD="python -m pytest -x -q --tb=short"
+  else
+    AUDIT_TEST_CMD="true"
+  fi
+fi
+eval "$AUDIT_TEST_CMD" 2>&1 | tail -20
 ```
 
 **c. If tests pass** — commit atomically:

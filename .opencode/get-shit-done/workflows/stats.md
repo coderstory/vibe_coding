@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Display comprehensive project statistics including phases, plans, requirements, git metrics, and timeline.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>

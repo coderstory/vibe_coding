@@ -174,9 +174,9 @@ blocked: [N]
 - `/gsd-verify-work {phase}` picks up from first pending/blocked test
 - When all items resolved, status advances to "complete"
 
-**Resume after /clear:**
-1. Read frontmatter → know phase and status
-2. Read Current Test → know where we are
+**Resume after /new:**
+1. read frontmatter → know phase and status
+2. read Current Test → know where we are
 3. Find first [pending] result → continue from there
 4. Summary shows progress so far
 

@@ -1,11 +1,11 @@
-<purpose>
+<objective>
 Research how to implement a phase. Spawns gsd-phase-researcher with phase context.
 
 Standalone research command. For most workflows, use `/gsd-plan-phase` which integrates research automatically.
-</purpose>
+</objective>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-phase-researcher — Researches technical approaches for a phase
 </available_agent_types>
 
@@ -13,14 +13,14 @@ Valid GSD subagent types (use exact names — do not fall back to 'general-purpo
 
 ## Step 0: Resolve Model Profile
 
-@D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/model-profile-resolution.md
+@./.opencode/get-shit-done/references/model-profile-resolution.md
 
 Resolve model for:
 - `gsd-phase-researcher`
 
 ## Step 1: Normalize and Validate Phase
 
-@D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/phase-argument-parsing.md
+@./.opencode/get-shit-done/references/phase-argument-parsing.md
 
 ```bash
 PHASE_INFO=$(gsd-sdk query roadmap.get-phase "${PHASE}")
@@ -42,14 +42,13 @@ If exists: Offer update/view/skip options.
 INIT=$(gsd-sdk query init.phase-op "${PHASE}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 # Extract: phase_dir, padded_phase, phase_number, state_path, requirements_path, context_path
-AGENT_SKILLS_RESEARCHER=$(gsd-sdk query agent-skills gsd-researcher 2>/dev/null)
+AGENT_SKILLS_RESEARCHER=$(gsd-sdk query agent-skills gsd-phase-researcher)
 ```
 
 ## Step 4: Spawn Researcher
 
 ```
-Task(
-  prompt="<objective>
+@gsd-phase-researcher "<objective>
 Research implementation approach for Phase {phase}: {name}
 </objective>
 
@@ -66,11 +65,8 @@ Phase description: {description}
 </additional_context>
 
 <output>
-Write to: .planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
-</output>",
-  subagent_type="gsd-phase-researcher",
-  model="{researcher_model}"
-)
+write to: .planning/phases/${PHASE}-{slug}/${PHASE}-RESEARCH.md
+</output>"
 ```
 
 ## Step 5: Handle Return

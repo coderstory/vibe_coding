@@ -70,19 +70,19 @@ File not found: {FILEPATH}
 
 Load project context for conflict detection:
 
-1. Read `.planning/ROADMAP.md` — extract phase structure, phase numbers, dependencies
-2. Read `.planning/PROJECT.md` — extract project constraints, tech stack, scope boundaries.
+1. read `.planning/ROADMAP.md` — extract phase structure, phase numbers, dependencies
+2. read `.planning/PROJECT.md` — extract project constraints, tech stack, scope boundaries.
    **If PROJECT.md does not exist:** skip constraint checks that rely on it and display:
    ```
    GSD > Note: No PROJECT.md found. Conflict checks against project constraints will be skipped.
    ```
-3. Read `.planning/REQUIREMENTS.md` — extract existing requirements for overlap and contradiction checks.
+3. read `.planning/REQUIREMENTS.md` — extract existing requirements for overlap and contradiction checks.
    **If REQUIREMENTS.md does not exist:** skip requirement conflict checks and continue.
-4. Glob for all CONTEXT.md files across phase directories:
+4. glob for all CONTEXT.md files across phase directories:
    ```bash
    find .planning/phases/ -name "*-CONTEXT.md" -o -name "CONTEXT.md" 2>/dev/null
    ```
-   Read each CONTEXT.md found — extract locked decisions (any decision in a `<decisions>` block)
+   read each CONTEXT.md found — extract locked decisions (any decision in a `<decisions>` block)
 
 Store loaded context for conflict detection in the next step.
 
@@ -90,7 +90,7 @@ Store loaded context for conflict detection in the next step.
 
 <step name="plan_read_input">
 
-Read the imported file at FILEPATH.
+read the imported file at FILEPATH.
 
 Determine the format:
 - **GSD PLAN.md format**: Has YAML frontmatter with `phase:`, `plan:`, `type:` fields
@@ -134,7 +134,7 @@ Render the full Conflict Detection Report using the format in `references/doc-co
 
 **If only WARNINGS and/or INFO (no blockers):**
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 
 Ask via question using the approve-revise-abort pattern (see `references/gate-prompts.md`):
 - question: "Review the warnings above. Proceed with import?"
@@ -183,7 +183,7 @@ If the directory does not exist, create it:
 mkdir -p ".planning/phases/{NN}-{slug}/"
 ```
 
-Write the PLAN.md file to the target directory.
+write the PLAN.md file to the target directory.
 
 </step>
 
@@ -192,7 +192,7 @@ Write the PLAN.md file to the target directory.
 Delegate validation to gsd-plan-checker:
 
 ```
-Task({
+task({
   subagent_type: "gsd-plan-checker",
   prompt: "Validate: .planning/phases/{phase}/{plan}-PLAN.md — check frontmatter completeness, task structure, and GSD conventions. Report any issues."
 })
@@ -238,9 +238,9 @@ Show: plan filename written, phase directory, validation result, next steps.
 
 Do NOT:
 - Violate the shared conflict-engine contract in `references/doc-conflict-engine.md` (no markdown tables, no new severity labels, no bypass of the BLOCKER gate)
-- Write PLAN.md files as `PLAN-01.md` or `plan-01.md` — always use `{NN}-{MM}-PLAN.md`
+- write PLAN.md files as `PLAN-01.md` or `plan-01.md` — always use `{NN}-{MM}-PLAN.md`
 - Use `pbr:plan-checker` or `pbr:planner` — use `gsd-plan-checker` and `gsd-planner`
-- Write `.planning/.active-skill` — this is a PBR pattern with no GSD equivalent
+- write `.planning/.active-skill` — this is a PBR pattern with no GSD equivalent
 - Reference `pbr-tools`, `pbr:`, or `PLAN-BUILD-RUN` anywhere
-- Write any PLAN.md file when blockers exist — the safety gate must hold
+- write any PLAN.md file when blockers exist — the safety gate must hold
 - Skip path validation on the --from file argument

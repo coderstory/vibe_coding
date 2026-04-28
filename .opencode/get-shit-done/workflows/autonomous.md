@@ -1,12 +1,12 @@
-<purpose>
+<objective>
 
-Drive milestone phases autonomously — all remaining phases, a range via `--from N`/`--to N`, or a single phase via `--only N`. For each incomplete phase: discuss → plan → execute using Skill() flat invocations. Pauses only for explicit user decisions (grey area acceptance, blockers, validation requests). Re-reads ROADMAP.md after each phase to catch dynamically inserted phases.
+Drive milestone phases autonomously — all remaining phases, a range via `--from N`/`--to N`, or a single phase via `--only N`. For each incomplete phase: discuss → plan → execute using skill() flat invocations. Pauses only for explicit user decisions (grey area acceptance, blockers, validation requests). Re-reads ROADMAP.md after each phase to catch dynamically inserted phases.
 
-</purpose>
+</objective>
 
 <required_reading>
 
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 
 </required_reading>
 
@@ -132,7 +132,7 @@ Exit cleanly.
 
 | # | Phase | Status |
 |---|-------|--------|
-| 5 | Skill Scaffolding & Phase Discovery | In Progress |
+| 5 | skill Scaffolding & Phase Discovery | In Progress |
 | 6 | Smart Discuss | Not Started |
 | 7 | Auto-Chain Refinements | Not Started |
 | 8 | Lifecycle Orchestration | Not Started |
@@ -194,13 +194,13 @@ SKIP_DISCUSS=$(gsd-sdk query config-get workflow.skip_discuss 2>/dev/null || ech
 Phase ${PHASE_NUM}: Discuss skipped (workflow.skip_discuss=true) — using ROADMAP phase goal as spec.
 ```
 
-Write a minimal CONTEXT.md so downstream plan-phase has valid input. Get phase details:
+write a minimal CONTEXT.md so downstream plan-phase has valid input. Get phase details:
 
 ```bash
 DETAIL=$(gsd-sdk query roadmap.get-phase ${PHASE_NUM})
 ```
 
-Extract `goal` and `requirements` from JSON. Write `${phase_dir}/${padded_phase}-CONTEXT.md` with:
+Extract `goal` and `requirements` from JSON. write `${phase_dir}/${padded_phase}-CONTEXT.md` with:
 
 ```markdown
 # Phase {PHASE_NUM}: {Phase Name} - Context
@@ -219,8 +219,8 @@ Extract `goal` and `requirements` from JSON. Write `${phase_dir}/${padded_phase}
 <decisions>
 ## Implementation Decisions
 
-### the agent's Discretion
-All implementation choices are at the agent's discretion — discuss phase was skipped per user setting. Use ROADMAP phase goal, success criteria, and codebase conventions to guide decisions.
+### OpenCode's Discretion
+All implementation choices are at OpenCode's discretion — discuss phase was skipped per user setting. Use ROADMAP phase goal, success criteria, and codebase conventions to guide decisions.
 
 </decisions>
 
@@ -262,7 +262,7 @@ The discuss step in `--auto` mode MUST NOT loop. If CONTEXT.md already exists af
 **If `INTERACTIVE` is set:** Run the standard discuss-phase skill inline (asks interactive questions, waits for user answers). This preserves user input on all design decisions while keeping plan+execute out of the main context:
 
 ```
-Skill(skill="gsd:discuss-phase", args="${PHASE_NUM}")
+skill(skill="gsd-discuss-phase", args="${PHASE_NUM}")
 ```
 
 **If `INTERACTIVE` is NOT set:** Execute the smart_discuss step for this phase (batch table proposals, auto-optimized).
@@ -301,7 +301,7 @@ Phase ${PHASE_NUM}: Frontend phase detected — generating UI design contract...
 ```
 
 ```
-Skill(skill="gsd-ui-phase", args="${PHASE_NUM}")
+skill(skill="gsd-ui-phase", args="${PHASE_NUM}")
 ```
 
 Verify UI-SPEC was created:
@@ -319,11 +319,7 @@ UI_SPEC_FILE=$(ls "${PHASE_DIR}"/*-UI-SPEC.md 2>/dev/null | head -1)
 **If `INTERACTIVE` is set:** Dispatch plan as a background agent to keep the main context lean. While plan runs, the workflow can immediately start discussing the next phase (see step 4).
 
 ```
-Agent(
-  description="Plan phase ${PHASE_NUM}: ${PHASE_NAME}",
-  run_in_background=true,
-  prompt="Run plan-phase for phase ${PHASE_NUM}: Skill(skill=\"gsd:plan-phase\", args=\"${PHASE_NUM}\")"
-)
+@gsd-plan-phase "Run plan-phase for phase ${PHASE_NUM}: skill(skill=\"gsd-plan-phase\", args=\"${PHASE_NUM}\")"
 ```
 
 Store the agent task_id. After discuss for the next phase completes (or if no next phase), wait for the plan agent to finish before proceeding to execute.
@@ -331,7 +327,7 @@ Store the agent task_id. After discuss for the next phase completes (or if no ne
 **If `INTERACTIVE` is NOT set (default):** Run plan inline as before.
 
 ```
-Skill(skill="gsd-plan-phase", args="${PHASE_NUM}")
+skill(skill="gsd-plan-phase", args="${PHASE_NUM}")
 ```
 
 Verify plan produced output — re-run `init phase-op` and check `has_plans`. If false → go to handle_blocker: "Plan phase ${PHASE_NUM} did not produce any plans."
@@ -341,11 +337,7 @@ Verify plan produced output — re-run `init phase-op` and check `has_plans`. If
 **If `INTERACTIVE` is set:** Wait for the plan agent to complete (if not already), verify plans exist, then dispatch execute as a background agent:
 
 ```
-Agent(
-  description="Execute phase ${PHASE_NUM}: ${PHASE_NAME}",
-  run_in_background=true,
-  prompt="Run execute-phase for phase ${PHASE_NUM}: Skill(skill=\"gsd:execute-phase\", args=\"${PHASE_NUM} --no-transition\")"
-)
+@gsd-execute-phase "Run execute-phase for phase ${PHASE_NUM}: skill(skill=\"gsd-execute-phase\", args=\"${PHASE_NUM} --no-transition\")"
 ```
 
 Store the agent task_id. The workflow can now start discussing the next phase while this phase executes in the background. Before starting post-execution routing for this phase, wait for the execute agent to complete.
@@ -353,7 +345,7 @@ Store the agent task_id. The workflow can now start discussing the next phase wh
 **If `INTERACTIVE` is NOT set (default):** Run execute inline as before.
 
 ```
-Skill(skill="gsd-execute-phase", args="${PHASE_NUM} --no-transition")
+skill(skill="gsd-execute-phase", args="${PHASE_NUM} --no-transition")
 ```
 
 **3c.5. Code Review and Fix**
@@ -367,15 +359,15 @@ CODE_REVIEW_ENABLED=$(gsd-sdk query config-get workflow.code_review 2>/dev/null 
 If `"false"`: display "Code review skipped (workflow.code_review=false)" and proceed to 3d.
 
 ```
-Skill(skill="gsd:code-review", args="${PHASE_NUM}")
+skill(skill="gsd-code-review", args="${PHASE_NUM}")
 ```
 
 Parse status from REVIEW.md frontmatter. If "clean" or "skipped": proceed to 3d. If findings found: auto-invoke:
 ```
-Skill(skill="gsd:code-review-fix", args="${PHASE_NUM} --auto")
+skill(skill="gsd-code-review-fix", args="${PHASE_NUM} --auto")
 ```
 
-**Error handling:** If either Skill fails, catch the error, display as non-blocking, and proceed to 3d.
+**Error handling:** If either skill fails, catch the error, display as non-blocking, and proceed to 3d.
 
 **3d. Post-Execution Routing**
 
@@ -410,10 +402,10 @@ Proceed to iterate step.
 
 **If `human_needed`:**
 
-Read the human_verification section from VERIFICATION.md to get the count and items requiring manual testing.
+read the human_verification section from VERIFICATION.md to get the count and items requiring manual testing.
 
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 Display the items, then ask user via question:
 - **question:** "Phase ${PHASE_NUM} has items needing manual verification. Validate now or continue to next phase?"
 - **options:** "Validate now" / "Continue without validation"
@@ -430,7 +422,7 @@ On **"Continue without validation"**: Display `Phase ${PHASE_NUM} ⏭ Human vali
 
 **If `gaps_found`:**
 
-Read gap summary from VERIFICATION.md (score and missing items). Display:
+read gap summary from VERIFICATION.md (score and missing items). Display:
 ```
 ⚠ Phase ${PHASE_NUM}: ${PHASE_NAME} — Gaps Found
 Score: {N}/{M} must-haves verified
@@ -443,14 +435,14 @@ Ask user via question:
 On **"Run gap closure"**: Execute gap closure cycle (limit: 1 attempt):
 
 ```
-Skill(skill="gsd-plan-phase", args="${PHASE_NUM} --gaps")
+skill(skill="gsd-plan-phase", args="${PHASE_NUM} --gaps")
 ```
 
 Verify gap plans were created — re-run `init phase-op ${PHASE_NUM}` and check `has_plans`. If no new gap plans → go to handle_blocker: "Gap closure planning for phase ${PHASE_NUM} did not produce plans."
 
 Re-execute:
 ```
-Skill(skill="gsd-execute-phase", args="${PHASE_NUM} --no-transition")
+skill(skill="gsd-execute-phase", args="${PHASE_NUM} --no-transition")
 ```
 
 Re-read verification status:
@@ -498,7 +490,7 @@ Phase ${PHASE_NUM}: Frontend phase with UI-SPEC — running UI review audit...
 ```
 
 ```
-Skill(skill="gsd-ui-review", args="${PHASE_NUM}")
+skill(skill="gsd-ui-review", args="${PHASE_NUM}")
 ```
 
 Display the review result summary (score from UI-REVIEW.md if produced). Continue to iterate step regardless of score — UI review is advisory, not blocking.
@@ -511,13 +503,13 @@ Display the review result summary (score from UI-REVIEW.md if produced). Continu
 
 ## Smart Discuss
 
-> Full instructions are in `get-shit-done/references/autonomous-smart-discuss.md`. Read that file now and follow it exactly.
+> Full instructions are in `get-shit-done/references/autonomous-smart-discuss.md`. read that file now and follow it exactly.
 
 Smart discuss is an autonomous-optimized variant of `gsd-discuss-phase`. It proposes grey area answers in batch tables — the user accepts or overrides per area — and writes an identical CONTEXT.md to what discuss-phase produces.
 
 **Inputs:** `PHASE_NUM` from execute_phase.
 
-Read and execute: `D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/autonomous-smart-discuss.md`
+read and execute: `./.opencode/get-shit-done/references/autonomous-smart-discuss.md`
 
 </step>
 
@@ -554,7 +546,7 @@ Re-filter incomplete phases using the same logic as discover_phases:
 - Apply `--to N` filter if originally provided
 - Sort by number ascending
 
-Read STATE.md fresh:
+read STATE.md fresh:
 
 ```bash
 cat .planning/STATE.md
@@ -611,7 +603,7 @@ Display lifecycle transition banner:
 **5a. Audit**
 
 ```
-Skill(skill="gsd-audit-milestone")
+skill(skill="gsd-audit-milestone")
 ```
 
 After audit completes, detect the result:
@@ -636,7 +628,7 @@ Proceed to 5b (no user pause — per CTRL-01).
 
 **If `gaps_found`:**
 
-Read the gaps summary from the audit file. Display:
+read the gaps summary from the audit file. Display:
 ```
 ⚠ Audit: Gaps Found
 ```
@@ -651,7 +643,7 @@ On **"Stop"**: Go to handle_blocker with "User stopped — audit gaps remain. Ru
 
 **If `tech_debt`:**
 
-Read the tech debt summary from the audit file. Display:
+read the tech debt summary from the audit file. Display:
 ```
 ⚠ Audit: Tech Debt Identified
 ```
@@ -667,7 +659,7 @@ On **"Stop"**: Go to handle_blocker with "User stopped — tech debt to address.
 **5b. Complete Milestone**
 
 ```
-Skill(skill="gsd-complete-milestone", args="${milestone_version}")
+skill(skill="gsd-complete-milestone", args="${milestone_version}")
 ```
 
 After complete-milestone returns, verify it produced output:
@@ -681,7 +673,7 @@ If the archive file does not exist, go to handle_blocker: "Complete milestone di
 **5c. Cleanup**
 
 ```
-Skill(skill="gsd-cleanup")
+skill(skill="gsd-cleanup")
 ```
 
 Cleanup shows its own dry-run and asks user for approval internally — this is an acceptable pause per CTRL-01 since it's an explicit decision about file deletion.
@@ -756,11 +748,11 @@ When any phase operation fails or a blocker is detected, present 3 options via q
 - [ ] Final completion or stop summary displayed
 - [ ] After all phases complete, lifecycle step is invoked (not manual suggestion)
 - [ ] Lifecycle transition banner displayed before audit
-- [ ] Audit invoked via Skill(skill="gsd-audit-milestone")
+- [ ] Audit invoked via skill(skill="gsd-audit-milestone")
 - [ ] Audit result routing: passed → auto-continue, gaps_found → user decides, tech_debt → user decides
 - [ ] Audit technical failure (no file/no status) routes to handle_blocker
-- [ ] Complete-milestone invoked via Skill() with ${milestone_version} arg
-- [ ] Cleanup invoked via Skill() — internal confirmation is acceptable (CTRL-01)
+- [ ] Complete-milestone invoked via skill() with ${milestone_version} arg
+- [ ] Cleanup invoked via skill() — internal confirmation is acceptable (CTRL-01)
 - [ ] Final completion banner displayed after lifecycle
 - [ ] Progress bar uses phase number / total milestone phases (not position among incomplete), with fallback display when phase numbers exceed total
 - [ ] Smart discuss documents relationship to discuss-phase with CTRL-03 note

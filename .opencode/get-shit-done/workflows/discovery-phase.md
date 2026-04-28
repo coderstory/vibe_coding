@@ -1,11 +1,11 @@
-<purpose>
+<objective>
 Execute discovery at the appropriate depth level.
 Produces DISCOVERY.md (for Level 2-3) that informs PLAN.md creation.
 
 Called from plan-phase.md's mandatory_discovery step with a depth parameter.
 
 NOTE: For comprehensive ecosystem research ("how do experts build this"), use /gsd-research-phase instead, which produces RESEARCH.md.
-</purpose>
+</objective>
 
 <depth_levels>
 **This workflow supports three depth levels:**
@@ -20,15 +20,15 @@ NOTE: For comprehensive ecosystem research ("how do experts build this"), use /g
 </depth_levels>
 
 <source_hierarchy>
-**MANDATORY: Context7 BEFORE WebSearch**
+**MANDATORY: Context7 BEFORE websearch**
 
-the agent's training data is 6-18 months stale. Always verify.
+OpenCode's training data is 6-18 months stale. Always verify.
 
 1. **Context7 MCP FIRST** - Current docs, no hallucination
 2. **Official docs** - When Context7 lacks coverage
-3. **WebSearch LAST** - For comparisons and trends only
+3. **websearch LAST** - For comparisons and trends only
 
-See D:/Data/桌面/vibe_coding/.opencode/get-shit-done/templates/discovery.md `<discovery_protocol>` for full protocol.
+See ./.opencode/get-shit-done/templates/discovery.md `<discovery_protocol>` for full protocol.
 </source_hierarchy>
 
 <process>
@@ -93,21 +93,21 @@ For: Choosing between options, new external integration.
 
    ```
    For each library/framework:
-   - mcp__context7__resolve-library-id
+   - mcp__context7__resolve-library-id 
    - mcp__context7__get-library-docs (mode: "code" for API, "info" for concepts)
    ```
 
 3. **Official docs** for anything Context7 lacks.
 
-4. **WebSearch** for comparisons:
+4. **websearch** for comparisons:
 
    - "[option A] vs [option B] {current_year}"
    - "[option] known issues"
    - "[option] with [our stack]"
 
-5. **Cross-verify:** Any WebSearch finding → confirm with Context7/official docs.
+5. **Cross-verify:** Any websearch finding → confirm with Context7/official docs.
 
-6. **Create DISCOVERY.md** using D:/Data/桌面/vibe_coding/.opencode/get-shit-done/templates/discovery.md structure:
+6. **Create DISCOVERY.md** using ./.opencode/get-shit-done/templates/discovery.md structure:
 
    - Summary with recommendation
    - Key findings per option
@@ -126,7 +126,7 @@ For: Architectural decisions, novel problems, high-risk choices.
 
 **Process:**
 
-1. **Scope the discovery** using D:/Data/桌面/vibe_coding/.opencode/get-shit-done/templates/discovery.md:
+1. **Scope the discovery** using ./.opencode/get-shit-done/templates/discovery.md:
 
    - Define clear scope
    - Define include/exclude boundaries
@@ -145,7 +145,7 @@ For: Architectural decisions, novel problems, high-risk choices.
    - Migration/upgrade guides
    - Known limitations
 
-4. **WebSearch for ecosystem context:**
+4. **websearch for ecosystem context:**
 
    - How others solved similar problems
    - Production experiences
@@ -154,13 +154,13 @@ For: Architectural decisions, novel problems, high-risk choices.
 
 5. **Cross-verify ALL findings:**
 
-   - Every WebSearch claim → verify with authoritative source
+   - Every websearch claim → verify with authoritative source
    - Mark what's verified vs assumed
    - Flag contradictions
 
 6. **Create comprehensive DISCOVERY.md:**
 
-   - Full structure from D:/Data/桌面/vibe_coding/.opencode/get-shit-done/templates/discovery.md
+   - Full structure from ./.opencode/get-shit-done/templates/discovery.md
    - Quality report with source attribution
    - Confidence by finding
    - If LOW confidence on any critical finding → add validation checkpoints
@@ -184,7 +184,7 @@ Ask: What do we need to learn before we can plan this phase?
   </step>
 
 <step name="create_discovery_scope">
-Use D:/Data/桌面/vibe_coding/.opencode/get-shit-done/templates/discovery.md.
+Use ./.opencode/get-shit-done/templates/discovery.md.
 
 Include:
 
@@ -203,7 +203,7 @@ Run the discovery:
 </step>
 
 <step name="create_discovery_output">
-Write `.planning/phases/XX-name/DISCOVERY.md`:
+write `.planning/phases/XX-name/DISCOVERY.md`:
 - Summary with recommendation
 - Key findings with sources
 - Code examples if applicable
@@ -215,7 +215,7 @@ After creating DISCOVERY.md, check confidence level.
 
 If confidence is LOW:
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 Use question:
 
 - header: "Low Conf."
@@ -238,8 +238,8 @@ If DISCOVERY.md has open_questions:
 Present them inline:
 "Open questions from discovery:
 
-- [Question 1]
-- [Question 2]
+- [question 1]
+- [question 2]
 
 These may affect implementation. Acknowledge and proceed? (yes / address first)"
 
@@ -274,7 +274,7 @@ NOTE: DISCOVERY.md is NOT committed separately. It will be committed with phase 
 
 **Level 2 (Standard):**
 - Context7 consulted for all options
-- WebSearch findings cross-verified
+- websearch findings cross-verified
 - DISCOVERY.md created with recommendation
 - Confidence level MEDIUM or higher
 - Ready to inform PLAN.md creation
@@ -282,7 +282,7 @@ NOTE: DISCOVERY.md is NOT committed separately. It will be committed with phase 
 **Level 3 (Deep Dive):**
 - Discovery scope defined
 - Context7 exhaustively consulted
-- All WebSearch findings verified against authoritative sources
+- All websearch findings verified against authoritative sources
 - DISCOVERY.md created with comprehensive analysis
 - Quality report with source attribution
 - If LOW confidence findings → validation checkpoints defined

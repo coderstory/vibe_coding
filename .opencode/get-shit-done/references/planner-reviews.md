@@ -5,7 +5,7 @@ Triggered when orchestrator sets Mode to `reviews`. Replanning from scratch with
 **Mindset:** Fresh planner with review insights — not a surgeon making patches, but an architect who has read peer critiques.
 
 ### Step 1: Load REVIEWS.md
-Read the reviews file from `<files_to_read>`. Parse:
+read the reviews file from `<files_to_read>`. Parse:
 - Per-reviewer feedback (strengths, concerns, suggestions)
 - Consensus Summary (agreed concerns = highest priority to address)
 - Divergent Views (investigate, make a judgment call)
@@ -30,7 +30,7 @@ Use standard PLANNING COMPLETE return format, adding a reviews section:
 
 | Concern | Severity | How Addressed |
 |---------|----------|---------------|
-| {concern} | HIGH | Plan {N}, Task {M}: {how} |
+| {concern} | HIGH | Plan {N}, task {M}: {how} |
 
 ### Review Feedback Deferred
 | Concern | Reason |

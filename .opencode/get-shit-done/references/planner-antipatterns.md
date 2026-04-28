@@ -14,7 +14,7 @@
 </task>
 ```
 
-**Why bad:** Vercel has a CLI. the agent should run `vercel --yes`. Never ask the user to do what the agent can automate via CLI/API.
+**Why bad:** Vercel has a CLI. OpenCode should run `vercel --yes`. Never ask the user to do what OpenCode can automate via CLI/API.
 
 ### Bad — Too many checkpoints
 
@@ -53,7 +53,7 @@ A plan should not interleave multiple checkpoint types with implementation tasks
 | "Handle errors" | "Wrap API calls in try/catch, return {error: string} on 4xx/5xx, show toast via sonner on client" |
 | "Set up the database" | "Add User and Project models to schema.prisma with UUID ids, email unique constraint, createdAt/updatedAt timestamps, run prisma db push" |
 
-**Specificity test:** Could a different the agent instance execute the task without asking clarifying questions? If not, add more detail.
+**Specificity test:** Could a different OpenCode instance execute the task without asking clarifying questions? If not, add more detail.
 
 ## Context Section Anti-Patterns
 

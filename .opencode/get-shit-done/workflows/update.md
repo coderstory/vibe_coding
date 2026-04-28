@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Check for GSD updates via npm, display changelog for versions between installed and latest, obtain user confirmation, and execute clean installation with cache clearing.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>
@@ -78,10 +78,10 @@ fi
 # runtime directories.
 if [ -n "$PREFERRED_CONFIG_DIR" ] && { [ -f "$PREFERRED_CONFIG_DIR/get-shit-done/VERSION" ] || [ -f "$PREFERRED_CONFIG_DIR/get-shit-done/workflows/update.md" ]; }; then
   INSTALL_SCOPE="GLOBAL"
-  # Normalize a path for comparison: on Windows with Git Bash, pwd returns
+  # Normalize a path for comparison: on Windows with Git bash, pwd returns
   # POSIX-style /c/Users/... but PREFERRED_CONFIG_DIR may carry C:/Users/...
   # Convert Windows drive-letter paths to POSIX form so the comparison works
-  # on both Windows (Git Bash) and POSIX systems.
+  # on both Windows (Git bash) and POSIX systems.
   normalize_path() {
     local p="$1"
     case "$p" in
@@ -272,14 +272,14 @@ Proceed to install step (treat as version 0.0.0 for comparison).
 Check npm for latest version:
 
 ```bash
-npm view get-shit-done-cc version 2>/dev/null
+npm view gsd-opencode version 2>/dev/null
 ```
 
 **If npm check fails:**
 ```
 Couldn't check for updates (offline or npm unavailable).
 
-To update manually: `npx get-shit-done-cc --global`
+To update manually: `npx gsd-opencode --global`
 ```
 
 Exit.
@@ -356,8 +356,8 @@ Exit.
 - `agents/gsd-*` files will be replaced
 
 (Paths are relative to detected runtime install location:
-global: `D:/Data/桌面/vibe_coding/.opencode/`, `~/.config/opencode/`, `~/.opencode/`, `~/.gemini/`, `~/.config/kilo/`, or `~/.codex/`
-local: `./.opencode/`, `./.config/opencode/`, `./.opencode/`, `./.gemini/`, `./.kilo/`, or `./.codex/`)
+global: `./.opencode/`, `./.opencode/`, `~/.opencode/`, `~/.gemini/`, `~/.config/kilo/`, or `~/.codex/`
+local: `./.claude/`, `./.config/opencode/`, `./.opencode/`, `./.gemini/`, `./.kilo/`, or `./.codex/`)
 
 Your custom files in other locations are preserved:
 - Custom commands not in `commands/gsd/` ✓
@@ -369,9 +369,9 @@ If you've modified any GSD files directly, they'll be automatically backed up to
 ```
 
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 Use question:
-- Question: "Proceed with update?"
+- question: "Proceed with update?"
 - Options:
   - "Yes, update now"
   - "No, cancel"
@@ -388,14 +388,15 @@ installer does not know about and will delete during the wipe.
 **Do not use bash path-stripping (`${filepath#$RUNTIME_DIR/}`) or `node -e require()`
 inline** — those patterns fail when `$RUNTIME_DIR` is unset and the stripped
 relative path may not match manifest key format, which causes CUSTOM_COUNT=0
-even when custom files exist (bug #1997). Use `gsd-tools detect-custom-files`
-instead, which resolves paths reliably with Node.js `path.relative()`.
+even when custom files exist (bug #1997). Use `gsd-sdk query detect-custom-files`
+when `gsd-sdk` is on `PATH`, or the bundled `gsd-tools.cjs detect-custom-files`
+otherwise — both resolve paths reliably with Node.js `path.relative()`.
 
 First, resolve the config directory (`RUNTIME_DIR`) from the install scope
 detected in `get_installed_version`:
 
 ```bash
-# RUNTIME_DIR is the resolved config directory (e.g. ~/.config/opencode, ~/.config/opencode)
+# RUNTIME_DIR is the resolved config directory (e.g. ~/.config/opencode, ~/.gemini)
 # It should already be set from get_installed_version as GLOBAL_DIR or LOCAL_DIR.
 # Use the appropriate variable based on INSTALL_SCOPE.
 if [ "$INSTALL_SCOPE" = "LOCAL" ]; then
@@ -410,17 +411,20 @@ fi
 If `RUNTIME_DIR` is empty or does not exist, skip this step (no config dir to
 inspect).
 
-Otherwise, resolve the path to `gsd-tools.cjs` and run:
+Otherwise run `detect-custom-files` (prefer SDK when available):
 
 ```bash
 GSD_TOOLS="$RUNTIME_DIR/get-shit-done/bin/gsd-tools.cjs"
-if [ -f "$GSD_TOOLS" ] && [ -n "$RUNTIME_DIR" ]; then
+CUSTOM_JSON=''
+if [ -n "$RUNTIME_DIR" ] && command -v gsd-sdk >/dev/null 2>&1; then
+  CUSTOM_JSON=$(gsd-sdk query detect-custom-files --config-dir "$RUNTIME_DIR" 2>/dev/null)
+elif [ -f "$GSD_TOOLS" ] && [ -n "$RUNTIME_DIR" ]; then
   CUSTOM_JSON=$(node "$GSD_TOOLS" detect-custom-files --config-dir "$RUNTIME_DIR" 2>/dev/null)
-  CUSTOM_COUNT=$(echo "$CUSTOM_JSON" | node -e "process.stdin.resume();let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{console.log(JSON.parse(d).custom_count);}catch{console.log(0);}})" 2>/dev/null || echo "0")
-else
-  CUSTOM_COUNT=0
+fi
+if [ -z "$CUSTOM_JSON" ]; then
   CUSTOM_JSON='{"custom_files":[],"custom_count":0}'
 fi
+CUSTOM_COUNT=$(echo "$CUSTOM_JSON" | node -e "process.stdin.resume();let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{console.log(JSON.parse(d).custom_count);}catch{console.log(0);}})" 2>/dev/null || echo "0")
 ```
 
 **If `CUSTOM_COUNT` > 0:**
@@ -471,17 +475,17 @@ RUNTIME_FLAG="--$TARGET_RUNTIME"
 
 **If LOCAL install:**
 ```bash
-npx -y get-shit-done-cc@latest "$RUNTIME_FLAG" --local
+npx -y gsd-opencode@latest "$RUNTIME_FLAG" --local
 ```
 
 **If GLOBAL install:**
 ```bash
-npx -y get-shit-done-cc@latest "$RUNTIME_FLAG" --global
+npx -y gsd-opencode@latest "$RUNTIME_FLAG" --global
 ```
 
 **If UNKNOWN install:**
 ```bash
-npx -y get-shit-done-cc@latest --claude --global
+npx -y gsd-opencode@latest --claude --global
 ```
 
 Capture output. If install fails, show error and exit.
@@ -550,7 +554,7 @@ Format completion message (changelog was already shown in confirmation step):
 
 ⚠️  Restart your runtime to pick up the new commands.
 
-[View full changelog](https://github.com/gsd-build/get-shit-done/blob/main/CHANGELOG.md)
+[View full changelog](https://github.com/rokicool/gsd-opencode/blob/main/CHANGELOG.md)
 ```
 </step>
 

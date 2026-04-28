@@ -1,6 +1,6 @@
-<purpose>
+<objective>
 Execute all plans in a phase using wave-based parallel execution. Orchestrator stays lean — delegates plan execution to subagents.
-</purpose>
+</objective>
 
 <core_principle>
 Orchestrator coordinates, not executes. Each subagent loads the full execute-plan context. Orchestrator: discover plans → analyze deps → group waves → spawn agents → handle checkpoints → collect results.
@@ -8,13 +8,13 @@ Orchestrator coordinates, not executes. Each subagent loads the full execute-pla
 
 <runtime_compatibility>
 **Subagent spawning is runtime-specific:**
-- **Claude Code:** Uses `Task(subagent_type="gsd-executor", ...)` — blocks until complete, returns result
+- **OpenCode:** Uses `task(subagent_type="gsd-executor", ...)` — blocks until complete, returns result
 - **Copilot:** Subagent spawning does not reliably return completion signals. **Default to
   sequential inline execution**: read and follow execute-plan.md directly for each plan
   instead of spawning parallel agents. Only attempt parallel spawning if the user
   explicitly requests it — and in that case, rely on the spot-check fallback in step 3
   to detect completion.
-- **Other runtimes:** If `Task`/`task` tool is unavailable, use sequential inline execution as the
+- **Other runtimes:** If `task`/`task` tool is unavailable, use sequential inline execution as the
   fallback. Check for tool availability at runtime rather than assuming based on runtime name.
 
 **Fallback rule:** If a spawned agent completes its work (commits visible, SUMMARY.md exists) but
@@ -24,16 +24,16 @@ via filesystem and git state.
 </runtime_compatibility>
 
 <required_reading>
-Read STATE.md before any operation to load project context.
+read STATE.md before any operation to load project context.
 
-@D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/agent-contracts.md
-@D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/context-budget.md
-@D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/gates.md
+@./.opencode/get-shit-done/references/agent-contracts.md
+@./.opencode/get-shit-done/references/context-budget.md
+@./.opencode/get-shit-done/references/gates.md
 </required_reading>
 
 <available_agent_types>
 These are the valid GSD subagent types registered in .claude/agents/ (or equivalent for your runtime).
-Always use the exact name from this list — do not fall back to 'general-purpose' or other built-in types:
+Always use the exact name from this list — do not fall back to 'general' or other built-in types:
 
 - gsd-executor — Executes plan tasks, commits, creates SUMMARY.md
 - gsd-verifier — Verifies phase completion, checks quality gates
@@ -69,14 +69,16 @@ Load all context in one call:
 ```bash
 INIT=$(gsd-sdk query init.execute-phase "${PHASE_ARG}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS=$(gsd-sdk query agent-skills gsd-executor 2>/dev/null)
+AGENT_SKILLS=$(gsd-sdk query agent-skills gsd-executor)
 ```
 
 Parse JSON for: `executor_model`, `verifier_model`, `commit_docs`, `parallelization`, `branching_strategy`, `branch_name`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `plans`, `incomplete_plans`, `plan_count`, `incomplete_count`, `state_exists`, `roadmap_exists`, `phase_req_ids`, `response_language`.
 
+**Model resolution:** If `executor_model` is `"inherit"`, omit the `model=` parameter from all `task()` calls — do NOT pass `model="inherit"` to task. Omitting the `model=` parameter causes OpenCode to inherit the current orchestrator model automatically. Only set `model=` when `executor_model` is an explicit model name (e.g., `"claude-sonnet-4-6"`, `"claude-opus-4-7"`).
+
 **If `response_language` is set:** Include `response_language: {value}` in all spawned subagent prompts so any user-facing output stays in the configured language.
 
-Read worktree config:
+read worktree config:
 
 ```bash
 USE_WORKTREES=$(gsd-sdk query config-get workflow.use_worktrees 2>/dev/null || echo "true")
@@ -93,7 +95,7 @@ fi
 
 When `USE_WORKTREES` is `false`, all executor agents run without `isolation="worktree"` — they execute sequentially on the main working tree instead of in parallel worktrees.
 
-Read context window size for adaptive prompt enrichment:
+read context window size for adaptive prompt enrichment:
 
 ```bash
 CONTEXT_WINDOW=$(gsd-sdk query config-get context_window 2>/dev/null || echo "200000")
@@ -105,8 +107,8 @@ When `CONTEXT_WINDOW >= 500000` (1M-class models), subagent prompts include rich
 - This enables cross-phase awareness and history-aware verification
 
 When `CONTEXT_WINDOW < 200000` (sub-200K models), subagent prompts are thinned to reduce static overhead:
-- Executor agents omit extended deviation rule examples and checkpoint examples from inline prompt — load on-demand via @D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/executor-examples.md
-- Planner agents omit extended anti-pattern lists and specificity examples from inline prompt — load on-demand via @D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/planner-antipatterns.md
+- Executor agents omit extended deviation rule examples and checkpoint examples from inline prompt — load on-demand via @./.opencode/get-shit-done/references/executor-examples.md
+- Planner agents omit extended anti-pattern lists and specificity examples from inline prompt — load on-demand via @./.opencode/get-shit-done/references/planner-antipatterns.md
 - Core rules and decision logic remain inline; only verbose examples and edge-case lists are extracted
 - This reduces executor static overhead by ~40% while preserving behavioral correctness
 
@@ -118,7 +120,7 @@ When `parallelization` is false, plans within a wave execute sequentially.
 
 **Runtime detection for Copilot:**
 Check if the current runtime is Copilot by testing for the `@gsd-executor` agent pattern
-or absence of the `Task()` subagent API. If running under Copilot, force sequential inline
+or absence of the `task()` subagent API. If running under Copilot, force sequential inline
 execution regardless of the `parallelization` setting — Copilot's subagent completion
 signals are unreliable (see `<runtime_compatibility>`). Set `COPILOT_SEQUENTIAL=true`
 internally and skip the `execute_waves` step in favor of `check_interactive_mode`'s
@@ -128,7 +130,7 @@ inline path for each plan.
 ```bash
 # REQUIRED: prevents stale auto-chain from previous --auto runs
 if [[ ! "$ARGUMENTS" =~ --auto ]]; then
-  gsd-sdk query config-set workflow._auto_chain_active false 2>/dev/null
+  gsd-sdk query config-set workflow._auto_chain_active false || true
 fi
 ```
 </step>
@@ -152,7 +154,7 @@ This step cannot be skipped. Before proceeding to `check_interactive_mode` or an
 2. **How did it manifest?** — Explain the specific failure that caused it to be recorded.
 3. **What structural mechanism (not acknowledgment) prevents it?** — Name the concrete step, checklist item, or enforcement mechanism that stops recurrence.
 
-Write these answers inline before continuing. If a blocking anti-pattern cannot be answered from the context in `.continue-here.md`, stop and ask the user for clarification.
+write these answers inline before continuing. If a blocking anti-pattern cannot be answered from the context in `.continue-here.md`, stop and ask the user for clarification.
 
 **If no `.continue-here.md` exists, or no `blocking` rows are found:** Proceed directly to `check_interactive_mode`.
 </step>
@@ -184,9 +186,9 @@ checkpoints between tasks. The user can review, modify, or redirect work at any 
       - Stop (end execution, save progress)
       ```
 
-   b. **If "Review first":** Read and display the full plan file. Ask again: Execute, Modify, Skip.
+   b. **If "Review first":** read and display the full plan file. Ask again: Execute, Modify, Skip.
 
-   c. **If "Execute":** Read and follow `D:/Data/桌面/vibe_coding/.opencode/get-shit-done/workflows/execute-plan.md` **inline**
+   c. **If "Execute":** read and follow `./.opencode/get-shit-done/workflows/execute-plan.md` **inline**
       (do NOT spawn a subagent). Execute tasks one at a time.
 
    d. **After each task:** Pause briefly. If the user intervenes (types anything), stop and address
@@ -310,9 +312,9 @@ CROSS_AI_TIMEOUT=$(gsd-sdk query config-get workflow.cross_ai_timeout 2>/dev/nul
 4. **Evaluate the result:**
 
    **Success (exit 0 + valid summary):**
-   - Read `$CANDIDATE_SUMMARY` and validate it contains meaningful content
+   - read `$CANDIDATE_SUMMARY` and validate it contains meaningful content
      (not empty, has at least a heading and description — a valid SUMMARY.md structure)
-   - Write it as the plan's SUMMARY.md file
+   - write it as the plan's SUMMARY.md file
    - Update STATE.md plan status to complete
    - Update ROADMAP.md progress
    - Mark plan as handled — skip it in execute_waves
@@ -333,6 +335,26 @@ CROSS_AI_TIMEOUT=$(gsd-sdk query config-get workflow.cross_ai_timeout 2>/dev/nul
 
 <step name="execute_waves">
 Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`, sequential if `false`.
+
+**Stream-idle-timeout prevention — checkpoint heartbeats (#2410):**
+
+Multi-plan phases can accumulate enough subagent context that the OpenCode API
+SSE layer terminates with `Stream idle timeout - partial response received`
+between a large tool_result and the next assistant turn (seen on OpenCode
++ Opus 4.7 at ~200K+ cache_read). To keep the stream warm, emit short
+assistant-text heartbeats — **no tool call, just a literal line** — at every
+wave and plan boundary. Each heartbeat MUST start with `[checkpoint]` so
+tooling and `/gsd-manager`'s background-completion handler can grep partial
+transcripts. `{P}/{Q}` is the phase-wide completed/total plans counter and
+increases monotonically across waves. `{status}` is `complete` (success),
+`failed` (executor error), or `checkpoint` (human-gate returned).
+
+```
+[checkpoint] phase {PHASE_NUMBER} wave {N}/{M} starting, {wave_plan_count} plan(s), {P}/{Q} plans done
+[checkpoint] phase {PHASE_NUMBER} wave {N}/{M} plan {plan_id} starting ({P}/{Q} plans done)
+[checkpoint] phase {PHASE_NUMBER} wave {N}/{M} plan {plan_id} {status} ({P}/{Q} plans done)
+[checkpoint] phase {PHASE_NUMBER} wave {N}/{M} complete, {P}/{Q} plans done ({wave_success}/{wave_plan_count} ok)
+```
 
 **For each wave:**
 
@@ -372,7 +394,15 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
 
 2. **Describe what's being built (BEFORE spawning):**
 
-   Read each plan's `<objective>`. Extract what's being built and why.
+   **First, emit the wave-start checkpoint heartbeat as a literal assistant-text
+   line — no tool call (#2410). Do NOT skip this even for single-plan waves; it
+   is required before any further reasoning or spawning:**
+
+   ```
+   [checkpoint] phase {PHASE_NUMBER} wave {N}/{M} starting, {wave_plan_count} plan(s), {P}/{Q} plans done
+   ```
+
+   Then read each plan's `<objective>`. Extract what's being built and why.
 
    ```
    ---
@@ -390,6 +420,13 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
 
 3. **Spawn executor agents:**
 
+   **Emit a plan-start heartbeat (literal line, no tool call) immediately before
+   each `task()` dispatch (#2410):**
+
+   ```
+   [checkpoint] phase {PHASE_NUMBER} wave {N}/{M} plan {plan_id} starting ({P}/{Q} plans done)
+   ```
+
    Pass paths only — executors read files themselves with their fresh context window.
    For 200k models, this keeps orchestrator context lean (~10-15%).
    For 1M+ models (Opus 4.6, Sonnet 4.6), richer context can be passed directly.
@@ -402,26 +439,29 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
    ```
 
    **Sequential dispatch for parallel execution (waves with 2+ agents):**
-   When spawning multiple agents in a wave, dispatch each `Task()` call **one at a time
-   with `run_in_background: true`** — do NOT send all Task calls in a single message.
+   When spawning multiple agents in a wave, dispatch each `task()` call **one at a time
+   with `run_in_background: true`** — do NOT send all task calls in a single message.
    `git worktree add` acquires an exclusive lock on `.git/config.lock`, so simultaneous
    calls race for this lock and fail. Sequential dispatch ensures each worktree finishes
    creation before the next begins (the round-trip latency of each tool call provides
    natural spacing), while all agents still **run in parallel** once created.
 
    ```
-   # CORRECT: dispatch one Task() per message, each with run_in_background: true
+   # CORRECT: dispatch one task() per message, each with run_in_background: true
    # → worktrees created sequentially, agents execute in parallel
    #
-   # WRONG: multiple Task() calls in a single message
+   # WRONG: multiple task() calls in a single message
    # → simultaneous git worktree add → .git/config.lock contention → failures
    ```
 
    ```
-   Task(
+   task(
      subagent_type="gsd-executor",
      description="Execute plan {plan_number} of phase {phase_number}",
-     model="{executor_model}",
+     # Only include model= when executor_model is an explicit model name.
+     # When executor_model is "inherit", omit this parameter entirely so
+     # OpenCode inherits the orchestrator model automatically.
+     model="{executor_model}",  # omit this line when executor_model == "inherit"
      isolation="worktree",
      prompt="
        <objective>
@@ -479,15 +519,15 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
        </parallel_execution>
 
        <execution_context>
-       @D:/Data/桌面/vibe_coding/.opencode/get-shit-done/workflows/execute-plan.md
-       @D:/Data/桌面/vibe_coding/.opencode/get-shit-done/templates/summary.md
-       @D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/checkpoints.md
-       @D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/tdd.md
-       ${CONTEXT_WINDOW < 200000 ? '' : '@D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/executor-examples.md'}
+       @./.opencode/get-shit-done/workflows/execute-plan.md
+       @./.opencode/get-shit-done/templates/summary.md
+       @./.opencode/get-shit-done/references/checkpoints.md
+       @./.opencode/get-shit-done/references/tdd.md
+       ${CONTEXT_WINDOW < 200000 ? '' : '@./.opencode/get-shit-done/references/executor-examples.md'}
        </execution_context>
 
        <files_to_read>
-       Read these files at execution start using the Read tool:
+       read these files at execution start using the read tool:
        - {phase_dir}/{plan_file} (Plan)
        - .planning/PROJECT.md (Project context — core value, requirements, evolution rules)
        - .planning/STATE.md (State)
@@ -505,9 +545,9 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
 
        <mcp_tools>
        If AGENTS.md or project instructions reference MCP tools (e.g. jCodeMunch, context7,
-       or other MCP servers), prefer those tools over Grep/Glob for code navigation when available.
+       or other MCP servers), prefer those tools over grep/glob for code navigation when available.
        MCP tools often save significant tokens by providing structured code indexes.
-       Check tool availability first — if MCP tools are not accessible, fall back to Grep/Glob.
+       Check tool availability first — if MCP tools are not accessible, fall back to grep/glob.
        </mcp_tools>
 
        <success_criteria>
@@ -522,7 +562,7 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
 
    **Sequential mode** (`USE_WORKTREES` is `false`):
 
-   Omit `isolation="worktree"` from the Task call. Replace the `<parallel_execution>` block with:
+   Omit `isolation="worktree"` from the task call. Replace the `<parallel_execution>` block with:
 
    ```
        <sequential_execution>
@@ -531,7 +571,7 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
        </sequential_execution>
    ```
 
-   The sequential mode Task prompt uses the same structure as worktree mode but with these differences in success_criteria — since there is only one agent writing at a time, there are no shared-file conflicts:
+   The sequential mode task prompt uses the same structure as worktree mode but with these differences in success_criteria — since there is only one agent writing at a time, there are no shared-file conflicts:
 
    ```
        <success_criteria>
@@ -547,7 +587,17 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
 
 4. **Wait for all agents in wave to complete.**
 
-   **Completion signal fallback (Copilot and runtimes where Task() may not return):**
+   **Plan-complete heartbeat (#2410):** as each executor returns (or is verified
+   via spot-check below), emit one line — `complete` advances `{P}`, `failed`
+   and `checkpoint` do not but still warm the stream:
+
+   ```
+   [checkpoint] phase {PHASE_NUMBER} wave {N}/{M} plan {plan_id} complete ({P}/{Q} plans done)
+   [checkpoint] phase {PHASE_NUMBER} wave {N}/{M} plan {plan_id} failed ({P}/{Q} plans done)
+   [checkpoint] phase {PHASE_NUMBER} wave {N}/{M} plan {plan_id} checkpoint ({P}/{Q} plans done)
+   ```
+
+   **Completion signal fallback (Copilot and runtimes where task() may not return):**
 
    If a spawned agent does not return a completion signal but appears to have finished
    its work, do NOT block indefinitely. Instead, verify completion via spot-checks:
@@ -566,7 +616,7 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
    activity. If commits are still appearing, wait longer. If no activity, report
    the plan as failed and route to the failure handler in step 6.
 
-   **This fallback applies automatically to all runtimes.** Claude Code's Task() normally
+   **This fallback applies automatically to all runtimes.** OpenCode's task() normally
    returns synchronously, but the fallback ensures resilience if it doesn't.
 
 5. **Post-wave hook validation (parallel mode only):**
@@ -623,6 +673,21 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
          break
        }
 
+       # Post-merge deletion audit: detect bulk file deletions in merge commit (#2384)
+       # --diff-filter=D HEAD~1 HEAD shows files deleted by the merge commit itself.
+       # Exclude .planning/ — orchestrator-owned deletions there are expected (resurrections
+       # are handled below). Require ALLOW_BULK_DELETE=1 to bypass for intentional large refactors.
+       MERGE_DEL_COUNT=$(git diff --diff-filter=D --name-only HEAD~1 HEAD 2>/dev/null | grep -vc '^\.planning/' || true)
+       if [ "$MERGE_DEL_COUNT" -gt 5 ] && [ "${ALLOW_BULK_DELETE:-0}" != "1" ]; then
+         MERGE_DELETIONS=$(git diff --diff-filter=D --name-only HEAD~1 HEAD 2>/dev/null | grep -v '^\.planning/' || true)
+         echo "⚠ BLOCKED: Merge of $WT_BRANCH deleted $MERGE_DEL_COUNT files outside .planning/ — reverting to protect repository integrity (#2384)"
+         echo "$MERGE_DELETIONS"
+         echo "  If these deletions are intentional, re-run with ALLOW_BULK_DELETE=1"
+         git reset --hard HEAD~1 2>/dev/null || true
+         rm -f "$STATE_BACKUP" "$ROADMAP_BACKUP"
+         continue
+       fi
+
        # Restore orchestrator-owned files (main always wins)
        if [ -s "$STATE_BACKUP" ]; then
          cp "$STATE_BACKUP" .planning/STATE.md
@@ -634,10 +699,15 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
 
        # Detect files deleted on main but re-added by worktree merge
        # (e.g., archived phase directories that were intentionally removed)
+       # A "resurrected" file must have a deletion event in main's ancestry —
+       # brand-new files (e.g. SUMMARY.md just created by the executor) have no
+       # such history and must NOT be removed (#2501).
        DELETED_FILES=$(git diff --diff-filter=A --name-only HEAD~1 -- .planning/ 2>/dev/null || true)
        for RESURRECTED in $DELETED_FILES; do
-         # Check if this file was NOT in main's pre-merge tree
-         if ! echo "$PRE_MERGE_FILES" | grep -qxF "$RESURRECTED"; then
+         # Only delete if this file was previously tracked on main and then
+         # deliberately removed (has a deletion event in git history).
+         WAS_DELETED=$(git log --follow --diff-filter=D --name-only --format="" HEAD~1 -- "$RESURRECTED" 2>/dev/null | grep -c . || true)
+         if [ "${WAS_DELETED:-0}" -gt 0 ]; then
            git rm -f "$RESURRECTED" 2>/dev/null || true
          fi
        done
@@ -665,7 +735,19 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
        fi
 
        # Remove the worktree
-       git worktree remove "$WT" --force 2>/dev/null || true
+       if ! git worktree remove "$WT" --force; then
+         WT_NAME=$(basename "$WT")
+         if [ -f ".git/worktrees/${WT_NAME}/locked" ]; then
+           echo "⚠ Worktree $WT is locked — attempting to unlock and retry"
+           git worktree unlock "$WT" 2>/dev/null || true
+           if ! git worktree remove "$WT" --force; then
+             echo "⚠ Residual worktree at $WT — manual cleanup required after session exits:"
+             echo "    git worktree unlock \"$WT\" && git worktree remove \"$WT\" --force && git branch -D \"$WT_BRANCH\""
+           fi
+         else
+           echo "⚠ Residual worktree at $WT (remove failed) — investigate manually"
+         fi
+       fi
 
        # Delete the temporary branch
        git branch -D "$WT_BRANCH" 2>/dev/null || true
@@ -688,22 +770,29 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
    merging their work creates failures.
 
    ```bash
+   # Resolve test command: project config > Makefile > language sniff
+   TEST_CMD=$(gsd-sdk query config-get workflow.test_command --default "" 2>/dev/null || true)
+   if [ -z "$TEST_CMD" ]; then
+     if [ -f "Makefile" ] && grep -q "^test:" Makefile; then
+       TEST_CMD="make test"
+     elif [ -f "Justfile" ] || [ -f "justfile" ]; then
+       TEST_CMD="just test"
+     elif [ -f "package.json" ]; then
+       TEST_CMD="npm test"
+     elif [ -f "Cargo.toml" ]; then
+       TEST_CMD="cargo test"
+     elif [ -f "go.mod" ]; then
+       TEST_CMD="go test ./..."
+     elif [ -f "pyproject.toml" ] || [ -f "requirements.txt" ]; then
+       TEST_CMD="python -m pytest -x -q --tb=short 2>&1 || uv run python -m pytest -x -q --tb=short"
+     else
+       TEST_CMD="true"
+       echo "⚠ No test runner detected — skipping post-merge test gate"
+     fi
+   fi
    # Detect test runner and run quick smoke test (timeout: 5 minutes)
    TEST_EXIT=0
-   timeout 300 bash -c '
-   if [ -f "package.json" ]; then
-     npm test 2>&1
-   elif [ -f "Cargo.toml" ]; then
-     cargo test 2>&1
-   elif [ -f "go.mod" ]; then
-     go test ./... 2>&1
-   elif [ -f "pyproject.toml" ] || [ -f "requirements.txt" ]; then
-     python -m pytest -x -q --tb=short 2>&1 || uv run python -m pytest -x -q --tb=short 2>&1
-   else
-     echo "⚠ No test runner detected — skipping post-merge test gate"
-     exit 0
-   fi
-   '
+   timeout 300 bash -c "$TEST_CMD" 2>&1
    TEST_EXIT=$?
    if [ "${TEST_EXIT}" -eq 0 ]; then
      echo "✓ Post-merge test gate passed — no cross-plan conflicts"
@@ -786,6 +875,15 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
 
 6. **Report completion — spot-check claims first:**
 
+   **Wave-close heartbeat (#2410):** after spot-checks finish (pass or fail),
+   before the `## Wave {N} Complete` summary, emit as a literal line:
+
+   ```
+   [checkpoint] phase {PHASE_NUMBER} wave {N}/{M} complete, {P}/{Q} plans done ({wave_success}/{wave_plan_count} ok)
+   ```
+
+
+
    For each SUMMARY.md:
    - Verify first 2 files from `key-files.created` exist on disk
    - Check `git log --oneline --all --grep="{phase}-{plan}"` returns ≥1 commit
@@ -811,7 +909,7 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
 
 7. **Handle failures:**
 
-   **Known Claude Code bug (classifyHandoffIfNeeded):** If an agent reports "failed" with error containing `classifyHandoffIfNeeded is not defined`, this is a Claude Code runtime bug — not a GSD or agent issue. The error fires in the completion handler AFTER all tool calls finish. In this case: run the same spot-checks as step 5 (SUMMARY.md exists, git commits present, no Self-Check: FAILED). If spot-checks PASS → treat as **successful**. If spot-checks FAIL → treat as real failure below.
+   **Known OpenCode bug (classifyHandoffIfNeeded):** If an agent reports "failed" with error containing `classifyHandoffIfNeeded is not defined`, this is a OpenCode runtime bug — not a GSD or agent issue. The error fires in the completion handler AFTER all tool calls finish. In this case: run the same spot-checks as step 5 (SUMMARY.md exists, git commits present, no Self-Check: FAILED). If spot-checks PASS → treat as **successful**. If spot-checks FAIL → treat as real failure below.
 
    For real failures: report which plan failed → ask "Continue?" or "Stop?" → if continue, dependent plans may also fail. If stop, partial completion report.
 
@@ -846,13 +944,12 @@ Plans with `autonomous: false` require user interaction.
 
 **Auto-mode checkpoint handling:**
 
-Read auto-advance config (chain flag + user preference):
+read auto-advance config (chain flag OR user preference — same boolean as `check.auto-mode`):
 ```bash
-AUTO_CHAIN=$(gsd-sdk query config-get workflow._auto_chain_active 2>/dev/null || echo "false")
-AUTO_CFG=$(gsd-sdk query config-get workflow.auto_advance 2>/dev/null || echo "false")
+AUTO_MODE=$(gsd-sdk query check auto-mode --pick active 2>/dev/null || echo "false")
 ```
 
-When executor returns a checkpoint AND (`AUTO_CHAIN` is `"true"` OR `AUTO_CFG` is `"true"`):
+When executor returns a checkpoint AND `AUTO_MODE` is `true`:
 - **human-verify** → Auto-spawn continuation agent with `{user_response}` = `"approved"`. Log `⚡ Auto-approved checkpoint`.
 - **decision** → Auto-spawn continuation agent with `{user_response}` = first option from checkpoint details. Log `⚡ Auto-selected: [option]`.
 - **human-action** → Present to user (existing behavior below). Auth gates cannot be automated.
@@ -1017,7 +1114,7 @@ If `CODE_REVIEW_ENABLED` is `"false"`: display "Code review skipped (workflow.co
 
 **Invoke review:**
 ```
-Skill(skill="gsd:code-review", args="${PHASE_NUMBER}")
+skill(skill="gsd-code-review", args="${PHASE_NUMBER}")
 ```
 
 **Check results using deterministic path (not glob):**
@@ -1033,7 +1130,7 @@ Code review found issues. Consider running:
 /gsd-code-review-fix ${PHASE_NUMBER}
 ```
 
-**Error handling:** If the Skill invocation fails or throws, catch the error, display "Code review encountered an error (non-blocking): {error}" and proceed to next step. Review failures must never block execution.
+**Error handling:** If the skill invocation fails or throws, catch the error, display "Code review encountered an error (non-blocking): {error}" and proceed to next step. Review failures must never block execution.
 
 Regardless of review result, ALWAYS proceed to close_parent_artifacts → regression_gate → verify_phase_goal.
 </step>
@@ -1061,7 +1158,7 @@ PARENT_INFO=$(gsd-sdk query find-phase "${PARENT_PHASE}" --raw)
 
 **3. Update UAT gap statuses:**
 
-Read the parent UAT file's `## Gaps` section. For each gap entry with `status: failed`:
+read the parent UAT file's `## Gaps` section. For each gap entry with `status: failed`:
 - Update to `status: resolved`
 
 **4. Update UAT frontmatter:**
@@ -1073,7 +1170,7 @@ If all gaps now have `status: resolved`:
 **5. Resolve referenced debug sessions:**
 
 For each gap that has a `debug_session:` field:
-- Read the debug session file
+- read the debug session file
 - Update frontmatter `status:` → `resolved`
 - Update frontmatter `updated:` timestamp
 - Move to resolved directory:
@@ -1111,16 +1208,27 @@ Collect all unique test file paths into `REGRESSION_FILES`.
 **Step 3: Run regression tests (if any found)**
 
 ```bash
-# Detect test runner and run prior phase tests
-if [ -f "package.json" ]; then
-  npm test 2>&1
-elif [ -f "Cargo.toml" ]; then
-  cargo test 2>&1
-elif [ -f "go.mod" ]; then
-  go test ./... 2>&1
-elif [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; then
-  python -m pytest ${REGRESSION_FILES} -q --tb=short 2>&1
+# Resolve test command: project config > Makefile > language sniff
+REG_TEST_CMD=$(gsd-sdk query config-get workflow.test_command --default "" 2>/dev/null || true)
+if [ -z "$REG_TEST_CMD" ]; then
+  if [ -f "Makefile" ] && grep -q "^test:" Makefile; then
+    REG_TEST_CMD="make test"
+  elif [ -f "Justfile" ] || [ -f "justfile" ]; then
+    REG_TEST_CMD="just test"
+  elif [ -f "package.json" ]; then
+    REG_TEST_CMD="npm test"
+  elif [ -f "Cargo.toml" ]; then
+    REG_TEST_CMD="cargo test"
+  elif [ -f "go.mod" ]; then
+    REG_TEST_CMD="go test ./..."
+  elif [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; then
+    REG_TEST_CMD="python -m pytest ${REGRESSION_FILES} -q --tb=short"
+  else
+    REG_TEST_CMD="true"
+  fi
 fi
+# Detect test runner and run prior phase tests
+eval "$REG_TEST_CMD" 2>&1
 ```
 
 **Step 4: Report results**
@@ -1216,17 +1324,26 @@ If `TEXT_MODE` is true, present as a plain-text numbered list. Otherwise use que
 **If user selects option 3:** Stop execution. Report partial completion.
 </step>
 
+<step name="codebase_drift_gate">
+Post-execution structural drift detection (#2003). Non-blocking by contract:
+any internal error here MUST fall through to `verify_phase_goal`. The phase
+is never failed by this gate.
+
+Load and follow the full step spec from
+`get-shit-done/workflows/execute-phase/steps/codebase-drift-gate.md` —
+covers the SDK call, JSON contract, `warn` vs `auto-remap` branches, mapper
+spawn template, and the two `workflow.drift_*` config keys.
+</step>
+
 <step name="verify_phase_goal">
 Verify phase achieved its GOAL, not just completed tasks.
 
 ```bash
-VERIFIER_SKILLS=$(gsd-sdk query agent-skills gsd-verifier 2>/dev/null)
+VERIFIER_SKILLS=$(gsd-sdk query agent-skills gsd-verifier)
 ```
 
 ```
-Task(
-  description="Verify phase {phase_number} goal achievement",
-  prompt="Verify phase {phase_number} goal achievement.
+@gsd-verifier "Verify phase {phase_number} goal achievement.
 Phase directory: {phase_dir}
 Phase goal: {goal from ROADMAP.md}
 Phase requirement IDs: {phase_req_ids}
@@ -1235,7 +1352,7 @@ Cross-reference requirement IDs from PLAN frontmatter against REQUIREMENTS.md �
 Create VERIFICATION.md.
 
 <files_to_read>
-Read these files before verification:
+read these files before verification:
 - {phase_dir}/*-PLAN.md (All plans — understand intent, check must_haves)
 - {phase_dir}/*-SUMMARY.md (All summaries — cross-reference claimed vs actual)
 - .planning/REQUIREMENTS.md (Requirement traceability)
@@ -1245,13 +1362,10 @@ ${CONTEXT_WINDOW >= 500000 ? `- {phase_dir}/*-CONTEXT.md (User decisions — ver
 ` : ''}
 </files_to_read>
 
-${VERIFIER_SKILLS}",
-  subagent_type="gsd-verifier",
-  model="{verifier_model}"
-)
+${VERIFIER_SKILLS}"
 ```
 
-Read status:
+read status:
 ```bash
 grep "^status:" "$PHASE_DIR"/*-VERIFICATION.md | cut -d: -f2 | tr -d ' '
 ```
@@ -1337,7 +1451,7 @@ Items saved to `{phase_num}-HUMAN-UAT.md` — they will appear in `/gsd-progress
 ---
 ## ▶ Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
 
-`/clear` then:
+`/new` then:
 
 `/gsd-plan-phase {X} --gaps ${GSD_WS}`
 
@@ -1402,13 +1516,45 @@ gsd-sdk query learnings.copy 2>/dev/null || echo "⚠ Learnings copy failed — 
 Copy failure must NOT block phase completion.
 </step>
 
+<step name="close_phase_todos">
+**Auto-close pending todos tagged for this phase (#2433).**
+
+This step runs AFTER `update_roadmap` marks the phase complete. It moves any pending todos that carry `resolves_phase: <current-phase-number>` to the completed directory.
+
+```bash
+PHASE_NUM="${PHASE_NUMBER}"
+PENDING_DIR=".planning/todos/pending"
+COMPLETED_DIR=".planning/todos/completed"
+mkdir -p "$COMPLETED_DIR"
+
+CLOSED=()
+for TODO_FILE in "$PENDING_DIR"/*.md; do
+  [ -f "$TODO_FILE" ] || continue
+  # Extract resolves_phase from YAML frontmatter (first --- block only)
+  RP=$(awk '/^---/{c++;next} c==1 && /^resolves_phase:/{print $2;exit} c==2{exit}' "$TODO_FILE" 2>/dev/null || true)
+  if [ "$RP" = "$PHASE_NUM" ] || [ "$RP" = "\"$PHASE_NUM\"" ]; then
+    mv "$TODO_FILE" "$COMPLETED_DIR/"
+    CLOSED+=("$(basename "$TODO_FILE")")
+  fi
+done
+
+if [ ${#CLOSED[@]} -gt 0 ]; then
+  gsd-sdk query commit "docs(phase-${PHASE_NUMBER}): auto-close ${#CLOSED[@]} todo(s) resolved by this phase" .planning/todos/completed/ .planning/STATE.md || true
+  echo "◆ Closed ${#CLOSED[@]} todo(s) resolved by Phase ${PHASE_NUMBER}:"
+  for f in "${CLOSED[@]}"; do echo "  ✓ $f"; done
+fi
+```
+
+**If no todos have `resolves_phase: <this-phase>`:** Skip silently — this step is always additive and never blocks phase completion.
+</step>
+
 <step name="update_project_md">
 **Evolve PROJECT.md to reflect phase completion (prevents planning document drift — #956):**
 
 PROJECT.md tracks validated requirements, decisions, and current state. Without this step,
 PROJECT.md falls behind silently over multiple phases.
 
-1. Read `.planning/PROJECT.md`
+1. read `.planning/PROJECT.md`
 2. If the file exists and has a `## Validated Requirements` or `## Requirements` section:
    - Move any requirements validated by this phase from Active → Validated
    - Add a brief note: `Validated in Phase {X}: {Name}`
@@ -1454,13 +1600,12 @@ STOP. Do not proceed to auto-advance or transition.
 **Auto-advance detection:**
 
 1. Parse `--auto` flag from $ARGUMENTS
-2. Read both the chain flag and user preference (chain flag already synced in init step):
+2. read consolidated auto-mode (`active` = chain flag OR user preference; chain flag already synced in init step):
    ```bash
-   AUTO_CHAIN=$(gsd-sdk query config-get workflow._auto_chain_active 2>/dev/null || echo "false")
-   AUTO_CFG=$(gsd-sdk query config-get workflow.auto_advance 2>/dev/null || echo "false")
+   AUTO_MODE=$(gsd-sdk query check auto-mode --pick active 2>/dev/null || echo "false")
    ```
 
-**If `--auto` flag present OR `AUTO_CHAIN` is true OR `AUTO_CFG` is true (AND verification passed with no gaps):**
+**If `--auto` flag present OR `AUTO_MODE` is true (AND verification passed with no gaps):**
 
 ```
 ╔══════════════════════════════════════════╗
@@ -1469,11 +1614,11 @@ STOP. Do not proceed to auto-advance or transition.
 ╚══════════════════════════════════════════╝
 ```
 
-Execute the transition workflow inline (do NOT use Task — orchestrator context is ~10-15%, transition needs phase completion data already in context):
+Execute the transition workflow inline (do NOT use task — orchestrator context is ~10-15%, transition needs phase completion data already in context):
 
-Read and follow `D:/Data/桌面/vibe_coding/.opencode/get-shit-done/workflows/transition.md`, passing through the `--auto` flag so it propagates to the next phase invocation.
+read and follow `./.opencode/get-shit-done/workflows/transition.md`, passing through the `--auto` flag so it propagates to the next phase invocation.
 
-**If none of `--auto`, `AUTO_CHAIN`, or `AUTO_CFG` is true:**
+**If neither `--auto` nor `AUTO_MODE` is true:**
 
 **STOP. Do not auto-advance. Do not execute transition. Do not plan next phase. Present options to the user and wait.**
 
@@ -1514,16 +1659,16 @@ Only suggest the commands listed above. Do not invent or hallucinate command nam
 
 <context_efficiency>
 Orchestrator: ~10-15% context for 200k windows, can use more for 1M+ windows.
-Subagents: fresh context each (200k-1M depending on model). No polling (Task blocks). No context bleed.
+Subagents: fresh context each (200k-1M depending on model). No polling (task blocks). No context bleed.
 
 For 1M+ context models, consider:
 - Passing richer context (code snippets, dependency outputs) directly to executors instead of just file paths
 - Running small phases (≤3 plans, no dependencies) inline without subagent spawning overhead
-- Relaxing /clear recommendations — context rot onset is much further out with 5x window
+- Relaxing /new recommendations — context rot onset is much further out with 5x window
 </context_efficiency>
 
 <failure_handling>
-- **classifyHandoffIfNeeded false failure:** Agent reports "failed" but error is `classifyHandoffIfNeeded is not defined` → Claude Code bug, not GSD. Spot-check (SUMMARY exists, commits present) → if pass, treat as success
+- **classifyHandoffIfNeeded false failure:** Agent reports "failed" but error is `classifyHandoffIfNeeded is not defined` → OpenCode bug, not GSD. Spot-check (SUMMARY exists, commits present) → if pass, treat as success
 - **Agent fails mid-plan:** Missing SUMMARY.md → report, ask user how to proceed
 - **Dependency chain breaks:** Wave 1 fails → Wave 2 dependents likely fail → user chooses attempt or skip
 - **All agents in wave fail:** Systemic issue → stop, report for investigation

@@ -6,7 +6,7 @@
  * Reads a GSD-2 project directory structure and produces a complete
  * .planning/ artifact tree in GSD v1 format.
  *
- * GSD-2 hierarchy:  Milestone → Slice → Task
+ * GSD-2 hierarchy:  Milestone → Slice → task
  * GSD v1 hierarchy: Milestone (in ROADMAP.md) → Phase → Plan
  *
  * Mapping rules:
@@ -108,7 +108,7 @@ function parseTaskMustHaves(content) {
 }
 
 /**
- * Read all task plan files from a GSD-2 tasks/ directory.
+ * read all task plan files from a GSD-2 tasks/ directory.
  */
 function readTasksDir(tasksDir) {
   if (!fs.existsSync(tasksDir)) return [];
@@ -236,7 +236,7 @@ function buildSummaryMd(task, phasePrefix, planPrefix) {
     `plan: "${planPrefix}"`,
     '---',
     '',
-    body || 'Task completed (migrated from GSD-2).',
+    body || 'task completed (migrated from GSD-2).',
     '',
   ].join('\n');
 }
@@ -429,7 +429,7 @@ function buildPreview(gsd2Data, artifacts) {
 // ─── Writer ───────────────────────────────────────────────────────────────────
 
 /**
- * Write all artifacts to the .planning/ directory.
+ * write all artifacts to the .planning/ directory.
  */
 function writePlanningDir(artifacts, planningRoot) {
   for (const [rel, content] of artifacts) {

@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 List all GSD workspaces found in ~/gsd-workspaces/ with their status.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <process>

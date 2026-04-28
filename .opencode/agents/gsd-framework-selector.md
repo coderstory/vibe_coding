@@ -2,6 +2,14 @@
 name: gsd-framework-selector
 description: Presents an interactive decision matrix to surface the right AI/LLM framework for the user's specific use case. Produces a scored recommendation with rationale. Spawned by /gsd-ai-integration-phase and /gsd-select-framework orchestrators.
 mode: subagent
+tools:
+  read: true
+  bash: true
+  grep: true
+  glob: true
+  websearch: true
+  question: true
+color: "#38BDF8"
 ---
 
 <role>
@@ -10,7 +18,7 @@ Run a ≤6-question interview, score frameworks, return a ranked recommendation 
 </role>
 
 <required_reading>
-Read `D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/ai-frameworks.md` before asking questions. This is your decision matrix.
+read `./.opencode/get-shit-done/references/ai-frameworks.md` before asking questions. This is your decision matrix.
 </required_reading>
 
 <project_context>
@@ -18,7 +26,7 @@ Scan for existing technology signals before the interview:
 ```bash
 find . -maxdepth 2 \( -name "package.json" -o -name "pyproject.toml" -o -name "requirements*.txt" \) -not -path "*/node_modules/*" 2>/dev/null | head -5
 ```
-Read found files to extract: existing AI libraries, model providers, language, team size signals. This prevents recommending a framework the team has already rejected.
+read found files to extract: existing AI libraries, model providers, language, team size signals. This prevents recommending a framework the team has already rejected.
 </project_context>
 
 <interview>
@@ -35,7 +43,7 @@ question([
       { label: "Multi-Agent Workflow", description: "Multiple AI agents collaborating on structured tasks" },
       { label: "Conversational Assistant / Chatbot", description: "Single-model chat interface with optional tool use" },
       { label: "Structured Data Extraction", description: "Extract fields, entities, or structured output from unstructured text" },
-      { label: "Autonomous Task Agent", description: "Agent that plans and executes multi-step tasks independently" },
+      { label: "Autonomous task Agent", description: "Agent that plans and executes multi-step tasks independently" },
       { label: "Content Generation Pipeline", description: "Generate text, summaries, drafts, or creative content at scale" },
       { label: "Code Automation Agent", description: "Agent that reads, writes, or executes code autonomously" },
       { label: "Not sure yet / Exploratory" }
@@ -47,7 +55,7 @@ question([
     multiSelect: false,
     options: [
       { label: "OpenAI (GPT-4o, o3, etc.)", description: "Comfortable with OpenAI vendor lock-in" },
-      { label: "Anthropic (the agent)", description: "Comfortable with Anthropic vendor lock-in" },
+      { label: "Anthropic (OpenCode)", description: "Comfortable with Anthropic vendor lock-in" },
       { label: "Google (Gemini)", description: "Committed to Gemini / Google Cloud / Vertex AI" },
       { label: "Model-agnostic", description: "Need ability to swap models or use local models" },
       { label: "Undecided / Want flexibility" }

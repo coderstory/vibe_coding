@@ -22,7 +22,7 @@ These patterns indicate placeholder code regardless of file type:
 
 **Comment-based stubs:**
 ```bash
-# Grep patterns for stub comments
+# grep patterns for stub comments
 grep -E "(TODO|FIXME|XXX|HACK|PLACEHOLDER)" "$file"
 grep -E "implement|add later|coming soon|will be" "$file" -i
 grep -E "// \.\.\.|/\* \.\.\. \*/|# \.\.\." "$file"
@@ -600,10 +600,10 @@ Some things can't be verified programmatically. Flag these for human testing:
 
 For automation-first checkpoint patterns, server lifecycle management, CLI installation handling, and error recovery protocols, see:
 
-**@D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/checkpoints.md** → `<automation_reference>` section
+**@./.opencode/get-shit-done/references/checkpoints.md** → `<automation_reference>` section
 
 Key principles:
-- the agent sets up verification environment BEFORE presenting checkpoints
+- OpenCode sets up verification environment BEFORE presenting checkpoints
 - Users never run CLI commands (visit URLs only)
 - Server lifecycle: start before checkpoint, handle port conflicts, keep running for duration
 - CLI installation: auto-install where safe, checkpoint for user choice otherwise

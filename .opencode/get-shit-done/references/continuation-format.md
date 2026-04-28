@@ -11,7 +11,7 @@ Standard format for presenting next steps after completing a command or workflow
 
 **{identifier}: {name}** — {one-line description}
 
-`/clear` then:
+`/new` then:
 
 `{command to copy-paste}`
 
@@ -32,7 +32,7 @@ Standard format for presenting next steps after completing a command or workflow
 1. **Always show what it is** — name + description, never just a command path
 2. **Pull context from source** — ROADMAP.md for phases, PLAN.md `<objective>` for plans
 3. **Command in inline code** — backticks, easy to copy-paste, renders as clickable link
-4. **`/clear` first** — always show `/clear` before the command so users run it in the correct order
+4. **`/new` first** — always show `/new` before the command so users run it in the correct order
 5. **"Also available" not "Other options"** — sounds more app-like
 6. **Visual separators** — `---` above and below to make it stand out
 7. **Project identity in heading** — include `[PROJECT_CODE] PROJECT_TITLE` from init context so handoffs are self-identifying across sessions. If `project_code` is not set, omit the suffix entirely (just `## ▶ Next Up`)
@@ -48,7 +48,7 @@ Standard format for presenting next steps after completing a command or workflow
 
 **02-03: Refresh Token Rotation** — Add /api/auth/refresh with sliding expiry
 
-`/clear` then:
+`/new` then:
 
 `/gsd-execute-phase 2`
 
@@ -71,9 +71,9 @@ Add note that this is the last plan and what comes after:
 ## ▶ Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
 
 **02-03: Refresh Token Rotation** — Add /api/auth/refresh with sliding expiry
-<sub>Final plan in Phase 2</sub>
+*Final plan in Phase 2*
 
-`/clear` then:
+`/new` then:
 
 `/gsd-execute-phase 2`
 
@@ -95,7 +95,7 @@ Add note that this is the last plan and what comes after:
 
 **Phase 2: Authentication** — JWT login flow with refresh tokens
 
-`/clear` then:
+`/new` then:
 
 `/gsd-plan-phase 2`
 
@@ -124,7 +124,7 @@ Show completion status before next action:
 
 **Phase 3: Core Features** — User dashboard, settings, and data export
 
-`/clear` then:
+`/new` then:
 
 `/gsd-plan-phase 3`
 
@@ -149,7 +149,7 @@ When there's no clear primary action:
 
 **Phase 3: Core Features** — User dashboard, settings, and data export
 
-`/clear` then one of:
+`/new` then one of:
 
 **To plan directly:** `/gsd-plan-phase 3`
 
@@ -173,7 +173,7 @@ All 4 phases shipped
 
 **Start v1.1** — questioning → research → requirements → roadmap
 
-`/clear` then:
+`/new` then:
 
 `/gsd-new-milestone`
 
@@ -217,18 +217,18 @@ Extract: `**02-03: Refresh Token Rotation** — Add /api/auth/refresh with slidi
 ```
 ## To Continue
 
-Run `/clear`, then paste:
+Run `/new`, then paste:
 /gsd-execute-phase 2
 ```
 
 User has no idea what 02-03 is about.
 
-### Don't: Missing /clear explanation
+### Don't: Missing /new explanation
 
 ```
 `/gsd-plan-phase 3`
 
-Run /clear first.
+Run /new first.
 ```
 
 Doesn't explain why. User might skip it.

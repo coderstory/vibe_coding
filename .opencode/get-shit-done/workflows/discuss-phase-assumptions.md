@@ -1,13 +1,13 @@
-<purpose>
+<objective>
 Extract implementation decisions that downstream agents need — using codebase-first analysis
 and assumption surfacing instead of interview-style questioning.
 
 You are a thinking partner, not an interviewer. Analyze the codebase deeply, surface what you
 believe based on evidence, and ask the user only to correct what's wrong.
-</purpose>
+</objective>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-assumptions-analyzer — Analyzes codebase to surface implementation assumptions
 </available_agent_types>
 
@@ -28,7 +28,7 @@ The user is a visionary, not a codebase archaeologist. They need enough context 
 whether your assumptions match their intent — not to answer questions you could figure out
 by reading the code.
 
-- Read the codebase FIRST, form opinions SECOND, ask ONLY about what's genuinely unclear
+- read the codebase FIRST, form opinions SECOND, ask ONLY about what's genuinely unclear
 - Every assumption must cite evidence (file paths, patterns found)
 - Every assumption must state consequences if wrong
 - Minimize user interactions: ~2-4 corrections vs ~15-20 questions
@@ -66,7 +66,7 @@ Phase number from argument (required).
 ```bash
 INIT=$(gsd-sdk query init.phase-op "${PHASE}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_ANALYZER=$(gsd-sdk query agent-skills gsd-assumptions-analyzer 2>/dev/null)
+AGENT_SKILLS_ANALYZER=$(gsd-sdk query agent-skills gsd-assumptions-analyzer)
 ```
 
 Parse JSON for: `commit_docs`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`,
@@ -136,9 +136,9 @@ If "Cancel": Exit workflow.
 </step>
 
 <step name="load_prior_context">
-Read project-level and prior phase context to avoid re-asking decided questions.
+read project-level and prior phase context to avoid re-asking decided questions.
 
-**Step 1: Read project-level files**
+**Step 1: read project-level files**
 ```bash
 cat .planning/PROJECT.md 2>/dev/null || true
 cat .planning/REQUIREMENTS.md 2>/dev/null || true
@@ -150,14 +150,14 @@ Extract from these:
 - **REQUIREMENTS.md** — Acceptance criteria, constraints
 - **STATE.md** — Current progress, any flags
 
-**Step 2: Read all prior CONTEXT.md files**
+**Step 2: read all prior CONTEXT.md files**
 ```bash
 (find .planning/phases -name "*-CONTEXT.md" 2>/dev/null || true) | sort
 ```
 
 For each CONTEXT.md where phase number < current phase:
-- Read the `<decisions>` section — these are locked preferences
-- Read `<specifics>` — particular references or "I want it like X" moments
+- read the `<decisions>` section — these are locked preferences
+- read `<specifics>` — particular references or "I want it like X" moments
 - Note patterns (e.g., "user consistently prefers minimal UI")
 
 **Step 3: Build internal `<prior_decisions>` context**
@@ -187,7 +187,7 @@ Parse JSON for: `todo_count`, `matches[]`.
 </step>
 
 <step name="load_methodology">
-Read the project-level methodology file if it exists. This must happen before assumption analysis
+read the project-level methodology file if it exists. This must happen before assumption analysis
 so that active lenses shape how assumptions are generated and evaluated.
 
 ```bash
@@ -212,7 +212,7 @@ Lightweight scan of existing code to inform assumption generation.
 ls .planning/codebase/*.md 2>/dev/null || true
 ```
 
-**If codebase maps exist:** Read relevant ones (CONVENTIONS.md, STRUCTURE.md, STACK.md). Extract reusable components, patterns, integration points. Skip to Step 3.
+**If codebase maps exist:** read relevant ones (CONVENTIONS.md, STRUCTURE.md, STACK.md). Extract reusable components, patterns, integration points. Skip to Step 3.
 
 **Step 2: If no codebase maps, do targeted grep**
 
@@ -222,7 +222,7 @@ Extract key terms from phase goal, search for related files.
 grep -rl "{term1}\|{term2}" src/ app/ --include="*.ts" --include="*.tsx" 2>/dev/null | head -10
 ```
 
-Read the 3-5 most relevant files.
+read the 3-5 most relevant files.
 
 **Step 3: Build internal `<codebase_context>`**
 
@@ -236,12 +236,12 @@ keeps raw file contents out of the main context window, protecting token budget.
 **Resolve calibration tier (if USER-PROFILE.md exists):**
 
 ```bash
-PROFILE_PATH="D:/Data/桌面/vibe_coding/.opencode/get-shit-done/USER-PROFILE.md"
+PROFILE_PATH="./.opencode/get-shit-done/USER-PROFILE.md"
 ```
 
 If file exists at PROFILE_PATH:
-- Priority 1: Read config.json > preferences.vendor_philosophy (project-level override)
-- Priority 2: Read USER-PROFILE.md Vendor Choices/Philosophy rating (global)
+- Priority 1: read config.json > preferences.vendor_philosophy (project-level override)
+- Priority 2: read USER-PROFILE.md Vendor Choices/Philosophy rating (global)
 - Priority 3: Default to "standard"
 
 Map to calibration tier:
@@ -254,7 +254,7 @@ If no USER-PROFILE.md: calibration_tier = "standard"
 **Spawn Explore subagent:**
 
 ```
-Task(subagent_type="gsd-assumptions-analyzer", prompt="""
+@gsd-assumptions-analyzer """
 Analyze the codebase for Phase {PHASE}: {phase_name}.
 
 Phase goal: {roadmap_description}
@@ -263,10 +263,10 @@ Codebase scout hints: {codebase_context_summary}
 Calibration: {calibration_tier}
 
 Your job:
-1. Read ROADMAP.md phase {PHASE} description
-2. Read any prior CONTEXT.md files from earlier phases
-3. Glob/Grep for files related to: {phase_relevant_terms}
-4. Read 5-15 most relevant source files
+1. read ROADMAP.md phase {PHASE} description
+2. read any prior CONTEXT.md files from earlier phases
+3. glob/grep for files related to: {phase_relevant_terms}
+4. read 5-15 most relevant source files
 5. Return structured assumptions
 
 ## Output Format
@@ -291,7 +291,7 @@ Return EXACTLY this structure:
 ecosystem best practices, etc. Leave empty if codebase provides enough evidence.]
 
 ${AGENT_SKILLS_ANALYZER}
-""")
+"""
 ```
 
 Parse the subagent's response. Extract:
@@ -307,10 +307,10 @@ Parse the subagent's response. Extract:
 <step name="external_research">
 **Skip if:** `needs_research` from deep_codebase_analysis is empty.
 
-If research topics were flagged, spawn a general-purpose research agent:
+If research topics were flagged, spawn a general research agent:
 
 ```
-Task(subagent_type="general", prompt="""
+@general """
 Research the following topics for Phase {PHASE}: {phase_name}.
 
 Topics needing research:
@@ -322,8 +322,8 @@ For each topic, return:
 - **Confidence impact:** [Which assumption this resolves and to what confidence level]
 
 Use Context7 (resolve-library-id then query-docs) for library-specific questions.
-Use WebSearch for ecosystem/best-practice questions.
-""")
+Use websearch for ecosystem/best-practice questions.
+"""
 ```
 
 Merge findings back into assumptions:
@@ -368,7 +368,7 @@ Based on codebase analysis, here's what I'd go with:
 - header: "Assumptions"
 - question: "These all look right?"
 - options:
-  - "Yes, proceed" — Write CONTEXT.md with these assumptions as decisions
+  - "Yes, proceed" — write CONTEXT.md with these assumptions as decisions
   - "Let me correct some" — Select which assumptions to change
 
 **If "Yes, proceed":** Skip to write_context.
@@ -404,7 +404,7 @@ After all corrections processed, continue to write_context with updated assumpti
 </step>
 
 <step name="write_context">
-Create phase directory if needed. Write CONTEXT.md using the standard 6-section format.
+Create phase directory if needed. write CONTEXT.md using the standard 6-section format.
 
 **File:** `${phase_dir}/${padded_phase}-CONTEXT.md`
 
@@ -437,7 +437,7 @@ Map assumptions to CONTEXT.md sections:
 ### {Area Name 2}
 - **D-03:** {Decision}
 
-### the agent's Discretion
+### OpenCode's Discretion
 {Any assumptions where the user confirmed "you decide" or left as-is with Likely confidence}
 
 ### Folded Todos
@@ -487,11 +487,11 @@ Map assumptions to CONTEXT.md sections:
 </deferred>
 ```
 
-Write file.
+write file.
 </step>
 
 <step name="write_discussion_log">
-Write audit trail of assumptions and corrections.
+write audit trail of assumptions and corrections.
 
 **File:** `${phase_dir}/${padded_phase}-DISCUSSION-LOG.md`
 
@@ -520,7 +520,7 @@ Write audit trail of assumptions and corrections.
 {If corrections were made:}
 
 ### {Area Name}
-- **Original assumption:** {what the agent assumed}
+- **Original assumption:** {what OpenCode assumed}
 - **User correction:** {what the user chose instead}
 - **Reason:** {user's rationale, if provided}
 
@@ -541,7 +541,7 @@ Write audit trail of assumptions and corrections.
 {If no research: omit this section}
 ```
 
-Write file.
+write file.
 </step>
 
 <step name="git_commit">
@@ -597,7 +597,7 @@ Created: .planning/phases/${PADDED_PHASE}-${SLUG}/${PADDED_PHASE}-CONTEXT.md
 
 **Phase ${PHASE}: {phase_name}** — {Goal from ROADMAP.md}
 
-`/clear` then:
+`/new` then:
 
 `/gsd-plan-phase ${PHASE}`
 
@@ -619,24 +619,23 @@ Check for auto-advance trigger:
 2. Sync chain flag:
    ```bash
    if [[ ! "$ARGUMENTS" =~ --auto ]]; then
-     gsd-sdk query config-set workflow._auto_chain_active false 2>/dev/null
+     gsd-sdk query config-set workflow._auto_chain_active false || true
    fi
    ```
-3. Read chain flag and user preference:
+3. read consolidated auto-mode (`active` = chain flag OR user preference):
    ```bash
-   AUTO_CHAIN=$(gsd-sdk query config-get workflow._auto_chain_active 2>/dev/null || echo "false")
-   AUTO_CFG=$(gsd-sdk query config-get workflow.auto_advance 2>/dev/null || echo "false")
+   AUTO_MODE=$(gsd-sdk query check auto-mode --pick active 2>/dev/null || echo "false")
    ```
 
-**If `--auto` flag present AND `AUTO_CHAIN` is not true:**
+**If `--auto` flag present AND `AUTO_MODE` is not true:**
 ```bash
 gsd-sdk query config-set workflow._auto_chain_active true
 ```
 
-**If `--auto` flag present OR `AUTO_CHAIN` is true OR `AUTO_CFG` is true:**
+**If `--auto` flag present OR `AUTO_MODE` is true:**
 
 Display banner:
-```
+```text
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  GSD ► AUTO-ADVANCING TO PLAN
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -644,7 +643,7 @@ Display banner:
 Context captured (assumptions mode). Launching plan-phase...
 ```
 
-Launch: `Skill(skill="gsd-plan-phase", args="${PHASE} --auto")`
+Launch: `skill(skill="gsd-plan-phase", args="${PHASE} --auto")`
 
 Handle return: PHASE COMPLETE / PLANNING COMPLETE / INCONCLUSIVE / GAPS FOUND
 (identical handling to discuss-phase.md auto_advance step)

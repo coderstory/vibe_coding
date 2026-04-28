@@ -1,8 +1,8 @@
-<purpose>
+<objective>
 Triage and review all open GitHub issues and PRs against project contribution templates.
 Produces a structured report showing compliance status for each item, flags missing
 required fields, identifies label gaps, and optionally takes action (label, comment, close).
-</purpose>
+</objective>
 
 <required_reading>
 Before starting, read these project files to understand the review criteria:
@@ -290,7 +290,7 @@ STALE ITEMS (>30 days, no activity)
 ===================================================================
 ```
 
-Write this report to `.planning/INBOX-TRIAGE.md` if a `.planning/` directory exists,
+write this report to `.planning/INBOX-TRIAGE.md` if a `.planning/` directory exists,
 otherwise print to console only.
 </step>
 
@@ -327,7 +327,7 @@ gh pr close {number} --comment "Closed by GSD inbox triage: this PR does not mee
 
 Always confirm with the user before closing anything:
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 
 ```
 question:

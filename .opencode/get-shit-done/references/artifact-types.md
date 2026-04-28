@@ -40,7 +40,7 @@ reads is inert — the consumption mechanism is what gives an artifact meaning.
 
 ### SUMMARY.md (per-plan)
 - **Shape**: Frontmatter with dependency graph + narrative + deviations + self-check
-- **Lifecycle**: Created at plan completion → Read by subsequent plans in same phase
+- **Lifecycle**: Created at plan completion → read by subsequent plans in same phase
 - **Location**: `.planning/phases/XX-name/XX-YY-SUMMARY.md`
 - **Consumed by**: Orchestrator (progress), planner (context for future plans), `milestone-summary`
 
@@ -56,14 +56,14 @@ reads is inert — the consumption mechanism is what gives an artifact meaning.
 
 ### DISCUSSION-LOG.md (per-phase)
 - **Shape**: Audit trail of assumptions and corrections from discuss-phase
-- **Lifecycle**: Created at discussion time → Read-only audit record
+- **Lifecycle**: Created at discussion time → read-only audit record
 - **Location**: `.planning/phases/XX-name/XX-DISCUSSION-LOG.md`
 - **Consumed by**: Human review; not read by automated workflows
 
 ### USER-PROFILE.md
 - **Shape**: Calibration tier and preferences profile
 - **Lifecycle**: Created by `profile-user` → Updated as preferences are observed
-- **Location**: `D:/Data/桌面/vibe_coding/.opencode/get-shit-done/USER-PROFILE.md`
+- **Location**: `./.opencode/get-shit-done/USER-PROFILE.md`
 - **Consumed by**: `discuss-phase-assumptions` (calibration tier), `plan-phase`
 
 ### SPIKE.md / DESIGN.md (per-spike)

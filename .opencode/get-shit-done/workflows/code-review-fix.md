@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Auto-fix issues from REVIEW.md. Validates phase, checks config gate, verifies REVIEW.md exists and has fixable issues, spawns gsd-code-fixer agent, handles --auto iteration loop (capped at 3), commits REVIEW-FIX.md once at the end, and presents results.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <available_agent_types>
@@ -186,11 +186,10 @@ echo "Applying fixes from ${REVIEW_PATH}..."
 echo "Fix scope: ${FIX_SCOPE}"
 ```
 
-Use Task() to spawn agent:
+Use task() to spawn agent:
 
 ```
-Task(subagent_type="gsd-code-fixer", prompt="
-<files_to_read>
+@gsd-code-fixer """<files_to_read>
 ${REVIEW_PATH}
 </files_to_read>
 
@@ -203,13 +202,13 @@ fix_report_path: ${FIX_REPORT_PATH}
 iteration: 1
 </config>
 
-Read REVIEW.md findings, apply fixes, commit each atomically, write REVIEW-FIX.md. Do NOT commit REVIEW-FIX.md (orchestrator handles that).
-")
+read REVIEW.md findings, apply fixes, commit each atomically, write REVIEW-FIX.md. Do NOT commit REVIEW-FIX.md (orchestrator handles that).
+"""
 ```
 
 **Agent failure handling:**
 
-If Task() fails:
+If task() fails:
 ```
 Error: Code fix agent failed: ${error_message}
 ```
@@ -270,17 +269,16 @@ if [ "$AUTO_MODE" = "true" ]; then
     
     # Spawn gsd-code-reviewer agent to re-review
     # (This overwrites REVIEW_PATH with latest review state)
-    Task(subagent_type="gsd-code-reviewer", prompt="
-<config>
+    @gsd-code-reviewer """<config>
 depth: ${REVIEW_DEPTH}
 phase_dir: ${PHASE_DIR}
 review_path: ${REVIEW_PATH}
 ${FILES_CONFIG}
 </config>
 
-Re-review the phase at ${REVIEW_DEPTH} depth. Write findings to ${REVIEW_PATH}.
+Re-review the phase at ${REVIEW_DEPTH} depth. write findings to ${REVIEW_PATH}.
 Do NOT commit the output — the orchestrator handles that.
-")
+"""
     
     # Check new REVIEW.md status
     NEW_STATUS=$(REVIEW_PATH="${REVIEW_PATH}" node -e "
@@ -303,8 +301,7 @@ Do NOT commit the output — the orchestrator handles that.
     # Still has issues — spawn fixer again
     echo "Issues remain. Applying fixes for iteration ${ITERATION}..."
     
-    Task(subagent_type="gsd-code-fixer", prompt="
-<files_to_read>
+    @gsd-code-fixer """<files_to_read>
 ${REVIEW_PATH}
 </files_to_read>
 
@@ -317,8 +314,8 @@ fix_report_path: ${FIX_REPORT_PATH}
 iteration: ${ITERATION}
 </config>
 
-Read REVIEW.md findings, apply fixes, commit each atomically, write REVIEW-FIX.md (overwrite previous). Do NOT commit REVIEW-FIX.md.
-")
+read REVIEW.md findings, apply fixes, commit each atomically, write REVIEW-FIX.md (overwrite previous). Do NOT commit REVIEW-FIX.md.
+"""
     
     # Check if fixer succeeded
     if [ ! -f "${FIX_REPORT_PATH}" ]; then
@@ -479,7 +476,7 @@ echo "════════════════════════�
 </process>
 
 <platform_notes>
-**Windows:** This workflow uses bash features (arrays, variable expansion, while loops). On Windows, it requires Git Bash or WSL. Native PowerShell is not supported. The CI matrix (Ubuntu/macOS/Windows) runs under Git Bash on Windows runners, which provides bash compatibility.
+**Windows:** This workflow uses bash features (arrays, variable expansion, while loops). On Windows, it requires Git bash or WSL. Native PowerShell is not supported. The CI matrix (Ubuntu/macOS/Windows) runs under Git bash on Windows runners, which provides bash compatibility.
 </platform_notes>
 
 <success_criteria>

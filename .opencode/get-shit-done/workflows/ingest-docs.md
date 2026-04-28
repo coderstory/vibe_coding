@@ -41,6 +41,8 @@ if [ -n "{MANIFEST_PATH}" ]; then
 fi
 ```
 
+**Containment (required):** After resolving `SCAN_PATH` and `MANIFEST_PATH` relative to the repo root, canonicalize each with `realpath` (or platform equivalent) and assert the result is under `realpath("$REPO_ROOT")`. Reject absolute paths outside the repo (e.g. `/tmp`, `C:\Windows`) even when they do not contain `..`.
+
 If `PATH_NOT_FOUND` or `MANIFEST_NOT_FOUND`: display error and exit.
 
 </step>
@@ -82,7 +84,7 @@ Build the doc list from three sources, in order:
 
 **1. Manifest (if provided)** — authoritative:
 
-Read `MANIFEST_PATH`. Expected YAML shape:
+read `MANIFEST_PATH`. Expected YAML shape:
 
 ```yaml
 docs:
@@ -157,7 +159,7 @@ Create staging directory:
 mkdir -p .planning/intel/classifications/
 ```
 
-For each discovered doc, spawn `gsd-doc-classifier` in parallel. In Claude Code, issue all Task calls in a single message with multiple tool uses so the harness runs them concurrently. For Copilot / sequential runtimes, fall back to sequential dispatch.
+For each discovered doc, spawn `gsd-doc-classifier` in parallel. In OpenCode, issue all task calls in a single message with multiple tool uses so the harness runs them concurrently. For Copilot / sequential runtimes, fall back to sequential dispatch.
 
 Per-spawn prompt fields:
 - `FILEPATH` — absolute path to the doc
@@ -175,7 +177,7 @@ Collect the one-line confirmations from each classifier. If any classifier error
 Spawn `gsd-doc-synthesizer` once:
 
 ```
-Task({
+task({
   subagent_type: "gsd-doc-synthesizer",
   prompt: "
     CLASSIFICATIONS_DIR: .planning/intel/classifications/
@@ -202,7 +204,7 @@ The synthesizer writes:
 
 <step name="conflict_gate">
 
-Read `.planning/INGEST-CONFLICTS.md`. Count entries in each bucket (the synthesizer always writes the three-bucket header; parse the `### BLOCKERS ({N})`, `### WARNINGS ({N})`, `### INFO ({N})` lines).
+read `.planning/INGEST-CONFLICTS.md`. Count entries in each bucket (the synthesizer always writes the three-bucket header; parse the `### BLOCKERS ({N})`, `### WARNINGS ({N})`, `### INFO ({N})` lines).
 
 Apply the safety semantics from `references/doc-conflict-engine.md`. Operation noun: `ingest`.
 
@@ -240,7 +242,7 @@ Audit PROJECT.md field requirements that `gsd-roadmapper` expects. For fields de
 Delegate to `gsd-roadmapper`:
 
 ```
-Task({
+task({
   subagent_type: "gsd-roadmapper",
   prompt: "
     Mode: new-project-from-ingest
@@ -317,7 +319,7 @@ Show:
 
 Do NOT:
 - Violate the shared conflict-engine contract in `references/doc-conflict-engine.md` (no markdown tables, no new severity labels, no bypass of the BLOCKER gate)
-- Write PROJECT.md, REQUIREMENTS.md, ROADMAP.md, or STATE.md when BLOCKERs exist in the conflict report
+- write PROJECT.md, REQUIREMENTS.md, ROADMAP.md, or STATE.md when BLOCKERs exist in the conflict report
 - Skip the 50-doc cap — larger sets must use `--manifest` to narrow the scope
 - Auto-resolve LOCKED-vs-LOCKED ADR contradictions — those are BLOCKERs in both modes
 - Merge competing PRD acceptance variants into a combined criterion — preserve all variants for user resolution

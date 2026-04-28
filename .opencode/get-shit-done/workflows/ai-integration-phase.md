@@ -1,4 +1,4 @@
-<purpose>
+<objective>
 Generate an AI design contract (AI-SPEC.md) for phases that involve building AI systems. Orchestrates gsd-framework-selector → gsd-ai-researcher → gsd-domain-researcher → gsd-eval-planner with a validation gate. Inserts between discuss-phase and plan-phase in the GSD lifecycle.
 
 AI-SPEC.md locks four things before the planner creates tasks:
@@ -8,11 +8,11 @@ AI-SPEC.md locks four things before the planner creates tasks:
 4. Evaluation strategy (dimensions, rubrics, tooling, reference dataset, guardrails)
 
 This prevents the two most common AI development failures: choosing the wrong framework for the use case, and treating evaluation as an afterthought.
-</purpose>
+</objective>
 
 <required_reading>
-@D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/ai-frameworks.md
-@D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/ai-evals.md
+@./.opencode/get-shit-done/references/ai-frameworks.md
+@./.opencode/get-shit-done/references/ai-evals.md
 </required_reading>
 
 <process>
@@ -76,7 +76,7 @@ AI_SPEC_FILE=$(ls "${PHASE_DIR}"/*-AI-SPEC.md 2>/dev/null | head -1)
 ```
 
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 **If exists:** Use question:
 - header: "Existing AI-SPEC"
 - question: "AI-SPEC.md already exists for Phase {N}. What would you like to do?"
@@ -102,7 +102,7 @@ Display:
 
 Spawn `gsd-framework-selector` with:
 ```markdown
-Read D:/Data/桌面/vibe_coding/.opencode/agents/gsd-framework-selector.md for instructions.
+read ./.opencode/agents/gsd-framework-selector.md for instructions.
 
 <objective>
 Select the right AI framework for Phase {phase_number}: {phase_name}
@@ -128,7 +128,7 @@ Parse selector output for: `primary_framework`, `system_type`, `model_provider`,
 
 Copy template:
 ```bash
-cp "D:/Data/桌面/vibe_coding/.opencode/get-shit-done/templates/AI-SPEC.md" "${PHASE_DIR}/${PADDED_PHASE}-AI-SPEC.md"
+cp "./.opencode/get-shit-done/templates/AI-SPEC.md" "${PHASE_DIR}/${PADDED_PHASE}-AI-SPEC.md"
 ```
 
 Fill in header fields:
@@ -146,11 +146,11 @@ Display:
 
 Spawn `gsd-ai-researcher` with:
 ```markdown
-Read D:/Data/桌面/vibe_coding/.opencode/agents/gsd-ai-researcher.md for instructions.
+read ./.opencode/agents/gsd-ai-researcher.md for instructions.
 
 <objective>
 Research {primary_framework} for Phase {phase_number}: {phase_name}
-Write Sections 3 and 4 of AI-SPEC.md
+write Sections 3 and 4 of AI-SPEC.md
 </objective>
 
 <files_to_read>
@@ -176,11 +176,11 @@ Display:
 
 Spawn `gsd-domain-researcher` with:
 ```markdown
-Read D:/Data/桌面/vibe_coding/.opencode/agents/gsd-domain-researcher.md for instructions.
+read ./.opencode/agents/gsd-domain-researcher.md for instructions.
 
 <objective>
 Research the business domain and expert evaluation criteria for Phase {phase_number}: {phase_name}
-Write Section 1b (Domain Context) of AI-SPEC.md
+write Section 1b (Domain Context) of AI-SPEC.md
 </objective>
 
 <files_to_read>
@@ -206,11 +206,11 @@ Display:
 
 Spawn `gsd-eval-planner` with:
 ```markdown
-Read D:/Data/桌面/vibe_coding/.opencode/agents/gsd-eval-planner.md for instructions.
+read ./.opencode/agents/gsd-eval-planner.md for instructions.
 
 <objective>
 Design evaluation strategy for Phase {phase_number}: {phase_name}
-Write Sections 5, 6, and 7 of AI-SPEC.md
+write Sections 5, 6, and 7 of AI-SPEC.md
 AI-SPEC.md now contains domain context (Section 1b) — use it as your rubric starting point.
 </objective>
 
@@ -232,7 +232,7 @@ ai_spec_path: {ai_spec_path}
 
 ## 10. Validate AI-SPEC Completeness
 
-Read the completed AI-SPEC.md. Check that:
+read the completed AI-SPEC.md. Check that:
 - Section 2 has a framework name (not placeholder)
 - Section 1b has at least one domain rubric ingredient (Good/Bad/Stakes)
 - Section 3 has a non-empty code block (entry point pattern)

@@ -482,7 +482,7 @@ async function cmdWebsearch(query, options, raw) {
   const apiKey = process.env.BRAVE_API_KEY;
 
   if (!apiKey) {
-    // No key = silent skip, agent falls back to built-in WebSearch
+    // No key = silent skip, agent falls back to built-in websearch
     output({ available: false, reason: 'BRAVE_API_KEY not set' }, raw, '');
     return;
   }
@@ -744,7 +744,7 @@ function cmdTodoComplete(cwd, filename, raw) {
   // Ensure completed directory exists
   fs.mkdirSync(completedDir, { recursive: true });
 
-  // Read, add completion timestamp, move
+  // read, add completion timestamp, move
   let content = fs.readFileSync(sourcePath, 'utf-8');
   const today = new Date().toISOString().split('T')[0];
   content = `completed: ${today}\n` + content;

@@ -451,7 +451,7 @@ function intelValidate(planningDir) {
 }
 
 /**
- * Patch _meta.updated_at in a JSON intel file to the current timestamp.
+ * patch _meta.updated_at in a JSON intel file to the current timestamp.
  * Reads the file, updates _meta.updated_at, increments version, writes back.
  *
  * NOTE: Does not gate on isIntelEnabled — operates on arbitrary file paths

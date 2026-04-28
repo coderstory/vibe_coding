@@ -69,7 +69,7 @@ function generateId() {
 }
 
 /**
- * Read and parse a single learning JSON file.
+ * read and parse a single learning JSON file.
  * Returns null (with stderr warning) for malformed files.
  * @param {string} filePath
  * @returns {object|null}
@@ -87,7 +87,7 @@ function readLearningFile(filePath) {
 // ─── CRUD Operations ─────────────────────────────────────────────────────────
 
 /**
- * Write a learning to the global store.
+ * write a learning to the global store.
  * Deduplicates by content hash — same content from same project is not stored twice.
  *
  * @param {object} entry
@@ -130,7 +130,7 @@ function learningsWrite(entry, opts) {
 }
 
 /**
- * Read a single learning by ID.
+ * read a single learning by ID.
  *
  * @param {string} id
  * @param {object} [opts]

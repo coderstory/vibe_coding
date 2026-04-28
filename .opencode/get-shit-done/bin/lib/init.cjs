@@ -26,7 +26,7 @@ function getLatestCompletedMilestone(cwd) {
 
 /**
  * Inject `project_root` into an init result object.
- * Workflows use this to prefix `.planning/` paths correctly when Claude's CWD
+ * Workflows use this to prefix `.planning/` paths correctly when OpenCode's CWD
  * differs from the project root (e.g., inside a sub-repo).
  */
 function withProjectRoot(cwd, result) {
@@ -381,7 +381,7 @@ function cmdInitNewProject(cwd, raw) {
       '.ex', '.exs',           // Elixir
       '.clj',                  // Clojure
     ]);
-    const skipDirs = new Set(['node_modules', '.git', '.planning', '.claude', '.codex', '__pycache__', 'target', 'dist', 'build']);
+    const skipDirs = new Set(['node_modules', '.git', '.planning', '.OpenCode', '.codex', '__pycache__', 'target', 'dist', 'build']);
     function findCodeFiles(dir, depth) {
       if (depth > 3) return false;
       let entries;
@@ -1171,7 +1171,7 @@ function cmdInitManager(cwd, raw) {
   const nonBacklogPhases = phases.filter(p => !/^999(?:\.|$)/.test(p.number));
   const completedCount = nonBacklogPhases.filter(p => p.disk_status === 'complete').length;
 
-  // Read manager flags from config (passthrough flags for each step)
+  // read manager flags from config (passthrough flags for each step)
   // Validate: flags must be CLI-safe (only --flags, alphanumeric, hyphens, spaces)
   const sanitizeFlags = (raw) => {
     const val = typeof raw === 'string' ? raw : '';
@@ -1521,7 +1521,7 @@ function cmdInitRemoveWorkspace(cwd, name, raw) {
 }
 
 /**
- * Build a formatted agent skills block for injection into Task() prompts.
+ * Build a formatted agent skills block for injection into task() prompts.
  *
  * Reads `config.agent_skills[agentType]` and validates each skill path exists
  * within the project root. Returns a formatted `<agent_skills>` block or empty
@@ -1535,7 +1535,7 @@ function cmdInitRemoveWorkspace(cwd, name, raw) {
 function buildAgentSkillsBlock(config, agentType, projectRoot) {
   const { validatePath } = require('./security.cjs');
   const os = require('os');
-  const globalSkillsBase = path.join(os.homedir(), '.claude', 'skills');
+  const globalSkillsBase = path.join(os.homedir(), '.OpenCode', 'skills');
 
   if (!config || !config.agent_skills || !agentType) return '';
 
@@ -1550,7 +1550,7 @@ function buildAgentSkillsBlock(config, agentType, projectRoot) {
   for (const skillPath of skillPaths) {
     if (typeof skillPath !== 'string') continue;
 
-    // Support global: prefix for skills installed at ~/.claude/skills/ (#1992)
+    // Support global: prefix for skills installed at $HOME/.config/opencode/skills/ (#1992)
     if (skillPath.startsWith('global:')) {
       const skillName = skillPath.slice(7);
       // Explicit empty-name guard before regex for clearer error message
@@ -1566,7 +1566,7 @@ function buildAgentSkillsBlock(config, agentType, projectRoot) {
       const globalSkillDir = path.join(globalSkillsBase, skillName);
       const globalSkillMd = path.join(globalSkillDir, 'SKILL.md');
       if (!fs.existsSync(globalSkillMd)) {
-        process.stderr.write(`[agent-skills] WARNING: Global skill not found at "~/.claude/skills/${skillName}/SKILL.md" — skipping\n`);
+        process.stderr.write(`[agent-skills] WARNING: Global skill not found at "$HOME/.config/opencode/skills/${skillName}/SKILL.md" — skipping\n`);
         continue;
       }
       // Symlink escape guard: validatePath resolves symlinks and enforces
@@ -1577,7 +1577,7 @@ function buildAgentSkillsBlock(config, agentType, projectRoot) {
         process.stderr.write(`[agent-skills] WARNING: Global skill "${skillName}" failed path check (symlink escape?) — skipping\n`);
         continue;
       }
-      validPaths.push({ ref: `${globalSkillDir}/SKILL.md`, display: `~/.claude/skills/${skillName}` });
+      validPaths.push({ ref: `${globalSkillDir}/SKILL.md`, display: `$HOME/.config/opencode/skills/${skillName}` });
       continue;
     }
 
@@ -1591,7 +1591,7 @@ function buildAgentSkillsBlock(config, agentType, projectRoot) {
     // Check that the skill directory and SKILL.md exist
     const skillMdPath = path.join(projectRoot, skillPath, 'SKILL.md');
     if (!fs.existsSync(skillMdPath)) {
-      process.stderr.write(`[agent-skills] WARNING: Skill not found at "${skillPath}/SKILL.md" — skipping\n`);
+      process.stderr.write(`[agent-skills] WARNING: skill not found at "${skillPath}/SKILL.md" — skipping\n`);
       continue;
     }
 
@@ -1653,8 +1653,8 @@ function buildSkillManifest(cwd, skillsDir = null) {
     kind: 'skills',
   }] : [
     {
-      root: '.claude/skills',
-      path: path.join(cwd, '.claude', 'skills'),
+      root: '.OpenCode/skills',
+      path: path.join(cwd, '.OpenCode', 'skills'),
       scope: 'project',
       kind: 'skills',
     },
@@ -1683,8 +1683,8 @@ function buildSkillManifest(cwd, skillsDir = null) {
       kind: 'skills',
     },
     {
-      root: '~/.claude/skills',
-      path: path.join(os.homedir(), '.claude', 'skills'),
+      root: '$HOME/.config/opencode/skills',
+      path: path.join(os.homedir(), '.OpenCode', 'skills'),
       scope: 'global',
       kind: 'skills',
     },
@@ -1695,15 +1695,15 @@ function buildSkillManifest(cwd, skillsDir = null) {
       kind: 'skills',
     },
     {
-      root: '.claude/get-shit-done/skills',
-      path: path.join(os.homedir(), '.claude', 'get-shit-done', 'skills'),
+      root: '.OpenCode/get-shit-done/skills',
+      path: path.join(os.homedir(), '.OpenCode', 'get-shit-done', 'skills'),
       scope: 'import-only',
       kind: 'skills',
       deprecated: true,
     },
     {
-      root: '.claude/commands/gsd',
-      path: path.join(os.homedir(), '.claude', 'commands', 'gsd'),
+      root: '.OpenCode/commands/gsd',
+      path: path.join(os.homedir(), '.OpenCode', 'commands', 'gsd'),
       scope: 'legacy-commands',
       kind: 'commands',
       deprecated: true,

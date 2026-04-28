@@ -24,7 +24,7 @@ Verify this task breakdown is MECE at the REQUIREMENT level: (1) list every requ
 
 **Counters:** Deferring the hardest constraint to the last task, causing late-stage failures.
 
-Identify the single hardest constraint in this phase -- the one thing that, if it doesn't work, makes everything else irrelevant. Schedule that constraint as Task 1 or 2, not last. If the constraint involves an external API or unfamiliar library, add a spike/proof-of-concept task before the main implementation.
+Identify the single hardest constraint in this phase -- the one thing that, if it doesn't work, makes everything else irrelevant. Schedule that constraint as task 1 or 2, not last. If the constraint involves an external API or unfamiliar library, add a spike/proof-of-concept task before the main implementation.
 
 ## 4. Reversibility Test
 
@@ -56,7 +56,7 @@ Before writing the fix plan, apply a single "why" round: Why did this gap occur?
 
 Skip structured reasoning models when the situation does not benefit from them:
 
-- **Single-task plans** -- If the phase has one clear requirement and one obvious task, do not run Pre-Mortem or MECE analysis. Write the task directly.
+- **Single-task plans** -- If the phase has one clear requirement and one obvious task, do not run Pre-Mortem or MECE analysis. write the task directly.
 - **Well-researched phases** -- If RESEARCH.md has HIGH-confidence recommendations for every decision and no `[NEEDS DECISION]` items, skip Base Rate Neglect Counter. The research already resolved uncertainty.
 - **Revision iterations** -- When revising a plan based on checker feedback, focus on fixing the flagged issues. Do not re-run the full model suite on every revision pass -- apply only the model relevant to the specific issue (e.g., MECE if the checker found a coverage gap).
 - **Boilerplate plans** -- Configuration changes, version bumps, documentation updates. These do not have failure modes worth pre-mortem analysis.

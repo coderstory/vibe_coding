@@ -850,7 +850,7 @@ function stripFrontmatter(content) {
 }
 
 function syncStateFrontmatter(content, cwd) {
-  // Read existing frontmatter BEFORE stripping — it may contain values
+  // read existing frontmatter BEFORE stripping — it may contain values
   // that the body no longer has (e.g., Status field removed by an agent).
   const existingFm = extractFrontmatter(content);
   const body = stripFrontmatter(content);
@@ -915,7 +915,7 @@ function releaseStateLock(lockPath) {
 }
 
 /**
- * Write STATE.md with synchronized YAML frontmatter.
+ * write STATE.md with synchronized YAML frontmatter.
  * All STATE.md writes should use this instead of raw writeFileSync.
  * Uses a simple lockfile to prevent parallel agents from overwriting
  * each other's changes (race condition with read-modify-write cycle).
@@ -1090,7 +1090,7 @@ function cmdStateBeginPhase(cwd, phaseNumber, phaseName, planCount, raw) {
 }
 
 /**
- * Write a WAITING.json signal file when GSD hits a decision point.
+ * write a WAITING.json signal file when GSD hits a decision point.
  * External watchers (fswatch, polling, orchestrators) can detect this.
  * File is written to .planning/WAITING.json (or .gsd/WAITING.json if .gsd exists).
  * Fixes #1034.
@@ -1561,7 +1561,7 @@ function cmdStatePrune(cwd, options, raw) {
     return result.newContent;
   }, cwd);
 
-  // Write archived entries to STATE-ARCHIVE.md
+  // write archived entries to STATE-ARCHIVE.md
   if (archived.length > 0) {
     const timestamp = new Date().toISOString().split('T')[0];
     let archiveContent = '';

@@ -1,8 +1,8 @@
-<purpose>
+<objective>
 
 Archive accumulated phase directories from completed milestones into `.planning/milestones/v{X.Y}-phases/`. Identifies which phases belong to each completed milestone, shows a dry-run summary, and moves directories on confirmation.
 
-</purpose>
+</objective>
 
 <required_reading>
 
@@ -16,7 +16,7 @@ Archive accumulated phase directories from completed milestones into `.planning/
 
 <step name="identify_completed_milestones">
 
-Read `.planning/MILESTONES.md` to identify completed milestones and their versions.
+read `.planning/MILESTONES.md` to identify completed milestones and their versions.
 
 ```bash
 cat .planning/MILESTONES.md
@@ -94,7 +94,7 @@ No phase directories found to archive. Phases may have been removed or archived 
 Stop here.
 
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 question: "Proceed with archiving?" with options: "Yes — archive listed phases" | "Cancel"
 
 If "Cancel": Stop.

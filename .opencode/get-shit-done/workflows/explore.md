@@ -1,17 +1,17 @@
-<purpose>
+<objective>
 Socratic ideation workflow. Guides the developer through exploring an idea via probing questions,
 offers mid-conversation research when useful, then routes crystallized outputs to GSD artifacts.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 
-@D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/questioning.md
-@D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/domain-probes.md
+@./.opencode/get-shit-done/references/questioning.md
+@./.opencode/get-shit-done/references/domain-probes.md
 </required_reading>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-phase-researcher — Researches specific questions and returns concise findings
 </available_agent_types>
 
@@ -60,10 +60,7 @@ This would take ~30 seconds and might surface useful context.
 
 If yes, spawn a research agent:
 ```
-Task(
-  prompt="Quick research: {specific_question}. Return 3-5 key findings, no more than 200 words.",
-  subagent_type="gsd-phase-researcher"
-)
+@gsd-phase-researcher "Quick research: {specific_question}. Return 3-5 key findings, no more than 200 words."
 ```
 
 Share findings and continue the conversation.
@@ -100,7 +97,7 @@ Create these? You can select specific ones or modify them.
 
 **Never write artifacts without explicit user selection.**
 
-## Step 5: Write selected outputs
+## Step 5: write selected outputs
 
 For each selected output, write the file:
 
@@ -109,7 +106,7 @@ For each selected output, write the file:
 - **Seeds:** Create `.planning/seeds/{slug}.md` with frontmatter (title, trigger_condition, planted_date)
 - **Research questions:** Append to `.planning/research/questions.md`
 - **Requirements:** Append to `.planning/REQUIREMENTS.md` with next available REQ ID
-- **Phases:** Use existing `/gsd-add-phase` command via skill
+- **Phases:** Use existing `/gsd-add-phase` command via command
 
 Commit if `commit_docs` is enabled:
 ```bash

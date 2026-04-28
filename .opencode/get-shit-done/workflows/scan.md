@@ -1,14 +1,14 @@
-<purpose>
+<objective>
 Lightweight codebase assessment. Spawns a single gsd-codebase-mapper agent for one focus area,
 producing targeted documents in `.planning/codebase/`.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-codebase-mapper — Maps project structure and dependencies
 </available_agent_types>
 
@@ -72,11 +72,7 @@ mkdir -p .planning/codebase
 Spawn a single `gsd-codebase-mapper` agent with the selected focus area:
 
 ```
-Task(
-  prompt="Scan this codebase with focus: {focus}. Write results to .planning/codebase/. Produce only: {document_list}",
-  subagent_type="gsd-codebase-mapper",
-  model="{resolved_model}"
-)
+@gsd-codebase-mapper "Scan this codebase with focus: {focus}. write results to .planning/codebase/. Produce only: {document_list}"
 ```
 
 ## Step 5: Report

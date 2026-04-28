@@ -1,13 +1,13 @@
-<purpose>
+<objective>
 Audit Nyquist validation gaps for a completed phase. Generate missing tests. Update VALIDATION.md.
-</purpose>
+</objective>
 
 <required_reading>
-@D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/ui-brand.md
+@./.opencode/get-shit-done/references/ui-brand.md
 </required_reading>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-nyquist-auditor — Validates verification coverage
 </available_agent_types>
 
@@ -18,7 +18,7 @@ Valid GSD subagent types (use exact names — do not fall back to 'general-purpo
 ```bash
 INIT=$(gsd-sdk query init.phase-op "${PHASE_ARG}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_AUDITOR=$(gsd-sdk query agent-skills gsd-nyquist-auditor 2>/dev/null)
+AGENT_SKILLS_AUDITOR=$(gsd-sdk query agent-skills gsd-nyquist-auditor)
 ```
 
 Parse: `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded_phase`.
@@ -45,11 +45,11 @@ SUMMARY_FILES=$(ls "${PHASE_DIR}"/*-SUMMARY.md 2>/dev/null)
 
 ## 2. Discovery
 
-### 2a. Read Phase Artifacts
+### 2a. read Phase Artifacts
 
-Read all PLAN and SUMMARY files. Extract: task lists, requirement IDs, key-files changed, verify blocks.
+read all PLAN and SUMMARY files. Extract: task lists, requirement IDs, key-files changed, verify blocks.
 
-### 2b. Build Requirement-to-Task Map
+### 2b. Build Requirement-to-task Map
 
 Per task: `{ task_id, plan_id, wave, requirement_ids, has_automated_command }`
 
@@ -84,7 +84,7 @@ No gaps → skip to Step 6, set `nyquist_compliant: true`.
 ## 4. Present Gap Plan
 
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 Call question with gap table and options:
 1. "Fix all gaps" → Step 5
 2. "Skip — mark manual-only" → add to Manual-Only, Step 6
@@ -93,17 +93,7 @@ Call question with gap table and options:
 ## 5. Spawn gsd-nyquist-auditor
 
 ```
-Task(
-  prompt="Read D:/Data/桌面/vibe_coding/.opencode/agents/gsd-nyquist-auditor.md for instructions.\n\n" +
-    "<files_to_read>{PLAN, SUMMARY, impl files, VALIDATION.md}</files_to_read>" +
-    "<gaps>{gap list}</gaps>" +
-    "<test_infrastructure>{framework, config, commands}</test_infrastructure>" +
-    "<constraints>Never modify impl files. Max 3 debug iterations. Escalate impl bugs.</constraints>" +
-    "${AGENT_SKILLS_AUDITOR}",
-  subagent_type="gsd-nyquist-auditor",
-  model="{AUDITOR_MODEL}",
-  description="Fill validation gaps for Phase {N}"
-)
+@gsd-nyquist-auditor "read ./.opencode/agents/gsd-nyquist-auditor.md for instructions.\n\n"
 ```
 
 Handle return:
@@ -114,12 +104,12 @@ Handle return:
 ## 6. Generate/Update VALIDATION.md
 
 **State B (create):**
-1. Read template from `D:/Data/桌面/vibe_coding/.opencode/get-shit-done/templates/VALIDATION.md`
-2. Fill: frontmatter, Test Infrastructure, Per-Task Map, Manual-Only, Sign-Off
-3. Write to `${PHASE_DIR}/${PADDED_PHASE}-VALIDATION.md`
+1. read template from `./.opencode/get-shit-done/templates/VALIDATION.md`
+2. Fill: frontmatter, Test Infrastructure, Per-task Map, Manual-Only, Sign-Off
+3. write to `${PHASE_DIR}/${PADDED_PHASE}-VALIDATION.md`
 
 **State A (update):**
-1. Update Per-Task Map statuses, add escalated to Manual-Only, update frontmatter
+1. Update Per-task Map statuses, add escalated to Manual-Only, update frontmatter
 2. Append audit trail:
 
 ```markdown
@@ -156,7 +146,7 @@ GSD > PHASE {N} VALIDATED (PARTIAL)
 ▶ Retry: /gsd-validate-phase {N} ${GSD_WS}
 ```
 
-Display `/clear` reminder.
+Display `/new` reminder.
 
 </process>
 

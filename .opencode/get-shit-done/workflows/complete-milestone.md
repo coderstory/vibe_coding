@@ -1,8 +1,8 @@
-<purpose>
+<objective>
 
 Mark a shipped version (v1.0, v1.1, v2.0) as complete. Creates historical record in MILESTONES.md, performs full PROJECT.md evolution review, reorganizes ROADMAP.md with milestone groupings, and tags the release in git.
 
-</purpose>
+</objective>
 
 <required_reading>
 
@@ -40,10 +40,8 @@ When a milestone completes:
 <step name="pre_close_artifact_audit">
 Before proceeding with milestone close, run the comprehensive open artifact audit.
 
-`audit-open` is not registered on `gsd-sdk query` yet; use the installed CJS CLI:
-
 ```bash
-node "D:/Data/桌面/vibe_coding/.opencode/get-shit-done/bin/gsd-tools.cjs" audit-open 2>/dev/null
+gsd-sdk query audit-open
 ```
 
 If the output contains open items (any section with count > 0):
@@ -59,8 +57,8 @@ These items are open. Choose an action:
 ```
 
 If user chooses [A] (Acknowledge):
-1. Re-run `audit-open --json` to get structured data
-2. Write acknowledged items to STATE.md under `## Deferred Items` section:
+1. Re-run `gsd-sdk query audit-open --json` to get structured data
+2. write acknowledged items to STATE.md under `## Deferred Items` section:
    ```markdown
    ## Deferred Items
 
@@ -78,7 +76,7 @@ If user chooses [A] (Acknowledge):
 
 If output shows all clear (no open items): print `All artifact types clear.` and proceed.
 
-SECURITY: Audit JSON output is structured data from `audit-open` (gsd-tools.cjs) — validated and sanitized at source. When writing to STATE.md, item slugs and descriptions are sanitized via `sanitizeForDisplay()` before inclusion. Never inject raw user-supplied content into STATE.md without sanitization.
+SECURITY: Audit JSON output is structured data from the `audit-open` query handler (same JSON contract as legacy `gsd-tools.cjs audit-open`) — validated and sanitized at source. When writing to STATE.md, item slugs and descriptions are sanitized via `sanitizeForDisplay()` before inclusion. Never inject raw user-supplied content into STATE.md without sanitization.
 </step>
 
 <step name="verify_readiness">
@@ -230,7 +228,7 @@ If additional details are needed (e.g., user-provided "Delivered" summary, git r
 
 Full PROJECT.md evolution review at milestone completion.
 
-Read all phase summaries:
+read all phase summaries:
 
 ```bash
 cat .planning/phases/*-*/*-SUMMARY.md
@@ -432,7 +430,7 @@ Verify: `✅ Milestone archived to .planning/milestones/`
 **Phase archival (optional):** After archival completes, ask the user:
 
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 question(header="Archive Phases", question="Archive phase directories to milestones/?", options: "Yes — move to milestones/v[X.Y]-phases/" | "Skip — keep phases in place")
 
 If "Yes": move phase directories to the milestone archive:
@@ -518,9 +516,9 @@ Check for existing retrospective:
 ls .planning/RETROSPECTIVE.md 2>/dev/null || true
 ```
 
-**If exists:** Read the file, append new milestone section before the "## Cross-Milestone Trends" section.
+**If exists:** read the file, append new milestone section before the "## Cross-Milestone Trends" section.
 
-**If doesn't exist:** Create from template at `D:/Data/桌面/vibe_coding/.opencode/get-shit-done/templates/retrospective.md`.
+**If doesn't exist:** Create from template at `./.opencode/get-shit-done/templates/retrospective.md`.
 
 **Gather retrospective data:**
 
@@ -530,7 +528,7 @@ ls .planning/RETROSPECTIVE.md 2>/dev/null || true
 4. From git log: Count commits, calculate timeline
 5. From the milestone work: Reflect on what worked and what didn't
 
-**Write the milestone section:**
+**write the milestone section:**
 
 ```markdown
 ## Milestone: v{version} — {name}
@@ -786,7 +784,7 @@ Tag: v[X.Y]
 
 **Start Next Milestone** — questioning → research → requirements → roadmap
 
-`/clear` then:
+`/new` then:
 
 `/gsd-new-milestone`
 

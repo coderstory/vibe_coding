@@ -1,13 +1,13 @@
-<purpose>
+<objective>
 Verify threat mitigations for a completed phase. Confirm PLAN.md threat register dispositions are resolved. Update SECURITY.md.
-</purpose>
+</objective>
 
 <required_reading>
-@D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/ui-brand.md
+@./.opencode/get-shit-done/references/ui-brand.md
 </required_reading>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-security-auditor — Verifies threat mitigation coverage
 </available_agent_types>
 
@@ -18,7 +18,7 @@ Valid GSD subagent types (use exact names — do not fall back to 'general-purpo
 ```bash
 INIT=$(gsd-sdk query init.phase-op "${PHASE_ARG}")
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_AUDITOR=$(gsd-sdk query agent-skills gsd-security-auditor 2>/dev/null)
+AGENT_SKILLS_AUDITOR=$(gsd-sdk query agent-skills gsd-security-auditor)
 ```
 
 Parse: `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `padded_phase`.
@@ -46,13 +46,13 @@ SUMMARY_FILES=$(ls "${PHASE_DIR}"/*-SUMMARY.md 2>/dev/null)
 
 ## 2. Discovery
 
-### 2a. Read Phase Artifacts
+### 2a. read Phase Artifacts
 
-Read PLAN.md — extract `<threat_model>` block: trust boundaries, STRIDE register (`threat_id`, `category`, `component`, `disposition`, `mitigation_plan`).
+read PLAN.md — extract `<threat_model>` block: trust boundaries, STRIDE register (`threat_id`, `category`, `component`, `disposition`, `mitigation_plan`).
 
-### 2b. Read Summary Threat Flags
+### 2b. read Summary Threat Flags
 
-Read SUMMARY.md — extract `## Threat Flags` entries.
+read SUMMARY.md — extract `## Threat Flags` entries.
 
 ### 2c. Build Threat Register
 
@@ -74,7 +74,7 @@ If `threats_open: 0` → skip to Step 6 directly.
 ## 4. Present Threat Plan
 
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 Call question with threat table and options:
 1. "Verify all open threats" → Step 5
 2. "Accept all open — document in accepted risks log" → add to SECURITY.md accepted risks, set all CLOSED, Step 6
@@ -83,17 +83,7 @@ Call question with threat table and options:
 ## 5. Spawn gsd-security-auditor
 
 ```
-Task(
-  prompt="Read D:/Data/桌面/vibe_coding/.opencode/agents/gsd-security-auditor.md for instructions.\n\n" +
-    "<files_to_read>{PLAN, SUMMARY, impl files, SECURITY.md}</files_to_read>" +
-    "<threat_register>{threat register}</threat_register>" +
-    "<config>asvs_level: {SECURITY_ASVS}, block_on: {SECURITY_BLOCK_ON}</config>" +
-    "<constraints>Never modify implementation files. Verify mitigations exist — do not scan for new threats. Escalate implementation gaps.</constraints>" +
-    "${AGENT_SKILLS_AUDITOR}",
-  subagent_type="gsd-security-auditor",
-  model="{AUDITOR_MODEL}",
-  description="Verify threat mitigations for Phase {N}"
-)
+@gsd-security-auditor "read ./.opencode/agents/gsd-security-auditor.md for instructions.\n\n"
 ```
 
 Handle return:
@@ -101,12 +91,12 @@ Handle return:
 - `## OPEN_THREATS` → record closed + open, present user with accept/block choice → Step 6
 - `## ESCALATE` → present to user → Step 6
 
-## 6. Write/Update SECURITY.md
+## 6. write/Update SECURITY.md
 
 **State B (create):**
-1. Read template from `D:/Data/桌面/vibe_coding/.opencode/get-shit-done/templates/SECURITY.md`
+1. read template from `./.opencode/get-shit-done/templates/SECURITY.md`
 2. Fill: frontmatter, threat register, accepted risks, audit trail
-3. Write to `${PHASE_DIR}/${PADDED_PHASE}-SECURITY.md`
+3. write to `${PHASE_DIR}/${PADDED_PHASE}-SECURITY.md`
 
 **State A (update):**
 1. Update threat register statuses, append to audit trail:
@@ -147,7 +137,7 @@ threats_open: 0 — all threats have dispositions.
 ▶ /gsd-verify-work {N}       run UAT
 ```
 
-Display `/clear` reminder.
+Display `/new` reminder.
 
 </process>
 

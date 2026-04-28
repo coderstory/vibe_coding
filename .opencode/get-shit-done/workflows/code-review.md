@@ -1,9 +1,9 @@
-<purpose>
+<objective>
 Review source files changed during a phase for bugs, security issues, and code quality problems. Computes file scope (--files override > SUMMARY.md > git diff fallback), checks config gate, spawns gsd-code-reviewer agent, commits REVIEW.md, and presents results to user.
-</purpose>
+</objective>
 
 <required_reading>
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 </required_reading>
 
 <available_agent_types>
@@ -347,8 +347,7 @@ done
 Spawn the gsd-code-reviewer agent:
 
 ```
-Task(subagent_type="gsd-code-reviewer", prompt="
-<files_to_read>
+@gsd-code-reviewer """<files_to_read>
 ${FILES_TO_READ}
 </files_to_read>
 
@@ -361,14 +360,14 @@ files:
 ${CONFIG_FILES}
 </config>
 
-Review the listed source files at ${REVIEW_DEPTH} depth. Write findings to ${REVIEW_PATH}.
+Review the listed source files at ${REVIEW_DEPTH} depth. write findings to ${REVIEW_PATH}.
 Do NOT commit the output — the orchestrator handles that.
-")
+"""
 ```
 
 **Agent failure handling:**
 
-If the Task() call fails (agent error, timeout, or exception):
+If the task() call fails (agent error, timeout, or exception):
 ```
 Error: Code review agent failed: ${error_message}
 
@@ -411,7 +410,7 @@ fi
 </step>
 
 <step name="present_results">
-Read the REVIEW.md YAML frontmatter to extract finding counts.
+read the REVIEW.md YAML frontmatter to extract finding counts.
 
 Extract frontmatter between `---` delimiters first to avoid matching values in the review body:
 
@@ -488,8 +487,8 @@ grep -A 3 "^### CR-\|^### WR-" "${REVIEW_PATH}" | head -n 12
 
 <platform_notes>
 **Windows:** This workflow uses bash features (arrays, process substitution). On Windows, it requires
-Git Bash or WSL. Native PowerShell is not supported. The CI matrix (Ubuntu/macOS/Windows)
-runs under Git Bash on Windows runners, which provides bash compatibility.
+Git bash or WSL. Native PowerShell is not supported. The CI matrix (Ubuntu/macOS/Windows)
+runs under Git bash on Windows runners, which provides bash compatibility.
 
 **macOS:** macOS ships with bash 3.2 (GPL licensing). This workflow does NOT use `mapfile` (bash 4+
 only) — all array construction uses portable `while IFS= read -r` loops compatible with bash 3.2.

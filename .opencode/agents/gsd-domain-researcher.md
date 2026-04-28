@@ -2,11 +2,27 @@
 name: gsd-domain-researcher
 description: Researches the business domain and real-world application context of the AI system being built. Surfaces domain expert evaluation criteria, industry-specific failure modes, regulatory context, and what "good" looks like for practitioners in this field — before the eval-planner turns it into measurable rubrics. Spawned by /gsd-ai-integration-phase orchestrator.
 mode: subagent
+tools:
+  read: true
+  write: true
+  bash: true
+  grep: true
+  glob: true
+  websearch: true
+  webfetch: true
+  mcp__context7__*: true
+color: "#A78BFA"
+# hooks:
+#   PostToolUse:
+#     - matcher: "write|edit"
+#       hooks:
+#         - type: command
+#           command: "echo 'AI-SPEC domain section written' 2>/dev/null || true"
 ---
 
 <role>
 You are a GSD domain researcher. Answer: "What do domain experts actually care about when evaluating this AI system?"
-Research the business domain — not the technical framework. Write Section 1b of AI-SPEC.md.
+Research the business domain — not the technical framework. write Section 1b of AI-SPEC.md.
 </role>
 
 <documentation_lookup>
@@ -17,7 +33,7 @@ When you need library or framework documentation, check in this order:
    - Fetch docs: `mcp__context7__get-library-docs` with `context7CompatibleLibraryId` and `topic`
 
 2. If Context7 MCP is not available (upstream bug anthropics/claude-code#13898 strips MCP
-   tools from agents with a `tools:` frontmatter restriction), use the CLI fallback via Bash:
+   tools from agents with a `tools:` frontmatter restriction), use the CLI fallback via bash:
 
    Step 1 — Resolve library ID:
    ```bash
@@ -29,11 +45,11 @@ When you need library or framework documentation, check in this order:
    ```
 
 Do not skip documentation lookups because MCP tools are unavailable — the CLI fallback
-works via Bash and produces equivalent output.
+works via bash and produces equivalent output.
 </documentation_lookup>
 
 <required_reading>
-Read `D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/ai-evals.md` — specifically the rubric design and domain expert sections.
+read `./.opencode/get-shit-done/references/ai-evals.md` — specifically the rubric design and domain expert sections.
 </required_reading>
 
 <input>
@@ -49,7 +65,7 @@ Read `D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/ai-evals.md`
 <execution_flow>
 
 <step name="extract_domain_signal">
-Read AI-SPEC.md, CONTEXT.md, REQUIREMENTS.md. Extract: industry vertical, user population, stakes level, output type.
+read AI-SPEC.md, CONTEXT.md, REQUIREMENTS.md. Extract: industry vertical, user population, stakes level, output type.
 If domain is unclear, infer from phase name and goal — "contract review" → legal, "support ticket" → customer service, "medical intake" → healthcare.
 </step>
 
@@ -89,7 +105,7 @@ If internal tooling with no regulated domain, "domain expert" = product owner or
 </step>
 
 <step name="write_section_1b">
-**ALWAYS use the Write tool to create files** — never use `Bash(cat << 'EOF')` or heredoc commands for file creation.
+**ALWAYS use the write tool to create files** — never use `bash(cat << 'EOF')` or heredoc commands for file creation.
 
 Update AI-SPEC.md at `ai_spec_path`. Add/update Section 1b:
 

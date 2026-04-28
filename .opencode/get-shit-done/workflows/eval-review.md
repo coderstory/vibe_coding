@@ -1,11 +1,11 @@
-<purpose>
+<objective>
 Retroactive audit of an implemented AI phase's evaluation coverage. Standalone command that works on any GSD-managed AI phase. Produces a scored EVAL-REVIEW.md with gap analysis and remediation plan.
 
 Use after /gsd-execute-phase to verify that the evaluation strategy from AI-SPEC.md was actually implemented. Mirrors the pattern of /gsd-ui-review and /gsd-validate-phase.
-</purpose>
+</objective>
 
 <required_reading>
-@D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/ai-evals.md
+@./.opencode/get-shit-done/references/ai-evals.md
 </required_reading>
 
 <process>
@@ -43,7 +43,7 @@ EVAL_REVIEW_FILE=$(ls "${PHASE_DIR}"/*-EVAL-REVIEW.md 2>/dev/null | head -1)
 **State C** — No SUMMARY.md: Exit — "Phase {N} not executed. Run /gsd-execute-phase {N} first."
 
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 **If `EVAL_REVIEW_FILE` non-empty:** Use question:
 - header: "Existing Eval Review"
 - question: "EVAL-REVIEW.md already exists for Phase {N}."
@@ -78,7 +78,7 @@ Build file list for auditor:
 Build prompt:
 
 ```markdown
-Read D:/Data/桌面/vibe_coding/.opencode/agents/gsd-eval-auditor.md for instructions.
+read ./.opencode/agents/gsd-eval-auditor.md for instructions.
 
 <objective>
 Conduct evaluation coverage audit of Phase {phase_number}: {phase_name}
@@ -102,11 +102,11 @@ state: {A or B}
 </input>
 ```
 
-Spawn as Task with model `AUDITOR_MODEL`.
+Spawn as task with model `AUDITOR_MODEL`.
 
 ## 4. Parse Auditor Result
 
-Read the written EVAL-REVIEW.md. Extract:
+read the written EVAL-REVIEW.md. Extract:
 - `overall_score`
 - `verdict` (PRODUCTION READY | NEEDS WORK | SIGNIFICANT GAPS | NOT IMPLEMENTED)
 - `critical_gap_count`

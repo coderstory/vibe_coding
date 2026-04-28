@@ -1,13 +1,13 @@
-<purpose>
+<objective>
 Orchestrate parallel debug agents to investigate UAT gaps and find root causes.
 
 After UAT finds gaps, spawn one debug agent per gap. Each agent investigates autonomously with symptoms pre-filled from UAT. Collect root causes, update UAT.md gaps with diagnosis, then hand off to plan-phase --gaps with actual diagnoses.
 
 Orchestrator stays lean: parse gaps, spawn agents, collect results, update UAT.
-</purpose>
+</objective>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-debugger — Diagnoses and fixes issues
 </available_agent_types>
 
@@ -31,7 +31,7 @@ With diagnosis: "Comment doesn't refresh" → "useEffect missing dependency" →
 <step name="parse_gaps">
 **Extract gaps from UAT.md:**
 
-Read the "Gaps" section (YAML format):
+read the "Gaps" section (YAML format):
 ```yaml
 - truth: "Comment appears immediately after submission"
   status: failed
@@ -55,7 +55,7 @@ gaps = [
 </step>
 
 <step name="report_plan">
-**Read worktree config:**
+**read worktree config:**
 
 ```bash
 USE_WORKTREES=$(gsd-sdk query config-get workflow.use_worktrees 2>/dev/null || echo "true")
@@ -87,7 +87,7 @@ This runs in parallel - all gaps investigated simultaneously.
 **Load agent skills:**
 
 ```bash
-AGENT_SKILLS_DEBUGGER=$(gsd-sdk query agent-skills gsd-debugger 2>/dev/null)
+AGENT_SKILLS_DEBUGGER=$(gsd-sdk query agent-skills gsd-debugger)
 EXPECTED_BASE=$(git rev-parse HEAD)
 ```
 
@@ -96,12 +96,7 @@ EXPECTED_BASE=$(git rev-parse HEAD)
 For each gap, fill the debug-subagent-prompt template and spawn:
 
 ```
-Task(
-  prompt=filled_debug_subagent_prompt + "\n\n<worktree_branch_check>\nFIRST ACTION: run git merge-base HEAD {EXPECTED_BASE} — if result differs from {EXPECTED_BASE}, run git reset --hard {EXPECTED_BASE} to correct the branch base (safe — runs before any agent work). Then verify: if [ \"$(git rev-parse HEAD)\" != \"{EXPECTED_BASE}\" ]; then echo \"ERROR: Could not correct worktree base\"; exit 1; fi. Fixes EnterWorktree creating branches from main on all platforms.\n</worktree_branch_check>\n\n<files_to_read>\n- {phase_dir}/{phase_num}-UAT.md\n- .planning/STATE.md\n</files_to_read>\n${AGENT_SKILLS_DEBUGGER}",
-  subagent_type="gsd-debugger",
-  ${USE_WORKTREES !== "false" ? 'isolation="worktree",' : ''}
-  description="Debug: {truth_short}"
-)
+@gsd-debugger filled_debug_subagent_prompt + "\n\n<worktree_branch_check>\nFIRST ACTION: run git merge-base HEAD {EXPECTED_BASE} — if result differs from {EXPECTED_BASE}, run git reset --hard {EXPECTED_BASE} to correct the branch base (safe — runs before any agent work). Then verify: if [ \"$(git rev-parse HEAD)\" != \"{EXPECTED_BASE}\" ]; then echo \"ERROR: Could not correct worktree base\"; exit 1; fi. Fixes EnterWorktree creating branches from main on all platforms.\n</worktree_branch_check>\n\n<files_to_read>\n- {phase_dir}/{phase_num}-UAT.md\n- .planning/STATE.md</files_to_read>\n${AGENT_SKILLS_DEBUGGER}"
 ```
 
 **All agents spawn in single message** (parallel execution).

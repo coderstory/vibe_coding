@@ -76,7 +76,7 @@ The workflow MUST NOT:
 
 - Introduce new severity levels beyond BLOCKER/WARNING/INFO
 - Render the report as a markdown table
-- Write any destination file when BLOCKERs exist
+- write any destination file when BLOCKERs exist
 - Auto-approve past WARNINGs without user input
 
 ---

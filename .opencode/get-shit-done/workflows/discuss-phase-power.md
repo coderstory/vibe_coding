@@ -1,8 +1,8 @@
-<purpose>
+<objective>
 Power user mode for discuss-phase. Generates ALL questions upfront into a JSON state file and an HTML companion UI, then waits for the user to answer at their own pace. When the user signals readiness, processes all answers in one pass and generates CONTEXT.md.
 
 **When to use:** Large phases with many gray areas, or when users prefer to answer questions offline / asynchronously rather than interactively in the chat session.
-</purpose>
+</objective>
 
 <trigger>
 This workflow executes when `--power` flag is present in ARGUMENTS to `/gsd-discuss-phase`.
@@ -19,7 +19,7 @@ Run the same gray area identification as standard discuss-phase mode.
 
 1. Load prior context (PROJECT.md, REQUIREMENTS.md, STATE.md, prior CONTEXT.md files)
 2. Scout codebase for reusable assets and patterns relevant to this phase
-3. Read the phase goal from ROADMAP.md
+3. read the phase goal from ROADMAP.md
 4. Identify ALL gray areas — specific implementation decisions the user should weigh in on
 5. For each gray area, generate 2–4 concrete options with tradeoff descriptions
 
@@ -29,7 +29,7 @@ Do NOT ask the user anything at this stage. Capture everything internally, then 
 </step>
 
 <step name="generate_json">
-Write all questions to:
+write all questions to:
 
 ```
 {phase_dir}/{padded_phase}-QUESTIONS.json
@@ -95,7 +95,7 @@ Write all questions to:
 </step>
 
 <step name="generate_html">
-Write a self-contained HTML companion file to:
+write a self-contained HTML companion file to:
 
 ```
 {phase_dir}/{padded_phase}-QUESTIONS.html
@@ -131,9 +131,9 @@ The file must be a single self-contained HTML file with inline CSS and JavaScrip
 - Collapsible via click — show/hide questions in the section
 - Show answered count for the section (e.g., "2/4 answered")
 
-**Question cards (3-column grid):**
+**question cards (3-column grid):**
 Each card contains:
-- Question ID badge (e.g., "Q-01") and title
+- question ID badge (e.g., "Q-01") and title
 - Context annotation (gray italic text)
 - Option list: radio buttons with bold label + description text
 - Chat more textarea (orange border when content present)
@@ -149,7 +149,7 @@ The Save button writes the updated JSON back using the File System Access API if
 
 ```
 After answering, click "Save answers" — or download the JSON and replace the original file.
-Then return to the agent and say "refresh" to process your answers.
+Then return to OpenCode and say "refresh" to process your answers.
 ```
 
 **Answered question styling:**
@@ -188,15 +188,15 @@ When ready, tell me:
 </step>
 
 <step name="wait_loop">
-Enter wait mode. the agent listens for user commands and handles each:
+Enter wait mode. OpenCode listens for user commands and handles each:
 
 ---
 
 **"refresh"** (or "process answers", "update", "re-read"):
 
-1. Read `{phase_dir}/{padded_phase}-QUESTIONS.json`
+1. read `{phase_dir}/{padded_phase}-QUESTIONS.json`
 2. Recalculate stats: count answered, chat_more, remaining
-3. Write updated stats back to the JSON
+3. write updated stats back to the JSON
 4. Re-generate the HTML file with the updated state (answered cards highlighted green, progress bar updated)
 5. Report to user:
 
@@ -229,7 +229,7 @@ Proceed to the **finalize** step.
 
 **"exit power mode"** (or "switch to interactive"):
 
-1. Read all currently answered questions from JSON
+1. read all currently answered questions from JSON
 2. Load answers into the internal accumulator as if they were answered interactively
 3. Continue with standard `discuss_areas` step from discuss-phase.md for any unanswered questions
 4. Generate CONTEXT.md as normal
@@ -246,7 +246,7 @@ Respond helpfully, then remind the user of available commands:
 <step name="finalize">
 Process all answered questions from the JSON file and generate CONTEXT.md.
 
-1. Read `{phase_dir}/{padded_phase}-QUESTIONS.json`
+1. read `{phase_dir}/{padded_phase}-QUESTIONS.json`
 2. Filter to questions where `answer` is not null/empty
 3. Group decisions by section
 4. For each answered question, format as a decision entry:
@@ -254,7 +254,7 @@ Process all answered questions from the JSON file and generate CONTEXT.md.
    - Rationale: the option description, plus `chat_more` content if present
    - Status: "Decided" if fully answered, "Needs clarification" if only chat_more with no option selected
 
-5. Write CONTEXT.md using the standard context template format:
+5. write CONTEXT.md using the standard context template format:
    - `<decisions>` section with all answered questions grouped by section
    - `<deferred_ideas>` section for unanswered questions (carry forward for future discussion)
    - `<specifics>` section for any chat_more content that adds nuance

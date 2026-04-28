@@ -1,16 +1,16 @@
-<purpose>
+<objective>
 Execute a phase prompt (PLAN.md) and create the outcome summary (SUMMARY.md).
-</purpose>
+</objective>
 
 <required_reading>
-Read STATE.md before any operation to load project context.
-Read config.json for planning behavior settings.
+read STATE.md before any operation to load project context.
+read config.json for planning behavior settings.
 
-@D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/git-integration.md
+@./.opencode/get-shit-done/references/git-integration.md
 </required_reading>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-executor — Executes plan tasks, commits, creates SUMMARY.md
 </available_agent_types>
 
@@ -81,7 +81,7 @@ Otherwise: Apply checkpoint-based routing below.
 | Verify-only | B (segmented) | Segments between checkpoints. After none/human-verify → SUBAGENT. After decision/human-action → MAIN |
 | Decision | C (main) | Execute entirely in main context |
 
-**Pattern A:** init_agent_tracking → capture `EXPECTED_BASE=$(git rev-parse HEAD)` → spawn Task(subagent_type="gsd-executor", model=executor_model) with prompt: execute plan at [path], autonomous, all tasks + SUMMARY + commit, follow deviation/auth rules, report: plan name, tasks, SUMMARY path, commit hash → track agent_id → wait → update tracking → report. **Include `isolation="worktree"` only if `workflow.use_worktrees` is not `false`** (read via `config-get workflow.use_worktrees`). **When using `isolation="worktree"`, include a `<worktree_branch_check>` block in the prompt** instructing the executor to run `git merge-base HEAD {EXPECTED_BASE}` and, if the result differs from `{EXPECTED_BASE}`, hard-reset the branch with `git reset --hard {EXPECTED_BASE}` before starting work (safe — runs before any agent work), then verify with `[ "$(git rev-parse HEAD)" != "{EXPECTED_BASE}" ] && exit 1`. This corrects a known issue where `EnterWorktree` creates branches from `main` instead of the feature branch HEAD (affects all platforms).
+**Pattern A:** init_agent_tracking → capture `EXPECTED_BASE=$(git rev-parse HEAD)` → spawn task(subagent_type="gsd-executor", model=executor_model) with prompt: execute plan at [path], autonomous, all tasks + SUMMARY + commit, follow deviation/auth rules, report: plan name, tasks, SUMMARY path, commit hash → track agent_id → wait → update tracking → report. **Include `isolation="worktree"` only if `workflow.use_worktrees` is not `false`** (read via `config-get workflow.use_worktrees`). **When using `isolation="worktree"`, include a `<worktree_branch_check>` block in the prompt** instructing the executor to run `git merge-base HEAD {EXPECTED_BASE}` and, if the result differs from `{EXPECTED_BASE}`, hard-reset the branch with `git reset --hard {EXPECTED_BASE}` before starting work (safe — runs before any agent work), then verify with `[ "$(git rev-parse HEAD)" != "{EXPECTED_BASE}" ] && exit 1`. This corrects a known issue where `EnterWorktree` creates branches from `main` instead of the feature branch HEAD (affects all platforms).
 
 **Pattern B:** Execute segment-by-segment. Autonomous segments: spawn subagent for assigned tasks only (no SUMMARY/commit). Checkpoints: main context. After all segments: aggregate, create SUMMARY, commit. See segment_execution.
 
@@ -102,7 +102,7 @@ if [ -f .planning/current-agent-id.txt ]; then
 fi
 ```
 
-If interrupted: ask user to resume (Task `resume` parameter) or start fresh.
+If interrupted: ask user to resume (task `resume` parameter) or start fresh.
 
 **Tracking protocol:** On spawn: write agent_id to `current-agent-id.txt`, append to agent-history.json: `{"agent_id":"[id]","task_description":"[desc]","phase":"[phase]","plan":"[plan]","segment":[num|null],"timestamp":"[ISO]","status":"spawned","completion_timestamp":null}`. On completion: status → "completed", set completion_timestamp, delete current-agent-id.txt. Prune: if entries > max_entries, remove oldest "completed" (never "spawned").
 
@@ -123,7 +123,7 @@ Pattern B only (verify-only checkpoints). Skip for A/C.
    - Re-run the plan-level `<verification>` commands — log results in SUMMARY
    - Append `## Self-Check: PASSED` or `## Self-Check: FAILED` to SUMMARY
 
-   **Known Claude Code bug (classifyHandoffIfNeeded):** If any segment agent reports "failed" with `classifyHandoffIfNeeded is not defined`, this is a Claude Code runtime bug — not a real failure. Run spot-checks; if they pass, treat as successful.
+   **Known OpenCode bug (classifyHandoffIfNeeded):** If any segment agent reports "failed" with `classifyHandoffIfNeeded is not defined`, this is a OpenCode runtime bug — not a real failure. Run spot-checks; if they pass, treat as successful.
 
 
 
@@ -145,15 +145,15 @@ gsd-sdk query phases.list --type summaries --raw
 # Extract the second-to-last summary from the JSON result
 ```
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 If previous SUMMARY has unresolved "Issues Encountered" or "Next Phase Readiness" blockers: question(header="Previous Issues", options: "Proceed anyway" | "Address first" | "Review previous").
 </step>
 
 <step name="execute">
 Deviations are normal — handle via rules below.
 
-1. Read @context files from prompt
-2. **MCP tools:** If AGENTS.md or project instructions reference MCP tools (e.g. jCodeMunch for code navigation), prefer them over Grep/Glob when available. Fall back to Grep/Glob if MCP tools are not accessible.
+1. read @context files from prompt
+2. **MCP tools:** If AGENTS.md or project instructions reference MCP tools (e.g. jCodeMunch for code navigation), prefer them over grep/glob when available. Fall back to grep/glob if MCP tools are not accessible.
 3. Per task:
    - **MANDATORY read_first gate:** If the task has a `<read_first>` field, you MUST read every listed file BEFORE making any edits. This is not optional. Do not skip files because you "already know" what's in them — read them. The read_first files establish ground truth for the task.
    - `type="auto"`: if `tdd="true"` → TDD execution. Implement with deviation rules + auth gates. Verify done criteria. Commit (see task_commit). Track hash for Summary.
@@ -212,7 +212,7 @@ Apply deviation rules from the gsd-executor agent definition (single source of t
 
 Summary MUST include deviations section. None? → `## Deviations from Plan\n\nNone - plan executed exactly as written.`
 
-Per deviation: **[Rule N - Category] Title** — Found during: Task X | Issue | Fix | Files modified | Verification | Commit hash
+Per deviation: **[Rule N - Category] Title** — Found during: task X | Issue | Fix | Files modified | Verification | Commit hash
 
 End with: **Total deviations:** N auto-fixed (breakdown). **Impact:** assessment.
 
@@ -224,13 +224,13 @@ End with: **Total deviations:** N auto-fixed (breakdown). **Impact:** assessment
 For `type: tdd` plans — RED-GREEN-REFACTOR:
 
 1. **Infrastructure** (first TDD plan only): detect project, install framework, config, verify empty suite
-2. **RED:** Read `<behavior>` → failing test(s) → run (MUST fail) → commit: `test({phase}-{plan}): add failing test for [feature]`
-3. **GREEN:** Read `<implementation>` → minimal code → run (MUST pass) → commit: `feat({phase}-{plan}): implement [feature]`
+2. **RED:** read `<behavior>` → failing test(s) → run (MUST fail) → commit: `test({phase}-{plan}): add failing test for [feature]`
+3. **GREEN:** read `<implementation>` → minimal code → run (MUST pass) → commit: `feat({phase}-{plan}): implement [feature]`
 4. **REFACTOR:** Clean up → tests MUST pass → commit: `refactor({phase}-{plan}): clean up [feature]`
 
 Errors: RED doesn't fail → investigate test/existing feature. GREEN doesn't pass → debug, iterate. REFACTOR breaks → undo.
 
-See `D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/tdd.md` for structure.
+See `./.opencode/get-shit-done/references/tdd.md` for structure.
 </tdd_plan_execution>
 
 <precommit_failure_handling>
@@ -245,7 +245,7 @@ Use `--no-verify` on all commits. Pre-commit hooks cause build lock contention w
 If a commit is BLOCKED by a hook:
 
 1. The `git commit` command fails with hook error output
-2. Read the error — it tells you exactly which hook and what failed
+2. read the error — it tells you exactly which hook and what failed
 3. Fix the issue (type error, lint violation, secret leak, etc.)
 4. `git add` the fixed files
 5. Retry the commit
@@ -253,7 +253,7 @@ If a commit is BLOCKED by a hook:
 </precommit_failure_handling>
 
 <task_commit>
-## Task Commit Protocol
+## task Commit Protocol
 
 Canonical per-task commit rules live in **`agents/gsd-executor.md`** (`<task_commit_protocol>`). Follow that section for staging, `{type}({phase}-{plan})` messages, `commit-to-subrepo` when `sub_repos` is set, post-commit checks, and untracked-file handling — do not duplicate or paraphrase the full protocol here (single source of truth).
 
@@ -264,7 +264,7 @@ Canonical per-task commit rules live in **`agents/gsd-executor.md`** (`<task_com
 <step name="checkpoint_protocol">
 On `type="checkpoint:*"`: automate everything possible first. Checkpoints are for verification/decisions only.
 
-Display: `CHECKPOINT: [Type]` box → Progress {X}/{Y} → Task name → type-specific content → `YOUR ACTION: [signal]`
+Display: `CHECKPOINT: [Type]` box → Progress {X}/{Y} → task name → type-specific content → `YOUR ACTION: [signal]`
 
 | Type | Content | Resume signal |
 |------|---------|---------------|
@@ -274,13 +274,13 @@ Display: `CHECKPOINT: [Type]` box → Progress {X}/{Y} → Task name → type-sp
 
 After response: verify if specified. Pass → continue. Fail → inform, wait. WAIT for user — do NOT hallucinate completion.
 
-See D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/checkpoints.md for details.
+See ./.opencode/get-shit-done/references/checkpoints.md for details.
 </step>
 
 <step name="checkpoint_return_for_orchestrator">
-When spawned via Task and hitting checkpoint: return structured state (cannot interact with user directly).
+When spawned via task and hitting checkpoint: return structured state (cannot interact with user directly).
 
-**Required return:** 1) Completed Tasks table (hashes + files) 2) Current Task (what's blocking) 3) Checkpoint Details (user-facing content) 4) Awaiting (what's needed from user)
+**Required return:** 1) Completed Tasks table (hashes + files) 2) Current task (what's blocking) 3) Checkpoint Details (user-facing content) 4) Awaiting (what's needed from user)
 
 Orchestrator parses → presents to user → spawns fresh continuation with your completed tasks state. You will NOT be resumed. In main context: use checkpoint_protocol above.
 </step>
@@ -293,7 +293,7 @@ If verification fails:
 NODE_REPAIR=$(gsd-sdk query config-get workflow.node_repair 2>/dev/null || echo "true")
 ```
 
-If `NODE_REPAIR` is `true`: invoke `@./.opencode/get-shit-done/workflows/node-repair.md` with:
+If `NODE_REPAIR` is `true`: invoke `@./.claude/get-shit-done/workflows/node-repair.md` with:
 - FAILED_TASK: task number, name, done-criteria
 - ERROR: expected vs actual result
 - PLAN_CONTEXT: adjacent task names + phase goal
@@ -301,7 +301,7 @@ If `NODE_REPAIR` is `true`: invoke `@./.opencode/get-shit-done/workflows/node-re
 
 Node repair will attempt RETRY, DECOMPOSE, or PRUNE autonomously. Only reaches this gate again if repair budget is exhausted (ESCALATE).
 
-If `NODE_REPAIR` is `false` OR repair returns ESCALATE: STOP. Present: "Verification failed for Task [X]: [name]. Expected: [criteria]. Actual: [result]. Repair attempted: [summary of what was tried]." Options: Retry | Skip (mark incomplete) | Stop (investigate). If skipped → SUMMARY "Issues Encountered".
+If `NODE_REPAIR` is `false` OR repair returns ESCALATE: STOP. Present: "Verification failed for task [X]: [name]. Expected: [criteria]. Actual: [result]. Repair attempted: [summary of what was tried]." Options: Retry | Skip (mark incomplete) | Stop (investigate). If skipped → SUMMARY "Issues Encountered".
 </step>
 
 <step name="record_completion_time">
@@ -327,11 +327,11 @@ fi
 grep -A 50 "^user_setup:" .planning/phases/XX-name/{phase}-{plan}-PLAN.md | head -50
 ```
 
-If user_setup exists: create `{phase}-USER-SETUP.md` using template `D:/Data/桌面/vibe_coding/.opencode/get-shit-done/templates/user-setup.md`. Per service: env vars table, account setup checklist, dashboard config, local dev notes, verification commands. Status "Incomplete". Set `USER_SETUP_CREATED=true`. If empty/missing: skip.
+If user_setup exists: create `{phase}-USER-SETUP.md` using template `./.opencode/get-shit-done/templates/user-setup.md`. Per service: env vars table, account setup checklist, dashboard config, local dev notes, verification commands. Status "Incomplete". Set `USER_SETUP_CREATED=true`. If empty/missing: skip.
 </step>
 
 <step name="create_summary">
-Create `{phase}-{plan}-SUMMARY.md` at `.planning/phases/XX-name/`. Use `D:/Data/桌面/vibe_coding/.opencode/get-shit-done/templates/summary.md`.
+Create `{phase}-{plan}-SUMMARY.md` at `.planning/phases/XX-name/`. Use `./.opencode/get-shit-done/templates/summary.md`.
 
 **Frontmatter:** phase, plan, subsystem, tags | requires/provides/affects | tech-stack.added/patterns | key-files.created/modified | key-decisions | requirements-completed (**MUST** copy `requirements` array from PLAN.md frontmatter verbatim) | duration ($DURATION), completed ($PLAN_END_TIME date).
 
@@ -402,15 +402,19 @@ If SUMMARY "Issues Encountered" ≠ "None": yolo → log and continue. Interacti
 </step>
 
 <step name="update_roadmap">
-**Skip this step if running in parallel mode** (the orchestrator handles ROADMAP.md
-updates centrally after merging worktrees).
+Run this step only when NOT executing inside a git worktree (i.e.
+`use_worktrees: false`, the bug #2661 reproducer). In worktree mode each
+worktree has its own ROADMAP.md, so per-plan writes here would diverge
+across siblings; the orchestrator owns the post-merge sync centrally
+(see execute-phase.md §5.7, single-writer contract from #1486 / dcb50396).
 
 ```bash
-# Auto-detect parallel mode: .git is a file in worktrees, a directory in main repo
+# Auto-detect worktree mode: .git is a file in worktrees, a directory in main repo.
+# This mirrors the use_worktrees config flag for the executing handler.
 IS_WORKTREE=$([ -f .git ] && echo "true" || echo "false")
 
-# Skip in parallel mode — orchestrator handles ROADMAP.md centrally
 if [ "$IS_WORKTREE" != "true" ]; then
+  # use_worktrees: false → this handler is the sole post-plan sync point (#2661)
   gsd-sdk query roadmap.update-plan-progress "${PHASE}"
 fi
 ```
@@ -428,7 +432,7 @@ Extract requirement IDs from the plan's frontmatter (e.g., `requirements: [AUTH-
 </step>
 
 <step name="git_commit_metadata">
-Task code already committed per-task. Commit plan metadata:
+task code already committed per-task. Commit plan metadata:
 
 ```bash
 # Auto-detect parallel mode: .git is a file in worktrees, a directory in main repo
@@ -472,7 +476,7 @@ If `USER_SETUP_CREATED=true`: display `⚠️ USER SETUP REQUIRED` with path + e
 | summaries = plans, current < highest phase | **B: Phase done** | Show completion, suggest `/gsd-plan-phase {Z+1}` + `/gsd-verify-work {Z}` + `/gsd-discuss-phase {Z+1}` |
 | summaries = plans, current = highest phase | **C: Milestone done** | Show banner, suggest `/gsd-complete-milestone` + `/gsd-verify-work` + `/gsd-add-phase` |
 
-All routes: `/clear` first for fresh context.
+All routes: `/new` first for fresh context.
 </step>
 
 </process>

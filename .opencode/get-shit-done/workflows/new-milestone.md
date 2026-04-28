@@ -1,17 +1,17 @@
-<purpose>
+<objective>
 
 Start a new milestone cycle for an existing project. Loads project context, gathers milestone goals (from MILESTONE-CONTEXT.md or conversation), updates PROJECT.md and STATE.md, optionally runs parallel research, defines scoped requirements with REQ-IDs, spawns the roadmapper to create phased execution plan, and commits all artifacts. Brownfield equivalent of new-project.
 
-</purpose>
+</objective>
 
 <required_reading>
 
-Read all files referenced by the invoking prompt's execution_context before starting.
+read all files referenced by the invoking prompt's execution_context before starting.
 
 </required_reading>
 
 <available_agent_types>
-Valid GSD subagent types (use exact names — do not fall back to 'general-purpose'):
+Valid GSD subagent types (use exact names — do not fall back to 'general'):
 - gsd-project-researcher — Researches project-level technical decisions
 - gsd-research-synthesizer — Synthesizes findings from parallel research agents
 - gsd-roadmapper — Creates phased execution roadmaps
@@ -27,9 +27,9 @@ Parse `$ARGUMENTS` before doing anything else:
 
 If the flag is absent, keep the current behavior of continuing phase numbering from the previous milestone.
 
-- Read PROJECT.md (existing project, validated requirements, decisions)
-- Read MILESTONES.md (what shipped previously)
-- Read STATE.md (pending todos, blockers)
+- read PROJECT.md (existing project, validated requirements, decisions)
+- read MILESTONES.md (what shipped previously)
+- read STATE.md (pending todos, blockers)
 - Check for MILESTONE-CONTEXT.md (from /gsd-discuss-milestone)
 
 ## 2. Gather Milestone Goals
@@ -41,7 +41,7 @@ If the flag is absent, keep the current behavior of continuing phase numbering f
 **If no context file:**
 - Present what shipped in last milestone
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-OpenCode runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
 - Ask inline (freeform, NOT question): "What do you want to build next?"
 - Wait for their response, then use question to probe specifics
 - If user selects "Other" at any point to provide freeform input, ask follow-up as plain text — not another question
@@ -56,7 +56,7 @@ ls .planning/seeds/SEED-*.md 2>/dev/null
 
 **If no seed files exist:** Skip this step silently — do not print any message or prompt.
 
-**If seed files exist:** Read each `SEED-*.md` file and extract from its frontmatter and body:
+**If seed files exist:** read each `SEED-*.md` file and extract from its frontmatter and body:
 - **Idea** — the seed title (heading after frontmatter, e.g. `# SEED-001: <idea>`)
 - **Trigger conditions** — the `trigger_when` frontmatter field and the "When to Surface" section's bullet list
 - **Planted during** — the `planted_during` frontmatter field (for context)
@@ -173,6 +173,19 @@ This document evolves at phase transitions and milestone boundaries.
 
 ## 5. Update STATE.md
 
+Reset STATE.md frontmatter AND body atomically via the SDK. This writes the new
+milestone version/name into the YAML frontmatter, resets `status` to
+`planning`, zeroes `progress.*` counters, and rewrites the `## Current Position`
+section to the new-milestone template. Accumulated Context (decisions,
+blockers, todos) is preserved across the switch — symmetric with
+`milestone.complete`.
+
+```bash
+gsd-sdk query state.milestone-switch --milestone "v[X.Y]" --name "[Name]"
+```
+
+The resulting Current Position section looks like:
+
 ```markdown
 ## Current Position
 
@@ -182,7 +195,11 @@ Status: Defining requirements
 Last activity: [today] — Milestone v[X.Y] started
 ```
 
-Keep Accumulated Context section from previous milestone.
+Bug #2630: a prior version of this workflow rewrote the Current Position body
+manually but left the frontmatter pointing at the previous milestone, so every
+downstream reader (`state.json`, `getMilestoneInfo`, progress bars) reported the
+stale milestone until the first phase advance forced a resync. Always use the
+SDK handler above — do not hand-edit STATE.md here.
 
 ## 6. Cleanup and Commit
 
@@ -203,12 +220,26 @@ gsd-sdk query commit "docs: start milestone v[X.Y] [Name]" .planning/PROJECT.md 
 ```bash
 INIT=$(gsd-sdk query init.new-milestone)
 if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
-AGENT_SKILLS_RESEARCHER=$(gsd-sdk query agent-skills gsd-project-researcher 2>/dev/null)
-AGENT_SKILLS_SYNTHESIZER=$(gsd-sdk query agent-skills gsd-synthesizer 2>/dev/null)
-AGENT_SKILLS_ROADMAPPER=$(gsd-sdk query agent-skills gsd-roadmapper 2>/dev/null)
+AGENT_SKILLS_RESEARCHER=$(gsd-sdk query agent-skills gsd-project-researcher)
+AGENT_SKILLS_SYNTHESIZER=$(gsd-sdk query agent-skills gsd-research-synthesizer)
+AGENT_SKILLS_ROADMAPPER=$(gsd-sdk query agent-skills gsd-roadmapper)
 ```
 
-Extract from init JSON: `researcher_model`, `synthesizer_model`, `roadmapper_model`, `commit_docs`, `research_enabled`, `current_milestone`, `project_exists`, `roadmap_exists`, `latest_completed_milestone`, `phase_dir_count`, `phase_archive_path`.
+Extract from init JSON: `researcher_model`, `synthesizer_model`, `roadmapper_model`, `commit_docs`, `research_enabled`, `current_milestone`, `project_exists`, `roadmap_exists`, `latest_completed_milestone`, `phase_dir_count`, `phase_archive_path`, `agents_installed`, `missing_agents`.
+
+**If `agents_installed` is false:** Display a warning before proceeding:
+```
+⚠ GSD agents not installed. The following agents are missing from your agents directory:
+  {missing_agents joined with newline}
+
+Subagent spawns (gsd-project-researcher, gsd-research-synthesizer, gsd-roadmapper) will fail
+with "agent type not found". Run the installer with --global to make agents available:
+
+  npx gsd-opencode@latest --global
+
+Proceeding without research subagents — roadmap will be generated inline.
+```
+Skip the parallel research spawn step and generate the roadmap inline.
 
 ## 7.5 Reset-phase safety (only when `--reset-phase-numbers`)
 
@@ -267,7 +298,7 @@ Spawn 4 parallel gsd-project-researcher agents. Each uses this template with dim
 
 **Common structure for all 4 researchers:**
 ```
-Task(prompt="
+@gsd-project-researcher "
 <research_type>Project Research — {DIMENSION} for [new features].</research_type>
 
 <milestone_context>
@@ -289,10 +320,10 @@ ${AGENT_SKILLS_RESEARCHER}
 <quality_gate>{GATES}</quality_gate>
 
 <output>
-Write to: .planning/research/{FILE}
-Use template: D:/Data/桌面/vibe_coding/.opencode/get-shit-done/templates/research-project/{FILE}
+write to: .planning/research/{FILE}
+Use template: ./.opencode/get-shit-done/templates/research-project/{FILE}
 </output>
-", subagent_type="gsd-project-researcher", model="{researcher_model}", description="{DIMENSION} research")
+"
 ```
 
 **Dimension-specific fields:**
@@ -308,7 +339,7 @@ Use template: D:/Data/桌面/vibe_coding/.opencode/get-shit-done/templates/resea
 After all 4 complete, spawn synthesizer:
 
 ```
-Task(prompt="
+@gsd-research-synthesizer "
 Synthesize research outputs into SUMMARY.md.
 
 <files_to_read>
@@ -320,10 +351,10 @@ Synthesize research outputs into SUMMARY.md.
 
 ${AGENT_SKILLS_SYNTHESIZER}
 
-Write to: .planning/research/SUMMARY.md
-Use template: D:/Data/桌面/vibe_coding/.opencode/get-shit-done/templates/research-project/SUMMARY.md
+write to: .planning/research/SUMMARY.md
+Use template: ./.opencode/get-shit-done/templates/research-project/SUMMARY.md
 Commit after writing.
-", subagent_type="gsd-research-synthesizer", model="{synthesizer_model}", description="Synthesize research")
+"
 ```
 
 Display key findings from SUMMARY.md:
@@ -347,11 +378,11 @@ Display key findings from SUMMARY.md:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-Read PROJECT.md: core value, current milestone goals, validated requirements (what exists).
+read PROJECT.md: core value, current milestone goals, validated requirements (what exists).
 
 **If `$SELECTED_SEEDS` is non-empty (from step 2.5):** Include selected seed ideas and their "Why This Matters" sections as additional input when defining requirements. Seeds provide user-validated feature ideas that should be incorporated into the requirement categories alongside research findings or conversation-gathered features.
 
-**If research exists:** Read FEATURES.md, extract feature categories.
+**If research exists:** read FEATURES.md, extract feature categories.
 
 Present features by category:
 ```
@@ -427,7 +458,7 @@ gsd-sdk query commit "docs: define milestone v[X.Y] requirements" .planning/REQU
 - Otherwise, continue from the previous milestone's last phase number (v1.0 ended at phase 5 → v1.1 starts at phase 6)
 
 ```
-Task(prompt="
+@gsd-roadmapper "
 <planning_context>
 <files_to_read>
 - .planning/PROJECT.md
@@ -450,19 +481,19 @@ Create roadmap for milestone v[X.Y]:
 3. Map every requirement to exactly one phase
 4. Derive 2-5 success criteria per phase (observable user behaviors)
 5. Validate 100% coverage
-6. Write files immediately (ROADMAP.md, STATE.md, update REQUIREMENTS.md traceability)
+6. write files immediately (ROADMAP.md, STATE.md, update REQUIREMENTS.md traceability)
 7. Return ROADMAP CREATED with summary
 
-Write files first, then return.
+write files first, then return.
 </instructions>
-", subagent_type="gsd-roadmapper", model="{roadmapper_model}", description="Create roadmap")
+"
 ```
 
 **Handle return:**
 
 **If `## ROADMAP BLOCKED`:** Present blocker, work with user, re-spawn.
 
-**If `## ROADMAP CREATED`:** Read ROADMAP.md, present inline:
+**If `## ROADMAP CREATED`:** read ROADMAP.md, present inline:
 
 ```
 ## Proposed Roadmap
@@ -496,6 +527,56 @@ Success criteria:
 gsd-sdk query commit "docs: create milestone v[X.Y] roadmap ([N] phases)" .planning/ROADMAP.md .planning/STATE.md .planning/REQUIREMENTS.md
 ```
 
+## 10.5. Link Pending Todos to Roadmap Phases
+
+After roadmap approval, scan pending todos against the newly approved phases. For each todo whose scope matches a phase, tag it with `resolves_phase: N` in its YAML frontmatter.
+
+**Check for pending todos:**
+```bash
+PENDING_TODOS=$(ls .planning/todos/pending/*.md 2>/dev/null | head -50)
+```
+
+**If no pending todos exist:** Skip this step silently.
+
+**If pending todos exist:**
+
+read the approved ROADMAP.md and extract the phase list: phase number, phase name, goal, and requirement IDs.
+
+For each pending todo, compare:
+- The todo's `title` and `area` frontmatter fields
+- The todo body (Problem and Solution sections)
+
+Against each phase's:
+- Phase goal
+- Requirement IDs and descriptions
+
+**Match criteria (best-effort — do not over-match):** A todo is considered resolved by a phase if the phase's goal or requirements directly describe implementing the same feature, area, or capability as the todo. Narrow, specific todos with concrete scopes are the best candidates. Vague or cross-cutting todos should be left unlinked.
+
+**For each matched todo**, add `resolves_phase: [N]` to the YAML frontmatter block (after the existing fields):
+```yaml
+---
+created: [existing]
+title: [existing]
+area: [existing]
+resolves_phase: [N]
+files: [existing]
+---
+```
+
+**Only modify todos that have a clear, confident match.** Leave unmatched todos unmodified.
+
+**If any todos were linked:**
+```bash
+gsd-sdk query commit "docs: tag [count] pending todos with resolves_phase after milestone v[X.Y] roadmap" .planning/todos/pending/*.md
+```
+
+Print a summary:
+```
+◆ Linked [N] pending todos to roadmap phases:
+  → [todo title] → Phase [N]: [Phase Name]
+  (Leave [M] unmatched todos in pending/)
+```
+
 ## 11. Done
 
 ```
@@ -518,7 +599,7 @@ gsd-sdk query commit "docs: create milestone v[X.Y] roadmap ([N] phases)" .plann
 
 **Phase [N]: [Phase Name]** — [Goal]
 
-`/clear` then:
+`/new` then:
 
 `/gsd-discuss-phase [N] ${GSD_WS}` — gather context and clarify approach
 
@@ -539,6 +620,7 @@ Also: `/gsd-plan-phase [N] ${GSD_WS}` — skip discussion, plan directly
 - [ ] User feedback incorporated (if any)
 - [ ] Phase numbering mode respected (continued or reset)
 - [ ] All commits made (if planning docs committed)
+- [ ] Pending todos scanned for phase matches; matched todos tagged with `resolves_phase: N`
 - [ ] User knows next step: `/gsd-discuss-phase [N] ${GSD_WS}`
 
 **Atomic commits:** Each phase commits its artifacts immediately.

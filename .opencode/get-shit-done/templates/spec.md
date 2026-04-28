@@ -84,13 +84,13 @@ Status: ✓ = met minimum, ⚠ = below minimum (planner treats as assumption)
 
 [Key decisions made during the Socratic interview. Format: round → question → answer → decision locked.]
 
-| Round | Perspective    | Question summary         | Decision locked                    |
+| Round | Perspective    | question summary         | Decision locked                    |
 |-------|----------------|-------------------------|------------------------------------|
 | 1     | Researcher     | [what was asked]        | [what was decided]                 |
 | 2     | Simplifier     | [what was asked]        | [what was decided]                 |
 | 3     | Boundary Keeper| [what was asked]        | [what was decided]                 |
 
-[If --auto mode: note "auto-selected" decisions with the reasoning the agent used.]
+[If --auto mode: note "auto-selected" decisions with the reasoning OpenCode used.]
 
 ---
 
@@ -181,7 +181,7 @@ The database has a `posts` table and `follows` table. No feed query or feed UI e
 
 ## Interview Log
 
-| Round | Perspective     | Question summary              | Decision locked                         |
+| Round | Perspective     | question summary              | Decision locked                         |
 |-------|-----------------|------------------------------|-----------------------------------------|
 | 1     | Researcher      | What exists in posts today?  | posts + follows tables exist, no feed  |
 | 2     | Simplifier      | Minimum viable feed?         | Cards + pull-refresh, no auto-scroll   |
@@ -269,7 +269,7 @@ No backup tooling exists. The project uses PostgreSQL. Developers currently use 
 
 ## Interview Log
 
-| Round | Perspective     | Question summary              | Decision locked                         |
+| Round | Perspective     | question summary              | Decision locked                         |
 |-------|-----------------|------------------------------|-----------------------------------------|
 | 1     | Researcher      | What backup tooling exists?  | None — pg_dump manual only             |
 | 2     | Simplifier      | Minimum viable backup?       | Full dump only, local only             |

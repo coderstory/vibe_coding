@@ -6,12 +6,12 @@ Use this workflow when:
 - User returns after time away from project
 </trigger>
 
-<purpose>
+<objective>
 Instantly restore full project context so "Where were we?" has an immediate, complete answer.
-</purpose>
+</objective>
 
 <required_reading>
-@D:/Data/桌面/vibe_coding/.opencode/get-shit-done/references/continuation-format.md
+@./.opencode/get-shit-done/references/continuation-format.md
 </required_reading>
 
 <process>
@@ -33,7 +33,7 @@ Parse JSON for: `state_exists`, `roadmap_exists`, `project_exists`, `planning_ex
 
 <step name="load_state">
 
-Read and parse STATE.md, then PROJECT.md:
+read and parse STATE.md, then PROJECT.md:
 
 ```bash
 cat .planning/STATE.md
@@ -96,7 +96,7 @@ fi
 **If .continue-here file exists (fallback):**
 
 - This is a mid-plan resumption point
-- Read the file for specific resumption context
+- read the file for specific resumption context
 - Flag: "Found mid-plan checkpoint"
 
 **If PLAN without SUMMARY exists:**
@@ -107,7 +107,7 @@ fi
 **If interrupted agent found:**
 
 - Subagent was spawned but session ended before completion
-- Read agent-history.json for task details
+- read agent-history.json for task details
 - Flag: "Found interrupted agent"
   </step>
 
@@ -134,10 +134,10 @@ Present complete project status to user:
 [If interrupted agent found:]
 ⚠️  Interrupted agent detected:
     Agent ID: [id]
-    Task: [task description from agent-history.json]
+    task: [task description from agent-history.json]
     Interrupted: [timestamp]
 
-    Resume with: Task tool (resume parameter with agent ID)
+    Resume with: task tool (resume parameter with agent ID)
 
 [If pending todos exist:]
 📋 [N] pending todos — /gsd-check-todos to review
@@ -157,7 +157,7 @@ Present complete project status to user:
 Based on project state, determine the most logical next action:
 
 **If interrupted agent exists:**
-→ Primary: Resume interrupted agent (Task tool with resume parameter)
+→ Primary: Resume interrupted agent (task tool with resume parameter)
 → Option: Start fresh (abandon agent work)
 
 **If HANDOFF.json exists:**
@@ -235,7 +235,7 @@ Based on user selection, route to appropriate workflow:
 
   **{phase}-{plan}: [Plan Name]** — [objective from PLAN.md]
 
-  `/clear` then:
+  `/new` then:
 
   `/gsd-execute-phase {phase} ${GSD_WS}`
 
@@ -249,7 +249,7 @@ Based on user selection, route to appropriate workflow:
 
   **Phase [N]: [Name]** — [Goal from ROADMAP.md]
 
-  `/clear` then:
+  `/new` then:
 
   `/gsd-plan-phase [phase-number] ${GSD_WS}`
 
@@ -262,8 +262,8 @@ Based on user selection, route to appropriate workflow:
   ---
   ```
 - **Advance to next phase** → ./transition.md (internal workflow, invoked inline — NOT a user command)
-- **Check todos** → Read .planning/todos/pending/, present summary
-- **Review alignment** → Read PROJECT.md, compare to current state
+- **Check todos** → read .planning/todos/pending/, present summary
+- **Review alignment** → read PROJECT.md, compare to current state
 - **Something else** → Ask what they need
 </step>
 
@@ -290,8 +290,8 @@ If STATE.md is missing but other artifacts exist:
 
 "STATE.md missing. Reconstructing from artifacts..."
 
-1. Read PROJECT.md → Extract "What This Is" and Core Value
-2. Read ROADMAP.md → Determine phases, find current position
+1. read PROJECT.md → Extract "What This Is" and Core Value
+2. read ROADMAP.md → Determine phases, find current position
 3. Scan \*-SUMMARY.md files → Extract decisions, concerns
 4. Count pending todos in .planning/todos/pending/
 5. Check for .continue-here files → Session continuity

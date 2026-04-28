@@ -248,9 +248,9 @@ function cmdPhasePlanIndex(cwd, phase, raw) {
     const content = fs.readFileSync(planPath, 'utf-8');
     const fm = extractFrontmatter(content);
 
-    // Count tasks: XML <task> tags (canonical) or ## Task N markdown (legacy)
+    // Count tasks: XML <task> tags (canonical) or ## task N markdown (legacy)
     const xmlTasks = content.match(/<task[\s>]/gi) || [];
-    const mdTasks = content.match(/##\s*Task\s*\d+/gi) || [];
+    const mdTasks = content.match(/##\s*task\s*\d+/gi) || [];
     const taskCount = xmlTasks.length || mdTasks.length;
 
     // Parse wave as integer
