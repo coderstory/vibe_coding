@@ -352,7 +352,7 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
                 } catch (Exception e) {
                     item.put("consumerCount", 0);
                     item.put("accumulatedDiff", 0L);
-                    log.debug("获取 Consumer Group {} 消费统计失败: {}", group, e.getMessage());
+                    log.debug("获取 Consumer Group {} 消费统计失败: {}", group, e.getMessage(),e);
                 }
 
 // 获取 Group 配置（类型）- RocketMQ 5.x API
