@@ -81,6 +81,13 @@
             <version>${rocketmq.version}</version>
         </dependency>
 
+        <!-- RocketMQ Logging (修复 ClassNotFoundException) -->
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-logging</artifactId>
+            <version>4.9.6</version>
+        </dependency>
+
         <!-- RocketMQ Tools (Admin API) -->
         <dependency>
             <groupId>org.apache.rocketmq</groupId>
@@ -178,8 +185,8 @@
                             <artifactId>spring-boot-configuration-processor</artifactId>
                         </path>
                     </annotationProcessorPaths>
-                    <source>21</source>
-                    <target>21</target>
+                    <source>26</source>
+                    <target>26</target>
                     <compilerArgs>--enable-preview</compilerArgs>
                 </configuration>
             </plugin>
