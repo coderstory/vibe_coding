@@ -331,8 +331,10 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
             List<Map<String, Object>> result = new ArrayList<>();
 
             for (String group : groupSet) {
-                // 过滤系统 Consumer Group
-                if (group.startsWith("%RETRY%") || group.startsWith("%DLQ%")) {
+                // 过滤系统 Consumer Group（包括所有内部重试组）
+                // %RETRY% 是重试组前缀，CID_ONSAPI 是内部系统组
+                if (group.startsWith("%RETRY%") || group.startsWith("%DLQ%") ||
+                    group.contains("CID_ONSAPI") || group.contains("OWNER") || group.contains("_BACKUP")) {
                     continue;
                 }
 
