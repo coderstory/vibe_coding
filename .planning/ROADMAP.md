@@ -105,8 +105,8 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 9. Topic 管理 | 0/1 | Pending | — |
-| 10. Consumer Group | 0/1 | Pending | — |
+| 9. Topic 管理 | 1/1 | Completed | 2026-04-20 |
+| 10. Consumer Group | 1/1 | Completed | 2026-04-28 |
 | 11. 消息管理 | 0/1 | Pending | — |
 | 12. 监控面板 | 0/1 | Pending | — |
 
