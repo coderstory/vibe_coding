@@ -1,7 +1,7 @@
 # 后台管理系统
 
 <p align="center">
-  <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=modern%20admin%20dashboard%20interface%20with%20blue%20and%20white%20color%20scheme&image_size=square_hd" alt="后台管理系统" width="200">
+  <img src="./docs/images/view-page-2.png" alt="后台管理系统" width="80%">
 </p>
 
 <p align="center">
@@ -20,8 +20,6 @@
 
 <p align="center">
   <img src="./docs/images/login-page.png" alt="登录页面" width="80%">
-  <img src="./docs/images/view-page-2.png" alt="登录页面" width="80%">
- 
 </p>
 
 
