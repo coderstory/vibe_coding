@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RocketMQConfig {
 
-    @Value("${rocketmq.name-server:localhost:9876}")
+    @Value("${rocketmq.name-server:localhost:8081}")
     private String nameServer;
 
     /**
