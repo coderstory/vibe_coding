@@ -81,27 +81,29 @@ cd springboot
 ## 📁 项目结构
 
 ```
-vibe coding/
-├── .agents/            # 配置目录（包含agent、skill、rules等）
-├── .idea/              # IDEA配置目录
-├── .planning/          # GSD日志文件
-├── .playwright/        # playwright插件目录
+vibe_coding/
+├── .opencode/          # AI 工具配置（skill、agent 等）
+│   └── skills/
+│       └── browser-msedge/  # 浏览器自动化脚本
+├── .planning/          # GSD 日志文件
 ├── app-vue/            # 前端项目源码
-│   ├── src/            # 源代码
-│   │   ├── api/        # API服务层
+│   ├── src/
+│   │   ├── api/        # API 服务层
 │   │   ├── components/ # 公共组件
 │   │   ├── views/      # 页面视图
 │   │   ├── router/     # 路由配置
 │   │   └── store/      # 状态管理
-│   └── vite.config.js  # Vite配置
+│   └── vite.config.js  # Vite 配置
 ├── docs/               # 项目文档
+│   ├── seckill/        # 秒杀系统文档
+│   ├── browser-automation-guide.md  # 浏览器自动化指南
 │   └── images/         # 项目图片
 ├── springboot/         # 后端源码目录
-│   ├── src/            # 源代码
-│   │   ├── main/java/  # Java代码
+│   ├── src/
+│   │   ├── main/java/  # Java 代码
 │   │   └── resources/  # 资源文件
-│   └── pom.xml         # Maven配置
-├── AGENTS.md           # AI开发说明文档
+│   └── pom.xml         # Maven 配置
+├── AGENTS.md           # AI 开发说明文档
 └── README.md           # 项目说明文档
 ```
 
@@ -208,13 +210,13 @@ vibe coding/
 
 1. **GSD**：安装到 `.opencode` 目录 `npx gsd-opencode@latest`
 2. **Superpower**：汉化版本 `npx superpowers-zh`
-3. **浏览器访问**：`npm install -g @playwright/cli@latest` `playwright-cli install --skills`
+3. **浏览器访问**：动态渲染页面使用 `.opencode/skills/browser-msedge/fetch-page.js`
 
 ## 🔧 配置说明
 
 - **npm镜像**：`npm config set registry https://registry.npmmirror.com`
-- **数据库配置**：在 `springboot/src/main/resources/application.yaml` 中配置
-- **直接访问数据库**：配置在 `opencode.json` 中
+- **数据库配置**：`springboot/src/main/resources/application.yaml`
+- **浏览器自动化**：`docs/browser-automation-guide.md` 或 `.opencode/skills/browser-msedge/`
 
 ## 🤝 贡献
 
