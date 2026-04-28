@@ -155,6 +155,12 @@ const routes: RouteRecordRaw[] = [
         name: 'MonitorDashboard',
         component: () => import('@/views/monitor/MonitorDashboard.vue'),
         meta: { title: '监控大盘', requiresAuth: true }
+      },
+      {
+        path: '/rocketmq/topics',
+        name: 'TopicList',
+        component: () => import('@/views/rocketmq/TopicList.vue'),
+        meta: { title: 'Topic 管理', requiresAuth: true }
       }
     ]
   },
