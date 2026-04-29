@@ -62,6 +62,12 @@ public interface RocketMQAdminService {
      */
     void resetConsumerOffset(String topic, String groupName, long timestamp);
 
+    /**
+     * 删除 Consumer Group
+     * @param groupName Group 名称
+     */
+    void deleteConsumerGroup(String groupName);
+
     // ==================== 消息管理 ====================
 
     /**

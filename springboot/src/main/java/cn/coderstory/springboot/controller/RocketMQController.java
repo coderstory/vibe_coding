@@ -130,6 +130,16 @@ public class RocketMQController {
         return ResponseEntity.ok(ApiResponse.success("位点重置成功", null));
     }
 
+    /**
+     * 删除 Consumer Group
+     * DELETE /api/rocketmq/consumer-groups/{group}
+     */
+    @DeleteMapping("/consumer-groups/{group}")
+    public ResponseEntity<ApiResponse<Void>> deleteConsumerGroup(@PathVariable String group) {
+        rocketMQAdminService.deleteConsumerGroup(group);
+        return ResponseEntity.ok(ApiResponse.success("Consumer Group 删除成功", null));
+    }
+
     // ==================== 消息管理 ====================
 
     /**
