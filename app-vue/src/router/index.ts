@@ -173,6 +173,12 @@ const routes: RouteRecordRaw[] = [
         name: 'MessageList',
         component: () => import('@/views/rocketmq/MessageList.vue'),
         meta: { title: '消息管理', requiresAuth: true }
+      },
+      {
+        path: '/rocketmq/dashboard',
+        name: 'RocketMQDashboard',
+        component: () => import('@/views/rocketmq/Dashboard.vue'),
+        meta: { title: '监控面板', requiresAuth: true }
       }
     ]
   },

@@ -835,4 +835,180 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
             throw BusinessException.badRequest("发送消息失败: " + e.getMessage());
         }
     }
+
+    // ==================== 监控面板 ====================
+
+    @Override
+    public Map<String, Object> getClusterOverview() {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            ClusterInfo clusterInfo = defaultMQAdminExt.examineBrokerClusterInfo();
+            result.put("clusterName", "DefaultCluster"); // ClusterInfo 5.x API 不直接提供集群名
+            result.put("brokerCount", clusterInfo.getBrokerAddrTable().size());
+
+            // 获取 Topic 数量（过滤系统 Topic）
+            TopicList topicList = defaultMQAdminExt.fetchAllTopicList();
+            int topicCount = 0;
+            for (String topic : topicList.getTopicList()) {
+                if (!isSystemTopic(topic)) {
+                    topicCount++;
+                }
+            }
+            result.put("topicCount", topicCount);
+
+            // 获取 Consumer Group 数量（需要 Broker 地址）
+            String brokerAddr = getFirstBrokerAddr();
+            int consumerGroupCount = 0;
+            long totalDiff = 0;
+            if (brokerAddr != null) {
+                SubscriptionGroupWrapper subGroupWrapper = defaultMQAdminExt.getAllSubscriptionGroup(brokerAddr, 3000);
+                for (String group : subGroupWrapper.getSubscriptionGroupTable().keySet()) {
+                    if (!isSystemGroup(group)) {
+                        consumerGroupCount++;
+                        // 获取每个组的消费进度和堆积量
+                        try {
+                            ConsumeStats stats = defaultMQAdminExt.examineConsumeStats(group);
+                            if (stats != null && stats.getOffsetTable() != null) {
+                                for ( var entry : stats.getOffsetTable().entrySet()) {
+                                    long brokerOffset = entry.getValue().getBrokerOffset();
+                                    long consumerOffset = entry.getValue().getConsumerOffset();
+                                    long diff = brokerOffset - consumerOffset;
+                                    if (diff > 0) {
+                                        totalDiff += diff;
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            log.debug("获取 Group {} 消费状态失败", group);
+                        }
+                    }
+                }
+            }
+            result.put("consumerGroupCount", consumerGroupCount);
+            result.put("totalDiff", totalDiff);
+
+            return result;
+        } catch (Exception e) {
+            log.error("获取集群概览失败", e);
+            throw BusinessException.badRequest("获取集群概览失败: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public Map<String, Object> getBrokerStatusList() {
+        List<Map<String, Object>> brokers = new ArrayList<>();
+        try {
+            ClusterInfo clusterInfo = defaultMQAdminExt.examineBrokerClusterInfo();
+            for (var entry : clusterInfo.getBrokerAddrTable().entrySet()) {
+                String brokerName = entry.getKey();
+                BrokerData brokerData = entry.getValue();
+                String brokerAddr = brokerData.selectBrokerAddr();
+
+                Map<String, Object> broker = new HashMap<>();
+                broker.put("brokerName", brokerName);
+                broker.put("brokerAddr", brokerAddr);
+                broker.put("status", "ONLINE"); // 默认在线
+                broker.put("version", "V5"); // RocketMQ 5.x
+                broker.put("inBrokerHouseDate", "");
+
+                brokers.add(broker);
+            }
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("records", brokers);
+            result.put("total", brokers.size());
+            return result;
+        } catch (Exception e) {
+           log.error("获取 Broker 状态列表失败", e);
+            throw BusinessException.badRequest("获取 Broker 状态列表失败: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public Map<String, Object> getTopicBacklogList() {
+        List<Map<String, Object>> topics = new ArrayList<>();
+        try {
+            String brokerAddr = getFirstBrokerAddr();
+            if (brokerAddr == null) {
+                Map<String, Object> result = new HashMap<>();
+                result.put("records", topics);
+                result.put("total", 0);
+                return result;
+            }
+
+            SubscriptionGroupWrapper subGroupWrapper = defaultMQAdminExt.getAllSubscriptionGroup(brokerAddr, 3000);
+
+            // 按 Topic 分组计算堆积量
+            Map<String, Long> topicDiffMap = new HashMap<>();
+            for (var entry : subGroupWrapper.getSubscriptionGroupTable().entrySet()) {
+                String group = entry.getKey();
+                if (isSystemGroup(group)) continue;
+
+                try {
+                    ConsumeStats stats = defaultMQAdminExt.examineConsumeStats(group);
+                    if (stats != null && stats.getOffsetTable() != null) {
+                        for (var offsetEntry : stats.getOffsetTable().entrySet()) {
+                            String topicName = offsetEntry.getKey().getTopic();
+                            long brokerOffset = offsetEntry.getValue().getBrokerOffset();
+                            long consumerOffset = offsetEntry.getValue().getConsumerOffset();
+                            long diff = brokerOffset - consumerOffset;
+                            if (diff > 0) {
+                                topicDiffMap.merge(topicName, diff, Long::sum);
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    log.debug("获取 Group {} 消费状态失败", group);
+                }
+            }
+
+            // 获取 Topic 列表
+            TopicList topicList = defaultMQAdminExt.fetchAllTopicList();
+            for (String topicName : topicList.getTopicList()) {
+                if (isSystemTopic(topicName)) continue;
+
+                Map<String, Object> topic = new HashMap<>();
+                topic.put("topicName", topicName);
+                topic.put("diff", topicDiffMap.getOrDefault(topicName, 0L));
+                topic.put("lastUpdateTime", System.currentTimeMillis());
+                topics.add(topic);
+            }
+
+            // 按堆积量倒序
+            topics.sort((a, b) -> Long.compare((Long) b.get("diff"), (Long) a.get("diff")));
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("records", topics);
+            result.put("total", topics.size());
+            return result;
+        } catch (Exception e) {
+            log.error("获取 Topic 堆积量列表失败", e);
+            throw BusinessException.badRequest("获取 Topic 堆积量列表失败: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public Map<String, Object> getBrokerMetrics(String brokerName) {
+        Map<String, Object> metrics = new HashMap<>();
+        try {
+            // 获取 Broker 地址
+            ClusterInfo clusterInfo = defaultMQAdminExt.examineBrokerClusterInfo();
+            BrokerData brokerData = clusterInfo.getBrokerAddrTable().get(brokerName);
+            if (brokerData == null) {
+                throw BusinessException.notFound("Broker 不存在: " + brokerName);
+            }
+            String brokerAddr = brokerData.selectBrokerAddr();
+
+            metrics.put("brokerName", brokerName);
+            metrics.put("brokerAddr", brokerAddr);
+            metrics.put("message", "Broker 详细运行时指标需要通过其他方式获取");
+
+            return metrics;
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("获取 Broker {} 运行时指标失败", brokerName, e);
+            throw BusinessException.badRequest("获取 Broker 指标失败: " + e.getMessage());
+        }
+    }
 }

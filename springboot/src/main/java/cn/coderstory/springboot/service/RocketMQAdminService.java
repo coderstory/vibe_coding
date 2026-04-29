@@ -105,4 +105,31 @@ public interface RocketMQAdminService {
      * @return 发送结果，包含 msgId
      */
     Map<String, Object> sendMessage(String topic, String tags, String keys, String body);
+
+    // ==================== 监控面板 ====================
+
+    /**
+     * 获取集群概览
+     * @return 集群概览信息（Broker数量、Topic数量、Consumer数量、总堆积量）
+     */
+    Map<String, Object> getClusterOverview();
+
+    /**
+     * 获取 Broker 状态列表
+     * @return Broker 状态列表
+     */
+    Map<String, Object> getBrokerStatusList();
+
+    /**
+     * 获取 Topic 堆积量列表
+     * @return Topic 堆积量列表
+     */
+    Map<String, Object> getTopicBacklogList();
+
+    /**
+     * 获取 Broker 运行时指标
+     * @param brokerName Broker 名称
+     * @return Broker 运行时指标
+     */
+    Map<String, Object> getBrokerMetrics(String brokerName);
 }
