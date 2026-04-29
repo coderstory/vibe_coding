@@ -231,3 +231,55 @@ export interface SendMessageResult {
 export function sendMessage(topic: string, body: string, tags?: string, keys?: string) {
   return request.post<ApiResponse<SendMessageResult>>(`/rocketmq/messages`, { topic, tags, keys, body })
 }
+
+// ==================== Dashboard 监控面板 ====================
+
+/**
+ * 集群概览
+ */
+export interface ClusterOverviewVO {
+  clusterName: string
+  brokerCount: number
+  topicCount: number
+  consumerGroupCount: number
+  totalDiff: number
+}
+
+export function getClusterOverview() {
+  return request.get<ApiResponse<ClusterOverviewVO>>('/rocketmq/dashboard/overview')
+}
+
+/**
+ * Broker 状态
+ */
+export interface BrokerStatusVO {
+  brokerName: string
+  brokerAddr: string
+  status: string
+  version: string
+  inBrokerHouseDate: string
+}
+
+export function getBrokerStatusList() {
+  return request.get<ApiResponse<{ records: BrokerStatusVO[]; total: number }>>('/rocketmq/dashboard/brokers')
+}
+
+/**
+ * Topic 堆积量
+ */
+export interface TopicBacklogVO {
+  topicName: string
+  diff: number
+  lastUpdateTime: number
+}
+
+export function getTopicBacklogList() {
+  return request.get<ApiResponse<{ records: TopicBacklogVO[]; total: number }>>('/rocketmq/dashboard/topics')
+}
+
+/**
+ * Broker 指标
+ */
+export function getBrokerMetrics(brokerName: string) {
+  return request.get<ApiResponse<any>>(`/rocketmq/dashboard/broker/${encodeURIComponent(brokerName)}/metrics`)
+}
