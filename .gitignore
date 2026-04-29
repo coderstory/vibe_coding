@@ -41,3 +41,15 @@ __screenshots__/
 # Worktrees
 .worktrees/
 worktrees/
+
+# Gradle
+springboot/.gradle/
+build/
+
+# Claude
+.claude/settings.local.json
+.claude/gsd-file-manifest.json
+.claude/projects/
+
+# get-shit-done workflow (external)
+get-shit-done/
