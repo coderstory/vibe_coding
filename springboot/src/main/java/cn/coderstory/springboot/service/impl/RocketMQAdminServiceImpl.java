@@ -521,7 +521,9 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
 
             for (int queueId = 0; queueId < queueCount && result.size() < maxMsg; queueId++) {
                 try {
-                    MessageQueue mq = new MessageQueue(topic, brokerAddr.split(":")[0], queueId);
+                    // 使用 brokerName 而非 IP 地址
+                    String brokerName = topicRoute.getQueueDatas().get(queueId).getBrokerName();
+                    MessageQueue mq = new MessageQueue(topic, brokerName, queueId);
 
                     // 获取队列的最小和最大 offset
                     long minOffset = defaultMQAdminExt.minOffset(mq);
