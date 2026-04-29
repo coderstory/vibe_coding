@@ -120,7 +120,7 @@ async function handleViewTrace(row: MessageVO) {
   traceDialogVisible.value = true
   try {
     const res = await getMessageTrace(selectedTopic.value, row.msgId)
-    traceList.value = res.data || []
+    traceList.value = res.data?.consumeTraceList || []
   } catch {
     // 错误已在 request.ts 的响应拦截器中处理
   } finally {
@@ -167,8 +167,7 @@ async function handleSend() {
     const res = await sendMessage(sendForm.topic, sendForm.body, sendForm.tags || undefined, sendForm.keys || undefined)
     ElMessage.success(`消息发送成功，MsgId: ${res.data.msgId}`)
     sendDialogVisible.value = false
-    // 可选：刷新消息列表
-    loadMessages()
+    // 发送成功后不自动刷新列表，让用户自己决定是否刷新
   } catch {
     // 错误已在 request.ts 的响应拦截器中处理
   } finally {
