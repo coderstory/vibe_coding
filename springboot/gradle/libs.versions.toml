@@ -7,7 +7,7 @@ java = "26"
 
 # Spring Boot
 spring-boot = "4.1.0-RC1"
-spring-aop = "4.1.0"
+spring-aop = "3.5.13"
 
 # Database
 mysql = "9.7.0"
@@ -24,7 +24,7 @@ jjwt = "0.13.0"
 
 # Utils
 zstd = "1.5.7-7"
-lombok = "1.18.50"
+lombok = "1.18.44"
 
 [libraries]
 # Spring Boot Starters
@@ -65,5 +65,5 @@ lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" 
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
-dependency-management = { id = "io.spring.dependency-management", version = "1.1.8" }
+dependency-management = { id = "io.spring.dependency-management", version = "1.1.7" }
 flyway = { id = "org.flywaydb.flyway", version.ref = "flyway" }

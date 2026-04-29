@@ -1,7 +1,7 @@
 plugins {
     `java-library`
     id("org.springframework.boot") version "4.1.0-RC1"
-    id("io.spring.dependency-management") version "1.1.8"
+    id("io.spring.dependency-management") version "1.1.7"
     id("org.flywaydb.flyway") version "12.4.0"
 }
 
@@ -49,8 +49,8 @@ dependencies {
     runtimeOnly("com.github.luben:zstd-jni:1.5.7-7")
 
     // Annotation Processors
-    compileOnly("org.projectlombok:lombok:1.18.50")
-    annotationProcessor("org.projectlombok:lombok:1.18.50")
+    compileOnly("org.projectlombok:lombok:1.18.44")
+    annotationProcessor("org.projectlombok:lombok:1.18.44")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     // Test
