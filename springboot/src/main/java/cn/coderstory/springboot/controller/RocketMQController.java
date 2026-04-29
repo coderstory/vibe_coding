@@ -134,16 +134,20 @@ public class RocketMQController {
 
     /**
      * 查询消息列表
-     * GET /api/rocketmq/messages?topic=xxx&startTime=xxx&endTime=xxx&maxMsg=100
+     * GET /api/rocketmq/messages/{topic}?startTime=xxx&endTime=xxx&maxMsg=100&keyword=xxx
      */
-    @GetMapping("/messages")
-    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getMessageList(
-            @RequestParam String topic,
-            @RequestParam long startTime,
-            @RequestParam long endTime,
-            @RequestParam(defaultValue = "100") int maxMsg) {
-        List<Map<String, Object>> result = rocketMQAdminService.getMessageList(topic, startTime, endTime, maxMsg);
-        return ResponseEntity.ok(ApiResponse.success(result));
+    @GetMapping("/messages/{topic}")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getMessageList(
+            @PathVariable String topic,
+            @RequestParam(required = false) Long startTime,
+            @RequestParam(required = false) Long endTime,
+            @RequestParam(defaultValue = "100") Integer maxMsg,
+            @RequestParam(required = false) String keyword) {
+        List<Map<String, Object>> list = rocketMQAdminService.getMessageList(topic, startTime != null ? startTime : 0, endTime != null ? endTime : System.currentTimeMillis(), maxMsg);
+        Map<String, Object> data = new HashMap<>();
+        data.put("records", list);
+        data.put("total", list.size());
+        return ResponseEntity.ok(ApiResponse.success(data));
     }
 
     /**

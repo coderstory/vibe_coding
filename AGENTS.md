@@ -5,9 +5,9 @@
 ## 交互要求
 
 1. **全程思考使用中文**
-2. **输出使用中文**（代码语法关键词除外）
-3. 当前操作系统是windows，调用shell时，**禁止生成bash命令**，而是使用**PowerShell 7 命令**：`pwsh -Command "your command"`
-4. 回复简洁直接，不确定的主动询问
+2. 当前操作系统是windows，调用shell时，**禁止生成bash命令**，而是使用**PowerShell 7 命令**：`pwsh -Command "your command"`
+3. 回复简洁直接，不确定的主动询问
+4. 当前只能使用MiniMax-M2.7模型，禁止调用gpt系列模型
 
 ---
 
