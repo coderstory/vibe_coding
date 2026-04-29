@@ -1,6 +1,7 @@
 package cn.coderstory.springboot.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.tools.admin.DefaultMQAdminExt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RocketMQConfig {
 
-    @Value("${rocketmq.name-server:localhost:8081}")
+    @Value("${rocketmq.name-server:localhost:9876}")
     private String nameServer;
 
     /**
@@ -33,5 +34,23 @@ public class RocketMQConfig {
             log.error("RocketMQ Admin 启动失败", e);
         }
         return admin;
+    }
+
+    /**
+     * 创建 RocketMQ 生产者实例
+     * 用于发送消息
+     */
+    @Bean
+    public DefaultMQProducer defaultMQProducer() {
+        DefaultMQProducer producer = new DefaultMQProducer("SEND_MESSAGE_PRODUCER");
+        producer.setNamesrvAddr(nameServer);
+        producer.setInstanceName("RocketMQProducer-" + System.currentTimeMillis());
+        try {
+            producer.start();
+            log.info("RocketMQ Producer 启动成功, nameserver: {}", nameServer);
+        } catch (Exception e) {
+            log.error("RocketMQ Producer 启动失败", e);
+        }
+        return producer;
     }
 }

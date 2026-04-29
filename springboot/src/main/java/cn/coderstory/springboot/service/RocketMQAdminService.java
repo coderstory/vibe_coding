@@ -89,4 +89,14 @@ public interface RocketMQAdminService {
      * @return 轨迹数据，包含 producerInfo, consumeTraceList (Consumer Group, status, consumeTime)
      */
     Map<String, Object> getMessageTrace(String topic, String msgId);
+
+    /**
+     * 发送消息
+     * @param topic Topic名称
+     * @param tags Tags（可选）
+     * @param keys Keys（可选）
+     * @param body 消息内容
+     * @return 发送结果，包含 msgId
+     */
+    Map<String, Object> sendMessage(String topic, String tags, String keys, String body);
 }

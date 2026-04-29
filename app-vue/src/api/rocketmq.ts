@@ -198,3 +198,28 @@ export function getMessageDetail(topic: string, msgId: string) {
 export function getMessageTrace(topic: string, msgId: string) {
   return request.get<ApiResponse<MessageTraceVO[]>>(`/rocketmq/messages/${encodeURIComponent(topic)}/${encodeURIComponent(msgId)}/trace`)
 }
+
+/**
+ * 发送消息结果
+ */
+export interface SendMessageResult {
+  msgId: string
+  topic: string
+  tags: string
+  keys: string
+  sendStatus: string
+  queueId: number
+  queueOffset: number
+  timestamp: number
+}
+
+/**
+ * 发送消息
+ * @param topic Topic 名称
+ * @param tags Tags（可选）
+ * @param keys Keys（可选）
+ * @param body 消息内容
+ */
+export function sendMessage(topic: string, body: string, tags?: string, keys?: string) {
+  return request.post<ApiResponse<SendMessageResult>>(`/rocketmq/messages`, { topic, tags, keys, body })
+}

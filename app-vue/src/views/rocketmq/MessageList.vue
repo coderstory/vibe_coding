@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
-import { getTopicList, getMessageList, getMessageDetail, getMessageTrace, type TopicVO, type MessageVO, type MessageDetailVO, type MessageTraceVO } from '@/api/rocketmq'
+import { getTopicList, getMessageList, getMessageDetail, getMessageTrace, sendMessage, type TopicVO, type MessageVO, type MessageDetailVO, type MessageTraceVO } from '@/api/rocketmq'
 
 // 状态
 const loading = ref(false)
 const messageLoading = ref(false)
 const traceLoading = ref(false)
+const sendLoading = ref(false)
 const topicList = ref<TopicVO[]>([])
 const messageList = ref<MessageVO[]>([])
 const total = ref(0)
@@ -38,6 +39,15 @@ const detailData = ref<MessageDetailVO | null>(null)
 // 轨迹对话框
 const traceDialogVisible = ref(false)
 const traceList = ref<MessageTraceVO[]>([])
+
+// 发送消息对话框
+const sendDialogVisible = ref(false)
+const sendForm = reactive({
+  topic: '',
+  tags: '',
+  keys: '',
+  body: ''
+})
 
 // 格式化时间
 const formatTime = (timestamp: number) => {
@@ -122,6 +132,40 @@ const statusTagType = (status: string): '' | 'success' | 'warning' | 'info' | 'd
   }
 }
 
+// 打开发送消息对话框
+function openSendDialog() {
+  sendForm.topic = selectedTopic.value
+  sendForm.tags = ''
+  sendForm.keys = ''
+  sendForm.body = ''
+  sendDialogVisible.value = true
+}
+
+// 发送消息
+async function handleSend() {
+  if (!sendForm.topic) {
+    ElMessage.warning('请选择 Topic')
+    return
+  }
+  if (!sendForm.body.trim()) {
+    ElMessage.warning('请输入消息内容')
+    return
+  }
+
+  sendLoading.value = true
+  try {
+    const res = await sendMessage(sendForm.topic, sendForm.body, sendForm.tags || undefined, sendForm.keys || undefined)
+    ElMessage.success(`消息发送成功，MsgId: ${res.data.msgId}`)
+    sendDialogVisible.value = false
+    // 可选：刷新消息列表
+    loadMessages()
+  } catch {
+    // 错误已在 request.ts 的响应拦截器中处理
+  } finally {
+    sendLoading.value = false
+  }
+}
+
 onMounted(() => {
   loadTopics()
 })
@@ -187,6 +231,9 @@ onMounted(() => {
         <el-form-item>
           <el-button type="primary" :loading="messageLoading" @click="loadMessages">
             查询
+          </el-button>
+          <el-button type="success" @click="openSendDialog" :disabled="!selectedTopic">
+            发送消息
           </el-button>
         </el-form-item>
       </el-form>
@@ -304,6 +351,51 @@ onMounted(() => {
       </el-table>
       <template #footer>
         <el-button @click="traceDialogVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 发送消息对话框 -->
+    <el-dialog
+      v-model="sendDialogVisible"
+      title="发送消息"
+      width="500px"
+    >
+      <el-form :model="sendForm" label-width="80px">
+        <el-form-item label="Topic" required>
+          <el-select
+            v-model="sendForm.topic"
+            placeholder="请选择 Topic"
+            filterable
+            style="width: 100%"
+          >
+            <el-option
+              v-for="topic in topicList"
+              :key="topic.topicName"
+              :label="topic.topicName"
+              :value="topic.topicName"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Tags">
+          <el-input v-model="sendForm.tags" placeholder="可选，如: order, payment" />
+        </el-form-item>
+        <el-form-item label="Keys">
+          <el-input v-model="sendForm.keys" placeholder="可选，用于消息检索" />
+        </el-form-item>
+        <el-form-item label="消息内容" required>
+          <el-input
+            v-model="sendForm.body"
+            type="textarea"
+            :rows="4"
+            placeholder="请输入消息内容"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="sendDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="sendLoading" @click="handleSend">
+          发送
+        </el-button>
       </template>
     </el-dialog>
   </div>

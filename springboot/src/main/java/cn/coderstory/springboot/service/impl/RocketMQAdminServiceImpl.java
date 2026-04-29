@@ -7,8 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.QueryResult;
 import org.apache.rocketmq.common.TopicConfig;
 import org.apache.rocketmq.common.message.MessageExt;
+import org.apache.rocketmq.remoting.protocol.admin.ConsumeStats;
 import org.apache.rocketmq.tools.admin.DefaultMQAdminExt;
 import org.apache.rocketmq.common.message.MessageQueue;
+import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.remoting.protocol.admin.ConsumeStats;
 import org.apache.rocketmq.remoting.protocol.body.ClusterInfo;
 import org.apache.rocketmq.remoting.protocol.body.SubscriptionGroupWrapper;
@@ -34,6 +36,7 @@ import java.util.*;
 public class RocketMQAdminServiceImpl implements RocketMQAdminService {
 
     private final DefaultMQAdminExt defaultMQAdminExt;
+    private final DefaultMQProducer defaultMQProducer;
 
     @Value("${rocketmq.name-server:localhost:9876}")
     private String nameServer;
@@ -706,5 +709,35 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
         }
         // Fallback: 返回第一个可用的 Broker 地址
         return getFirstBrokerAddr();
+    }
+
+    @Override
+    public Map<String, Object> sendMessage(String topic, String tags, String keys, String body) {
+        try {
+            org.apache.rocketmq.common.message.Message message = new org.apache.rocketmq.common.message.Message(
+                topic,
+                tags != null && !tags.isEmpty() ? tags : "*",
+                keys != null && !keys.isEmpty() ? keys : "",
+                body.getBytes(java.nio.charset.StandardCharsets.UTF_8)
+            );
+
+            org.apache.rocketmq.client.producer.SendResult sendResult = defaultMQProducer.send(message);
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("msgId", sendResult.getMsgId());
+            result.put("topic", topic);
+            result.put("tags", tags != null ? tags : "");
+            result.put("keys", keys != null ? keys : "");
+            result.put("sendStatus", sendResult.getSendStatus().toString());
+            result.put("queueId", sendResult.getMessageQueue().getQueueId());
+            result.put("queueOffset", sendResult.getQueueOffset());
+            result.put("timestamp", System.currentTimeMillis());
+
+            log.info("消息发送成功: topic={}, msgId={}", topic, sendResult.getMsgId());
+            return result;
+        } catch (Exception e) {
+            log.error("发送消息失败: topic={}", topic, e);
+            throw BusinessException.badRequest("发送消息失败: " + e.getMessage());
+        }
     }
 }
