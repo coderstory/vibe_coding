@@ -1,25 +1,17 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { ElStatistic, ElCard } from 'element-plus'
+import { getClusterOverview, type ClusterOverviewVO } from '@/api/rocketmq'
 
-interface ClusterOverview {
-  clusterName: string
-  brokerCount: number
-  topicCount: number
-  consumerGroupCount: number
-  totalDiff: number
-}
-
-const overview = ref<ClusterOverview | null>(null)
+const overview = ref<ClusterOverviewVO | null>(null)
 const loading = ref(false)
 
 async function loadOverview() {
   loading.value = true
   try {
-    const res = await fetch('/api/rocketmq/dashboard/overview')
-    const data = await res.json()
-    if (data.code === 200) {
-      overview.value = data.data
+    const res = await getClusterOverview()
+    if (res.code === 200) {
+      overview.value = res.data
     }
   } catch (e) {
     console.error('加载集群概览失败', e)
