@@ -10,8 +10,6 @@ import org.apache.rocketmq.client.producer.TransactionListener;
 import org.apache.rocketmq.client.producer.TransactionMQProducer;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
-import org.apache.rocketmq.spring.core.RocketMQTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import jakarta.annotation.PostConstruct;
@@ -21,7 +19,6 @@ import java.util.UUID;
 @Component
 public class OrderTransactionProducer {
 
-    private final RocketMQTemplate rocketMQTemplate;
     private final OrderMapper orderMapper;
     private final SeckillGoodsMapper goodsMapper;
     private final SeckillSseService sseService;
@@ -30,8 +27,7 @@ public class OrderTransactionProducer {
     @Value("${rocketmq.name-server}")
     private String nameServer;
 
-    public OrderTransactionProducer(RocketMQTemplate rocketMQTemplate, OrderMapper orderMapper, SeckillGoodsMapper goodsMapper, SeckillSseService sseService) {
-        this.rocketMQTemplate = rocketMQTemplate;
+    public OrderTransactionProducer(OrderMapper orderMapper, SeckillGoodsMapper goodsMapper, SeckillSseService sseService) {
         this.orderMapper = orderMapper;
         this.goodsMapper = goodsMapper;
         this.sseService = sseService;
