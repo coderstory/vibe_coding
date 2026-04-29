@@ -232,7 +232,7 @@ onMounted(() => {
           <el-button type="primary" :loading="messageLoading" @click="loadMessages">
             查询
           </el-button>
-          <el-button type="success" @click="openSendDialog" :disabled="!selectedTopic">
+          <el-button type="success" @click="openSendDialog">
             发送消息
           </el-button>
         </el-form-item>

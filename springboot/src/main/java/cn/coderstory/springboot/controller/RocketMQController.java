@@ -179,12 +179,12 @@ public class RocketMQController {
      * POST /api/rocketmq/messages
      */
     @PostMapping("/messages")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> sendMessage(
-            @RequestParam String topic,
-            @RequestParam(required = false) String tags,
-            @RequestParam(required = false) String keys,
-            @RequestBody String body) {
-        Map<String, Object> result = rocketMQAdminService.sendMessage(topic, tags, keys, body);
+    public ResponseEntity<ApiResponse<Map<String, Object>>> sendMessage(@RequestBody Map<String, Object> body) {
+        String topic = (String) body.get("topic");
+        String tags = (String) body.get("tags");
+        String keys = (String) body.get("keys");
+        String msgBody = (String) body.get("body");
+        Map<String, Object> result = rocketMQAdminService.sendMessage(topic, tags, keys, msgBody);
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 }
