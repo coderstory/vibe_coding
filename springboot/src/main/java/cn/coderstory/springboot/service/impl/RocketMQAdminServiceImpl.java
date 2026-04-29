@@ -714,14 +714,22 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
     @Override
     public Map<String, Object> sendMessage(String topic, String tags, String keys, String body) {
         try {
+            // 先尝试获取 Topic 路由信息，确保 Nameserver 有该 Topic 的路由
+            try {
+                defaultMQAdminExt.examineTopicRouteInfo(topic);
+            } catch (Exception e) {
+                log.debug("获取 Topic 路由信息失败，继续尝试发送: topic={}", topic);
+            }
+
             org.apache.rocketmq.common.message.Message message = new org.apache.rocketmq.common.message.Message(
                 topic,
                 tags != null && !tags.isEmpty() ? tags : "*",
                 keys != null && !keys.isEmpty() ? keys : "",
                 body.getBytes(java.nio.charset.StandardCharsets.UTF_8)
             );
+            message.setWaitStoreMsgOK(false);
 
-            org.apache.rocketmq.client.producer.SendResult sendResult = messageProducer.send(message);
+            org.apache.rocketmq.client.producer.SendResult sendResult = messageProducer.send(message, 3000);
 
             Map<String, Object> result = new HashMap<>();
             result.put("msgId", sendResult.getMsgId());
