@@ -4,6 +4,7 @@ import { ElCard, ElRow, ElCol } from 'element-plus'
 import OverviewCard from './OverviewCard.vue'
 import BrokerStatusTable from './BrokerStatusTable.vue'
 import TopicBacklogTable from './TopicBacklogTable.vue'
+import QpsChart from './QpsChart.vue'
 
 // 刷新间隔（毫秒）
 const REFRESH_INTERVAL = 30000
@@ -30,6 +31,14 @@ onUnmounted(() => {
 
     <!-- 概览卡片 -->
     <OverviewCard />
+
+    <!-- Broker QPS 图表 -->
+    <el-card shadow="hover" style="margin-top: 16px">
+      <template #header>
+        <span>Broker TPS 监控</span>
+      </template>
+      <QpsChart />
+    </el-card>
 
     <!-- Broker 状态和 Topic 堆积 -->
     <el-row :gutter="16" style="margin-top: 16px">
