@@ -8,6 +8,7 @@ import org.apache.rocketmq.client.QueryResult;
 import org.apache.rocketmq.common.TopicConfig;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.tools.admin.DefaultMQAdminExt;
+import org.apache.rocketmq.common.message.MessageQueue;
 import org.apache.rocketmq.remoting.protocol.admin.ConsumeStats;
 import org.apache.rocketmq.remoting.protocol.body.ClusterInfo;
 import org.apache.rocketmq.remoting.protocol.body.SubscriptionGroupWrapper;
@@ -493,11 +494,6 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
 
     @Override
     public List<Map<String, Object>> getMessageList(String topic, long startTime, long endTime, int maxMsg) {
-        String brokerAddr = getFirstBrokerAddr(topic);
-        if (brokerAddr == null) {
-            throw BusinessException.badRequest("未找到可用的 Broker");
-        }
-
         try {
             // 时间范围校验（最多 7 天）
             long sevenDays = 7 * 24 * 60 * 60 * 1000L;
@@ -505,30 +501,77 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
                 throw BusinessException.badRequest("时间范围不能超过 7 天");
             }
 
-            // 使用 queryMessage 方法查询消息
-            QueryResult queryResult = defaultMQAdminExt.queryMessage(
-                topic,
-                "*", // msgId 模糊匹配，* 表示所有
-                maxMsg > 0 ? maxMsg : 100,
-                startTime,
-                endTime
-            );
-
+            // RocketMQ 5.x queryMessage 不支持通配符，改用遍历队列方式获取消息
             List<Map<String, Object>> result = new ArrayList<>();
-            if (queryResult != null && queryResult.getMessageList() != null) {
-                for (MessageExt msg : queryResult.getMessageList()) {
-                    Map<String, Object> item = new HashMap<>();
-                    item.put("msgId", msg.getMsgId());
-                    item.put("topic", msg.getTopic());
-                    item.put("tags", msg.getTags() != null ? msg.getTags() : "");
-                    item.put("keys", msg.getKeys() != null ? msg.getKeys() : "");
-                    item.put("timestamp", msg.getStoreTimestamp());
-                    item.put("queueId", msg.getQueueId());
-                    item.put("queueOffset", msg.getQueueOffset());
-                    item.put("properties", msg.getProperties());
-                    result.add(item);
+
+            // 获取 Topic 的路由信息（包含队列信息）
+            TopicRouteData topicRoute = defaultMQAdminExt.examineTopicRouteInfo(topic);
+            if (topicRoute == null || topicRoute.getQueueDatas() == null) {
+                return result;
+            }
+
+            // 获取 broker 地址
+            String brokerAddr = getFirstBrokerAddr(topic);
+            if (brokerAddr == null) {
+                return result;
+            }
+
+            int queueCount = topicRoute.getQueueDatas().size();
+            int messagesPerQueue = Math.max(1, maxMsg / queueCount);
+
+            for (int queueId = 0; queueId < queueCount && result.size() < maxMsg; queueId++) {
+                try {
+                    MessageQueue mq = new MessageQueue(topic, brokerAddr.split(":")[0], queueId);
+
+                    // 获取队列的最小和最大 offset
+                    long minOffset = defaultMQAdminExt.minOffset(mq);
+                    long maxOffset = defaultMQAdminExt.maxOffset(mq);
+
+                    if (maxOffset <= minOffset) {
+                        continue;
+                    }
+
+                    // 从最新的位置往前查找（每批获取 messagesPerQueue 条）
+                    long startOffset = Math.max(minOffset, maxOffset - messagesPerQueue);
+
+                    // 遍历该队列的消息
+                    for (long offset = startOffset; offset < maxOffset && result.size() < maxMsg; offset += 1) {
+                        try {
+                            // viewMessage(topic, offset) - offset 需要是 String 类型
+                            MessageExt msg = defaultMQAdminExt.viewMessage(topic, String.valueOf(offset));
+                            if (msg != null) {
+                                long storeTime = msg.getStoreTimestamp();
+                                // 按时间范围过滤
+                                if (storeTime >= startTime && storeTime <= endTime) {
+                                    Map<String, Object> item = new HashMap<>();
+                                    item.put("msgId", msg.getMsgId());
+                                    item.put("topic", msg.getTopic());
+                                    item.put("tags", msg.getTags() != null ? msg.getTags() : "");
+                                    item.put("keys", msg.getKeys() != null ? msg.getKeys() : "");
+                                    item.put("timestamp", storeTime);
+                                    item.put("queueId", msg.getQueueId());
+                                    item.put("queueOffset", msg.getQueueOffset());
+                                    item.put("properties", msg.getProperties());
+                                    result.add(item);
+                                }
+                            }
+                        } catch (Exception e) {
+                            // 跳过无法获取的消息
+                            log.debug("获取消息失败: offset={}, error={}", offset, e.getMessage());
+                        }
+                    }
+                } catch (Exception e) {
+                    log.debug("遍历队列失败: queueId={}, error={}", queueId, e.getMessage());
                 }
             }
+
+            // 按时间倒序排序
+            result.sort((a, b) -> {
+                Long tsA = (Long) a.get("timestamp");
+                Long tsB = (Long) b.get("timestamp");
+                return tsB.compareTo(tsA);
+            });
+
             return result;
         } catch (BusinessException e) {
             throw e;
