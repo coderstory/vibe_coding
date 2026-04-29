@@ -22,7 +22,7 @@ See: .planning/MILESTONES.md
 |-------|-----------|--------|
 | Phase 9 | 09-topic-mgmt | Completed |
 | Phase 10 | 10-consumer-group-mgmt | Completed |
-| Phase 11 | TBD | Pending |
+| Phase 11 | 11-msg-mgmt | Planned |
 | Phase 12 | TBD | Pending |
 
 ## Roadmap Summary
