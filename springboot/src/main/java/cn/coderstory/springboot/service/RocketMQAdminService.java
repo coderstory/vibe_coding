@@ -58,7 +58,6 @@ public interface RocketMQAdminService {
      * @param topic Topic 名称
      * @param groupName Group 名称
      * @param timestamp 重置时间戳（毫秒）
-     * @throws BusinessException 如果是广播模式或消费者不在线
      */
     void resetConsumerOffset(String topic, String groupName, long timestamp);
 
