@@ -23,7 +23,6 @@ type: user
 - **Spring Boot 4.1 特有**: `spring-boot-starter-aop` 在 SB4.1 BOM 中可能不存在，需用 `org.springframework:spring-aop:7.0.7` 直接引用
 - **AspectJ 依赖**: 仅 `spring-aop` 不够，还需要 `aspectjweaver` 来提供 `org.aspectj.lang` 包
 
-## 反馈风格
+## Git 规范
 
-- 简洁直接，不要总结
-- 发现问题立即告知，不要等到最后
+- **提交信息**: 必须使用中文撰写 commit message
