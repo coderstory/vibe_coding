@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pwsh *)",
+      "Bash(git -C springboot branch -a)",
+      "Bash(git *)",
+      "Skill(update-config)",
+      "Skill(gsd:plan-phase)",
+      "Skill(gsd:execute-phase)",
+      "Bash(./gradlew.bat --version)",
+      "Bash(./gradlew.bat tasks *)",
+      "Bash(mkdir -p gradle)",
+      "Bash(mv springboot/gradle/libs.versions.toml gradle/libs.versions.toml)",
+      "Bash(rmdir springboot/gradle)",
+      "Bash(./gradlew.bat :springboot:tasks --no-daemon)",
+      "Bash(./gradlew.bat build *)"
+    ]
+  }
+}

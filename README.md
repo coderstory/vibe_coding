@@ -170,15 +170,15 @@ vibe_coding/
 
 本项目使用基于 GSD（Get Shit Done）的开发流程：
 
-1. **提出问题**：初步分析 `/gsd-new-project`
-2. **技术分析**：发现标准技术栈、架构模式、常见陷阱。`/gsd-research-phase N`
-3. **拆解问题**：讨论技术方案，产出需求 `/gsd-discuss-phase N`
-4. **拆解问题**：讨论UI方案，产出需求 `/gsd-ui-phase N`
-5. **详细设计**：针对单个需求进行设计 `/gsd-plan-phase N`
-6. **执行编码**：实现功能 `/gsd-execute-phase N`
-7. **功能测试**：验证功能正确性 `/gsd-verify-work N`
-8. **完成里程碑**：结束本轮开发 `/gsd-complete-milestone`
-9. **开始新里程**：启动新一轮开发 `/gsd-new-milestone`
+1. **提出问题**：初步分析 `/gsd:new-project`
+2. **技术分析**：发现标准技术栈、架构模式、常见陷阱。`/gsd:research-phase N`
+3. **拆解问题**：讨论技术方案，产出需求 `/gsd:discuss-phase N`
+4. **拆解问题**：讨论UI方案，产出需求 `/gsd:ui-phase N`
+5. **详细设计**：针对单个需求进行设计 `/gsd:plan-phase N`
+6. **执行编码**：实现功能 `/gsd:execute-phase N`
+7. **功能测试**：验证功能正确性 `/gsd:verify-work N`
+8. **完成里程碑**：结束本轮开发 `/gsd:complete-milestone`
+9. **开始新里程**：启动新一轮开发 `/gsd:new-milestone`
 
 ## 🛠 技术栈
 
@@ -210,7 +210,7 @@ vibe_coding/
 
 ## 📦 技能依赖
 
-1. **GSD**：安装到 `.opencode` 目录 `npx gsd-opencode@latest`
+1. **GSD**：安装到 `.opencode` 目录 `npx gsd:opencode@latest`
 2. **Superpower**：汉化版本 `npx superpowers-zh`
 3. **浏览器访问**：动态渲染页面使用 `.opencode/skills/browser-msedge/fetch-page.js`
 
@@ -234,7 +234,7 @@ vibe_coding/
 - [Spring Boot](https://spring.io/projects/spring-boot)
 - [Element Plus](https://element-plus.org/)
 - [MyBatis Plus](https://baomidou.com/)
-- [GSD](https://github.com/gsd-2/get-shit-done)
+- [GSD](https://github.com/gsd:2/get-shit-done)
 - [Superpower](https://github.com/obra/superpowers)
 
 ---
