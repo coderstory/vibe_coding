@@ -14,6 +14,7 @@ import org.apache.rocketmq.common.message.MessageQueue;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.remoting.protocol.admin.ConsumeStats;
 import org.apache.rocketmq.remoting.protocol.body.ClusterInfo;
+import org.apache.rocketmq.remoting.protocol.body.KVTable;
 import org.apache.rocketmq.remoting.protocol.body.SubscriptionGroupWrapper;
 import org.apache.rocketmq.remoting.protocol.body.TopicList;
 import org.apache.rocketmq.remoting.protocol.route.BrokerData;
@@ -1000,7 +1001,7 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
             String brokerAddr = brokerData.selectBrokerAddr();
 
             // 获取运行时统计信息
-            org.apache.rocketmq.remoting.protocol.admin.KVTable kvTable = defaultMQAdminExt.fetchBrokerRuntimeStats(brokerAddr);
+            KVTable kvTable = defaultMQAdminExt.fetchBrokerRuntimeStats(brokerAddr);
             Map<String, String> statsTable = kvTable.getTable();
 
             metrics.put("brokerName", brokerName);
