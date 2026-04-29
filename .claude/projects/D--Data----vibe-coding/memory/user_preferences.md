@@ -9,6 +9,7 @@ type: user
 - **Gradle vs Maven**: 优先使用 Gradle，但项目迁移过程中遇到问题时会回滚到 Maven
 - **Spring Boot 版本**: Spring Boot 4.1.0-RC1 测试中遇到依赖解析问题时会考虑回滚到 4.0.5
 
+
 ## 工作方式
 
 - **执行策略**: 长时间任务使用 subagent 并行执行，不阻塞主会话
