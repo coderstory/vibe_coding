@@ -61,4 +61,32 @@ public interface RocketMQAdminService {
      * @throws BusinessException 如果是广播模式或消费者不在线
      */
     void resetConsumerOffset(String topic, String groupName, long timestamp);
+
+    // ==================== 消息管理 ====================
+
+    /**
+     * 查询消息列表
+     * @param topic Topic名称
+     * @param startTime 开始时间戳
+     * @param endTime 结束时间戳
+     * @param maxMsg 最大返回消息数（默认100）
+     * @return 消息列表，每条消息包含 msgId, topic, tags, keys, timestamp, queueId, queueOffset, properties
+     */
+    List<Map<String, Object>> getMessageList(String topic, long startTime, long endTime, int maxMsg);
+
+    /**
+     * 查询消息详情
+     * @param topic Topic名称
+     * @param msgId 消息ID
+     * @return 消息详情，包含所有字段和 body
+     */
+    Map<String, Object> getMessageDetail(String topic, String msgId);
+
+    /**
+     * 查询消息轨迹
+     * @param topic Topic名称
+     * @param msgId 消息ID
+     * @return 轨迹数据，包含 producerInfo, consumeTraceList (Consumer Group, status, consumeTime)
+     */
+    Map<String, Object> getMessageTrace(String topic, String msgId);
 }

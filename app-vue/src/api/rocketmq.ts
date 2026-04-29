@@ -126,3 +126,75 @@ export function getConsumerGroupDetail(group: string) {
 export function resetConsumerOffset(group: string, params: ResetOffsetParams) {
   return request.post<ApiResponse<void>>(`/rocketmq/consumer-groups/${encodeURIComponent(group)}/reset-offset`, params)
 }
+
+// ==================== Message 管理 ====================
+
+/**
+ * Message 视图对象
+ */
+export interface MessageVO {
+  msgId: string
+  topic: string
+  tags: string
+  keys: string
+  timestamp: number
+  queueId: number
+  queueOffset: number
+  properties: Record<string, string>
+}
+
+/**
+ * Message 详情视图对象
+ */
+export interface MessageDetailVO extends MessageVO {
+  body: string
+}
+
+/**
+ * Message Trace 视图对象
+ */
+export interface MessageTraceVO {
+  traceType: string
+  traceTime: number
+  regionId: string
+  groupName: string
+  costTime: number
+  traceStatus: 'SUCCESS' | 'FAILED' | 'PARTIAL_SUCCESS'
+  customId: string
+  clientHost: string
+  serverHost: string
+  storeHost: string
+  requestCode: string
+}
+
+/**
+ * 获取 Message 列表
+ * @param topic Topic 名称
+ * @param keyword 关键字筛选（可选）
+ * @param startTime 开始时间戳
+ * @param endTime 结束时间戳
+ * @param maxMsg 最大消息数
+ */
+export function getMessageList(topic: string, startTime?: number, endTime?: number, maxMsg?: number, keyword?: string) {
+  return request.get<ApiResponse<{ records: MessageVO[]; total: number }>>(`/rocketmq/messages/${encodeURIComponent(topic)}`, {
+    params: { startTime, endTime, maxMsg, keyword }
+  })
+}
+
+/**
+ * 获取 Message 详情
+ * @param topic Topic 名称
+ * @param msgId Message ID
+ */
+export function getMessageDetail(topic: string, msgId: string) {
+  return request.get<ApiResponse<MessageDetailVO>>(`/rocketmq/messages/${encodeURIComponent(topic)}/${encodeURIComponent(msgId)}`)
+}
+
+/**
+ * 获取 Message 轨迹
+ * @param topic Topic 名称
+ * @param msgId Message ID
+ */
+export function getMessageTrace(topic: string, msgId: string) {
+  return request.get<ApiResponse<MessageTraceVO[]>>(`/rocketmq/messages/${encodeURIComponent(topic)}/${encodeURIComponent(msgId)}/trace`)
+}

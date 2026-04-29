@@ -129,4 +129,44 @@ public class RocketMQController {
 
         return ResponseEntity.ok(ApiResponse.success("位点重置成功", null));
     }
+
+    // ==================== 消息管理 ====================
+
+    /**
+     * 查询消息列表
+     * GET /api/rocketmq/messages?topic=xxx&startTime=xxx&endTime=xxx&maxMsg=100
+     */
+    @GetMapping("/messages")
+    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getMessageList(
+            @RequestParam String topic,
+            @RequestParam long startTime,
+            @RequestParam long endTime,
+            @RequestParam(defaultValue = "100") int maxMsg) {
+        List<Map<String, Object>> result = rocketMQAdminService.getMessageList(topic, startTime, endTime, maxMsg);
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
+    /**
+     * 查询消息详情
+     * GET /api/rocketmq/messages/{topic}/{msgId}
+     */
+    @GetMapping("/messages/{topic}/{msgId}")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getMessageDetail(
+            @PathVariable String topic,
+            @PathVariable String msgId) {
+        Map<String, Object> result = rocketMQAdminService.getMessageDetail(topic, msgId);
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
+    /**
+     * 查询消息轨迹
+     * GET /api/rocketmq/messages/{topic}/{msgId}/trace
+     */
+    @GetMapping("/messages/{topic}/{msgId}/trace")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getMessageTrace(
+            @PathVariable String topic,
+            @PathVariable String msgId) {
+        Map<String, Object> result = rocketMQAdminService.getMessageTrace(topic, msgId);
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
 }

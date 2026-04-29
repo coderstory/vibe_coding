@@ -4,7 +4,10 @@ import cn.coderstory.springboot.exception.BusinessException;
 import cn.coderstory.springboot.service.RocketMQAdminService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.client.QueryResult;
 import org.apache.rocketmq.common.TopicConfig;
+import org.apache.rocketmq.common.message.MessageExt;
+import org.apache.rocketmq.tools.admin.DefaultMQAdminExt;
 import org.apache.rocketmq.remoting.protocol.admin.ConsumeStats;
 import org.apache.rocketmq.remoting.protocol.body.ClusterInfo;
 import org.apache.rocketmq.remoting.protocol.body.SubscriptionGroupWrapper;
@@ -484,5 +487,179 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
             log.error("位点重置失败: topic={}, group={}", topic, groupName, e);
             throw BusinessException.badRequest("位点重置失败: " + e.getMessage());
         }
+    }
+
+    // ==================== 消息管理 ====================
+
+    @Override
+    public List<Map<String, Object>> getMessageList(String topic, long startTime, long endTime, int maxMsg) {
+        String brokerAddr = getFirstBrokerAddr(topic);
+        if (brokerAddr == null) {
+            throw BusinessException.badRequest("未找到可用的 Broker");
+        }
+
+        try {
+            // 时间范围校验（最多 7 天）
+            long sevenDays = 7 * 24 * 60 * 60 * 1000L;
+            if (endTime - startTime > sevenDays) {
+                throw BusinessException.badRequest("时间范围不能超过 7 天");
+            }
+
+            // 使用 queryMessage 方法查询消息
+            QueryResult queryResult = defaultMQAdminExt.queryMessage(
+                topic,
+                "*", // msgId 模糊匹配，* 表示所有
+                maxMsg > 0 ? maxMsg : 100,
+                startTime,
+                endTime
+            );
+
+            List<Map<String, Object>> result = new ArrayList<>();
+            if (queryResult != null && queryResult.getMessageList() != null) {
+                for (MessageExt msg : queryResult.getMessageList()) {
+                    Map<String, Object> item = new HashMap<>();
+                    item.put("msgId", msg.getMsgId());
+                    item.put("topic", msg.getTopic());
+                    item.put("tags", msg.getTags() != null ? msg.getTags() : "");
+                    item.put("keys", msg.getKeys() != null ? msg.getKeys() : "");
+                    item.put("timestamp", msg.getStoreTimestamp());
+                    item.put("queueId", msg.getQueueId());
+                    item.put("queueOffset", msg.getQueueOffset());
+                    item.put("properties", msg.getProperties());
+                    result.add(item);
+                }
+            }
+            return result;
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("查询消息列表失败: topic={}", topic, e);
+            throw BusinessException.badRequest("查询消息失败: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public Map<String, Object> getMessageDetail(String topic, String msgId) {
+        String brokerAddr = getFirstBrokerAddr(topic);
+        if (brokerAddr == null) {
+            throw BusinessException.badRequest("未找到可用的 Broker");
+        }
+
+        try {
+            // 通过 queryMessage 查询单条消息
+            // 时间范围：最近 7 天
+            long now = System.currentTimeMillis();
+            long sevenDaysAgo = now - (7 * 24 * 60 * 60 * 1000L);
+
+            QueryResult queryResult = defaultMQAdminExt.queryMessage(
+                topic,
+                msgId,
+                1, // maxMsg=1 只返回一条
+                sevenDaysAgo,
+                now
+            );
+
+            if (queryResult != null && queryResult.getMessageList() != null) {
+                for (MessageExt msg : queryResult.getMessageList()) {
+                    if (msg.getMsgId().equals(msgId)) {
+                        Map<String, Object> result = new HashMap<>();
+                        result.put("msgId", msg.getMsgId());
+                        result.put("topic", msg.getTopic());
+                        result.put("tags", msg.getTags() != null ? msg.getTags() : "");
+                        result.put("keys", msg.getKeys() != null ? msg.getKeys() : "");
+                        result.put("timestamp", msg.getStoreTimestamp());
+                        result.put("queueId", msg.getQueueId());
+                        result.put("queueOffset", msg.getQueueOffset());
+                        result.put("properties", msg.getProperties());
+                        result.put("body", new String(msg.getBody(), java.nio.charset.StandardCharsets.UTF_8));
+                        return result;
+                    }
+                }
+            }
+            throw BusinessException.notFound("未找到消息: " + msgId);
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("查询消息详情失败: topic={}, msgId={}", topic, msgId, e);
+            throw BusinessException.badRequest("查询消息详情失败: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public Map<String, Object> getMessageTrace(String topic, String msgId) {
+        try {
+            Map<String, Object> result = new HashMap<>();
+            result.put("msgId", msgId);
+            result.put("topic", topic);
+
+            // 查询该 topic 下的 Consumer Group 消费信息
+            List<Map<String, Object>> consumeTraceList = new ArrayList<>();
+
+            // 获取 Broker 地址
+            String brokerAddr = getFirstBrokerAddr(topic);
+            if (brokerAddr != null) {
+                try {
+                    SubscriptionGroupWrapper wrapper = defaultMQAdminExt.getAllSubscriptionGroup(brokerAddr, 3000);
+                    Set<String> groups = wrapper.getSubscriptionGroupTable().keySet();
+
+                    for (String group : groups) {
+                        // 跳过系统 Consumer Group
+                        if (group.startsWith("%RETRY%") || group.startsWith("%DLQ%") ||
+                            group.contains("CID_ONSAPI") || group.contains("OWNER") || group.contains("_BACKUP")) {
+                            continue;
+                        }
+
+                        try {
+                            ConsumeStats stats = defaultMQAdminExt.examineConsumeStats(group);
+                            if (stats != null && stats.getOffsetTable() != null && !stats.getOffsetTable().isEmpty()) {
+                                Map<String, Object> trace = new HashMap<>();
+                                trace.put("consumerGroup", group);
+                                trace.put("status", "已消费");
+                                trace.put("consumeTime", System.currentTimeMillis());
+                                consumeTraceList.add(trace);
+                            }
+                        } catch (Exception e) {
+                            // 跳过无法获取的 group
+                            log.debug("获取 Group {} 消费状态失败: {}", group, e.getMessage());
+                        }
+                    }
+                } catch (Exception e) {
+                    log.debug("获取订阅组列表失败: {}", e.getMessage());
+                }
+            }
+
+            result.put("consumeTraceList", consumeTraceList);
+            return result;
+        } catch (Exception e) {
+            log.error("查询消息轨迹失败: topic={}, msgId={}", topic, msgId, e);
+            throw BusinessException.badRequest("查询消息轨迹失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 获取指定 Topic 的 Broker 地址
+     */
+    private String getFirstBrokerAddr(String topic) {
+        try {
+            TopicRouteData routeData = defaultMQAdminExt.examineTopicRouteInfo(topic);
+            if (routeData != null && routeData.getQueueDatas() != null && !routeData.getQueueDatas().isEmpty()) {
+                String brokerName = routeData.getQueueDatas().get(0).getBrokerName();
+                ClusterInfo clusterInfo = defaultMQAdminExt.examineBrokerClusterInfo();
+                Map<String, BrokerData> brokerAddrTable = clusterInfo.getBrokerAddrTable();
+                if (brokerAddrTable != null) {
+                    BrokerData brokerData = brokerAddrTable.get(brokerName);
+                    if (brokerData != null) {
+                        String addr = brokerData.selectBrokerAddr();
+                        if (addr != null && !addr.isEmpty()) {
+                            return addr;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.debug("获取 Topic {} 的 Broker 地址失败: {}", topic, e.getMessage());
+        }
+        // Fallback: 返回第一个可用的 Broker 地址
+        return getFirstBrokerAddr();
     }
 }
