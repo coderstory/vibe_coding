@@ -5,29 +5,41 @@ import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { LineChart } from 'echarts/charts'
 import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components'
-import { getBrokerMetrics, type BrokerMetricsVO } from '@/api/rocketmq'
+import { getBrokerMetrics, getBrokerStatusList, type BrokerStatusVO } from '@/api/rocketmq'
 
 use([CanvasRenderer, LineChart, GridComponent, TooltipComponent, LegendComponent])
 
 const loading = ref(false)
 const chartOption = ref({})
+const hasData = ref(false)
 let timer: ReturnType<typeof setInterval> | null = null
-
-const brokerNames = ref<string[]>([])
 
 async function loadMetrics() {
   try {
-    const res = await getBrokerMetrics(brokerNames.value[0] || '')
+    // 先获取 Broker 列表
+    const brokerRes = await getBrokerStatusList()
+    if (brokerRes.code !== 200 || !brokerRes.data.records?.length) {
+      hasData.value = false
+      return
+    }
+    const firstBroker: BrokerStatusVO = brokerRes.data.records[0]
+    const res = await getBrokerMetrics(firstBroker.brokerName)
     if (res.code === 200 && res.data) {
-      updateChart(res.data)
+      // 检查是否有真实 TPS 数据
+      if (res.data.sendTps && res.data.consumeTps) {
+        hasData.value = true
+        updateChart(res.data)
+      } else {
+        hasData.value = false
+      }
     }
   } catch (e) {
     console.error('加载 Broker 指标失败', e)
+    hasData.value = false
   }
 }
 
-function updateChart(data: BrokerMetricsVO) {
-  const now = new Date().getTime()
+function updateChart(data: any) {
   chartOption.value = {
     tooltip: {
       trigger: 'axis',
@@ -86,6 +98,13 @@ onUnmounted(() => {
 
 <template>
   <div v-loading="loading" style="height: 300px">
-    <v-chart :option="chartOption" autoresize style="height: 100%" />
+    <template v-if="!hasData">
+      <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #909399;">
+        <span>暂无 TPS 数据（RocketMQ 5.x 运行时指标需通过其他方式获取）</span>
+      </div>
+    </template>
+    <template v-else>
+      <v-chart :option="chartOption" autoresize style="height: 100%" />
+    </template>
   </div>
 </template>
