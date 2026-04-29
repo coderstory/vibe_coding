@@ -15,11 +15,21 @@ const total = ref(0)
 // 选中的 Topic
 const selectedTopic = ref('')
 
-// 搜索表单
+// 搜索表单 - 默认查询当天
+const getDefaultStartTime = () => {
+  const now = new Date()
+  now.setHours(0, 0, 0, 0)
+  return now
+}
+const getDefaultEndTime = () => {
+  const now = new Date()
+  now.setHours(23, 59, 59, 999)
+  return now
+}
 const searchForm = reactive({
   keyword: '',
-  startTime: '',
-  endTime: '',
+  startTime: getDefaultStartTime(),
+  endTime: getDefaultEndTime(),
   maxMsg: 100
 })
 
