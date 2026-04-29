@@ -127,6 +127,14 @@ export function resetConsumerOffset(group: string, params: ResetOffsetParams) {
   return request.post<ApiResponse<void>>(`/rocketmq/consumer-groups/${encodeURIComponent(group)}/reset-offset`, params)
 }
 
+/**
+ * 删除 Consumer Group
+ * @param group Group 名称
+ */
+export function deleteConsumerGroup(group: string) {
+  return request.delete<ApiResponse<void>>(`/rocketmq/consumer-groups/${encodeURIComponent(group)}`)
+}
+
 // ==================== Message 管理 ====================
 
 /**

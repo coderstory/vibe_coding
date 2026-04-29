@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
-import { getConsumerGroupList, type ConsumerGroupVO } from '@/api/rocketmq'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { getConsumerGroupList, deleteConsumerGroup, type ConsumerGroupVO } from '@/api/rocketmq'
 import ConsumerGroupDetail from './ConsumerGroupDetail.vue'
 
 // 状态
@@ -117,6 +117,26 @@ function handleView(row: ConsumerGroupVO) {
   detailDialogVisible.value = true
 }
 
+// 删除
+async function handleDelete(row: ConsumerGroupVO) {
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除 Consumer Group "${row.group}" 吗？`,
+      '删除确认',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+    await deleteConsumerGroup(row.group)
+    ElMessage.success('删除成功')
+    loadData()
+  } catch {
+    // 取消或错误已在 request.ts 拦截
+  }
+}
+
 onMounted(() => {
   loadData()
 })
@@ -181,10 +201,13 @@ onMounted(() => {
           {{ formatDiff(row.accumulatedDiff) }}
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="120" fixed="right">
+      <el-table-column label="操作" width="160" fixed="right">
         <template #default="{ row }">
           <el-button link type="primary" size="small" @click="handleView(row)">
             查看
+          </el-button>
+          <el-button link type="danger" size="small" @click="handleDelete(row)">
+            删除
           </el-button>
         </template>
       </el-table-column>
