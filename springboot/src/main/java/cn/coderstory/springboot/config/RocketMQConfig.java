@@ -1,6 +1,7 @@
 package cn.coderstory.springboot.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.tools.admin.DefaultMQAdminExt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -33,5 +34,24 @@ public class RocketMQConfig {
             log.error("RocketMQ Admin 启动失败", e);
         }
         return admin;
+    }
+
+    /**
+     * 创建消息发送专用生产者
+     * 使用独立的生产者组，避免与秒杀系统生产者冲突
+     */
+    @Bean
+    public DefaultMQProducer messageProducer() {
+        DefaultMQProducer producer = new DefaultMQProducer("MSG_SENDER_PRODUCER_GROUP");
+        producer.setNamesrvAddr(nameServer);
+        producer.setInstanceName("RocketMQMsgProducer-" + System.currentTimeMillis());
+        producer.setMaxMessageSize(1024 * 1024 * 4); // 4MB
+        try {
+            producer.start();
+            log.info("消息发送生产者启动成功, nameserver: {}", nameServer);
+        } catch (Exception e) {
+            log.error("消息发送生产者启动失败", e);
+        }
+        return producer;
     }
 }

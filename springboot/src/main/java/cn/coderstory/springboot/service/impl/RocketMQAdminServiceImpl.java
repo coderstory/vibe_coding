@@ -11,7 +11,7 @@ import org.apache.rocketmq.remoting.protocol.admin.ConsumeStats;
 import org.apache.rocketmq.tools.admin.DefaultMQAdminExt;
 import org.apache.rocketmq.common.message.MessageQueue;
 import org.apache.rocketmq.remoting.protocol.admin.ConsumeStats;
-import org.apache.rocketmq.spring.core.RocketMQTemplate;
+import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.remoting.protocol.body.ClusterInfo;
 import org.apache.rocketmq.remoting.protocol.body.SubscriptionGroupWrapper;
 import org.apache.rocketmq.remoting.protocol.body.TopicList;
@@ -36,7 +36,7 @@ import java.util.*;
 public class RocketMQAdminServiceImpl implements RocketMQAdminService {
 
     private final DefaultMQAdminExt defaultMQAdminExt;
-    private final RocketMQTemplate rocketMQTemplate;
+    private final DefaultMQProducer messageProducer;
 
     @Value("${rocketmq.name-server:localhost:9876}")
     private String nameServer;
@@ -721,7 +721,7 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
                 body.getBytes(java.nio.charset.StandardCharsets.UTF_8)
             );
 
-            org.apache.rocketmq.client.producer.SendResult sendResult = rocketMQTemplate.getProducer().send(message);
+            org.apache.rocketmq.client.producer.SendResult sendResult = messageProducer.send(message);
 
             Map<String, Object> result = new HashMap<>();
             result.put("msgId", sendResult.getMsgId());
