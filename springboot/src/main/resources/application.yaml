@@ -43,15 +43,15 @@ spring:
   # 数据源配置（MySQL）
   # ===========================================
   datasource:
-    url: jdbc:mysql://localhost:3306/admin_system?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:mysql://${DB_HOST:-localhost}:3306/admin_system?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
     # 连接参数说明：
     # - useUnicode=true: 使用 Unicode 字符集
     # - characterEncoding=utf-8: 字符编码为 UTF-8
     # - serverTimezone=Asia/Shanghai: 服务器时区设为上海
     # - allowPublicKeyRetrieval=true: 允许获取公钥（MySQL 8.x 兼容）
     # - useSSL=false: 禁用 SSL 连接
-    username: root                   # 数据库用户名
-    password: 123456                # 数据库密码
+    username: ${DB_USER:-root}      # 数据库用户名 (可通过 DB_USER 环境变量覆盖)
+    password: ${DB_PASSWORD:-}      # 数据库密码 (可通过 DB_PASSWORD 环境变量覆盖)
     driver-class-name: com.mysql.cj.jdbc.Driver  # MySQL 驱动类
     hikari:
       minimum-idle: 5              # 最小空闲连接数
