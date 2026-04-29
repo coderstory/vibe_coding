@@ -5,19 +5,21 @@ import cn.coderstory.springboot.service.RocketMQAdminService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.QueryResult;
+import org.apache.rocketmq.client.consumer.DefaultMQPullConsumer;
+import org.apache.rocketmq.client.consumer.PullResult;
+import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.TopicConfig;
 import org.apache.rocketmq.common.message.MessageExt;
-import org.apache.rocketmq.remoting.protocol.admin.ConsumeStats;
-import org.apache.rocketmq.tools.admin.DefaultMQAdminExt;
 import org.apache.rocketmq.common.message.MessageQueue;
-import org.apache.rocketmq.remoting.protocol.admin.ConsumeStats;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
+import org.apache.rocketmq.remoting.protocol.admin.ConsumeStats;
 import org.apache.rocketmq.remoting.protocol.body.ClusterInfo;
 import org.apache.rocketmq.remoting.protocol.body.SubscriptionGroupWrapper;
 import org.apache.rocketmq.remoting.protocol.body.TopicList;
 import org.apache.rocketmq.remoting.protocol.route.BrokerData;
 import org.apache.rocketmq.remoting.protocol.route.TopicRouteData;
 import org.apache.rocketmq.remoting.protocol.subscription.SubscriptionGroupConfig;
+import org.apache.rocketmq.remoting.protocol.admin.ConsumeStats;
 import org.apache.rocketmq.tools.admin.DefaultMQAdminExt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -35,11 +37,47 @@ import java.util.*;
 @RequiredArgsConstructor
 public class RocketMQAdminServiceImpl implements RocketMQAdminService {
 
+    // 系统 Topic 前缀过滤列表
+    private static final List<String> SYSTEM_TOPIC_PREFIXES = List.of(
+        "SCHEDULE_TOPIC_",
+        "TBW_",
+        "RMQ_SYS_",
+        "%RETRY%",
+        "%DLQ%",
+        "%BINDER%"
+    );
+
+    // 系统 Consumer Group 前缀过滤列表
+    private static final List<String> SYSTEM_GROUP_PREFIXES = List.of(
+        "%RETRY%",
+        "%DLQ%",
+        "CID_RMQ_SYS_"
+    );
+
     private final DefaultMQAdminExt defaultMQAdminExt;
     private final DefaultMQProducer messageProducer;
 
     @Value("${rocketmq.name-server:localhost:9876}")
     private String nameServer;
+
+    /**
+     * 判断是否为系统 Topic
+     */
+    private boolean isSystemTopic(String topicName) {
+        return SYSTEM_TOPIC_PREFIXES.stream().anyMatch(topicName::startsWith) ||
+               topicName.contains("_BACKUP") ||
+               topicName.equals("DEFAULT_TOPIC");
+    }
+
+    /**
+     * 判断是否为系统 Consumer Group
+     */
+    private boolean isSystemGroup(String groupName) {
+        return SYSTEM_GROUP_PREFIXES.stream().anyMatch(groupName::startsWith) ||
+               groupName.contains("CID_ONSAPI") ||
+               groupName.contains("OWNER") ||
+               groupName.contains("_BACKUP");
+    }
 
     @Override
     public List<Map<String, Object>> getTopicList(String keyword) {
@@ -57,11 +95,7 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
 
             for (String topicName : topicSet) {
                 // 过滤系统 Topic
-                if (topicName.startsWith("SCHEDULE_TOPIC_") ||
-                    topicName.startsWith("TBW_") ||
-                    topicName.equals("RMQ_SYS_TRANS_HALF_TOPIC") ||
-                    topicName.equals("RMQ_SYS_TRACE_TOPIC") ||
-                    topicName.equals("RMQ_SYS_ACL_TOPIC")) {
+                if (isSystemTopic(topicName)) {
                     continue;
                 }
 
@@ -493,6 +527,23 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
         }
     }
 
+    @Override
+    public void deleteConsumerGroup(String groupName) {
+        try {
+            String brokerAddr = getFirstBrokerAddr();
+            if (brokerAddr == null) {
+                throw BusinessException.badRequest("未找到可用的 Broker");
+            }
+            defaultMQAdminExt.deleteSubscriptionGroup(brokerAddr, groupName);
+            log.info("删除 Consumer Group 成功: group={}", groupName);
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("删除 Consumer Group 失败: group={}", groupName, e);
+            throw BusinessException.badRequest("删除 Consumer Group 失败: " + e.getMessage());
+        }
+    }
+
     // ==================== 消息管理 ====================
 
     @Override
@@ -504,70 +555,30 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
                 throw BusinessException.badRequest("时间范围不能超过 7 天");
             }
 
-            // RocketMQ 5.x queryMessage 不支持通配符，改用遍历队列方式获取消息
             List<Map<String, Object>> result = new ArrayList<>();
 
-            // 获取 Topic 的路由信息（包含队列信息）
-            TopicRouteData topicRoute = defaultMQAdminExt.examineTopicRouteInfo(topic);
-            if (topicRoute == null || topicRoute.getQueueDatas() == null) {
-                return result;
-            }
-
-            // 获取 broker 地址
-            String brokerAddr = getFirstBrokerAddr(topic);
-            if (brokerAddr == null) {
-                return result;
-            }
-
-            int queueCount = topicRoute.getQueueDatas().size();
-            int messagesPerQueue = Math.max(1, maxMsg / queueCount);
-
-            for (int queueId = 0; queueId < queueCount && result.size() < maxMsg; queueId++) {
-                try {
-                    // 使用 brokerName 而非 IP 地址
-                    String brokerName = topicRoute.getQueueDatas().get(queueId).getBrokerName();
-                    MessageQueue mq = new MessageQueue(topic, brokerName, queueId);
-
-                    // 获取队列的最小和最大 offset
-                    long minOffset = defaultMQAdminExt.minOffset(mq);
-                    long maxOffset = defaultMQAdminExt.maxOffset(mq);
-
-                    if (maxOffset <= minOffset) {
-                        continue;
+            // 使用 queryMessage 按时间范围查询消息
+            // RocketMQ 5.x queryMessage 支持按时间范围过滤
+            try {
+                QueryResult queryResult = defaultMQAdminExt.queryMessage(topic, "*", maxMsg, startTime, endTime);
+                if (queryResult != null && queryResult.getMessageList() != null) {
+                    for (MessageExt msg : queryResult.getMessageList()) {
+                        Map<String, Object> item = new HashMap<>();
+                        item.put("msgId", msg.getMsgId());
+                        item.put("topic", msg.getTopic());
+                        item.put("tags", msg.getTags() != null ? msg.getTags() : "");
+                        item.put("keys", msg.getKeys() != null ? msg.getKeys() : "");
+                        item.put("timestamp", msg.getStoreTimestamp());
+                        item.put("queueId", msg.getQueueId());
+                        item.put("queueOffset", msg.getQueueOffset());
+                        item.put("properties", msg.getProperties());
+                        result.add(item);
                     }
-
-                    // 从最新的位置往前查找（每批获取 messagesPerQueue 条）
-                    long startOffset = Math.max(minOffset, maxOffset - messagesPerQueue);
-
-                    // 遍历该队列的消息
-                    for (long offset = startOffset; offset < maxOffset && result.size() < maxMsg; offset += 1) {
-                        try {
-                            // viewMessage(topic, offset) - offset 需要是 String 类型
-                            MessageExt msg = defaultMQAdminExt.viewMessage(topic, String.valueOf(offset));
-                            if (msg != null) {
-                                long storeTime = msg.getStoreTimestamp();
-                                // 按时间范围过滤
-                                if (storeTime >= startTime && storeTime <= endTime) {
-                                    Map<String, Object> item = new HashMap<>();
-                                    item.put("msgId", msg.getMsgId());
-                                    item.put("topic", msg.getTopic());
-                                    item.put("tags", msg.getTags() != null ? msg.getTags() : "");
-                                    item.put("keys", msg.getKeys() != null ? msg.getKeys() : "");
-                                    item.put("timestamp", storeTime);
-                                    item.put("queueId", msg.getQueueId());
-                                    item.put("queueOffset", msg.getQueueOffset());
-                                    item.put("properties", msg.getProperties());
-                                    result.add(item);
-                                }
-                            }
-                        } catch (Exception e) {
-                            // 跳过无法获取的消息
-                            log.debug("获取消息失败: offset={}, error={}", offset, e.getMessage());
-                        }
-                    }
-                } catch (Exception e) {
-                    log.debug("遍历队列失败: queueId={}, error={}", queueId, e.getMessage());
                 }
+            } catch (Exception e) {
+                log.warn("queryMessage 查询失败，尝试遍历队列方式: {}", e.getMessage());
+                // 如果 queryMessage 失败，回退到遍历队列方式
+                return getMessageListByQueue(topic, startTime, endTime, maxMsg);
             }
 
             // 按时间倒序排序
@@ -586,45 +597,126 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
         }
     }
 
-    @Override
-    public Map<String, Object> getMessageDetail(String topic, String msgId) {
-        String brokerAddr = getFirstBrokerAddr(topic);
-        if (brokerAddr == null) {
-            throw BusinessException.badRequest("未找到可用的 Broker");
-        }
-
+    /**
+     * 通过遍历队列方式获取消息（使用 PullConsumer 正确实现）
+     */
+    private List<Map<String, Object>> getMessageListByQueue(String topic, long startTime, long endTime, int maxMsg) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        DefaultMQPullConsumer consumer = null;
+        String consumerGroup = "pull_consumer_" + topic + "_" + System.currentTimeMillis();
         try {
-            // 通过 queryMessage 查询单条消息
-            // 时间范围：最近 7 天
-            long now = System.currentTimeMillis();
-            long sevenDaysAgo = now - (7 * 24 * 60 * 60 * 1000L);
+            consumer = new DefaultMQPullConsumer(consumerGroup);
+            consumer.setNamesrvAddr(nameServer);
+            consumer.setInstanceName("PullConsumer-" + topic + "-" + System.currentTimeMillis());
+            consumer.start();
 
-            QueryResult queryResult = defaultMQAdminExt.queryMessage(
-                topic,
-                msgId,
-                1, // maxMsg=1 只返回一条
-                sevenDaysAgo,
-                now
-            );
+            // 获取 Topic 下的所有队列
+            Set<MessageQueue> mqs = consumer.fetchSubscribeMessageQueues(topic);
+            log.info("查询 Topic {} 的队列，数量: {}", topic, mqs.size());
 
-            if (queryResult != null && queryResult.getMessageList() != null) {
-                for (MessageExt msg : queryResult.getMessageList()) {
-                    if (msg.getMsgId().equals(msgId)) {
-                        Map<String, Object> result = new HashMap<>();
-                        result.put("msgId", msg.getMsgId());
-                        result.put("topic", msg.getTopic());
-                        result.put("tags", msg.getTags() != null ? msg.getTags() : "");
-                        result.put("keys", msg.getKeys() != null ? msg.getKeys() : "");
-                        result.put("timestamp", msg.getStoreTimestamp());
-                        result.put("queueId", msg.getQueueId());
-                        result.put("queueOffset", msg.getQueueOffset());
-                        result.put("properties", msg.getProperties());
-                        result.put("body", new String(msg.getBody(), java.nio.charset.StandardCharsets.UTF_8));
-                        return result;
+            for (MessageQueue mq : mqs) {
+                if (result.size() >= maxMsg) break;
+
+                try {
+                    long minOffset = consumer.minOffset(mq);
+                    long maxOffset = consumer.maxOffset(mq);
+
+                    if (maxOffset <= minOffset) {
+                        continue;
                     }
+
+                    log.debug("队列 {}: minOffset={}, maxOffset={}", mq, minOffset, maxOffset);
+
+                    // 从最新位置往前查找
+                    long offset = Math.max(minOffset, maxOffset - 100);
+
+                    int pullCount = 0;
+                    while (offset < maxOffset && result.size() < maxMsg) {
+                        try {
+                            // 每次拉取 32 条
+                            PullResult pullResult = consumer.pullBlockIfNotFound(mq, null, offset, 32);
+
+                            if (pullResult.getMsgFoundList() == null || pullResult.getMsgFoundList().isEmpty()) {
+                                break;
+                            }
+
+                            for (MessageExt msg : pullResult.getMsgFoundList()) {
+                                if (result.size() >= maxMsg) break;
+
+                                long storeTime = msg.getStoreTimestamp();
+                                // 按时间范围过滤
+                                if (storeTime >= startTime && storeTime <= endTime) {
+                                    Map<String, Object> item = new HashMap<>();
+                                    item.put("msgId", msg.getMsgId());
+                                    item.put("topic", msg.getTopic());
+                                    item.put("tags", msg.getTags() != null ? msg.getTags() : "");
+                                    item.put("keys", msg.getKeys() != null ? msg.getKeys() : "");
+                                    item.put("timestamp", storeTime);
+                                    item.put("queueId", msg.getQueueId());
+                                    item.put("queueOffset", msg.getQueueOffset());
+                                    item.put("properties", msg.getProperties());
+                                    result.add(item);
+                                }
+                            }
+
+                            offset = pullResult.getNextBeginOffset();
+                            pullCount++;
+
+                            // 防止无限循环
+                            if (pullCount > 1000) {
+                                log.warn("队列 {} 拉取次数超过 1000，停止", mq);
+                                break;
+                            }
+                        } catch (Exception e) {
+                            log.debug("拉取队列 {} 消息失败: {}", mq, e.getMessage());
+                            break;
+                        }
+                    }
+                } catch (Exception e) {
+                    log.debug("遍历队列 {} 失败: {}", mq, e.getMessage());
                 }
             }
-            throw BusinessException.notFound("未找到消息: " + msgId);
+        } catch (Exception e) {
+            log.error("遍历队列方式查询消息失败: topic={}", topic, e);
+        } finally {
+            if (consumer != null) {
+                consumer.shutdown();
+                // 删除临时消费者组，避免在 broker 上残留
+                try {
+                    String brokerAddr = getFirstBrokerAddr(topic);
+                    if (brokerAddr != null) {
+                        defaultMQAdminExt.deleteSubscriptionGroup(brokerAddr, consumerGroup);
+                        log.info("已删除临时消费者组: {}", consumerGroup);
+                    }
+                } catch (Exception e) {
+                    log.debug("删除临时消费者组失败: {}", e.getMessage());
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getMessageDetail(String topic, String msgId) {
+        try {
+            // 使用 viewMessage 按 msgId 精确查询
+            MessageExt msg = defaultMQAdminExt.viewMessage(topic, msgId);
+
+            if (msg == null) {
+                throw BusinessException.notFound("未找到消息: " + msgId);
+            }
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("msgId", msg.getMsgId());
+            result.put("topic", msg.getTopic());
+            result.put("tags", msg.getTags() != null ? msg.getTags() : "");
+            result.put("keys", msg.getKeys() != null ? msg.getKeys() : "");
+            result.put("timestamp", msg.getStoreTimestamp());
+            result.put("queueId", msg.getQueueId());
+            result.put("queueOffset", msg.getQueueOffset());
+            result.put("properties", msg.getProperties());
+            result.put("body", new String(msg.getBody(), java.nio.charset.StandardCharsets.UTF_8));
+            return result;
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
@@ -652,8 +744,7 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
 
                     for (String group : groups) {
                         // 跳过系统 Consumer Group
-                        if (group.startsWith("%RETRY%") || group.startsWith("%DLQ%") ||
-                            group.contains("CID_ONSAPI") || group.contains("OWNER") || group.contains("_BACKUP")) {
+                        if (isSystemGroup(group)) {
                             continue;
                         }
 
@@ -714,12 +805,8 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
     @Override
     public Map<String, Object> sendMessage(String topic, String tags, String keys, String body) {
         try {
-            // 先尝试获取 Topic 路由信息，确保 Nameserver 有该 Topic 的路由
-            try {
-                defaultMQAdminExt.examineTopicRouteInfo(topic);
-            } catch (Exception e) {
-                log.debug("获取 Topic 路由信息失败，继续尝试发送: topic={}", topic);
-            }
+            // 使用 adminExt 获取 Topic 路由，确保 Nameserver 有该 Topic 的最新路由信息
+            defaultMQAdminExt.examineTopicRouteInfo(topic);
 
             org.apache.rocketmq.common.message.Message message = new org.apache.rocketmq.common.message.Message(
                 topic,
