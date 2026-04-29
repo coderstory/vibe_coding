@@ -6,7 +6,7 @@ type: user
 
 ## 构建偏好
 
-- **Gradle vs Maven**: 优先使用 Gradle，但项目迁移过程中遇到问题时会回滚到 Maven
+- **Gradle**: 优先使用 Gradle 构建项目
 - **Spring Boot 版本**: Spring Boot 4.1.0-RC1 测试中遇到依赖解析问题时会考虑回滚到 4.0.5
 
 
