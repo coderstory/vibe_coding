@@ -3,7 +3,7 @@
 # 用于秒杀订单的异步消息处理
 # ===========================================
 rocketmq:
-  name-server: localhost:9876          # RocketMQ NameServer 地址
+  name-server: 127.0.0.1:9876          # RocketMQ NameServer 地址
   producer:
     group: seckill_producer_group    # 生产者组名称
     send-message-timeout: 3000       # 发送消息超时时间（毫秒）
@@ -43,7 +43,7 @@ spring:
   # 数据源配置（MySQL）
   # ===========================================
   datasource:
-    url: jdbc:mysql://${DB_HOST:-localhost}:3306/admin_system?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:mysql://${DB_HOST:127.0.0.1}:3306/admin_system?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
     # 连接参数说明：
     # - useUnicode=true: 使用 Unicode 字符集
     # - characterEncoding=utf-8: 字符编码为 UTF-8
@@ -66,7 +66,7 @@ spring:
   # ===========================================
   data:
     redis:
-      host: localhost               # Redis 服务器地址
+      host: 127.0.0.1               # Redis 服务器地址
       port: 6379                   # Redis 端口
       password: ""                   # Redis 密码（为空表示无密码）
       database: 0                    # 使用的数据库编号
@@ -84,7 +84,7 @@ spring:
 # ===========================================
 redisson:
   single-server-config:
-    address: redis://localhost:6379  # Redis 服务器地址
+    address: redis://127.0.0.1:6379  # Redis 服务器地址
     connection-minimum-idle-size: 5  # 最小空闲连接数
     connection-pool-size: 20         # 连接池大小
     idle-connection-timeout: 10000    # 空闲连接超时（毫秒）
