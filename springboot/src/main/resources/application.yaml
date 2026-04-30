@@ -50,8 +50,8 @@ spring:
     # - serverTimezone=Asia/Shanghai: 服务器时区设为上海
     # - allowPublicKeyRetrieval=true: 允许获取公钥（MySQL 8.x 兼容）
     # - useSSL=false: 禁用 SSL 连接
-    username: ${DB_USER:-root}      # 数据库用户名 (可通过 DB_USER 环境变量覆盖)
-    password: ${DB_PASSWORD:-}      # 数据库密码 (可通过 DB_PASSWORD 环境变量覆盖)
+    username: ${DB_USER:root}      # 数据库用户名 (可通过 DB_USER 环境变量覆盖)
+    password: ${DB_PASSWORD:123456}      # 数据库密码 (可通过 DB_PASSWORD 环境变量覆盖)
     driver-class-name: com.mysql.cj.jdbc.Driver  # MySQL 驱动类
     hikari:
       minimum-idle: 5              # 最小空闲连接数
