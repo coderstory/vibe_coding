@@ -1,0 +1,9 @@
+# ===========================================
+# RocketMQ 消息队列配置
+# 用于秒杀订单的异步消息处理
+# ===========================================
+rocketmq:
+  name-server: 127.0.0.1:9876           # RocketMQ NameServer 地址
+  producer:
+    group: seckill_producer_group       # 生产者组名称
+    send-message-timeout: 3000          # 发送消息超时时间（毫秒）

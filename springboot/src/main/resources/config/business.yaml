@@ -1,0 +1,37 @@
+# ===========================================
+# MyBatis Plus 配置
+# ===========================================
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true              # 开启下划线转驼峰命名
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # SQL 日志输出到控制台
+  mapper-locations: classpath:mapper/*.xml          # Mapper XML 文件路径
+  global-config:
+    db-config:
+      logic-delete-field: deleted     # 逻辑删除字段名
+      logic-delete-value: 1           # 删除标记值
+      logic-not-delete-value: 0       # 未删除标记值
+
+# ===========================================
+# 秒杀业务配置
+# ===========================================
+seckill:
+  limiter:
+    qps: 1000                         # 全局 QPS 限制（每秒请求数）
+    concurrency: 500                   # 最大并发数
+    ip-rate: 100                      # 单个 IP 的 QPS 限制
+  lock:
+    wait-time: 30                     # 获取锁最大等待时间（秒）
+    lease-time: 60                    # 锁自动释放时间（秒）
+  order:
+    timeout: 900                      # 订单支付超时时间（秒），默认 15 分钟
+  sse:
+    timeout: 300000                   # SSE 连接超时时间（毫秒），约 5 分钟
+
+# ===========================================
+# 日志配置
+# ===========================================
+logging:
+  level:
+    cn.coderstory: DEBUG              # 应用日志级别
+    org.flywaydb: DEBUG               # Flyway 数据库迁移日志级别
