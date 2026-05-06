@@ -30,7 +30,8 @@
       "Bash(mv *)",
       "Bash(rmdir *)",
       "Bash(python3 *)",
-      "Read(//c/Users/coder/.claude/projects/D--Data----vibe-coding/memory/**)"
+      "Read(//c/Users/coder/.claude/projects/D--Data----vibe-coding/memory/**)",
+      "WebSearch"
     ],
     "deny": [
       "Bash(rm -rf:*)",
