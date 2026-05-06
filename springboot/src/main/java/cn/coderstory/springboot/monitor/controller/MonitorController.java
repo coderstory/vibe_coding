@@ -46,7 +46,6 @@ public class MonitorController {
     public ApiResponse<Map<String, Object>> getMetrics() {
         Map<String, Object> metrics = new HashMap<>();
 
-        String qpsKey = "seckill:qps:*";
         String concurrentCount = redisTemplate.opsForValue().get("seckill:processing:count");
 
         metrics.put("concurrentCount", concurrentCount != null ? concurrentCount : "0");
