@@ -1,13 +1,12 @@
-# CLAUDE.md - AI 编程指南
+# CLAUDE.md — AI 编程指南
 
-本项目使用 Claude Code 进行 AI 辅助开发，本文件为 AI 代理提供项目规范和沟通配置。
+本项目使用 Claude Code 进行 AI 辅助开发，本文件为 AI 代理提供项目规范、沟通配置和常见陷阱指南。
 
 ## AI 语言配置
 
 **默认语言：中文**
 - 所有回复、注释、错误信息、文档均使用中文
 - 仅当用户明确要求、代码本身是英文、或技术术语无公认中文翻译时才使用英文
-- 系统会自动检测并纠正英文输出为中文
 
 ### Superpowers-ZH 配置
 - **技能框架**：已安装 20 个中文增强技能
@@ -16,62 +15,76 @@
 
 ## 交互要求
 
-1. **全程使用中文沟通** - 所有输出必须使用中文，包括回复内容、代码注释、错误信息、文档描述
-2. **禁止输出英文** - 除非：用户明确要求、代码本身是英文、技术术语无公认中文翻译
-3. 回复简洁直接，不确定的主动询问
-4. 优先使用 Superpowers-ZH 技能框架进行中文优化
-
-## 构建与开发命令
-
-### 前端 (app-vue)
-
-```powershell
-cd app-vue
-npm install
-npm run dev        # 开发模式（端口 5173）
-npm run build      # 生产构建
-npm run test       # 单元测试（vitest）
-npm run lint       # ESLint 检查
-```
-
-### 后端 (springboot)
-
-**注意：项目已完成从 Maven 到 Gradle 的迁移**
-
-```powershell
-cd springboot
-./gradlew.bat bootRun          # 运行应用
-./gradlew.bat build            # 编译打包
-./gradlew.bat test             # 运行测试
-./gradlew.bat test --tests "*ClassName"  # 运行单个测试类
-./gradlew.bat build -x test    # 跳过测试打包
-```
+1. **全程使用中文沟通** — 包括回复、代码注释、错误信息、文档
+2. **禁止输出英文** — 除非用户明确要求、代码本身是英文、或无公认真译的技术术语
+3. **回复简洁直接** — 不要总结已做的事，发现问题立即报告
+4. **证据支撑断言** — 声称完成/修复前必须运行验证命令并提供输出
+5. **不确定时主动询问** — 不要自行假设
 
 ---
 
-## 项目架构
+## 技术栈（当前状态）
+
+| 模块 | 技术 | 版本 |
+|------|------|------|
+| 前端 | Vue 3 + Vite + TypeScript | 3.5+ / 8+ |
+| 后端 | Spring Boot + Java | 4.1.0-RC1 / 26 |
+| 构建工具 | Gradle (Kotlin DSL) | 9.5 |
+| ORM | MyBatis Plus | 3.5.x |
+| 数据库 | MySQL + Flyway | admin_system |
+| 缓存 | Redis + Redisson | 8.0+ |
+| 消息队列 | RocketMQ | 5.3.2 |
+| 认证 | JWT (jjwt) | 0.13.0 |
+| 代码质量 | ArchUnit + Checkstyle + PMD + SpotBugs + Error Prone + JaCoCo | — |
+| 前端 lint | ESLint 10.x flat config + Stylelint 17.x | — |
+
+**端口**：前端 5173，后端 8080
+
+---
+
+## 项目架构（v1.5 重构后）
 
 ### 模块结构
 
 ```
 vibe_coding/
-├── app-vue/           # Vue 3 前端（Vite + TypeScript）
+├── app-vue/                    # Vue 3 前端（Vite + TypeScript）
 │   └── src/
-│       ├── api/       # API 层（Axios 封装）
-│       ├── views/     # 页面（auth/, dashboard/, system/, seckill/）
-│       ├── router/    # 路由 + 导航守卫
-│       └── store/     # Pinia 状态管理
+│       ├── api/modules/        # API 层，按业务域拆分（auth/user/role/menu/seckill/rocketmq）
+│       ├── components/         # 组件（common/ + layout/ + business/）
+│       ├── router/modules/     # 路由按模块拆分 + guards.ts 导航守卫
+│       ├── store/              # Pinia 状态管理
+│       ├── views/              # 页面（auth/ dashboard/ system/ seckill/）
+│       └── composables/        # 组合式函数
 │
-├── springboot/        # Spring Boot 后端
+├── springboot/                 # Spring Boot 后端（Gradle + Kotlin DSL）
 │   └── src/main/java/cn/coderstory/springboot/
-│       ├── controller/   # REST 控制器
-│       ├── service/impl/ # 业务逻辑
-│       ├── mapper/       # MyBatis Plus Mapper
-│       ├── entity/       # 数据实体
-│       ├── config/       # 配置类（Cors、Security、Web）
-│       ├── security/     # JWT 认证过滤器
-│       ├── aspect/       # AOP 切面（审计日志）
-│       └── exception/    # 异常处理
+│       ├── shared/             # 通用层：config/security/aspect/exception/util/limiter
+│       ├── user/               # 用户管理域
+│       ├── role/               # 角色管理域
+│       ├── menu/               # 菜单管理域
+│       ├── auth/               # 认证域
+│       ├── audit/              # 审计日志域
+│       ├── knowledge/          # 知识库域
+│       ├── seckill/            # 秒杀系统域
+│       ├── rocketmq/           # RocketMQ 管理域
+│       ├── order/              # 订单域
+│       └── monitor/            # 监控域
+│
+└── docs/                       # 项目文档
+    ├── seckill/                # 秒杀系统文档
+    └── superpowers/specs/      # 设计规格文档
+```
+
+### 后端包规范（每个业务域内）
+
+```
+{domain}/
+├── controller/     # REST 控制器
+├── service/impl/   # 业务接口与实现
+├── mapper/         # MyBatis Plus Mapper
+├── entity/         # 数据实体
+└── dto/            # 数据传输对象
 ```
 
 ### 认证流程
@@ -96,19 +109,31 @@ vibe_coding/
 
 ---
 
-## 技术栈
+## 构建与开发命令
 
-| 模块 | 技术 | 版本 |
-|------|------|------|
-| 前端 | Vue 3 + Vite + TypeScript | 3.5+ / 8+ |
-| 后端 | Spring Boot + Java | 4.0.5 / 26 |
-| ORM | MyBatis Plus | 3.5.x |
-| 数据库 | MySQL + Flyway | admin_system |
-| 缓存 | Redis | 8.0+ |
-| 消息队列 | RocketMQ | 5.3.2 |
-| 认证 | JWT | 0.13.0 |
+### 前端 (app-vue)
 
-**端口**：前端 5173，后端 8080
+```powershell
+cd app-vue
+npm install
+npm run dev        # 开发模式（端口 5173）
+npm run build      # 生产构建
+npm run test       # 单元测试（vitest）
+npm run lint       # ESLint + Stylelint 检查
+```
+
+### 后端 (springboot)
+
+```powershell
+cd springboot
+./gradlew.bat bootRun               # 运行应用
+./gradlew.bat build                 # 编译打包
+./gradlew.bat test                  # 运行测试
+./gradlew.bat test --tests "*ClassName"  # 单个测试类
+./gradlew.bat build -x test         # 跳过测试打包
+./gradlew.bat check                 # 全量代码质量检查（Checkstyle/PMD/SpotBugs/ArchUnit）
+./gradlew.bat test jacocoTestReport # 测试 + 覆盖率报告
+```
 
 ---
 
@@ -122,54 +147,66 @@ Flyway 脚本位于 `springboot/src/main/resources/db/migration/`
 - 每次变更创建新脚本，禁止修改已执行脚本
 - 使用幂等语句（`CREATE TABLE IF NOT EXISTS`）
 
+配置文件已拆分为 5 个关注点：
+- `config/datasource.yaml` — 数据源
+- `config/cache.yaml` — 缓存
+- `config/mq.yaml` — 消息队列
+- `config/security.yaml` — 安全
+- `config/business.yaml` — 业务配置
+
+---
+
+## 常见陷阱与规避（从历史修复中总结）
+
+### 1. Windows 中文路径编码问题
+**症状**：Gradle 执行测试时报 `ClassNotFoundException`
+**原因**：Windows 中文用户名/路径导致编码问题
+**修复**：在 `build.gradle.kts` 中添加 `-Dfile.encoding=GBK`
+
+### 2. localhost DNS 解析失败
+**症状**：`UnknownHostException: localhost`
+**原因**：Windows 下 DNS 解析 intermittent 失败
+**修复**：所有配置和代码中使用 `127.0.0.1` 替代 `localhost`
+
+### 3. RocketMQ 5.x API 兼容性
+**症状**：`ClassNotFoundException`，包路径变更
+**原因**：RocketMQ 5.x 将部分类从 `remoting` 移到 `remoting.protocol.body/route`
+**注意**：引入新版本 RocketMQ 依赖时需检查 API 包路径
+
+### 4. Edit 工具误删
+**症状**：跨段落匹配导致意外删除文件内容
+**规避**：
+- 编辑前先读完整文件
+- 使用**最小唯一字符串**作为 `old_string`
+- 避免跨段落匹配
+
+### 5. 依赖版本对齐
+**症状**：启动失败、Bean 注入失败
+**常见**：
+- Lombok + Spring AOP 版本需与 Spring Boot 对齐
+- `spring-boot-starter-webmvc` vs `spring-boot-starter-web` 一致性
+
+### 6. GSD 命令语法
+**注意**：GSD 命令使用冒号 `gsd:execute-phase`（不是 `gsd-execute-phase`）
+
+---
+
+## 里程碑完成记录
+
+| 版本 | 内容 | 完成日期 |
+|------|------|---------|
+| v1.0 | 基础框架（Vue 3 + Element Plus + Spring Boot） | 2026-04-02 |
+| v1.1 | 夏日海滩风主题修复与完善 | 2026-04-03 |
+| v1.2 | 用户管理模块 | 2026-04-18 |
+| v1.3 | RocketMQ 管理功能（Topic/Consumer Group/消息/监控） | 2026-04-29 |
+| v1.4 | Maven→Gradle 迁移 + Spring Boot 4.1 + 依赖升级 | 2026-05-06 |
+| v1.5 | 前后端代码重构与目录整理 | 2026-05-07 |
+
 ---
 
 ## 参考文档
 
-- `AGENTS.md` - AI 编程规范和代码风格指南
-- `docs/seckill/user-guide.md` - 秒杀系统用户手册
-- `docs/browser-automation-guide.md` - 浏览器自动化指南
-
----
-
-# Superpowers-ZH 中文增强版
-
-本项目已安装 superpowers-zh 技能框架（20 个 skills）。
-
-## 核心规则
-
-1. **收到任务时，先检查是否有匹配的 skill** — 哪怕只有 1% 的可能性也要检查
-2. **设计先于编码** — 收到功能需求时，先用 brainstorming skill 做需求分析
-3. **测试先于实现** — 写代码前先写测试（TDD）
-4. **验证先于完成** — 声称完成前必须运行验证命令
-
-## 可用 Skills
-
-Skills 位于 `.claude/skills/` 目录，每个 skill 有独立的 `SKILL.md` 文件。
-
-- **brainstorming**: 在任何创造性工作之前必须使用此技能——创建功能、构建组件、添加功能或修改行为。在实现之前先探索用户意图、需求和设计。
-- **chinese-code-review**: 中文代码审查规范——在保持专业严谨的同时，用符合国内团队文化的方式给出有效反馈
-- **chinese-commit-conventions**: 中文 Git 提交规范 — 适配国内团队的 commit message 规范和 changelog 自动化
-- **chinese-documentation**: 中文技术文档写作规范——排版、术语、结构一步到位，告别机翻味
-- **chinese-git-workflow**: 适配国内 Git 平台和团队习惯的工作流规范——Gitee、Coding、极狐 GitLab、CNB 全覆盖
-- **dispatching-parallel-agents**: 当面对 2 个以上可以独立进行、无共享状态或顺序依赖的任务时使用
-- **executing-plans**: 当你有一份书面实现计划需要在单独的会话中执行，并设有审查检查点时使用
-- **finishing-a-development-branch**: 当实现完成、所有测试通过、需要决定如何集成工作时使用——通过提供合并、PR 或清理等结构化选项来引导开发工作的收尾
-- **mcp-builder**: MCP 服务器构建方法论 — 系统化构建生产级 MCP 工具，让 AI 助手连接外部能力
-- **receiving-code-review**: 收到代码审查反馈后、实施建议之前使用，尤其当反馈不明确或技术上有疑问时——需要技术严谨性和验证，而非敷衍附和或盲目执行
-- **requesting-code-review**: 完成任务、实现重要功能或合并前使用，用于验证工作成果是否符合要求
-- **subagent-driven-development**: 当在当前会话中执行包含独立任务的实现计划时使用
-- **systematic-debugging**: 遇到任何 bug、测试失败或异常行为时使用，在提出修复方案之前执行
-- **test-driven-development**: 在实现任何功能或修复 bug 时使用，在编写实现代码之前
-- **using-git-worktrees**: 当需要开始与当前工作区隔离的功能开发或执行实现计划之前使用——创建具有智能目录选择和安全验证的隔离 git 工作树
-- **using-superpowers**: 在开始任何对话时使用——确立如何查找和使用技能，要求在任何响应（包括澄清性问题）之前调用 Skill 工具
-- **verification-before-completion**: 在宣称工作完成、已修复或测试通过之前使用，在提交或创建 PR 之前——必须运行验证命令并确认输出后才能声称成功；始终用证据支撑断言
-- **workflow-runner**: 在 Claude Code / OpenClaw / Cursor 中直接运行 agency-orchestrator YAML 工作流——无需 API key，使用当前会话的 LLM 作为执行引擎。当用户提供 .yaml 工作流文件或要求多角色协作完成任务时触发。
-- **writing-plans**: 当你有规格说明或需求用于多步骤任务时使用，在动手写代码之前
-- **writing-skills**: 当创建新技能、编辑现有技能或在部署前验证技能是否有效时使用
-
-## 如何使用
-
-当任务匹配某个 skill 时，使用 `Skill` 工具加载对应 skill 并严格遵循其流程。绝不要用 Read 工具读取 SKILL.md 文件。
-
-如果你认为哪怕只有 1% 的可能性某个 skill 适用于你正在做的事情，你必须调用该 skill 检查。
+- `AGENTS.md` — AI 编程规范和代码风格指南
+- `docs/seckill/user-guide.md` — 秒杀系统用户手册
+- `docs/browser-automation-guide.md` — 浏览器自动化指南
+- `.planning/` — GSD 工作流规划文件

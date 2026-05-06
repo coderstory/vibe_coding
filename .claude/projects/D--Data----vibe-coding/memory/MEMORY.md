@@ -1,1 +1,3 @@
-- [user_preferences](user_preferences.md) — 构建偏好、工作方式、调试习惯
+- [user_preferences](user_preferences.md) — 工作方式、Git规范、编辑规范、反馈风格（完整版）
+- [project_history](project_history.md) — 项目完整演变历史，v1.0~v1.5 里程碑
+- [common_pitfalls](common_pitfalls.md) — 8 类历史常见错误及规避方案

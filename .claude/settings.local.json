@@ -28,7 +28,9 @@
       "Bash(sed *)",
       "Bash(mkdir *)",
       "Bash(mv *)",
-      "Bash(rmdir *)"
+      "Bash(rmdir *)",
+      "Bash(python3 *)",
+      "Read(//c/Users/coder/.claude/projects/D--Data----vibe-coding/memory/**)"
     ],
     "deny": [
       "Bash(rm -rf:*)",
