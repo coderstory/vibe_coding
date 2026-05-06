@@ -2,10 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { ElButton, ElInput, ElTable, ElPagination } from 'element-plus'
 import ConsumerGroupList from '@/views/rocketmq/ConsumerGroupList.vue'
-import { getConsumerGroupList } from '@/api/rocketmq'
+import { getConsumerGroupList } from '@/api/modules/rocketmq'
 
 // Mock API
-vi.mock('@/api/rocketmq', () => ({
+vi.mock('@/api/modules/rocketmq', () => ({
   getConsumerGroupList: vi.fn()
 }))
 
@@ -39,7 +39,7 @@ describe('ConsumerGroupList.vue', () => {
       ]
       ;(getConsumerGroupList as any).mockResolvedValue({ data: { records: mockGroups, total: 2 } })
 
-      const wrapper = mount(ConsumerGroupList, {
+      mount(ConsumerGroupList, {
         global: {
           stubs: {
             'el-input': ElInput,

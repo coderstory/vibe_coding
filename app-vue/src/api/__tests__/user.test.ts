@@ -12,7 +12,7 @@ vi.mock('element-plus', async () => {
 })
 
 // Import after mocking
-await import('../user.ts')
+await import('../modules/user.ts')
 
 describe('User API Error Handling', () => {
   beforeEach(() => {

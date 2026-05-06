@@ -85,9 +85,9 @@
   height: 100%;
   background: linear-gradient(180deg, 
     transparent 0%,
-    rgba(59, 130, 246, 0.1) 30%,
-    rgba(30, 58, 138, 0.3) 70%,
-    rgba(30, 58, 138, 0.6) 100%
+    rgb(59 130 246 / 10%) 30%,
+    rgb(30 58 138 / 30%) 70%,
+    rgb(30 58 138 / 60%) 100%
   );
   z-index: 1;
 }
@@ -105,7 +105,7 @@
   opacity: 0.4;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .wave-container {
     min-height: 150px;
   }

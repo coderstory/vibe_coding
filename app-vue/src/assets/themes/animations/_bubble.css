@@ -15,7 +15,7 @@
 .bubble {
   position: absolute;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.6);
+  background: rgb(255 255 255 / 60%);
   animation: bubble-rise var(--animation-bubble-rise-duration, 8s) ease-in-out infinite;
 }
 
@@ -127,7 +127,7 @@
   animation-delay: 6.5s;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .bubble-container {
     display: none;
   }

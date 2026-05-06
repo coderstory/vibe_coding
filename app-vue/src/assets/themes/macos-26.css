@@ -27,7 +27,7 @@
   --el-color-warning-light-7: #FFD699;
   --el-color-warning-light-8: #FFE5B3;
   --el-color-warning-light-9: #FFF2E5;
-  --el-color-warning-dark-2: #CC7700;
+  --el-color-warning-dark-2: #C70;
 
   /* Danger Colors - Rich Red */
   --el-color-danger: #FF3B30;
@@ -55,9 +55,9 @@
   --el-text-color-disabled: #C7C7CC;
 
   /* Background Colors - Enhanced layering */
-  --el-bg-color: #FFFFFF;
+  --el-bg-color: #FFF;
   --el-bg-color-page: #F0F2F5;
-  --el-bg-color-overlay: rgba(255, 255, 255, 0.85);
+  --el-bg-color-overlay: rgb(255 255 255 / 85%);
 
   /* Border Colors */
   --el-border-color: #D1D5DB;
@@ -71,13 +71,13 @@
   --el-fill-color: #E8EAED;
   --el-fill-color-light: #F3F4F6;
   --el-fill-color-lighter: #F9FAFB;
-  --el-fill-color-blank: #FFFFFF;
+  --el-fill-color-blank: #FFF;
 
   /* Shadows - Soft system */
-  --el-box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  --el-box-shadow-light: 0 2px 8px rgba(0, 0, 0, 0.04);
-  --el-box-shadow-lighter: 0 1px 4px rgba(0, 0, 0, 0.02);
-  --el-box-shadow-dark: 0 4px 24px rgba(0, 0, 0, 0.16);
+  --el-box-shadow: 0 2px 12px rgb(0 0 0 / 6%);
+  --el-box-shadow-light: 0 2px 8px rgb(0 0 0 / 4%);
+  --el-box-shadow-lighter: 0 1px 4px rgb(0 0 0 / 2%);
+  --el-box-shadow-dark: 0 4px 24px rgb(0 0 0 / 16%);
 
   /* Border Radius - macOS preference */
   --el-border-radius-base: 10px;
@@ -86,7 +86,7 @@
   --el-border-radius-circle: 50%;
 
   /* Typography */
-  --el-font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+  --el-font-family: -apple-system, blinkmacsystemfont, 'SF Pro Display', 'Segoe UI', roboto, sans-serif;
   --el-font-size-extra-large: 17px;
   --el-font-size-large: 15px;
   --el-font-size-base: 14px;
@@ -96,14 +96,12 @@
   /* Component-specific */
   --el-menu-bg-color: transparent;
   --el-menu-text-color: #3D3D3F;
-  --el-menu-hover-bg-color: rgba(0, 122, 255, 0.08);
+  --el-menu-hover-bg-color: rgb(0 122 255 / 8%);
   --el-menu-active-color: #007AFF;
   --el-menu-item-height: 48px;
-
-  --el-header-bg-color: rgba(255, 255, 255, 0.78);
+  --el-header-bg-color: rgb(255 255 255 / 78%);
   --el-header-text-color: #1D1D1F;
   --el-header-height: 56px;
-
   --el-button-padding-horizontal: 20px;
   --el-button-padding-vertical: 10px;
   --el-button-font-size: 14px;
@@ -126,7 +124,7 @@
   --gradient-success: linear-gradient(135deg, #34C759 0%, #10B981 100%);
   --gradient-warm: linear-gradient(135deg, #FF9500 0%, #FF3B30 100%);
   --gradient-cool: linear-gradient(135deg, #007AFF 0%, #5E5CE6 100%);
-  --gradient-surface: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%);
+  --gradient-surface: linear-gradient(180deg, rgb(255 255 255 / 90%) 0%, rgb(255 255 255 / 60%) 100%);
 }
 
 /* ===== Dark Theme ===== */
@@ -137,66 +135,55 @@
   --el-color-primary-light-7: #66B3FF;
   --el-color-primary-light-9: #E6F2FF;
   --el-color-primary-dark-2: #0062CC;
-
   --el-color-success: #30D158;
   --el-color-success-light-3: #30D158;
   --el-color-success-light-5: #5DD67A;
   --el-color-success-light-7: #85E09B;
   --el-color-success-light-9: #E6FBE9;
   --el-color-success-dark-2: #248A3D;
-
   --el-color-warning: #FF9F0A;
   --el-color-warning-light-3: #FF9F0A;
   --el-color-warning-light-5: #FFAD33;
   --el-color-warning-light-7: #FFC266;
   --el-color-warning-light-9: #FFF2E5;
-  --el-color-warning-dark-2: #CC7700;
-
+  --el-color-warning-dark-2: #C70;
   --el-color-danger: #FF453A;
   --el-color-danger-light-3: #FF453A;
   --el-color-danger-light-5: #FF6B60;
   --el-color-danger-light-7: #FF918A;
   --el-color-danger-light-9: #FFE6E4;
   --el-color-danger-dark-2: #CC2F26;
-
   --el-color-info: #5E5CE6;
   --el-color-info-light-3: #5E5CE6;
   --el-color-info-light-5: #7A7AEB;
   --el-color-info-light-7: #9999F0;
   --el-color-info-light-9: #E6E6FC;
   --el-color-info-dark-2: #4B49B8;
-
   --el-text-color-primary: #F5F5F7;
   --el-text-color-regular: #E5E5E7;
   --el-text-color-secondary: #98989D;
   --el-text-color-placeholder: #636366;
   --el-text-color-disabled: #48484A;
-
   --el-bg-color: #1D1D1F;
-  --el-bg-color-page: #000000;
-  --el-bg-color-overlay: rgba(29, 29, 31, 0.78);
-
+  --el-bg-color-page: #000;
+  --el-bg-color-overlay: rgb(29 29 31 / 78%);
   --el-border-color: #38383A;
   --el-border-color-light: #48484A;
   --el-border-color-lighter: #636366;
   --el-border-color-darker: #2C2C2E;
-
   --el-fill-color: #2C2C2E;
   --el-fill-color-light: #3A3A3C;
   --el-fill-color-lighter: #48484A;
   --el-fill-color-blank: #2C2C2E;
-
-  --el-box-shadow: 0 2px 12px rgba(0, 0, 0, 0.24);
-  --el-box-shadow-light: 0 2px 8px rgba(0, 0, 0, 0.16);
-  --el-box-shadow-lighter: 0 1px 4px rgba(0, 0, 0, 0.08);
-  --el-box-shadow-dark: 0 4px 24px rgba(0, 0, 0, 0.48);
-
+  --el-box-shadow: 0 2px 12px rgb(0 0 0 / 24%);
+  --el-box-shadow-light: 0 2px 8px rgb(0 0 0 / 16%);
+  --el-box-shadow-lighter: 0 1px 4px rgb(0 0 0 / 8%);
+  --el-box-shadow-dark: 0 4px 24px rgb(0 0 0 / 48%);
   --el-menu-bg-color: transparent;
   --el-menu-text-color: #E5E5E7;
-  --el-menu-hover-bg-color: rgba(10, 132, 255, 0.12);
+  --el-menu-hover-bg-color: rgb(10 132 255 / 12%);
   --el-menu-active-color: #0A84FF;
-
-  --el-header-bg-color: rgba(29, 29, 31, 0.78);
+  --el-header-bg-color: rgb(29 29 31 / 78%);
   --el-header-text-color: #F5F5F7;
 
   /* Dark mode icon colors - brighter variants */
@@ -213,33 +200,31 @@
   --gradient-success: linear-gradient(135deg, #30D158 0%, #10B981 100%);
   --gradient-warm: linear-gradient(135deg, #FF9F0A 0%, #FF453A 100%);
   --gradient-cool: linear-gradient(135deg, #0A84FF 0%, #5E5CE6 100%);
-  --gradient-surface: linear-gradient(180deg, rgba(29,29,31,0.9) 0%, rgba(29,29,31,0.6) 100%);
+  --gradient-surface: linear-gradient(180deg, rgb(29 29 31 / 90%) 0%, rgb(29 29 31 / 60%) 100%);
 }
 
 /* ===== Glassmorphism Utilities ===== */
 .glass-surface {
   background: var(--el-bg-color-overlay);
   backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid rgb(0 0 0 / 8%);
 }
 
 .dark .glass-surface {
   background: var(--el-bg-color-overlay);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgb(255 255 255 / 10%);
 }
 
 .glass-card {
   background: var(--el-bg-color-overlay);
   backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid rgb(0 0 0 / 6%);
   border-radius: var(--el-border-radius-base);
   box-shadow: var(--el-box-shadow);
 }
 
 .dark .glass-card {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgb(255 255 255 / 8%);
   box-shadow: var(--el-box-shadow-dark);
 }
 
@@ -262,7 +247,6 @@
 
 .gradient-text {
   background-clip: text;
-  -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background: var(--gradient-cool);
 }

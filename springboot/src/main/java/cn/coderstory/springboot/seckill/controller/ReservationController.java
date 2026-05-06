@@ -3,7 +3,7 @@ package cn.coderstory.springboot.seckill.controller;
 import cn.coderstory.springboot.seckill.entity.SeckillReservation;
 import cn.coderstory.springboot.seckill.mapper.SeckillReservationMapper;
 import cn.coderstory.springboot.seckill.service.PreheatService;
-import cn.coderstory.springboot.vo.ApiResponse;
+import cn.coderstory.springboot.shared.vo.ApiResponse;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

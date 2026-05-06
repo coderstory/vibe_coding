@@ -1,19 +1,18 @@
 package cn.coderstory.springboot.seckill.service.impl;
 
-import cn.coderstory.springboot.limiter.ConcurrencyLimiter;
-import cn.coderstory.springboot.limiter.QpsLimiter;
-import cn.coderstory.springboot.lock.DistributedLockService;
-import cn.coderstory.springboot.lock.impl.DistributedLockServiceImpl;
-import cn.coderstory.springboot.mq.producer.OrderTransactionProducer;
-import cn.coderstory.springboot.security.IdempotentService;
+import cn.coderstory.springboot.shared.limiter.ConcurrencyLimiter;
+import cn.coderstory.springboot.shared.limiter.QpsLimiter;
+import cn.coderstory.springboot.shared.lock.DistributedLockService;
+import cn.coderstory.springboot.shared.lock.impl.DistributedLockServiceImpl;
+import cn.coderstory.springboot.seckill.mq.producer.OrderTransactionProducer;
+import cn.coderstory.springboot.shared.security.IdempotentService;
 import cn.coderstory.springboot.seckill.dto.SeckillRequest;
 import cn.coderstory.springboot.seckill.dto.SeckillResponse;
 import cn.coderstory.springboot.seckill.entity.SeckillActivity;
 import cn.coderstory.springboot.seckill.mapper.SeckillActivityMapper;
 import cn.coderstory.springboot.seckill.service.SignService;
 import cn.coderstory.springboot.seckill.service.SeckillService;
-import cn.coderstory.springboot.sse.SeckillSseService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import cn.coderstory.springboot.seckill.sse.SeckillSseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.Collections;
-import java.util.UUID;
 
 /**
  * 秒杀服务实现类

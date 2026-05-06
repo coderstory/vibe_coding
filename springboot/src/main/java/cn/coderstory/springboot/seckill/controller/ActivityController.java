@@ -3,7 +3,7 @@ package cn.coderstory.springboot.seckill.controller;
 import cn.coderstory.springboot.seckill.entity.SeckillActivity;
 import cn.coderstory.springboot.seckill.service.ActivityService;
 import cn.coderstory.springboot.seckill.service.PreheatService;
-import cn.coderstory.springboot.vo.ApiResponse;
+import cn.coderstory.springboot.shared.vo.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

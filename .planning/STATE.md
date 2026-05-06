@@ -7,10 +7,10 @@ last_updated: "2026-05-06"
 last_activity: 2026-05-06
 progress:
   total_phases: 5
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  completed_phases: 5
+  total_plans: 5
+  completed_plans: 5
+  percent: 100
 ---
 
 ## Project Reference
@@ -22,12 +22,23 @@ See: .planning/PROJECT.md (updated 2026-05-06)
 
 ## Current Position
 
-Phase: 17 of 21 (基础设施搭建)
-Plan: 0 of TBD
-Status: Ready to plan
-Last activity: 2026-05-06 — v1.5 roadmap created with 5 phases and 31 requirements
+Phase: 21 of 21 (代码规范统一)
+Plan: 1 of 1
+Status: ✅ Completed
+Last activity: 2026-05-07 — v1.5 all 5 phases completed
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████████] 100%
+
+## Milestone: v1.5 ✅ COMPLETED
+
+**前后端代码重构与目录整理** — 所有 5 个阶段（17-21）均已完成：
+
+### 成果总结
+- **Phase 17**: 工具链搭建 — EditorConfig/ESLint 10.x/Stylelint/Checkstyle/ArchUnit
+- **Phase 18**: 后端包结构重组 — 71 个文件迁移到 10 个业务域包
+- **Phase 19**: 配置文件整理 — application.yaml 拆分为 5 个关注点文件
+- **Phase 20**: 前端目录重组 — components/api/router 按域组织
+- **Phase 21**: 代码规范统一 — 前后端 lint 清理，Checkstyle 治理
 
 ## Performance Metrics
 
@@ -63,9 +74,7 @@ None yet.
 
 ### Blockers/Concerns
 
-- **Phase 18:** @MapperScan 通配符在包重组后能否自动覆盖新路径（需首个域迁移后立即验证）
-- **Phase 20:** Vue Router 27 条懒加载路径在文件移动后可能断裂（每次移动后 npm run build 验证）
-- **Phase 18:** MyBatis XML namespace 需与移动后的 Mapper 全限定名同步更新
+无。v1.5 里程碑全部完成。
 
 ## Deferred Items
 
@@ -75,9 +84,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-06
-Stopped at: v1.5 roadmap creation complete, ready for Phase 17 planning
-Resume file: None
+Last session: 2026-05-07
+Stopped at: v1.5 里程碑全部完成（5/5 阶段）
+Resume file: None (handoff consumed)
 
 ---
 

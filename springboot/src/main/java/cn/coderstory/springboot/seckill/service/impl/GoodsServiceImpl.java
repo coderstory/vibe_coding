@@ -1,6 +1,6 @@
 package cn.coderstory.springboot.seckill.service.impl;
 
-import cn.coderstory.springboot.exception.BusinessException;
+import cn.coderstory.springboot.shared.exception.BusinessException;
 import cn.coderstory.springboot.seckill.entity.SeckillGoods;
 import cn.coderstory.springboot.seckill.mapper.SeckillGoodsMapper;
 import cn.coderstory.springboot.seckill.service.GoodsService;

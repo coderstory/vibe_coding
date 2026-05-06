@@ -1,6 +1,6 @@
 package cn.coderstory.springboot.seckill.controller;
 
-import cn.coderstory.springboot.exception.BusinessException;
+import cn.coderstory.springboot.shared.exception.BusinessException;
 import cn.coderstory.springboot.seckill.dto.SeckillRequest;
 import cn.coderstory.springboot.seckill.dto.SeckillResponse;
 import cn.coderstory.springboot.seckill.entity.SeckillActivity;
@@ -9,8 +9,8 @@ import cn.coderstory.springboot.seckill.mapper.SeckillActivityMapper;
 import cn.coderstory.springboot.seckill.mapper.SeckillGoodsMapper;
 import cn.coderstory.springboot.seckill.service.SeckillService;
 import cn.coderstory.springboot.seckill.service.SignService;
-import cn.coderstory.springboot.security.IdempotentService;
-import cn.coderstory.springboot.vo.ApiResponse;
+import cn.coderstory.springboot.shared.security.IdempotentService;
+import cn.coderstory.springboot.shared.vo.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

@@ -1,8 +1,8 @@
 package cn.coderstory.springboot.seckill.service.impl;
 
-import cn.coderstory.springboot.exception.BusinessException;
-import cn.coderstory.springboot.lock.DistributedLockService;
-import cn.coderstory.springboot.lock.impl.DistributedLockServiceImpl;
+import cn.coderstory.springboot.shared.exception.BusinessException;
+import cn.coderstory.springboot.shared.lock.DistributedLockService;
+import cn.coderstory.springboot.shared.lock.impl.DistributedLockServiceImpl;
 import cn.coderstory.springboot.seckill.entity.SeckillActivity;
 import cn.coderstory.springboot.seckill.entity.SeckillGoods;
 import cn.coderstory.springboot.seckill.mapper.SeckillActivityMapper;
@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -266,7 +265,7 @@ public class ActivityServiceImpl implements ActivityService {
      * 处理空值和转换异常
      */
     private Long parseLong(Object value) {
-        if (value == null || value.toString().isEmpty()) return null;
+        if (value == null || value.toString().isEmpty()) { return null; }
         try {
             return Long.parseLong(value.toString());
         } catch (NumberFormatException e) {
@@ -279,7 +278,7 @@ public class ActivityServiceImpl implements ActivityService {
      * 处理空值和转换异常
      */
     private Integer parseInteger(Object value) {
-        if (value == null || value.toString().isEmpty()) return 0;
+        if (value == null || value.toString().isEmpty()) { return 0; }
         try {
             return Integer.parseInt(value.toString());
         } catch (NumberFormatException e) {
@@ -292,7 +291,7 @@ public class ActivityServiceImpl implements ActivityService {
      * 处理空值和转换异常
      */
     private Boolean parseBoolean(Object value) {
-        if (value == null || value.toString().isEmpty()) return false;
+        if (value == null || value.toString().isEmpty()) { return false; }
         return Boolean.parseBoolean(value.toString());
     }
 
@@ -301,7 +300,7 @@ public class ActivityServiceImpl implements ActivityService {
      * 使用 ISO 格式解析，处理异常情况
      */
     private LocalDateTime parseLocalDateTime(Object value) {
-        if (value == null || value.toString().isEmpty()) return null;
+        if (value == null || value.toString().isEmpty()) { return null; }
         try {
             return LocalDateTime.parse(value.toString(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         } catch (Exception e) {

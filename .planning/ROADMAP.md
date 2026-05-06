@@ -14,7 +14,7 @@
 - ✅ **v1.2 用户管理模块** — Phases 7-8 (shipped 2026-04-18)
 - ✅ **v1.3 RocketMQ 管理功能** — Phases 9-12 (shipped 2026-04-29)
 - ✅ **v1.4 Maven→Gradle + Spring Boot 4.1 升级** — Phases 13-16 (shipped 2026-05-06)
-- 🚧 **v1.5 前后端代码重构与目录整理** — Phases 17-21 (in progress)
+- 🚧 **v1.5 前后端代码重构与目录整理** — Phases 17-21 (shipped 2026-05-07)
 
 ---
 
@@ -111,7 +111,7 @@
 
 ---
 
-## 🚧 v1.5 前后端代码重构与目录整理 (In Progress)
+## ✅ v1.5 前后端代码重构与目录整理 (shipped 2026-05-07)
 
 **Milestone Goal:** 重构前后端代码结构，整理代码和配置文件目录，消除技术债务。建立代码质量工具链作为重构安全网，按业务域垂直切分包结构，拆分配置文件实现关注点分离，统一前端目录组织，收敛命名与代码规范。
 
@@ -127,7 +127,7 @@
   5. `./gradlew.bat test jacocoTestReport` 成功生成 JaCoCo 测试覆盖率报告
 **Plans**: TBD
 
-### Phase 18: 后端包结构重组
+### Phase 18: 后端包结构重组 (✅ Completed 2026-05-07)
 **Goal**: 按业务域垂直切分后端包结构，修复分层违规
 **Depends on**: Phase 17（工具链就绪后方可迁移验证）
 **Requirements**: BACK-01, BACK-02, BACK-03, BACK-04, BACK-05, BACK-06, BACK-07
@@ -139,7 +139,7 @@
   5. `./gradlew.bat bootRun` 正常启动，运行时所有 API 端点功能无回归
 **Plans**: TBD
 
-### Phase 19: 配置文件整理
+### Phase 19: 配置文件整理 (✅ Completed 2026-05-07)
 **Goal**: 拆分 application.yaml 为关注点文件，消除配置冗余
 **Depends on**: Phase 18（包结构确定后配置归属才明确）
 **Requirements**: CONF-01, CONF-02, CONF-03, CONF-04
@@ -150,7 +150,7 @@
   4. application-test.yaml 中与主配置文件重复的内容已消除，仅保留 test profile 特有配置
 **Plans**: TBD
 
-### Phase 20: 前端目录重组
+### Phase 20: 前端目录重组 (✅ Completed 2026-05-07)
 **Goal**: 按域组织 components/api/router/types 目录，清理无用代码
 **Depends on**: 技术上独立，建议在 Phase 18-19 后执行以保持前后端命名一致
 **Requirements**: FRNT-01, FRNT-02, FRNT-03, FRNT-04, FRNT-05, FRNT-06, FRNT-07
@@ -163,7 +163,7 @@
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 21: 代码规范统一
+### Phase 21: 代码规范统一 (✅ Completed 2026-05-07)
 **Goal**: 统一前后端命名规范，清理无用代码和导入
 **Depends on**: Phase 18 + Phase 20（目录重组完成后才能全面收敛规范）
 **Requirements**: QUAL-01, QUAL-02, QUAL-03
@@ -183,12 +183,12 @@
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 17. 基础设施搭建 | v1.5 | 0/TBD | Not started | - |
-| 18. 后端包结构重组 | v1.5 | 0/TBD | Not started | - |
-| 19. 配置文件整理 | v1.5 | 0/TBD | Not started | - |
-| 20. 前端目录重组 | v1.5 | 0/TBD | Not started | - |
-| 21. 代码规范统一 | v1.5 | 0/TBD | Not started | - |
+| 17. 基础设施搭建 | v1.5 | 1/1 | ✅ Completed | 2026-05-07 |
+| 18. 后端包结构重组 | v1.5 | 1/1 | ✅ Completed | 2026-05-07 |
+| 19. 配置文件整理 | v1.5 | 1/1 | ✅ Completed | 2026-05-07 |
+| 20. 前端目录重组 | v1.5 | 1/1 | ✅ Completed | 2026-05-07 |
+| 21. 代码规范统一 | v1.5 | 1/1 | ✅ Completed | 2026-05-07 |
 
 ---
 
-*路线图更新: 2026-05-06 — v1.5 milestone phases defined*
+*路线图更新: 2026-05-07 — v1.5 全部完成*

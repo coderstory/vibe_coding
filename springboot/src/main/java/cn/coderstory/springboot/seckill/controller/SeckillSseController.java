@@ -1,6 +1,6 @@
 package cn.coderstory.springboot.seckill.controller;
 
-import cn.coderstory.springboot.sse.SeckillSseService;
+import cn.coderstory.springboot.seckill.sse.SeckillSseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
