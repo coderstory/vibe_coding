@@ -1,6 +1,26 @@
-# CLAUDE.md
+# CLAUDE.md - AI 编程指南
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+本项目使用 Claude Code 进行 AI 辅助开发，本文件为 AI 代理提供项目规范和沟通配置。
+
+## AI 语言配置
+
+**默认语言：中文**
+- 所有回复、注释、错误信息、文档均使用中文
+- 仅当用户明确要求、代码本身是英文、或技术术语无公认中文翻译时才使用英文
+- 系统会自动检测并纠正英文输出为中文
+
+### Superpowers-ZH 配置
+- **技能框架**：已安装 20 个中文增强技能
+- **自动激活**：收到任务时自动检查匹配的技能
+- **强制中文**：所有交互优先使用中文沟通
+
+## 交互要求
+
+1. **全程使用中文沟通** - 所有输出必须使用中文，包括回复内容、代码注释、错误信息、文档描述
+2. **禁止输出英文** - 除非：用户明确要求、代码本身是英文、技术术语无公认中文翻译  
+3. 当前操作系统是 Windows，调用 shell 时，**禁止使用 bash 命令**，而是使用 **PowerShell 7 命令**：`pwsh -Command "your command"`
+4. 回复简洁直接，不确定的主动询问
+5. 优先使用 Superpowers-ZH 技能框架进行中文优化
 
 ## 构建与开发命令
 

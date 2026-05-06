@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/build-passing-green.svg" alt="构建状态">
   </a>
   <a href="#">
-    <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="许可证">
+    <img src="https://img.shields.io/badge/license-GPL--3.0-blue.svg" alt="许可证">
   </a>
 </p>
 
@@ -199,9 +199,18 @@ vibe_coding/
 | **数据库迁移** | Flyway | - |
 | **认证** | JWT | - |
 
+## 🤖 AI 协作配置
+
+本项目已配置 AI 编程工具，默认使用中文沟通：
+
+- **AI 语言**：默认中文（简体中文）
+- **技能框架**：Superpowers-ZH 中文增强版
+- **交互规范**：见 `CLAUDE.md` 和 `AGENTS.md`
+
 ## 📚 文档
 
-- **开发文档**：`AGENTS.md` - AI开发说明文档
+- **AI 开发指南**：`AGENTS.md` - AI 编程说明文档  
+- **AI 配置**：`CLAUDE.md` - Claude Code 工作指南
 - **项目文档**：`docs/` 目录下的相关文档
 
 ## 🔍 问题分析
