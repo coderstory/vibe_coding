@@ -1,122 +1,111 @@
 # Requirements: Vue + Spring Boot 管理后台
 
-**Defined:** 2026-04-29
+**Defined:** 2026-05-06
 **Core Value:** 提供清晰、高效的企业级管理后台界面，通过夏日海滩风主题营造清爽专业的视觉体验。
 
-## v1 Requirements
+## v1.5 Requirements
 
-### 迁移准备 (Migration Prep)
+### 代码质量工具链 (TOOL)
 
-- [ ] **MIGR-01**: 分析现有 pom.xml 依赖和插件，生成完整依赖清单
-- [ ] **MIGR-02**: 创建 Gradle Wrapper 配置（Gradle 9.4）
-- [ ] **MIGR-03**: 创建初始 build.gradle 文件，等效翻译 pom.xml 依赖
-- [ ] **MIGR-04**: 配置 Java Toolchain (JDK 26)
-- [ ] **MIGR-05**: 配置 annotationProcessor (Lombok + spring-boot-configuration-processor)
+- [ ] **TOOL-01**: 配置 EditorConfig 统一编辑器设置
+- [ ] **TOOL-02**: 升级 ESLint 到 10.x flat config 并集成 typescript-eslint + eslint-plugin-vue
+- [ ] **TOOL-03**: 集成 @stylistic/eslint-plugin 替代已废弃的 ESLint 核心风格规则
+- [ ] **TOOL-04**: 配置 Stylelint 17.x 对 CSS 文件进行静态分析
+- [ ] **TOOL-05**: 集成 ArchUnit 1.4.0 定义包结构和依赖规则（如"Controller 不能直接调用 Mapper"）
+- [ ] **TOOL-06**: 集成 Checkstyle (Gradle 内置) 统一 Java 代码风格
+- [ ] **TOOL-07**: 集成 PMD (Gradle 内置) 检测源码异味
+- [ ] **TOOL-08**: 集成 SpotBugs 4.9.3 检测字节码级 bug
+- [ ] **TOOL-09**: 集成 JaCoCo 测试覆盖率统计
+- [ ] **TOOL-10**: 集成 Error Prone 2.37.0 编译时错误检测
 
-### Spring Boot 升级 (Boot Upgrade)
+### 后端包结构重组 (BACKEND)
 
-- [ ] **BOOT-01**: 升级 Spring Boot 4.0.5 → 4.1.0-RC1 (spring-boot-starter-parent)
-- [ ] **BOOT-02**: 升级 Spring Boot Gradle Plugin → 4.1.0-RC1
-- [ ] **BOOT-03**: 升级 Spring AOP 版本覆盖（3.5.13 → 兼容 4.1 版本）
-- [ ] **BOOT-04**: 验证 Spring Boot 4.1 兼容性测试通过
+- [ ] **BACK-01**: 创建 shared/ 通用层，迁移 config/security/aspect/exception/util 等跨域组件
+- [ ] **BACK-02**: 按业务域垂直切分后端包结构（shared + user/role/menu/auth/audit/knowledge/seckill/rocketmq/order/monitor）
+- [ ] **BACK-03**: 每个业务域内部统一 controller/service/impl/mapper/entity/dto 结构
+- [ ] **BACK-04**: 修复 Controller 直接注入 Mapper 的分层违规（UserController、SeckillController 等）
+- [ ] **BACK-05**: 合并零散模块（mq/stock/sse）到 seckill/ 域
+- [ ] **BACK-06**: 统一 Service 接口+impl 分离（修复 MenuServiceImpl 等放在 service/ 根目录问题）
+- [ ] **BACK-07**: 使用 `git mv` 分步移动，每个域迁移后运行 `./gradlew.bat test` 验证
 
-### 依赖升级 (Dependency Upgrades)
+### 配置文件整理 (CONFIG)
 
-- [ ] **DEPS-01**: 升级 Flyway 4.0.6 → 12.x (12.4.0)
-- [ ] **DEPS-02**: 升级 Redisson 4.3.1 → 4.2.0
-- [ ] **DEPS-03**: 升级 MySQL Connector 9.6.0 → 9.7.0
-- [ ] **DEPS-04**: MyBatis-Plus 3.5.16 + mybatis-plus-spring-boot4-starter
-- [ ] **DEPS-05**: 验证 RocketMQ 2.3.5 与 Spring Boot 4.1 兼容性
-- [ ] **DEPS-06**: 验证 JJWT 0.13.0 与 Spring Boot 4.1 兼容性
-- [ ] **DEPS-07**: 验证 ZSTD 1.5.7-7 与 Spring Boot 4.1 兼容性
+- [ ] **CONF-01**: 将 154 行 application.yaml 按关注点拆分为 5 个配置文件（datasource/cache/mq/security/business）
+- [ ] **CONF-02**: 使用 spring.config.import 实现配置文件的关注点分离加载
+- [ ] **CONF-03**: 消除 application-test.yaml 与主文件的重复内容
+- [ ] **CONF-04**: 每次拆分后用 `./gradlew.bat bootRun` 双 profile 启动验证
 
-### 配置迁移 (Config Migration)
+### 前端目录重组 (FRONTEND)
 
-- [ ] **CONF-01**: 迁移 maven-compiler-plugin --enable-preview 到 Gradle options
-- [ ] **CONF-02**: 迁移 spring-boot-maven-plugin 的 Lombok exclude 配置
-- [ ] **CONF-03**: 迁移 Flyway Maven Plugin 配置到 Gradle Flyway 插件
-- [ ] **CONF-04**: 修复硬编码数据库凭证（pom.xml 中的 root/123456）
-- [ ] **CONF-05**: 检查 ReactorClientHttpRequestFactoryBuilder 默认值变更影响
-- [ ] **CONF-06**: 检查 management.httpexchanges.recording.include 默认值变更
+- [ ] **FRNT-01**: components/ 拆分为 common/layout/business 子目录
+- [ ] **FRNT-02**: api/ 创建 modules/ 按业务域组织（auth/user/role/menu/seckill/rocketmq 等）
+- [ ] **FRNT-03**: router/ 拆分为 modules/*.ts + guards.ts（按域分模块）
+- [ ] **FRNT-04**: 创建 types/ 目录按域组织独立类型定义文件
+- [ ] **FRNT-05**: 清理无用脚手架模板组件（HelloWorld.vue、AboutView.vue 等）
+- [ ] **FRNT-06**: vite.config.js 迁移为 vite.config.ts
+- [ ] **FRNT-07**: 每次移动文件后执行 `npm run build` 验证懒加载路径
 
-### 构建验证 (Build Verification)
+### 代码规范统一 (QUALITY)
 
-- [ ] **BUILD-01**: gradlew bootRun 成功启动应用
-- [ ] **BUILD-02**: gradlew build 成功打包（跳过测试）
-- [ ] **BUILD-03**: gradlew test 测试通过
-- [ ] **BUILD-04**: 验证 Flyway 数据库迁移正常工作
-- [ ] **BUILD-05**: 验证 Redis 连接正常工作
-- [ ] **BUILD-06**: 验证 RocketMQ 生产者/消费者正常工作
-- [ ] **BUILD-07**: 验证 JWT 认证流程正常工作
+- [ ] **QUAL-01**: 前端组件/页面命名规范统一（PascalCase 组件、Page 后缀页面）
+- [ ] **QUAL-02**: TypeScript 统一使用 interface 定义对象类型，type 仅用于联合类型/工具类型
+- [ ] **QUAL-03**: 清理未使用的导入、变量和组件
 
-### 功能回归 (Regression Testing)
+## v2 待定
 
-- [ ] **REGR-01**: 用户登录/登出功能正常
-- [ ] **REGR-02**: 用户管理 CRUD 功能正常
-- [ ] **REGR-03**: 角色管理功能正常
-- [ ] **REGR-04**: 菜单管理功能正常
-- [ ] **REGR-05**: 审计日志功能正常
-- [ ] **REGR-06**: 知识库功能正常
-- [ ] **REGR-07**: 秒杀系统功能正常
-
-## v2 Requirements
-
-暂未定义，待 v1.4 完成后根据需要添加。
+暂未定义。
 
 ## Out of Scope
 
-| Feature | Reason |
-|---------|--------|
-| 前端技术栈变更 | 保持 Vue 3 + Vite 不变 |
-| 移动端响应式 | 桌面端优先 |
-| Spring Boot 4.1 正式版发布前生产使用 | RC 版本仅用于评估 |
+| 功能 | 原因 |
+|------|------|
+| 敏感信息环境变量加固（JWT secret、DB 密码） | 用户要求暂不处理 |
+| DTO/VO 分离规范 | 当前规模下手动 toVO() 足够 |
+| Spring Boot 多模块拆分 | ~100 Java 文件单模块即可，200+ 后再考虑 |
+| 新增业务功能 | 本里程碑仅重构不新增功能 |
+| 前端技术栈变更 | 保持 Vue 3 + Vite + Element Plus 不变 |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MIGR-01 | Phase 1 | Pending |
-| MIGR-02 | Phase 1 | Pending |
-| MIGR-03 | Phase 1 | Pending |
-| MIGR-04 | Phase 1 | Pending |
-| MIGR-05 | Phase 1 | Pending |
-| BOOT-01 | Phase 2 | Pending |
-| BOOT-02 | Phase 2 | Pending |
-| BOOT-03 | Phase 2 | Pending |
-| BOOT-04 | Phase 2 | Pending |
-| DEPS-01 | Phase 2 | Pending |
-| DEPS-02 | Phase 2 | Pending |
-| DEPS-03 | Phase 2 | Pending |
-| DEPS-04 | Phase 2 | Pending |
-| DEPS-05 | Phase 2 | Pending |
-| DEPS-06 | Phase 2 | Pending |
-| DEPS-07 | Phase 2 | Pending |
+| TOOL-01 | Phase 1 | Pending |
+| TOOL-02 | Phase 1 | Pending |
+| TOOL-03 | Phase 1 | Pending |
+| TOOL-04 | Phase 1 | Pending |
+| TOOL-05 | Phase 1 | Pending |
+| TOOL-06 | Phase 1 | Pending |
+| TOOL-07 | Phase 1 | Pending |
+| TOOL-08 | Phase 1 | Pending |
+| TOOL-09 | Phase 1 | Pending |
+| TOOL-10 | Phase 1 | Pending |
+| BACK-01 | Phase 2 | Pending |
+| BACK-02 | Phase 2 | Pending |
+| BACK-03 | Phase 2 | Pending |
+| BACK-04 | Phase 2 | Pending |
+| BACK-05 | Phase 2 | Pending |
+| BACK-06 | Phase 2 | Pending |
+| BACK-07 | Phase 2 | Pending |
 | CONF-01 | Phase 3 | Pending |
 | CONF-02 | Phase 3 | Pending |
 | CONF-03 | Phase 3 | Pending |
 | CONF-04 | Phase 3 | Pending |
-| CONF-05 | Phase 3 | Pending |
-| CONF-06 | Phase 3 | Pending |
-| BUILD-01 | Phase 4 | Pending |
-| BUILD-02 | Phase 4 | Pending |
-| BUILD-03 | Phase 4 | Pending |
-| BUILD-04 | Phase 4 | Pending |
-| BUILD-05 | Phase 4 | Pending |
-| BUILD-06 | Phase 4 | Pending |
-| BUILD-07 | Phase 4 | Pending |
-| REGR-01 | Phase 4 | Pending |
-| REGR-02 | Phase 4 | Pending |
-| REGR-03 | Phase 4 | Pending |
-| REGR-04 | Phase 4 | Pending |
-| REGR-05 | Phase 4 | Pending |
-| REGR-06 | Phase 4 | Pending |
-| REGR-07 | Phase 4 | Pending |
+| FRNT-01 | Phase 4 | Pending |
+| FRNT-02 | Phase 4 | Pending |
+| FRNT-03 | Phase 4 | Pending |
+| FRNT-04 | Phase 4 | Pending |
+| FRNT-05 | Phase 4 | Pending |
+| FRNT-06 | Phase 4 | Pending |
+| FRNT-07 | Phase 4 | Pending |
+| QUAL-01 | Phase 5 | Pending |
+| QUAL-02 | Phase 5 | Pending |
+| QUAL-03 | Phase 5 | Pending |
 
 **Coverage:**
-- v1 requirements: 34 total
-- Mapped to phases: 34
+- v1.5 requirements: 31 total
+- Mapped to phases: 31
 - Unmapped: 0 ✓
 
 ---
-*Requirements defined: 2026-04-29*
-*Last updated: 2026-04-29 after initial definition*
+*Requirements defined: 2026-05-06*
+*Last updated: 2026-05-06 after v1.5 research and scoping*
