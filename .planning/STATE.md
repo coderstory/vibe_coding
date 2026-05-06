@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.5
-milestone_name: 前后端代码重构与目录整理
-status: roadmap-ready
-last_updated: "2026-05-06"
+milestone: v1.6
+milestone_name: 代码深度清理与优化
+status: planning
+last_updated: "2026-05-06T18:05:54.239Z"
 last_activity: 2026-05-06
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 5
-  completed_plans: 5
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 ## Project Reference
@@ -22,18 +22,17 @@ See: .planning/PROJECT.md (updated 2026-05-06)
 
 ## Current Position
 
-Phase: 21 of 21 (代码规范统一)
-Plan: 1 of 1
-Status: ✅ Completed
-Last activity: 2026-05-07 — v1.5 all 5 phases completed
-
-Progress: [██████████] 100%
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-06 — Milestone v1.6 started
 
 ## Milestone: v1.5 ✅ COMPLETED
 
 **前后端代码重构与目录整理** — 所有 5 个阶段（17-21）均已完成：
 
 ### 成果总结
+
 - **Phase 17**: 工具链搭建 — EditorConfig/ESLint 10.x/Stylelint/Checkstyle/ArchUnit
 - **Phase 18**: 后端包结构重组 — 71 个文件迁移到 10 个业务域包
 - **Phase 19**: 配置文件整理 — application.yaml 拆分为 5 个关注点文件
@@ -43,6 +42,7 @@ Progress: [██████████] 100%
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed: 36 (across v1.0-v1.4)
 - Average duration: N/A
 - Total execution time: N/A

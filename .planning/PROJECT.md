@@ -32,18 +32,27 @@ Vue 3 + Element Plus 管理后台系统，前端使用夏日海滩风主题（�
 - ✓ 修复 Gradle 测试中文路径 ClassNotFoundException — v1.4
 - ✓ 修复 pom.xml 中硬编码的数据库凭证 — v1.4
 
-## Current Milestone: v1.5 前后端代码重构与目录整理
+## Current Milestone: v1.6 代码深度清理与优化
 
-**Goal:** 重构前后端代码结构，整理代码和配置文件目录，消除技术债务
+**Goal:** 全面清理前后端代码，删除无用方法、无用依赖、无用组件，合并拆分代码类，优化代码结构
 
 **Target features:**
-- 后端代码包结构整理（controller/service/mapper/entity 等目录合理化）
-- 配置文件目录整理（application.yaml 拆分、统一配置管理）
-- 前端代码目录结构优化（views/api/router/store 分类整理）
-- 清理无用代码、冗余依赖
-- 代码风格统一、命名规范对齐
+- 后端 Java 代码清理（无用方法/类删除、类合并拆分、代码精简）
+- 后端依赖清理（pom/gradle 无用依赖移除）
+- 前端 Vue/TS 代码清理（冗余组件删除、API 层瘦身）
+- 前端依赖清理（npm 无用包移除）
+- 配置文件与环境变量清理
 
-### Previous Milestone
+### Previous Milestones
+
+**v1.5 前后端代码重构与目录整理 — ✅ 已完成 (2026-05-07)**
+
+**Delivered:**
+- 代码质量工具链（ESLint 10.x/Stylelint/Checkstyle/ArchUnit/PMD/SpotBugs/JaCoCo）
+- 后端 10 个业务域分包 + shared 通用层
+- 配置文件拆分为 5 个关注点（datasource/cache/mq/security/business）
+- 前端 components/api/router 按域拆分
+- 代码规范统一（命名/PascalCase/import 清理）
 
 **v1.4 Maven→Gradle + Spring Boot 4.1 升级 — ✅ 已完成 (2026-05-06)**
 
@@ -104,4 +113,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-06 after v1.4 completed, v1.5 initialized*
+*Last updated: 2026-05-07 after v1.5 completed, v1.6 initialized*
