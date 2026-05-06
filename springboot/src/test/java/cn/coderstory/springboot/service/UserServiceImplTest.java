@@ -1,11 +1,11 @@
 package cn.coderstory.springboot.service;
 
-import cn.coderstory.springboot.entity.User;
-import cn.coderstory.springboot.exception.BusinessException;
-import cn.coderstory.springboot.mapper.UserMapper;
-import cn.coderstory.springboot.security.PasswordEncoder;
-import cn.coderstory.springboot.service.impl.UserServiceImpl;
-import cn.coderstory.springboot.vo.UserVO;
+import cn.coderstory.springboot.user.entity.User;
+import cn.coderstory.springboot.shared.exception.BusinessException;
+import cn.coderstory.springboot.user.mapper.UserMapper;
+import cn.coderstory.springboot.shared.security.PasswordEncoder;
+import cn.coderstory.springboot.user.service.impl.UserServiceImpl;
+import cn.coderstory.springboot.user.dto.UserVO;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;

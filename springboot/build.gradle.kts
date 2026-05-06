@@ -3,6 +3,7 @@ plugins {
     id("org.springframework.boot") version "4.1.0-RC1"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.flywaydb.flyway") version "12.4.0"
+    checkstyle
 }
 
 val javaVersion = JavaLanguageVersion.of(26)
@@ -57,6 +58,7 @@ dependencies {
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("com.tngtech.archunit:archunit-junit5:1.4.0")
 }
 
 tasks.withType<JavaCompile>().configureEach {
@@ -65,6 +67,11 @@ tasks.withType<JavaCompile>().configureEach {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+checkstyle {
+    toolVersion = "10.21.4"
+    isIgnoreFailures = true
 }
 
 springBoot {

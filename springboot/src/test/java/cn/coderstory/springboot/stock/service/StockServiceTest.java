@@ -1,8 +1,9 @@
 package cn.coderstory.springboot.stock.service;
+import cn.coderstory.springboot.seckill.stock.service.StockService;
 
 import cn.coderstory.springboot.SpringbootApplication;
-import cn.coderstory.springboot.stock.entity.Stock;
-import cn.coderstory.springboot.stock.mapper.StockMapper;
+import cn.coderstory.springboot.seckill.stock.entity.Stock;
+import cn.coderstory.springboot.seckill.stock.mapper.StockMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,5 @@
 package cn.coderstory.springboot.security;
+import cn.coderstory.springboot.shared.security.IdempotentService;
 
 import cn.coderstory.springboot.SpringbootApplication;
 import org.junit.jupiter.api.*;

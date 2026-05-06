@@ -1,4 +1,5 @@
 package cn.coderstory.springboot.lock;
+import cn.coderstory.springboot.shared.lock.DistributedLockService;
 
 import cn.coderstory.springboot.SpringbootApplication;
 import org.junit.jupiter.api.*;

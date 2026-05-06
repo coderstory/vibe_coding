@@ -1,4 +1,5 @@
 package cn.coderstory.springboot.limiter;
+import cn.coderstory.springboot.shared.limiter.QpsLimiter;
 
 import cn.coderstory.springboot.SpringbootApplication;
 import org.junit.jupiter.api.*;
