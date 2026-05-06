@@ -17,15 +17,15 @@ npm run lint       # ESLint 检查
 
 ### 后端 (springboot)
 
-**注意：当前项目正从 Maven 迁移到 Gradle，build 文件以 pom.xml 为准**
+**注意：项目已完成从 Maven 到 Gradle 的迁移**
 
 ```powershell
 cd springboot
-./mvnw.cmd spring-boot:run   # 运行应用
-./mvnw.cmd package          # 编译打包
-./mvnw.cmd test             # 运行测试
-./mvnw.cmd test -Dtest=ClassName  # 运行单个测试类
-./mvnw.cmd package -DskipTests   # 跳过测试打包
+./gradlew bootRun          # 运行应用
+./gradlew build            # 编译打包
+./gradlew test             # 运行测试
+./gradlew test --tests "*ClassName"  # 运行单个测试类
+./gradlew build -x test    # 跳过测试打包
 ```
 
 ---
@@ -111,6 +111,7 @@ Flyway 脚本位于 `springboot/src/main/resources/db/migration/`
 - `docs/seckill/user-guide.md` - 秒杀系统用户手册
 - `docs/browser-automation-guide.md` - 浏览器自动化指南
 
+---
 
 # Superpowers-ZH 中文增强版
 
