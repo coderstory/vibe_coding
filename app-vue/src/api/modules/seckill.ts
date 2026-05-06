@@ -23,7 +23,7 @@
  *
  * 使用示例：
  * ```typescript
- * import { seckillApi, activityApi } from '@/api/seckill'
+ * import { seckillApi, activityApi } from '@/api/modules/seckill'
  *
  * // 获取活动详情
  * const res = await activityApi.get(1)
@@ -37,7 +37,7 @@
  * })
  * ```
  */
-import request from './request'
+import request from '../request'
 
 // ==================== 秒杀相关接口 ====================
 
@@ -53,17 +53,17 @@ import request from './request'
  */
 export interface SeckillRequest {
   /** 商品ID */
-  goodsId: number
+  goodsId: number;
   /** 活动ID */
-  activityId: number
+  activityId: number;
   /** 签名（防篡改，后端用于验证请求合法性） */
-  sign?: string
+  sign?: string;
   /** 时间戳（签名的一部分，用于验证签名是否过期） */
-  timestamp?: number
+  timestamp?: number;
   /** 幂等键（格式: user_{userId}_{activityId}_{timestamp}） */
-  idempotentKey?: string
+  idempotentKey?: string;
   /** 队列ID（前端生成，用于SSE通知） */
-  queueId?: string
+  queueId?: string;
 }
 
 /**
@@ -76,13 +76,13 @@ export interface SeckillRequest {
  */
 export interface SeckillResponse {
   /** 队列ID（用于查询结果和 SSE 订阅） */
-  queueId?: string
+  queueId?: string;
   /** 状态：0-排队中 1-成功 2-失败 */
-  status: number
+  status: number;
   /** 状态消息（失败时返回错误原因） */
-  message: string
+  message: string;
   /** 订单ID（成功时返回） */
-  orderId?: number
+  orderId?: number;
 }
 
 /**
@@ -244,7 +244,8 @@ export const seckillApi = {
         const data = JSON.parse(event.data) as SeckillResponse
         console.log('收到秒杀结果:', data)
         onMessage?.(data)
-      } catch (error) {
+      }
+      catch (error) {
         console.error('解析秒杀结果失败', error)
       }
     })
@@ -255,7 +256,8 @@ export const seckillApi = {
         const data = JSON.parse(event.data)
         console.log('状态更新:', data)
         // 可以在这里更新页面上的状态显示
-      } catch (error) {
+      }
+      catch (error) {
         console.error('解析状态更新失败', error)
       }
     })
@@ -311,21 +313,21 @@ export const seckillApi = {
  */
 export interface Goods {
   /** 商品ID（自增） */
-  id: number
+  id: number;
   /** 关联的活动ID */
-  activityId: number
+  activityId: number;
   /** 商品名称 */
-  name: string
+  name: string;
   /** 商品原价 */
-  originalPrice: number
+  originalPrice: number;
   /** 秒杀价格 */
-  seckillPrice: number
+  seckillPrice: number;
   /** 库存数量 */
-  stock: number
+  stock: number;
   /** 已售数量 */
-  sold: number
+  sold: number;
   /** 商品图片URL */
-  imageUrl: string
+  imageUrl: string;
 }
 
 /**
@@ -336,31 +338,31 @@ export interface Goods {
  */
 export interface ActivityDetail {
   /** 活动ID */
-  id: number
+  id: number;
   /** 活动名称 */
-  name: string
+  name: string;
   /** 活动描述 */
-  description: string
+  description: string;
   /** 开始时间 */
-  startTime: string
+  startTime: string;
   /** 结束时间 */
-  endTime: string
+  endTime: string;
   /** 活动状态（0=未开始, 1=进行中, 2=已结束） */
-  status: number
+  status: number;
   /** 每人限购数量 */
-  perLimit: number
+  perLimit: number;
   /** 是否启用验证码 */
-  enableCaptcha: boolean
+  enableCaptcha: boolean;
   /** 是否启用IP限制 */
-  enableIpLimit: boolean
+  enableIpLimit: boolean;
   /** 签名密钥 */
-  signKey: string
+  signKey: string;
   /** 创建时间 */
-  createTime: string
+  createTime: string;
   /** 更新时间 */
-  updateTime: string
+  updateTime: string;
   /** 关联的商品 */
-  goods: Goods
+  goods: Goods;
 }
 
 /**
@@ -370,21 +372,21 @@ export interface ActivityDetail {
  */
 export interface Activity {
   /** 活动ID（自增） */
-  id: number
+  id: number;
   /** 活动名称 */
-  name: string
+  name: string;
   /** 活动描述 */
-  description: string
+  description: string;
   /** 开始时间（ISO 格式） */
-  startTime: string
+  startTime: string;
   /** 结束时间（ISO 格式） */
-  endTime: string
+  endTime: string;
   /** 活动状态（0=未开始, 1=进行中, 2=已结束） */
-  status: number
+  status: number;
   /** 每人限购数量 */
-  perLimit: number
+  perLimit: number;
   /** 总库存（预留字段） */
-  totalStock: number
+  totalStock: number;
 }
 
 /**
@@ -394,19 +396,19 @@ export interface Activity {
  */
 export interface Reservation {
   /** 预约ID */
-  id: number
+  id: number;
   /** 用户ID */
-  userId: number
+  userId: number;
   /** 活动ID */
-  activityId: number
+  activityId: number;
   /** 预约时间 */
-  reserveTime: string
+  reserveTime: string;
   /** 状态（0=预约中, 1=已提醒, 2=已过期） */
-  status: number
+  status: number;
   /** 是否已发送提醒 */
-  notified: boolean
+  notified: boolean;
   /** 提醒时间 */
-  notifyTime: string | null
+  notifyTime: string | null;
 }
 
 /**
@@ -430,7 +432,7 @@ export const activityApi = {
    * ```
    */
   list(page: number = 1, size: number = 20) {
-    return request.get<{ records: Activity[]; total: number }>(`/seckill/activity`, { params: { page, size } })
+    return request.get<{ records: Activity[]; total: number }>('/seckill/activity', { params: { page, size } })
   },
 
   /**

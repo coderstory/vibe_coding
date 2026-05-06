@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { ref, watch, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
-import { resetConsumerOffset, getTopicList } from '@/api/rocketmq'
+import { resetConsumerOffset, getTopicList } from '@/api/modules/rocketmq'
 
 const props = defineProps<{
-  modelValue: boolean
-  groupName: string
+  modelValue: boolean;
+  groupName: string;
 }>()
 
 const emit = defineEmits<{
-  'update:modelValue': [value: boolean]
-  'success': []
+  'update:modelValue': [value: boolean];
+  'success': [];
 }>()
 
 const dialogVisible = ref(props.modelValue)
@@ -37,7 +37,8 @@ async function loadTopics() {
   try {
     const res = await getTopicList()
     topicList.value = res.data.records
-  } catch {
+  }
+  catch {
     // 忽略错误
   }
 }
@@ -62,9 +63,11 @@ async function handleSubmit() {
     ElMessage.success('位点重置成功')
     emit('success')
     emit('update:modelValue', false)
-  } catch (error: any) {
+  }
+  catch (error: any) {
     ElMessage.error(error.message || '重置失败')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }

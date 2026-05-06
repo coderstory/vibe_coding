@@ -32,10 +32,12 @@ async function handleCommand(command: string) {
 
       await userStore.logout()
       router.push('/login')
-    } catch {
+    }
+    catch {
       // 用户取消操作
     }
-  } else if (command === 'profile') {
+  }
+  else if (command === 'profile') {
     // TODO: 跳转到个人中心
   }
 }

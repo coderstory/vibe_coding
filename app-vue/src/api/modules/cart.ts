@@ -1,10 +1,10 @@
-import request from './request'
+import request from '../request'
 
 export interface Cart {
-  id: number
-  userId: number
-  goodsId: number
-  quantity: number
+  id: number;
+  userId: number;
+  goodsId: number;
+  quantity: number;
 }
 
 export const cartApi = {

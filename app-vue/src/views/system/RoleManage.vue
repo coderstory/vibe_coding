@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
-import { getRoleList, createRole, updateRole, deleteRole, getRoleMenus, assignRoleMenus, getMenuTree } from '@/api/role'
+import { getRoleList, createRole, updateRole, deleteRole, getRoleMenus, assignRoleMenus, getMenuTree } from '@/api/modules/role'
 import type { Role, MenuTree, CreateRoleParams, UpdateRoleParams } from '@/api/types'
 import type { ElTree } from 'element-plus'
 
@@ -65,9 +65,11 @@ async function loadRoleList() {
     const res = await getRoleList(params)
     roleList.value = res.data.records
     total.value = res.data.total
-  } catch {
+  }
+  catch {
     ElMessage.error('加载角色列表失败')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -131,7 +133,8 @@ function handleDelete(row: Role) {
       await deleteRole(row.id)
       ElMessage.success('角色删除成功')
       loadRoleList()
-    } catch {
+    }
+    catch {
       ElMessage.error('角色删除失败')
     }
   }).catch(() => {})
@@ -153,7 +156,8 @@ async function handleAssignPermission(row: Role) {
     checkedMenuIds.value = roleMenuRes.data || []
 
     permissionDialogVisible.value = true
-  } catch {
+  }
+  catch {
     ElMessage.error('加载权限数据失败')
   }
 }
@@ -173,7 +177,8 @@ async function handleSaveRole() {
         }
         await updateRole(roleForm.id as number, params)
         ElMessage.success('角色更新成功')
-      } else {
+      }
+      else {
         const params: CreateRoleParams = {
           roleName: roleForm.roleName,
           roleCode: roleForm.roleCode,
@@ -184,7 +189,8 @@ async function handleSaveRole() {
       }
       dialogVisible.value = false
       loadRoleList()
-    } catch {
+    }
+    catch {
       ElMessage.error(isEdit.value ? '角色更新失败' : '角色创建失败')
     }
   })
@@ -203,7 +209,8 @@ async function handleSavePermission() {
     await assignRoleMenus(currentRoleId.value as number, allSelected)
     ElMessage.success('权限保存成功')
     permissionDialogVisible.value = false
-  } catch {
+  }
+  catch {
     ElMessage.error('权限保存失败')
   }
 }
@@ -228,7 +235,7 @@ onMounted(() => {
 <template>
   <div class="page-container">
     <h2 class="page-title">角色管理</h2>
-    
+
     <!-- 搜索区域 -->
     <div class="search-section">
       <el-form :model="searchForm" inline>
@@ -241,12 +248,12 @@ onMounted(() => {
         </el-form-item>
       </el-form>
     </div>
-    
+
     <!-- 操作按钮 -->
     <div class="action-section">
       <el-button type="primary" @click="handleCreate">新建角色</el-button>
     </div>
-    
+
     <!-- 角色列表 -->
     <el-table :data="roleList" stripe border v-loading="loading" class="role-table">
       <el-table-column type="index" label="序号" width="60" align="center" />
@@ -262,7 +269,7 @@ onMounted(() => {
         </template>
       </el-table-column>
     </el-table>
-    
+
     <!-- 分页 -->
     <div class="pagination-section">
       <el-pagination
@@ -276,7 +283,7 @@ onMounted(() => {
         @size-change="handleSizeChange"
       />
     </div>
-    
+
     <!-- 新建/编辑角色对话框 -->
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px" :close-on-click-modal="false">
       <el-form ref="roleFormRef" :model="roleForm" :rules="roleFormRules" label-width="100px">
@@ -295,7 +302,7 @@ onMounted(() => {
         <el-button type="primary" @click="handleSaveRole">保存</el-button>
       </template>
     </el-dialog>
-    
+
     <!-- 分配权限对话框 -->
     <el-dialog v-model="permissionDialogVisible" :title="permissionDialogTitle" width="500px" :close-on-click-modal="false">
       <div class="permission-tree-container">

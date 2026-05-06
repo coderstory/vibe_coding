@@ -16,34 +16,34 @@ let animationId: number | null = null
 let time = 0
 
 interface Wave {
-  amplitude: number
-  frequency: number
-  speed: number
-  phase: number
-  color: string
-  yOffset: number
+  amplitude: number;
+  frequency: number;
+  speed: number;
+  phase: number;
+  color: string;
+  yOffset: number;
 }
 
 interface Bubble {
-  x: number
-  y: number
-  radius: number
-  speed: number
-  wobble: number
-  wobbleSpeed: number
-  alpha: number
+  x: number;
+  y: number;
+  radius: number;
+  speed: number;
+  wobble: number;
+  wobbleSpeed: number;
+  alpha: number;
 }
 
 interface Whale {
-  x: number
-  y: number
-  size: number
-  speed: number
-  tailPhase: number
-  bodyWave: number
-  blowholeTimer: number
-  bubbles: Bubble[]
-  direction: number // 1 = right, -1 = left
+  x: number;
+  y: number;
+  size: number;
+  speed: number;
+  tailPhase: number;
+  bodyWave: number;
+  blowholeTimer: number;
+  bubbles: Bubble[];
+  direction: number; // 1 = right, -1 = left
 }
 
 function initCanvas() {
@@ -62,7 +62,7 @@ function initCanvas() {
     { amplitude: 45, frequency: 0.015, speed: 0.03, phase: 2, color: 'rgba(52, 152, 219, 0.6)', yOffset: 0.74 },
     { amplitude: 40, frequency: 0.018, speed: 0.035, phase: 3, color: 'rgba(93, 173, 226, 0.5)', yOffset: 0.76 },
     { amplitude: 35, frequency: 0.02, speed: 0.04, phase: 4, color: 'rgba(133, 193, 233, 0.4)', yOffset: 0.78 },
-    { amplitude: 30, frequency: 0.025, speed: 0.05, phase: 5, color: 'rgba(180, 220, 245, 0.3)', yOffset: 0.8 },
+    { amplitude: 30, frequency: 0.025, speed: 0.05, phase: 5, color: 'rgba(180, 220, 245, 0.3)', yOffset: 0.8 }
   ]
 
   const ambientBubbles: Bubble[] = []
@@ -118,7 +118,7 @@ function initCanvas() {
     }
 
     // 更新鲸鱼泡泡
-    whale.bubbles = whale.bubbles.filter(b => {
+    whale.bubbles = whale.bubbles.filter((b) => {
       b.y -= b.speed
       b.x -= whale.speed * whale.direction * 0.3
       b.wobble += b.wobbleSpeed
@@ -130,7 +130,8 @@ function initCanvas() {
     // 到达边界转向
     if (whale.x > canvas.width + whale.size * 2) {
       whale.direction = -1
-    } else if (whale.x < -whale.size * 2) {
+    }
+    else if (whale.x < -whale.size * 2) {
       whale.direction = 1
     }
   }
@@ -222,7 +223,7 @@ function initCanvas() {
     ctx.restore()
 
     // 绘制鲸鱼泡泡
-    whale.bubbles.forEach(b => {
+    whale.bubbles.forEach((b) => {
       ctx.beginPath()
       ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2)
       ctx.fillStyle = `rgba(255, 255, 255, ${b.alpha * 0.4})`

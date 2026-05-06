@@ -8,7 +8,7 @@
  * - 新增/编辑/删除/发布活动
  */
 import { ref, onMounted, onActivated } from 'vue'
-import { activityApi } from '@/api/seckill'
+import { activityApi } from '@/api/modules/seckill'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
 
@@ -26,9 +26,11 @@ async function loadActivities() {
     const res = await activityApi.list()
     activityList.value = res.data?.records || []
     total.value = res.data?.total || 0
-  } catch (e) {
+  }
+  catch (e) {
     ElMessage.error('加载活动列表失败')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -71,7 +73,8 @@ async function handlePublish(id: number) {
     await activityApi.publish(id)
     ElMessage.success('发布成功')
     loadActivities()
-  } catch (e) {
+  }
+  catch (e) {
     // 错误消息已由 axios 拦截器通过 ElMessage 显示，此处无需重复处理
     if (e === 'cancel') {
       // 用户取消确认对话框，不做任何处理
@@ -83,7 +86,8 @@ async function handlePreheat(id: number) {
   try {
     await activityApi.preheat(id)
     ElMessage.success('预热成功，Redis数据已更新')
-  } catch (e) {
+  }
+  catch (e) {
     // 错误由拦截器处理
   }
 }
@@ -96,7 +100,8 @@ async function handleEnd(id: number) {
     await activityApi.end(id)
     ElMessage.success('结束成功')
     loadActivities()
-  } catch (e) {
+  }
+  catch (e) {
     // 错误消息已由 axios 拦截器通过 ElMessage 显示，此处无需重复处理
     if (e === 'cancel') {
       // 用户取消确认对话框，不做任何处理
@@ -112,7 +117,8 @@ async function handleDelete(id: number) {
     await activityApi.delete(id)
     ElMessage.success('删除成功')
     loadActivities()
-  } catch (e) {
+  }
+  catch (e) {
     // 错误消息已由 axios 拦截器通过 ElMessage 显示，此处无需重复处理
     if (e === 'cancel') {
       // 用户取消确认对话框，不做任何处理

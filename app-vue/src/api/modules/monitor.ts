@@ -1,14 +1,14 @@
-import request from './request'
+import request from '../request'
 
 export interface MonitorMetrics {
-  concurrentCount: number
-  qpsKeys: number
-  timestamp: number
+  concurrentCount: number;
+  qpsKeys: number;
+  timestamp: number;
 }
 
 export interface GoodsStockInfo {
-  goodsId: number
-  availableStock: number
+  goodsId: number;
+  availableStock: number;
 }
 
 export const monitorApi = {

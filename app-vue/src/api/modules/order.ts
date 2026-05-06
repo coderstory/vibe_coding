@@ -1,16 +1,16 @@
-import request from './request'
+import request from '../request'
 
 export interface Order {
-  id: number
-  orderNo: string
-  userId: number
-  goodsId: number
-  activityId: number
-  quantity: number
-  price: number
-  status: number
-  queueId: string
-  createTime: string
+  id: number;
+  orderNo: string;
+  userId: number;
+  goodsId: number;
+  activityId: number;
+  quantity: number;
+  price: number;
+  status: number;
+  queueId: string;
+  createTime: string;
 }
 
 export const orderApi = {

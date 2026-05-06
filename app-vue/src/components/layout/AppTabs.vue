@@ -3,8 +3,8 @@ import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 interface Tab {
-  path: string
-  title: string
+  path: string;
+  title: string;
 }
 
 const route = useRoute()
@@ -99,7 +99,8 @@ function refreshCurrentTab() {
   // 如果刷新的是当前激活的标签页，使用 router.replace 刷新
   if (rightClickedTab.value.path === activeTab.value) {
     router.replace(rightClickedTab.value.path)
-  } else {
+  }
+  else {
     // 如果刷新的是非激活标签页，先切换过去再刷新
     router.push(rightClickedTab.value.path)
     setTimeout(() => {

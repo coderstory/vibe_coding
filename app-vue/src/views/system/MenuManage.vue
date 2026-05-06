@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
-import { getMenuTree, createMenu, updateMenu, deleteMenu } from '@/api/menu'
+import { getMenuTree, createMenu, updateMenu, deleteMenu } from '@/api/modules/menu'
 import type { MenuTree, Menu } from '@/api/types'
 import type { ElTree } from 'element-plus'
 
@@ -42,9 +42,11 @@ async function loadMenuTree() {
   try {
     const res = await getMenuTree()
     menuTreeData.value = res.data || []
-  } catch {
+  }
+  catch {
     ElMessage.error('加载菜单列表失败')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -53,7 +55,7 @@ async function loadMenuTree() {
 function getAllMenuNodes(): Menu[] {
   const nodes: Menu[] = []
   function flatten(list: MenuTree[]) {
-    list.forEach(item => {
+    list.forEach((item) => {
       nodes.push(item)
       if (item.children && item.children.length > 0) {
         flatten(item.children)
@@ -111,7 +113,8 @@ function handleDelete(row: Menu) {
       await deleteMenu(row.id)
       ElMessage.success('菜单删除成功')
       loadMenuTree()
-    } catch {
+    }
+    catch {
       ElMessage.error('菜单删除失败')
     }
   }).catch(() => {})
@@ -128,13 +131,15 @@ async function handleSaveMenu() {
       if (isEdit.value) {
         await updateMenu(menuForm.id as number, menuForm)
         ElMessage.success('菜单更新成功')
-      } else {
+      }
+      else {
         await createMenu(menuForm)
         ElMessage.success('菜单创建成功')
       }
       dialogVisible.value = false
       loadMenuTree()
-    } catch {
+    }
+    catch {
       ElMessage.error(isEdit.value ? '菜单更新失败' : '菜单创建失败')
     }
   })

@@ -2,38 +2,38 @@
  * RocketMQ Topic 管理 API
  * 提供 Topic 的列表查询、详情查看、创建、删除等操作
  */
-import request from './request'
-import type { ApiResponse } from './types'
+import request from '../request'
+import type { ApiResponse } from '../types'
 
 /**
 
  * Topic 视图对象
  */
 export interface TopicVO {
-  topicName: string
-  queueCount: number
-  status: 'ACTIVE' | 'SUSPEND' | 'UNKNOWN'
-  messageCount: number
-  createTime: string
-  readQueueNums?: number
-  perm?: string
+  topicName: string;
+  queueCount: number;
+  status: 'ACTIVE' | 'SUSPEND' | 'UNKNOWN';
+  messageCount: number;
+  createTime: string;
+  readQueueNums?: number;
+  perm?: string;
 }
 
 /**
  * Topic 详情视图对象
  */
 export interface TopicDetailVO extends TopicVO {
-  routeInfo?: any
-  subscriptions?: string[]
+  routeInfo?: any;
+  subscriptions?: string[];
 }
 
 /**
  * 创建 Topic 参数
  */
 export interface CreateTopicParams {
-  topicName: string
-  queueCount?: number
-  perm?: string
+  topicName: string;
+  queueCount?: number;
+  perm?: string;
 }
 
 /**
@@ -76,28 +76,28 @@ export function deleteTopic(topicName: string) {
  * Consumer Group 视图对象
  */
 export interface ConsumerGroupVO {
-  group: string
-  groupType: 'BROADCASTING' | 'CLUSTERING' | 'UNKNOWN'
-  status: 'OK' | 'REBALANCE_NOT_INIT' | 'OFFLINE' | 'UNKNOWN'
-  consumerCount: number
-  accumulatedDiff: number
+  group: string;
+  groupType: 'BROADCASTING' | 'CLUSTERING' | 'UNKNOWN';
+  status: 'OK' | 'REBALANCE_NOT_INIT' | 'OFFLINE' | 'UNKNOWN';
+  consumerCount: number;
+  accumulatedDiff: number;
 }
 
 /**
  * Consumer Group 详情视图对象
  */
 export interface ConsumerGroupDetailVO extends ConsumerGroupVO {
-  totalDiff: number
-  offsetTable: Record<string, number>
-  subscriptions?: any[]
+  totalDiff: number;
+  offsetTable: Record<string, number>;
+  subscriptions?: any[];
 }
 
 /**
  * 重置位点参数
  */
 export interface ResetOffsetParams {
-  topic: string
-  timestamp: number
+  topic: string;
+  timestamp: number;
 }
 
 /**
@@ -141,38 +141,38 @@ export function deleteConsumerGroup(group: string) {
  * Message 视图对象
  */
 export interface MessageVO {
-  msgId: string
-  topic: string
-  tags: string
-  keys: string
-  timestamp: number
-  queueId: number
-  queueOffset: number
-  properties: Record<string, string>
+  msgId: string;
+  topic: string;
+  tags: string;
+  keys: string;
+  timestamp: number;
+  queueId: number;
+  queueOffset: number;
+  properties: Record<string, string>;
 }
 
 /**
  * Message 详情视图对象
  */
 export interface MessageDetailVO extends MessageVO {
-  body: string
+  body: string;
 }
 
 /**
  * Message Trace 视图对象
  */
 export interface MessageTraceVO {
-  traceType: string
-  traceTime: number
-  regionId: string
-  groupName: string
-  costTime: number
-  traceStatus: 'SUCCESS' | 'FAILED' | 'PARTIAL_SUCCESS'
-  customId: string
-  clientHost: string
-  serverHost: string
-  storeHost: string
-  requestCode: string
+  traceType: string;
+  traceTime: number;
+  regionId: string;
+  groupName: string;
+  costTime: number;
+  traceStatus: 'SUCCESS' | 'FAILED' | 'PARTIAL_SUCCESS';
+  customId: string;
+  clientHost: string;
+  serverHost: string;
+  storeHost: string;
+  requestCode: string;
 }
 
 /**
@@ -211,14 +211,14 @@ export function getMessageTrace(topic: string, msgId: string) {
  * 发送消息结果
  */
 export interface SendMessageResult {
-  msgId: string
-  topic: string
-  tags: string
-  keys: string
-  sendStatus: string
-  queueId: number
-  queueOffset: number
-  timestamp: number
+  msgId: string;
+  topic: string;
+  tags: string;
+  keys: string;
+  sendStatus: string;
+  queueId: number;
+  queueOffset: number;
+  timestamp: number;
 }
 
 /**
@@ -229,7 +229,7 @@ export interface SendMessageResult {
  * @param body 消息内容
  */
 export function sendMessage(topic: string, body: string, tags?: string, keys?: string) {
-  return request.post<ApiResponse<SendMessageResult>>(`/rocketmq/messages`, { topic, tags, keys, body })
+  return request.post<ApiResponse<SendMessageResult>>('/rocketmq/messages', { topic, tags, keys, body })
 }
 
 // ==================== Dashboard 监控面板 ====================
@@ -238,11 +238,11 @@ export function sendMessage(topic: string, body: string, tags?: string, keys?: s
  * 集群概览
  */
 export interface ClusterOverviewVO {
-  clusterName: string
-  brokerCount: number
-  topicCount: number
-  consumerGroupCount: number
-  totalDiff: number
+  clusterName: string;
+  brokerCount: number;
+  topicCount: number;
+  consumerGroupCount: number;
+  totalDiff: number;
 }
 
 export function getClusterOverview() {
@@ -253,11 +253,11 @@ export function getClusterOverview() {
  * Broker 状态
  */
 export interface BrokerStatusVO {
-  brokerName: string
-  brokerAddr: string
-  status: string
-  version: string
-  inBrokerHouseDate: string
+  brokerName: string;
+  brokerAddr: string;
+  status: string;
+  version: string;
+  inBrokerHouseDate: string;
 }
 
 export function getBrokerStatusList() {
@@ -268,9 +268,9 @@ export function getBrokerStatusList() {
  * Topic 堆积量
  */
 export interface TopicBacklogVO {
-  topicName: string
-  diff: number
-  lastUpdateTime: number
+  topicName: string;
+  diff: number;
+  lastUpdateTime: number;
 }
 
 export function getTopicBacklogList() {

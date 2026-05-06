@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getConsumerGroupList, deleteConsumerGroup, type ConsumerGroupVO } from '@/api/rocketmq'
+import { getConsumerGroupList, deleteConsumerGroup, type ConsumerGroupVO } from '@/api/modules/rocketmq'
 import ConsumerGroupDetail from './ConsumerGroupDetail.vue'
 
 // 状态
@@ -93,9 +93,11 @@ async function loadData() {
     const res = await getConsumerGroupList(searchForm.keyword || undefined)
     consumerGroupList.value = res.data.records
     total.value = res.data.total
-  } catch {
+  }
+  catch {
     // 错误已在 request.ts 的响应拦截器中处理
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -132,7 +134,8 @@ async function handleDelete(row: ConsumerGroupVO) {
     await deleteConsumerGroup(row.group)
     ElMessage.success('删除成功')
     loadData()
-  } catch {
+  }
+  catch {
     // 取消或错误已在 request.ts 拦截
   }
 }

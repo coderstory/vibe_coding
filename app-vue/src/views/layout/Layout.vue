@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import AppMenu from '@/components/AppMenu.vue'
-import AppHeader from '@/components/AppHeader.vue'
-import AppTabs from '@/components/AppTabs.vue'
+import AppMenu from '@/components/layout/AppMenu.vue'
+import AppHeader from '@/components/layout/AppHeader.vue'
+import AppTabs from '@/components/layout/AppTabs.vue'
 import '@/assets/themes/animations/_keyframes.css'
 import '@/assets/themes/animations/_wave.css'
 import '@/assets/themes/animations/_bubble.css'
@@ -40,7 +40,7 @@ function toggleCollapse() {
       </div>
       <AppMenu :collapsed="collapsed" />
     </el-aside>
-    
+
     <el-container class="main-container">
       <el-header class="layout-header">
         <div class="header-left">
@@ -50,9 +50,9 @@ function toggleCollapse() {
         </div>
         <AppHeader />
       </el-header>
-      
+
       <AppTabs />
-      
+
       <el-main class="layout-main">
         <router-view v-slot="{ Component }">
           <keep-alive>

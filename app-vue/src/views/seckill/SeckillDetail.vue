@@ -24,7 +24,7 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Loading } from '@element-plus/icons-vue'
-import { seckillApi, activityApi, type ActivityDetail, type Goods, type SeckillResponse } from '@/api/seckill'
+import { seckillApi, activityApi, type ActivityDetail, type Goods, type SeckillResponse } from '@/api/modules/seckill'
 
 const route = useRoute()
 const router = useRouter()
@@ -106,13 +106,16 @@ async function loadActivity() {
       activity.value = res.data
       // 活动信息加载成功后，获取库存
       await loadStock()
-    } else {
+    }
+    else {
       ElMessage.error(res.message || '加载活动详情失败')
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('加载活动详情失败', error)
     ElMessage.error('加载活动详情失败，请重试')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -133,7 +136,8 @@ async function loadStock() {
   try {
     const res = await seckillApi.getStock(activity.value.id)
     stock.value = res.data
-  } catch (error) {
+  }
+  catch (error) {
     console.error('加载库存失败', error)
     ElMessage.error('加载库存失败，请重试')
   }
@@ -175,7 +179,7 @@ async function handleSeckill() {
     const queueId = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
 
     // 2. 先建立 SSE 连接，确保能收到通知
-    queueing.value = true  // 显示排队模态窗
+    queueing.value = true // 显示排队模态窗
     subscribeSeckillResult(queueId)
 
     // 3. 获取签名（防止请求被篡改）
@@ -185,7 +189,8 @@ async function handleSeckill() {
       const signRes = await seckillApi.getSign(activity.value.goods.id)
       sign = signRes.data.sign
       timestamp = signRes.data.timestamp
-    } catch (e) {
+    }
+    catch (e) {
       console.error('获取签名失败', e)
       ElMessage.error('获取签名失败，请刷新页面重试')
       eventSource?.close()
@@ -201,7 +206,7 @@ async function handleSeckill() {
       sign,
       timestamp,
       idempotentKey,
-      queueId  // 传入前端生成的queueId
+      queueId // 传入前端生成的queueId
     })
 
     // 5. 处理响应（等待SSE通知即可）
@@ -211,13 +216,15 @@ async function handleSeckill() {
       eventSource = null
       queueing.value = false
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('抢购失败', error)
     ElMessage.error('抢购失败，请稍后重试')
     eventSource?.close()
     eventSource = null
     queueing.value = false
-  } finally {
+  }
+  finally {
     seckilling.value = false
   }
 }
@@ -250,16 +257,18 @@ function subscribeSeckillResult(queueId: string) {
     queueId,
     // 消息回调：处理秒杀结果
     (data: SeckillResponse) => {
-      queueing.value = false  // 关闭模态窗
+      queueing.value = false // 关闭模态窗
       if (data.status === 1) {
         // status=1: 抢购成功
         ElMessage.success('恭喜！抢购成功！')
         // 跳转到订单确认页面
         router.push('/order/confirm')
-      } else if (data.status === 2) {
+      }
+      else if (data.status === 2) {
         // status=2: 抢购失败
         ElMessage.error(data.message || '抢购失败')
-      } else {
+      }
+      else {
         // status=0: 排队中或其他状态
         ElMessage.info(data.message || '处理中...')
       }
@@ -270,7 +279,7 @@ function subscribeSeckillResult(queueId: string) {
     },
     // 错误回调：处理连接异常
     (error: Event) => {
-      queueing.value = false  // 关闭模态窗
+      queueing.value = false // 关闭模态窗
       console.error('SSE 连接错误', error)
       ElMessage.warning('实时通知连接中断，请刷新页面重试')
     }
@@ -289,7 +298,8 @@ async function handleReserve() {
   try {
     await activityApi.reserve(activity.value.id)
     ElMessage.success('预约成功，活动开始前会通知您')
-  } catch (error) {
+  }
+  catch (error) {
     console.error('预约失败', error)
     ElMessage.error('预约失败，请重试')
   }

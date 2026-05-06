@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { monitorApi } from '@/api/monitor'
-import type { MonitorMetrics } from '@/api/monitor'
+import { monitorApi } from '@/api/modules/monitor'
+import type { MonitorMetrics } from '@/api/modules/monitor'
 
 const metrics = ref<MonitorMetrics | null>(null)
 const loading = ref(false)
@@ -23,7 +23,8 @@ async function loadMetrics() {
   try {
     const res = await monitorApi.getMetrics()
     metrics.value = res.data
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }

@@ -9,7 +9,7 @@
  * - 新增/编辑/删除商品
  */
 import { ref, onMounted, onActivated } from 'vue'
-import { goodsApi, type SeckillGoods } from '@/api/goods'
+import { goodsApi, type SeckillGoods } from '@/api/modules/goods'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
 
@@ -28,9 +28,11 @@ async function loadGoods() {
     const res = await goodsApi.getGoodsPage(currentPage.value, pageSize.value, activityId.value)
     goodsList.value = res.data.records
     total.value = res.data.total
-  } catch (e) {
+  }
+  catch (e) {
     ElMessage.error('加载商品列表失败')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -51,7 +53,8 @@ async function handleDelete(id: number) {
     await goodsApi.deleteGoods(id)
     ElMessage.success('删除成功')
     loadGoods()
-  } catch (e) {
+  }
+  catch (e) {
     // 错误消息已由 axios 拦截器通过 ElMessage 显示，此处无需重复处理
     if (e === 'cancel') {
       // 用户取消确认对话框，不做任何处理

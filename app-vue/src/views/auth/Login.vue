@@ -35,10 +35,12 @@ async function handleLogin() {
       await userStore.login(loginForm.username, loginForm.password)
       ElMessage.success('登录成功')
       router.push('/index')
-    } catch (error: unknown) {
+    }
+    catch (error: unknown) {
       const err = error as Error
       ElMessage.error(err.message || '用户名或密码错误')
-    } finally {
+    }
+    finally {
       loading.value = false
     }
   })
@@ -53,13 +55,13 @@ function handleKeydown(e: KeyboardEvent) {
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 let animationFrameId: number
 let particles: Array<{
-  x: number
-  y: number
-  vx: number
-  vy: number
-  radius: number
-  color: string
-  alpha: number
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  radius: number;
+  color: string;
+  alpha: number;
 }>
 
 function initParticles(canvas: HTMLCanvasElement) {
@@ -153,13 +155,13 @@ onUnmounted(() => {
 const UserIcon = {
   render() {
     return h('svg', {
-      xmlns: 'http://www.w3.org/2000/svg',
-      viewBox: '0 0 24 24',
-      fill: 'none',
-      stroke: 'currentColor',
+      'xmlns': 'http://www.w3.org/2000/svg',
+      'viewBox': '0 0 24 24',
+      'fill': 'none',
+      'stroke': 'currentColor',
       'stroke-width': '2',
-      width: '18',
-      height: '18'
+      'width': '18',
+      'height': '18'
     }, [
       h('path', { d: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2' }),
       h('circle', { cx: '12', cy: '7', r: '4' })
@@ -170,13 +172,13 @@ const UserIcon = {
 const LockIcon = {
   render() {
     return h('svg', {
-      xmlns: 'http://www.w3.org/2000/svg',
-      viewBox: '0 0 24 24',
-      fill: 'none',
-      stroke: 'currentColor',
+      'xmlns': 'http://www.w3.org/2000/svg',
+      'viewBox': '0 0 24 24',
+      'fill': 'none',
+      'stroke': 'currentColor',
       'stroke-width': '2',
-      width: '18',
-      height: '18'
+      'width': '18',
+      'height': '18'
     }, [
       h('rect', { x: '3', y: '11', width: '18', height: '11', rx: '2', ry: '2' }),
       h('path', { d: 'M7 11V7a5 5 0 0 1 10 0v4' })

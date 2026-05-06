@@ -13,45 +13,45 @@
 import { ref, watch, computed, shallowRef, onBeforeUnmount } from 'vue'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import '@wangeditor/editor/dist/css/style.css'
-import { uploadFile } from '@/api/knowledge'
-import { getArticleDetail, createArticle, updateArticle, getAllTags, createTag } from '@/api/knowledge'
+import { uploadFile } from '@/api/modules/knowledge'
+import { getArticleDetail, createArticle, updateArticle, getAllTags, createTag } from '@/api/modules/knowledge'
 import { ElMessage } from 'element-plus'
 import type { KnowledgeTag, CreateArticleParams, UpdateArticleParams } from '@/api/types'
 
 /** 文章表单数据结构 */
 interface ArticleForm {
   /** 文章标题 */
-  title: string
+  title: string;
   /** 分类 ID */
-  categoryId: number | null
+  categoryId: number | null;
   /** 标签 ID 列表 */
-  tagIds: (string | number)[]
+  tagIds: (string | number)[];
   /** 状态 */
-  status: number
+  status: number;
 }
 
 /** 组件Props定义 */
 const props = defineProps<{
   /** 弹窗显示状态 */
-  modelValue: boolean
+  modelValue: boolean;
   /** 文章 ID（编辑时传入） */
-  articleId?: number | null
+  articleId?: number | null;
   /** 默认分类 ID */
-  categoryId?: number | null
+  categoryId?: number | null;
 }>()
 
 /** 组件事件定义 */
 const emit = defineEmits<{
   /** 更新弹窗显示状态 */
-  'update:modelValue': [value: boolean]
+  'update:modelValue': [value: boolean];
   /** 保存成功后触发 */
-  'success': []
+  'success': [];
 }>()
 
 /** 弹窗显示状态（双向绑定） */
 const visible = computed({
   get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val)
+  set: val => emit('update:modelValue', val)
 })
 
 /** 是否为编辑模式 */
@@ -88,7 +88,7 @@ const handleCreated = (editor: InstanceType<typeof Editor>) => {
  * @param insertFn - 插入图片的回调函数
  */
 const customUpload = (file: File, insertFn: (url: string, alt: string, href: string) => void) => {
-  uploadFile(0, file.name, file).then(res => {
+  uploadFile(0, file.name, file).then((res) => {
     insertFn(`/api/knowledge/files/${res.data.id}`, file.name, '')
   }).catch((err) => {
     ElMessage.error('图片上传失败')
@@ -131,7 +131,8 @@ watch(visible, async (val) => {
     await loadTags()
     if (props.articleId) {
       await loadArticle()
-    } else {
+    }
+    else {
       resetForm()
     }
   }
@@ -144,7 +145,8 @@ async function loadTags() {
   try {
     const res = await getAllTags()
     allTags.value = res.data || []
-  } catch (e) {
+  }
+  catch (e) {
     console.error('加载标签失败', e)
   }
 }
@@ -167,7 +169,8 @@ async function loadArticle() {
       status: article.status
     }
     editorData.value = article.content || ''
-  } catch {
+  }
+  catch {
     ElMessage.error('加载文章失败')
   }
 }
@@ -222,13 +225,15 @@ async function handleSave() {
     if (isEdit.value) {
       await updateArticle(props.articleId as number, data as UpdateArticleParams)
       ElMessage.success('更新成功')
-    } else {
+    }
+    else {
       await createArticle(data as CreateArticleParams)
       ElMessage.success('创建成功')
     }
     emit('success')
     visible.value = false
-  } catch {
+  }
+  catch {
     ElMessage.error(isEdit.value ? '更新失败' : '创建失败')
   }
 }

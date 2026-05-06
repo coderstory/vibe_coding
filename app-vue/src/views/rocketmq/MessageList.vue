@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
-import { getTopicList, getMessageList, getMessageDetail, getMessageTrace, sendMessage, type TopicVO, type MessageVO, type MessageDetailVO, type MessageTraceVO } from '@/api/rocketmq'
+import { getTopicList, getMessageList, getMessageDetail, getMessageTrace, sendMessage, type TopicVO, type MessageVO, type MessageDetailVO, type MessageTraceVO } from '@/api/modules/rocketmq'
 
 // 状态
 const loading = ref(false)
@@ -70,7 +70,8 @@ async function loadTopics() {
   try {
     const res = await getTopicList()
     topicList.value = res.data.records || []
-  } catch {
+  }
+  catch {
     // 错误已在 request.ts 的响应拦截器中处理
   }
 }
@@ -96,9 +97,11 @@ async function loadMessages() {
     )
     messageList.value = res.data.records || []
     total.value = res.data.total
-  } catch {
+  }
+  catch {
     // 错误已在 request.ts 的响应拦截器中处理
-  } finally {
+  }
+  finally {
     messageLoading.value = false
   }
 }
@@ -109,7 +112,8 @@ async function handleViewDetail(row: MessageVO) {
     const res = await getMessageDetail(selectedTopic.value, row.msgId)
     detailData.value = res.data
     detailDialogVisible.value = true
-  } catch {
+  }
+  catch {
     // 错误已在 request.ts 的响应拦截器中处理
   }
 }
@@ -121,9 +125,11 @@ async function handleViewTrace(row: MessageVO) {
   try {
     const res = await getMessageTrace(selectedTopic.value, row.msgId)
     traceList.value = res.data?.consumeTraceList || []
-  } catch {
+  }
+  catch {
     // 错误已在 request.ts 的响应拦截器中处理
-  } finally {
+  }
+  finally {
     traceLoading.value = false
   }
 }
@@ -168,9 +174,11 @@ async function handleSend() {
     ElMessage.success(`消息发送成功，MsgId: ${res.data.msgId}`)
     sendDialogVisible.value = false
     // 发送成功后不自动刷新列表，让用户自己决定是否刷新
-  } catch {
+  }
+  catch {
     // 错误已在 request.ts 的响应拦截器中处理
-  } finally {
+  }
+  finally {
     sendLoading.value = false
   }
 }

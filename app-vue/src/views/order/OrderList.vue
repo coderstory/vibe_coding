@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { orderApi } from '@/api/order'
-import type { Order } from '@/api/order'
+import { orderApi } from '@/api/modules/order'
+import type { Order } from '@/api/modules/order'
 import { ElMessage } from 'element-plus'
 
 const orders = ref<Order[]>([])
@@ -12,7 +12,8 @@ onMounted(async () => {
   try {
     const res = await orderApi.getMyOrders()
     orders.value = res.data || []
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 })
@@ -23,7 +24,8 @@ async function handlePay(orderNo: string) {
     ElMessage.success('支付成功')
     const res = await orderApi.getMyOrders()
     orders.value = res.data || []
-  } catch {
+  }
+  catch {
     ElMessage.error('支付失败')
   }
 }
@@ -34,7 +36,8 @@ async function handleCancel(orderNo: string) {
     ElMessage.success('取消成功')
     const res = await orderApi.getMyOrders()
     orders.value = res.data || []
-  } catch {
+  }
+  catch {
     ElMessage.error('取消失败')
   }
 }

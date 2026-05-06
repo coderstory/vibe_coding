@@ -8,7 +8,7 @@
  *
  * @module api/knowledge
  */
-import request from './request'
+import request from '../request'
 import type {
   ApiResponse,
   KnowledgeCategory,
@@ -21,7 +21,7 @@ import type {
   UpdateCategoryParams,
   CreateArticleParams,
   UpdateArticleParams
-} from './types'
+} from '../types'
 
 /**
  * 获取分类树形结构
@@ -65,7 +65,7 @@ export function deleteCategory(id: number) {
  * @returns 分页后的文章列表
  */
 export function getArticlePage(params: ArticleQueryParams) {
-  return request.get<ApiResponse<PageResult<KnowledgeArticle>>>(`/knowledge/articles`, { params })
+  return request.get<ApiResponse<PageResult<KnowledgeArticle>>>('/knowledge/articles', { params })
 }
 
 /**

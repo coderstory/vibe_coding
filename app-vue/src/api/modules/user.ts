@@ -2,7 +2,7 @@
  * 用户管理相关 API
  * 提供用户的 CRUD 操作和状态管理
  */
-import request from './request'
+import request from '../request'
 import type {
   ApiResponse,
   User,
@@ -12,14 +12,14 @@ import type {
   UserQueryParams,
   CreateUserParams,
   UpdateUserParams
-} from './types'
+} from '../types'
 
 /**
  * 获取用户分页列表
  * 支持多条件筛选查询
  */
 export function getUserList(params: UserQueryParams) {
-  return request.get<ApiResponse<PageResult<User>>>(`/users`, { params })
+  return request.get<ApiResponse<PageResult<User>>>('/users', { params })
 }
 
 /**
@@ -35,7 +35,7 @@ export function getUserDetail(id: number) {
  * 密码需要单独传入，由后端加密存储
  */
 export function createUser(data: CreateUserParams) {
-  return request.post<ApiResponse<void>>(`/users`, data)
+  return request.post<ApiResponse<void>>('/users', data)
 }
 
 /**
@@ -67,7 +67,7 @@ export function resetUserPassword(id: number, password: string) {
  * 用于用户编辑时的角色选择
  */
 export function getAllRoles() {
-  return request.get<ApiResponse<Role[]>>(`/users/roles/all`)
+  return request.get<ApiResponse<Role[]>>('/users/roles/all')
 }
 
 /**

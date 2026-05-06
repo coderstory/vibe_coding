@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import CategoryTree from '@/components/knowledge/CategoryTree.vue'
-import ArticleEditor from '@/components/knowledge/ArticleEditor.vue'
-import { getArticlePage, deleteArticle, searchArticles } from '@/api/knowledge'
+import CategoryTree from '@/components/business/knowledge/CategoryTree.vue'
+import ArticleEditor from '@/components/business/knowledge/ArticleEditor.vue'
+import { getArticlePage, deleteArticle, searchArticles } from '@/api/modules/knowledge'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { KnowledgeArticle, KnowledgeCategory, ArticleQueryParams } from '@/api/types'
 
@@ -26,7 +26,8 @@ async function loadArticles() {
       res = await searchArticles(searchKeyword.value)
       articleList.value = res.data || []
       pagination.value.total = articleList.value.length
-    } else {
+    }
+    else {
       const params: ArticleQueryParams = {
         page: pagination.value.page,
         size: pagination.value.size
@@ -39,7 +40,8 @@ async function loadArticles() {
       articleList.value = data.records || []
       pagination.value.total = data.total || 0
     }
-  } catch {
+  }
+  catch {
     ElMessage.error('加载知识列表失败')
   }
 }
@@ -76,7 +78,8 @@ async function handleDelete(row: KnowledgeArticle) {
     await deleteArticle(row.id)
     ElMessage.success('删除成功')
     loadArticles()
-  } catch {
+  }
+  catch {
     // user cancelled
   }
 }

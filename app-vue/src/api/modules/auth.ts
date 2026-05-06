@@ -2,8 +2,8 @@
  * 认证相关 API
  * 提供登录、登出、Token刷新等认证功能
  */
-import request from './request'
-import type { ApiResponse, LoginParams, LoginResult, RefreshTokenResult } from './types'
+import request from '../request'
+import type { ApiResponse, LoginParams, LoginResult, RefreshTokenResult } from '../types'
 
 /**
  * 用户登录

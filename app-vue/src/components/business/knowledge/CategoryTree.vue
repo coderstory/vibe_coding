@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { getCategoryTree, createCategory, deleteCategory } from '@/api/knowledge'
+import { getCategoryTree, createCategory, deleteCategory } from '@/api/modules/knowledge'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { KnowledgeCategory, KnowledgeCategoryTree } from '@/api/types'
 
 const emit = defineEmits<{
-  select: [category: KnowledgeCategory]
+  select: [category: KnowledgeCategory];
 }>()
 
 const treeRef = ref<InstanceType<typeof import('element-plus').ElTree> | null>(null)
@@ -13,7 +13,7 @@ const treeData = ref<KnowledgeCategoryTree[]>([])
 const selectedId = ref<number | null>(null)
 
 interface FlatCategory extends KnowledgeCategory {
-  level: number
+  level: number;
 }
 
 function flattenCategories(categories: KnowledgeCategoryTree[], result: FlatCategory[] = [], level = 0): FlatCategory[] {
@@ -33,7 +33,8 @@ async function loadTree() {
     const res = await getCategoryTree()
     treeData.value = res.data || []
     flatCategories.value = flattenCategories(treeData.value)
-  } catch {
+  }
+  catch {
     ElMessage.error('加载分类失败')
   }
 }
@@ -49,7 +50,8 @@ async function handleAddRoot() {
     await createCategory({ name: result.value, parentId: 0, sortOrder: 0 })
     ElMessage.success('创建成功')
     loadTree()
-  } catch {
+  }
+  catch {
     // user cancelled
   }
 }
@@ -60,7 +62,8 @@ async function handleAddChild(data: KnowledgeCategory) {
     await createCategory({ name: result.value, parentId: data.id, sortOrder: 0 })
     ElMessage.success('创建成功')
     loadTree()
-  } catch {
+  }
+  catch {
     // user cancelled
   }
 }
@@ -71,7 +74,8 @@ async function handleDelete(data: KnowledgeCategory) {
     await deleteCategory(data.id)
     ElMessage.success('删除成功')
     loadTree()
-  } catch {
+  }
+  catch {
     // user cancelled
   }
 }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { ElStatistic, ElCard } from 'element-plus'
-import { getClusterOverview, type ClusterOverviewVO } from '@/api/rocketmq'
+import { getClusterOverview, type ClusterOverviewVO } from '@/api/modules/rocketmq'
 
 const overview = ref<ClusterOverviewVO | null>(null)
 const loading = ref(false)
@@ -13,9 +13,11 @@ async function loadOverview() {
     if (res.code === 200) {
       overview.value = res.data
     }
-  } catch (e) {
+  }
+  catch (e) {
     console.error('加载集群概览失败', e)
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }

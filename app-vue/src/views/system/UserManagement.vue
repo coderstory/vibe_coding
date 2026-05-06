@@ -2,7 +2,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
-import { getUserList, getUserDetail, createUser, updateUser, deleteUser, resetUserPassword, getAllRoles, updateUserStatus } from '@/api/user'
+import { getUserList, getUserDetail, createUser, updateUser, deleteUser, resetUserPassword, getAllRoles, updateUserStatus } from '@/api/modules/user'
 import type { User, Role, CreateUserParams, UpdateUserParams } from '@/api/types'
 
 const router = useRouter()
@@ -103,9 +103,11 @@ async function loadUserList() {
     const res = await getUserList(params)
     userList.value = res.data.records
     total.value = res.data.total
-  } catch {
+  }
+  catch {
     ElMessage.error('加载用户列表失败')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -115,7 +117,8 @@ async function loadRoles() {
   try {
     const res = await getAllRoles()
     roleList.value = res.data
-  } catch {
+  }
+  catch {
     ElMessage.error('加载角色列表失败')
   }
 }
@@ -201,7 +204,8 @@ async function confirmResetPassword() {
     await resetUserPassword(passwordForm.id!, passwordForm.password)
     ElMessage.success('密码重置成功')
     passwordDialogVisible.value = false
-  } catch {
+  }
+  catch {
     ElMessage.error('密码重置失败')
   }
 }
@@ -221,7 +225,8 @@ function handleDelete(row: User) {
       await deleteUser(row.id)
       ElMessage.success('用户删除成功')
       loadUserList()
-    } catch {
+    }
+    catch {
       ElMessage.error('用户删除失败')
     }
   }).catch(() => {})
@@ -252,7 +257,8 @@ async function handleSaveUser() {
         }
         await updateUser(userForm.id, updateData)
         ElMessage.success('用户更新成功')
-      } else {
+      }
+      else {
         const createData: CreateUserParams = {
           username: userForm.username,
           password: userForm.password,
@@ -271,7 +277,8 @@ async function handleSaveUser() {
       }
       dialogVisible.value = false
       loadUserList()
-    } catch {
+    }
+    catch {
       ElMessage.error(isEdit.value ? '用户更新失败' : '用户创建失败')
     }
   })
@@ -312,7 +319,8 @@ async function handleStatusChange(row: User) {
   try {
     await updateUserStatus(row.id, row.enabled!)
     ElMessage.success(row.enabled === 1 ? '用户已启用' : '用户已禁用')
-  } catch {
+  }
+  catch {
     // 恢复原状态
     row.enabled = row.enabled === 1 ? 0 : 1
     ElMessage.error('状态更新失败')
@@ -329,7 +337,8 @@ onMounted(async () => {
       const res = await getUserDetail(Number(editId))
       handleEdit(res.data)
       router.replace({ path: '/system/user' })
-    } catch {
+    }
+    catch {
       ElMessage.error('加载用户信息失败')
     }
   }
@@ -339,7 +348,7 @@ onMounted(async () => {
 <template>
   <div class="page-container">
     <h2 class="page-title">用户管理</h2>
-    
+
     <!-- 搜索区域 -->
     <div class="search-section">
       <el-form :model="searchForm" inline>
@@ -371,12 +380,12 @@ onMounted(async () => {
         </el-form-item>
       </el-form>
     </div>
-    
+
     <!-- 操作按钮 -->
     <div class="action-section">
       <el-button type="primary" @click="handleCreate">新建用户</el-button>
     </div>
-    
+
     <!-- 用户列表 -->
     <el-table :data="userList" stripe border v-loading="loading" class="user-table" @row-click="handleRowClick">
       <el-table-column type="index" label="序号" width="60" align="center" />
@@ -410,7 +419,7 @@ onMounted(async () => {
         </template>
       </el-table-column>
     </el-table>
-    
+
     <!-- 分页 -->
     <div class="pagination-section">
       <el-pagination
@@ -424,7 +433,7 @@ onMounted(async () => {
         @size-change="handleSizeChange"
       />
     </div>
-    
+
     <!-- 新建/编辑用户对话框 -->
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="600px" :close-on-click-modal="false">
       <el-form ref="userFormRef" :model="userForm" :rules="userFormRules" label-width="100px">
@@ -487,7 +496,7 @@ onMounted(async () => {
         <el-button type="primary" @click="handleSaveUser">保存</el-button>
       </template>
     </el-dialog>
-    
+
     <!-- 重置密码对话框 -->
     <el-dialog v-model="passwordDialogVisible" title="重置密码" width="400px">
       <el-form :model="passwordForm" :rules="passwordRules" label-width="80px">

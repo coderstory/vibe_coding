@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { orderApi } from '@/api/order'
-import type { Order } from '@/api/order'
+import { orderApi } from '@/api/modules/order'
+import type { Order } from '@/api/modules/order'
 
 const orders = ref<Order[]>([])
 const loading = ref(false)
@@ -11,7 +11,8 @@ onMounted(async () => {
   try {
     const res = await orderApi.getMyOrders()
     orders.value = res.data || []
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 })

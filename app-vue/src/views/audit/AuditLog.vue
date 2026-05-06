@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import { getAuditLogs } from '@/api/audit'
+import { getAuditLogs } from '@/api/modules/audit'
 import type { AuditLog, AuditLogQueryParams } from '@/api/types'
 
 // 查询表单
@@ -48,9 +48,11 @@ async function loadAuditLogs() {
     const res = await getAuditLogs(params)
     auditList.value = res.data.records
     total.value = res.data.total
-  } catch (error) {
+  }
+  catch (error) {
     console.error('加载审计日志失败', error)
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -99,11 +101,11 @@ function handleSizeChange(size: number) {
 // 格式化操作类型
 function formatOperationType(type: string): string {
   const typeMap: Record<string, string> = {
-    'LOGIN': '登录',
-    'LOGOUT': '登出',
-    '新增': '新增',
-    '编辑': '编辑',
-    '删除': '删除'
+    LOGIN: '登录',
+    LOGOUT: '登出',
+    新增: '新增',
+    编辑: '编辑',
+    删除: '删除'
   }
   return typeMap[type] || type
 }
@@ -129,7 +131,7 @@ onMounted(() => {
 <template>
   <div class="page-container">
     <h2 class="page-title">审计日志</h2>
-    
+
     <!-- 查询区域 -->
     <div class="search-section">
       <el-form :model="searchForm" inline>
@@ -167,7 +169,7 @@ onMounted(() => {
         </el-form-item>
       </el-form>
     </div>
-    
+
     <!-- 审计日志列表 -->
     <el-table :data="auditList" stripe v-loading="loading" class="audit-table">
       <el-table-column type="index" label="序号" width="60" align="center" />
@@ -185,10 +187,10 @@ onMounted(() => {
       </el-table-column>
       <el-table-column prop="ipAddress" label="IP地址" min-width="140" />
     </el-table>
-    
+
     <!-- 空状态 -->
     <el-empty v-if="!loading && auditList.length === 0" description="暂无审计日志" />
-    
+
     <!-- 分页 -->
     <div class="pagination-section">
       <el-pagination

@@ -5,7 +5,7 @@ import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { LineChart } from 'echarts/charts'
 import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components'
-import { getBrokerMetrics, getBrokerStatusList, type BrokerStatusVO } from '@/api/rocketmq'
+import { getBrokerMetrics, getBrokerStatusList, type BrokerStatusVO } from '@/api/modules/rocketmq'
 
 use([CanvasRenderer, LineChart, GridComponent, TooltipComponent, LegendComponent])
 
@@ -29,11 +29,13 @@ async function loadMetrics() {
       if (res.data.sendTps && res.data.consumeTps) {
         hasData.value = true
         updateChart(res.data)
-      } else {
+      }
+      else {
         hasData.value = false
       }
     }
-  } catch (e) {
+  }
+  catch (e) {
     console.error('加载 Broker 指标失败', e)
     hasData.value = false
   }

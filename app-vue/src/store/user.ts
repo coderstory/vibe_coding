@@ -4,16 +4,16 @@
  */
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { login as apiLogin, logout as apiLogout, getCurrentUser, refreshToken as apiRefreshToken } from '@/api/auth'
+import { login as apiLogin, logout as apiLogout, getCurrentUser, refreshToken as apiRefreshToken } from '@/api/modules/auth'
 
 /**
  * 用户信息结构
  */
 interface UserInfo {
-  id: number
-  username: string
-  name: string
-  roleId: number
+  id: number;
+  username: string;
+  name: string;
+  roleId: number;
 }
 
 /**
@@ -56,7 +56,8 @@ export const useUserStore = defineStore('user', () => {
       localStorage.setItem('token', token.value)
       localStorage.setItem('refreshToken', storedRefreshToken.value)
       return true
-    } catch {
+    }
+    catch {
       return false
     }
   }
@@ -68,7 +69,8 @@ export const useUserStore = defineStore('user', () => {
   async function logout() {
     try {
       await apiLogout()
-    } catch {
+    }
+    catch {
       // 忽略登出错误，确保本地状态被清除
     }
     token.value = ''
@@ -90,7 +92,8 @@ export const useUserStore = defineStore('user', () => {
       user.value = res.data
       localStorage.setItem('user', JSON.stringify(user.value))
       return user.value
-    } catch {
+    }
+    catch {
       logout()
       return null
     }
@@ -104,7 +107,8 @@ export const useUserStore = defineStore('user', () => {
     if (savedUser) {
       try {
         user.value = JSON.parse(savedUser)
-      } catch {
+      }
+      catch {
         user.value = null
       }
     }

@@ -12,18 +12,18 @@
  */
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { activityApi, type Reservation } from '@/api/seckill'
+import { activityApi, type Reservation } from '@/api/modules/seckill'
 
 /** 预约记录（包含活动详情） */
 interface ReservationWithActivity extends Reservation {
   /** 活动名称 */
-  activityName?: string
+  activityName?: string;
   /** 活动开始时间 */
-  activityStartTime?: string
+  activityStartTime?: string;
   /** 活动结束时间 */
-  activityEndTime?: string
+  activityEndTime?: string;
   /** 活动状态 */
-  activityStatus?: number
+  activityStatus?: number;
 }
 
 /** 预约列表 */
@@ -42,10 +42,12 @@ onMounted(async () => {
 
     // 补充活动详情（需要分别调用活动详情接口）
     await enrichActivityDetails()
-  } catch (error) {
+  }
+  catch (error) {
     console.error('加载预约列表失败', error)
     ElMessage.error('加载预约列表失败，请重试')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 })
@@ -66,7 +68,8 @@ async function enrichActivityDetails() {
         reservation.activityEndTime = res.data.endTime
         reservation.activityStatus = res.data.status
       }
-    } catch (error) {
+    }
+    catch (error) {
       console.error('加载活动详情失败', error)
     }
   }
@@ -97,9 +100,9 @@ function getStatusText(status: number) {
  */
 function getStatusType(status: number) {
   const map: Record<number, string> = {
-    0: 'warning',  // 预约中 - 黄色
-    1: 'success',  // 已提醒 - 绿色
-    2: 'info'      // 已过期 - 灰色
+    0: 'warning', // 预约中 - 黄色
+    1: 'success', // 已提醒 - 绿色
+    2: 'info' // 已过期 - 灰色
   }
   return map[status] || 'info'
 }

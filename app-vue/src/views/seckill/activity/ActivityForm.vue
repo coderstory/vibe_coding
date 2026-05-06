@@ -8,7 +8,7 @@
  * - 保存后返回列表
  */
 import { ref, onMounted, watch } from 'vue'
-import { activityApi } from '@/api/seckill'
+import { activityApi } from '@/api/modules/seckill'
 import { ElMessage } from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
 
@@ -43,10 +43,12 @@ async function loadActivity(id: number) {
       enableCaptcha: data.enableCaptcha,
       enableIpLimit: data.enableIpLimit
     }
-  } catch (e) {
+  }
+  catch (e) {
     ElMessage.error('加载活动失败')
     router.back()
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -74,14 +76,17 @@ async function handleSubmit() {
     if (isEdit.value) {
       await activityApi.update(Number(route.params.id), form.value)
       ElMessage.success('更新成功')
-    } else {
+    }
+    else {
       await activityApi.create(form.value)
       ElMessage.success('创建成功')
     }
     router.push('/seckill/activity')
-  } catch (e) {
+  }
+  catch (e) {
     ElMessage.error(isEdit.value ? '更新失败' : '创建失败')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -107,7 +112,8 @@ function checkRouteAndInit() {
   if (id) {
     isEdit.value = true
     loadActivity(Number(id))
-  } else {
+  }
+  else {
     // 新增模式，重置表单
     isEdit.value = false
     form.value = {

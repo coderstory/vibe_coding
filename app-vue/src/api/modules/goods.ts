@@ -5,26 +5,26 @@
  *
  * @module api/goods
  */
-import request from './request'
+import request from '../request'
 
 export interface SeckillGoods {
-  id?: number
-  activityId: number
-  name: string
-  originalPrice: number
-  seckillPrice: number
-  stock: number
-  sold?: number
-  imageUrl?: string
-  createTime?: string
-  updateTime?: string
+  id?: number;
+  activityId: number;
+  name: string;
+  originalPrice: number;
+  seckillPrice: number;
+  stock: number;
+  sold?: number;
+  imageUrl?: string;
+  createTime?: string;
+  updateTime?: string;
 }
 
 export interface PageResult<T> {
-  records: T[]
-  total: number
-  size: number
-  current: number
+  records: T[];
+  total: number;
+  size: number;
+  current: number;
 }
 
 export const goodsApi = {

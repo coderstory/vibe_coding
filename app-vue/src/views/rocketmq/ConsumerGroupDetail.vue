@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import { getConsumerGroupDetail, type ConsumerGroupDetailVO } from '@/api/rocketmq'
+import { getConsumerGroupDetail, type ConsumerGroupDetailVO } from '@/api/modules/rocketmq'
 import ResetOffsetDialog from './ResetOffsetDialog.vue'
 
 const props = defineProps<{
-  modelValue: boolean
-  groupName: string
+  modelValue: boolean;
+  groupName: string;
 }>()
 
 const emit = defineEmits<{
-  'update:modelValue': [value: boolean]
-  'refresh': []
+  'update:modelValue': [value: boolean];
+  'refresh': [];
 }>()
 
 const dialogVisible = ref(props.modelValue)
@@ -33,9 +33,11 @@ async function loadDetail() {
   try {
     const res = await getConsumerGroupDetail(props.groupName)
     detailData.value = res.data
-  } catch (error: any) {
+  }
+  catch (error: any) {
     ElMessage.error(error.message || '获取详情失败')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }

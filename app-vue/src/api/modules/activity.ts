@@ -8,28 +8,28 @@
  *
  * @module api/activity
  */
-import request from './request'
+import request from '../request'
 
 /**
  * 活动实体接口
  */
 export interface Activity {
   /** 活动 ID */
-  id: number
+  id: number;
   /** 活动名称 */
-  name: string
+  name: string;
   /** 活动描述 */
-  description: string
+  description: string;
   /** 开始时间 */
-  startTime: string
+  startTime: string;
   /** 结束时间 */
-  endTime: string
+  endTime: string;
   /** 活动状态：0-未开始 1-进行中 2-已结束 */
-  status: number
+  status: number;
   /** 每人限购数量 */
-  perLimit: number
+  perLimit: number;
   /** 活动总库存 */
-  totalStock?: number
+  totalStock?: number;
 }
 
 /**

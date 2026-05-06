@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { ElTable, ElTableColumn, ElTag } from 'element-plus'
-import { getBrokerStatusList, type BrokerStatusVO } from '@/api/rocketmq'
+import { getBrokerStatusList, type BrokerStatusVO } from '@/api/modules/rocketmq'
 
 const loading = ref(false)
 const brokers = ref<BrokerStatusVO[]>([])
@@ -13,9 +13,11 @@ async function loadBrokers() {
     if (res.code === 200) {
       brokers.value = res.data.records || []
     }
-  } catch (e) {
+  }
+  catch (e) {
     console.error('加载 Broker 状态失败', e)
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }

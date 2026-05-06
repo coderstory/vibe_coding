@@ -2,7 +2,7 @@
  * 角色管理相关 API
  * 提供角色 CRUD 和权限分配操作
  */
-import request from './request'
+import request from '../request'
 import type {
   ApiResponse,
   Role,
@@ -10,13 +10,13 @@ import type {
   RoleQueryParams,
   CreateRoleParams,
   UpdateRoleParams
-} from './types'
+} from '../types'
 
 /**
  * 获取角色分页列表
  */
 export function getRoleList(params: RoleQueryParams) {
-  return request.get<ApiResponse<PageResult<Role>>>(`/roles`, { params })
+  return request.get<ApiResponse<PageResult<Role>>>('/roles', { params })
 }
 
 /**
@@ -30,7 +30,7 @@ export function getRoleDetail(id: number) {
  * 创建角色
  */
 export function createRole(data: CreateRoleParams) {
-  return request.post<ApiResponse<void>>(`/roles`, data)
+  return request.post<ApiResponse<void>>('/roles', data)
 }
 
 /**
@@ -68,5 +68,5 @@ export function assignRoleMenus(roleId: number, menuIds: number[]) {
  * 用于角色权限分配的菜单选择
  */
 export function getMenuTree() {
-  return request.get<ApiResponse<import('./types').MenuTree[]>>(`/menus/tree`)
+  return request.get<ApiResponse<import('./types').MenuTree[]>>('/menus/tree')
 }
