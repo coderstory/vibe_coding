@@ -1,9 +1,10 @@
 package cn.coderstory.springboot;
 
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
@@ -36,8 +37,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * - Structured Concurrency (结构化并发)
  * - Scoped Values
  */
-@Slf4j
 public class VirtualThreadTest {
+    private static final Logger log = LoggerFactory.getLogger(VirtualThreadTest.class);
 
     /**
      * 1. 虚拟线程的创建方式
