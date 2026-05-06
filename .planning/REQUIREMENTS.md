@@ -69,43 +69,44 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TOOL-01 | Phase 1 | Pending |
-| TOOL-02 | Phase 1 | Pending |
-| TOOL-03 | Phase 1 | Pending |
-| TOOL-04 | Phase 1 | Pending |
-| TOOL-05 | Phase 1 | Pending |
-| TOOL-06 | Phase 1 | Pending |
-| TOOL-07 | Phase 1 | Pending |
-| TOOL-08 | Phase 1 | Pending |
-| TOOL-09 | Phase 1 | Pending |
-| TOOL-10 | Phase 1 | Pending |
-| BACK-01 | Phase 2 | Pending |
-| BACK-02 | Phase 2 | Pending |
-| BACK-03 | Phase 2 | Pending |
-| BACK-04 | Phase 2 | Pending |
-| BACK-05 | Phase 2 | Pending |
-| BACK-06 | Phase 2 | Pending |
-| BACK-07 | Phase 2 | Pending |
-| CONF-01 | Phase 3 | Pending |
-| CONF-02 | Phase 3 | Pending |
-| CONF-03 | Phase 3 | Pending |
-| CONF-04 | Phase 3 | Pending |
-| FRNT-01 | Phase 4 | Pending |
-| FRNT-02 | Phase 4 | Pending |
-| FRNT-03 | Phase 4 | Pending |
-| FRNT-04 | Phase 4 | Pending |
-| FRNT-05 | Phase 4 | Pending |
-| FRNT-06 | Phase 4 | Pending |
-| FRNT-07 | Phase 4 | Pending |
-| QUAL-01 | Phase 5 | Pending |
-| QUAL-02 | Phase 5 | Pending |
-| QUAL-03 | Phase 5 | Pending |
+| TOOL-01 | Phase 17 基础设施搭建 | Pending |
+| TOOL-02 | Phase 17 基础设施搭建 | Pending |
+| TOOL-03 | Phase 17 基础设施搭建 | Pending |
+| TOOL-04 | Phase 17 基础设施搭建 | Pending |
+| TOOL-05 | Phase 17 基础设施搭建 | Pending |
+| TOOL-06 | Phase 17 基础设施搭建 | Pending |
+| TOOL-07 | Phase 17 基础设施搭建 | Pending |
+| TOOL-08 | Phase 17 基础设施搭建 | Pending |
+| TOOL-09 | Phase 17 基础设施搭建 | Pending |
+| TOOL-10 | Phase 17 基础设施搭建 | Pending |
+| BACK-01 | Phase 18 后端包结构重组 | Pending |
+| BACK-02 | Phase 18 后端包结构重组 | Pending |
+| BACK-03 | Phase 18 后端包结构重组 | Pending |
+| BACK-04 | Phase 18 后端包结构重组 | Pending |
+| BACK-05 | Phase 18 后端包结构重组 | Pending |
+| BACK-06 | Phase 18 后端包结构重组 | Pending |
+| BACK-07 | Phase 18 后端包结构重组 | Pending |
+| CONF-01 | Phase 19 配置文件整理 | Pending |
+| CONF-02 | Phase 19 配置文件整理 | Pending |
+| CONF-03 | Phase 19 配置文件整理 | Pending |
+| CONF-04 | Phase 19 配置文件整理 | Pending |
+| FRNT-01 | Phase 20 前端目录重组 | Pending |
+| FRNT-02 | Phase 20 前端目录重组 | Pending |
+| FRNT-03 | Phase 20 前端目录重组 | Pending |
+| FRNT-04 | Phase 20 前端目录重组 | Pending |
+| FRNT-05 | Phase 20 前端目录重组 | Pending |
+| FRNT-06 | Phase 20 前端目录重组 | Pending |
+| FRNT-07 | Phase 20 前端目录重组 | Pending |
+| QUAL-01 | Phase 21 代码规范统一 | Pending |
+| QUAL-02 | Phase 21 代码规范统一 | Pending |
+| QUAL-03 | Phase 21 代码规范统一 | Pending |
 
 **Coverage:**
 - v1.5 requirements: 31 total
 - Mapped to phases: 31
-- Unmapped: 0 ✓
+- Unmapped: 0
 
 ---
+
 *Requirements defined: 2026-05-06*
-*Last updated: 2026-05-06 after v1.5 research and scoping*
+*Last updated: 2026-05-06 — Traceability updated with Phase 17-21 mappings*
