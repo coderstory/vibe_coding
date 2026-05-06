@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Maven→Gradle + Spring Boot 4.1 升级
 status: planning
-last_updated: "2026-04-29T18:53:33.647Z"
+last_updated: "2026-05-06T15:00:33.072Z"
 last_activity: 2026-04-30 — Phase 15 completed
 progress:
   total_phases: 4
