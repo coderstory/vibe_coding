@@ -1,1249 +1,554 @@
-# Element Plus 主题化研究 - 海滩主题完成指南
+# 代码组织规范研究
 
-**项目:** Ocean Breeze Admin 海滩主题
-**研究日期:** 2026-04-03
-**Element Plus 版本:** 2.9.0
-**置信度:** HIGH
+**域:** Vue 3 + Spring Boot 管理后台代码组织标准
+**研究日期:** 2026-05-06
+**置信度:** HIGH（基于 Vue 官方风格指南 + 阿里巴巴 Java 开发手册 + 现有项目分析）
 
 ---
 
 ## 执行摘要
 
-本项目已完成海滩主题基础样式（CSS变量定义），但在业务页面中仍存在大量未主题化的Element Plus组件。本文档提供完整的主题覆盖清单、CSS选择器参考和常见踩坑指南。
+当前项目前端 (Vue 3 + Element Plus) 和后端 (Spring Boot + MyBatis Plus) 的目录结构存在不一致性。前端整体采用按域分视图（views/rocketmq/, views/seckill/），但 components/ 和 api/ 扁平化严重；后端混合了按层分包（根层 controller/service/entity/mapper/）和按域分包（seckill/, order/, stock/），两种风格共存导致新功能模块无处安放。
+
+本次研究基于 Vue 官方风格指南、阿里巴巴 Java 开发手册（P3C）和现有项目代码分析，提供统一的代码组织规范、目录结构建议和命名约定。
 
 ---
 
-## 一、现有覆盖分析
+## 一、目录组织：表需规范（Table Stakes）
 
-### 已实现 (enterprise-theme.css)
+每个项目必须满足的代码组织基本要求。
 
-| 组件 | 覆盖状态 | 选择器 |
-|------|----------|--------|
-| el-table | ✅ 部分 | `.el-table`, `.el-table th`, `.el-table td` |
-| el-button | ✅ 完整 | `.el-button`, `.el-button--primary` |
-| el-tag | ✅ 完整 | `.el-tag`, `.el-tag--success/warning/danger/info` |
-| el-alert | ✅ 完整 | `.el-alert`, `.el-alert--success/warning/danger/info` |
-| el-pagination | ✅ 完整 | `.el-pagination` |
-| el-dialog | ✅ 部分 | `.el-dialog`, `.el-dialog__header` |
-| el-input | ✅ 完整 | `.el-input__wrapper` |
-| el-select | ✅ 部分 | `.el-select__wrapper` |
-| el-dropdown-menu | ✅ 完整 | `.el-dropdown-menu`, `.el-dropdown-menu__item` |
-| el-tabs | ✅ 完整 | `.el-tabs__item`, `.el-tabs__active-bar` |
-| el-form | ✅ 部分 | `.el-form-item__label` |
+### 1.1 前端 (Vue 3 + TypeScript + Element Plus)
 
-### 未覆盖/需补充
+| 规范 | 为什么必须 | 实施难度 | 当前状态 |
+|------|-----------|---------|---------|
+| views/ 按业务域分目录 | 页面文件超过 10 个后查找困难。Vue 风格指南推荐按功能域组织 | 低 | 已基本实现，但 rocketmq/ 下 10 个文件扁平 |
+| components/ 区分公共和私有组件 | 公共组件（跨页面复用）和私有组件（单页面使用）混放导致导入路径混乱 | 低 | 未实现，10 个 .vue 文件平铺在 components/ 根目录 |
+| API 模块与后端 Controller 一一对应 | API 文件应与后端接口一致，便于定位和修改 | 低 | 基本实现，但 15 个 api 文件扁平在 api/ 根目录 |
+| 每个组件独立一个 .vue 文件 | Vue 风格指南 Priority B 强制要求 | 低 | 已实现 |
+| Composables 统一放在 composables/ 目录 | Composition API 复用逻辑集中管理，以 use 前缀命名 | 低 | 已实现，仅 useAnimationToggle.ts 一个文件 |
+| Router 模块化拆分 | 单一路由文件随页面增加迅速膨胀 | 低 | 未实现，router/index.ts 单文件已 7KB+ |
+| Store 按业务域拆分 | 单一 store 随业务增长膨胀为数千行 | 低 | 仅有 user.ts 一个 store |
 
-| 组件 | 优先级 | 原因 |
-|------|--------|------|
-| el-card | 🔴 高 | Login页面、业务数据页面使用 |
-| el-tree | 🔴 高 | RoleManage权限树、CategoryTree使用 |
-| el-switch | 🔴 高 | UserManagement用户状态切换 |
-| el-radio | 🔴 高 | UserManagement性别选择 |
-| el-date-picker | 🔴 高 | AuditLog时间范围选择 |
-| el-empty | 🟡 中 | AuditLog空状态 |
-| el-link | 🟡 中 | 各页面操作链接 |
-| el-descriptions | 🟡 中 | 潜在使用 |
-| el-loading | 🟡 中 | 全局加载状态 |
-| el-message | 🟡 中 | 消息提示已定制但可优化 |
-| el-message-box | 🟡 中 | 确认对话框 |
-| el-textarea | 🟡 中 | RoleManage角色描述 |
+### 1.2 后端 (Spring Boot + MyBatis Plus)
 
----
+| 规范 | 为什么必须 | 实施难度 | 当前状态 |
+|------|-----------|---------|---------|
+| Controller/Service/Mapper 三层分离 | 阿里巴巴 Java 开发手册强制：禁止 Controller 直接调用 Mapper | 低 | 已实现 |
+| Service 接口 + Impl 实现类 | 阿里巴巴规约强制：暴露服务应为接口，实现类用 Impl 后缀 | 低 | 部分实现（Menu/Role 有接口+实现，但 service/ 根目录混放） |
+| Entity 与数据库表一一映射 | MyBatis Plus 依赖 entity 与表结构对应 | 低 | 已实现 |
+| Mapper XML 统一放在 resources/mapper/ | MyBatis Plus 默认扫描路径 | 低 | 已实现 |
+| 统一返回对象 (ApiResponse) | 前端需要一致格式处理成功/失败 | 低 | 已实现（vo/ApiResponse.java） |
+| 全局异常处理器 | 避免异常栈直接暴露给前端 | 低 | 已实现（exception/） |
 
-## 二、完整组件覆盖清单
+### 1.3 配置文件
 
-### 2.1 表单组件 (Form Components)
-
-#### el-input / el-textarea
-
-```css
-/* 现有覆盖 */
-.el-input__wrapper {
-  border-radius: var(--el-border-radius-round);
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #dbeafe;
-}
-
-/* 需补充 - textarea */
-.el-textarea__inner {
-  border-radius: var(--el-border-radius-base);
-  border: 1px solid #dbeafe;
-  background: rgba(255, 255, 255, 0.9);
-}
-
-.el-textarea__inner:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-}
-
-/* 搜索区域输入框强化 */
-.search-section .el-input__wrapper {
-  background: #ffffff;
-}
-```
-
-#### el-select
-
-```css
-/* 现有覆盖 */
-.el-select__wrapper {
-  border-radius: var(--el-border-radius-round);
-}
-
-/* 需补充 - 下拉选项 */
-.el-select-dropdown__item {
-  border-radius: var(--el-border-radius-small);
-  padding: 8px 12px;
-}
-
-.el-select-dropdown__item.is-hovering {
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
-}
-
-.el-select-dropdown__item.is-selected {
-  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-  color: #1e3a8a;
-  font-weight: 600;
-}
-
-.el-select-dropdown__item.is-highlighted {
-  background: #eff6ff;
-}
-
-/* 选中标签样式 */
-.el-select__tags {
-  flex-wrap: nowrap;
-  overflow-x: auto;
-}
-```
-
-#### el-switch
-
-```css
-/* 海洋蓝开关 */
-.el-switch {
-  --el-switch-off-color: #bfdbfe;
-  --el-switch-on-color: #3b82f6;
-  --el-switch-border-color: #93c5fd;
-}
-
-.el-switch.is-checked .el-switch__core {
-  background: linear-gradient(135deg, #3b82f6, #1e3a8a);
-  border-color: #3b82f6;
-}
-
-.el-switch__core {
-  border-radius: 24px;
-}
-
-.el-switch__core::after {
-  border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-}
-
-/* 激活状态文字 */
-.el-switch__label--left,
-.el-switch__label--right {
-  color: #64748b;
-}
-
-.el-switch__label.is-active {
-  color: #1e3a8a;
-}
-```
-
-#### el-radio
-
-```css
-/* 海洋蓝单选框 */
-.el-radio {
-  --el-radio-font-size: 14px;
-  --el-radio-text-color: #475569;
-  --el-radio-input-border: 1px solid #bfdbfe;
-  --el-radio-input-border-hover: #3b82f6;
-  --el-radio-input-fill: #3b82f6;
-}
-
-.el-radio__input.is-checked .el-radio__inner {
-  background: linear-gradient(135deg, #3b82f6, #1e3a8a);
-  border-color: #3b82f6;
-}
-
-.el-radio__inner::after {
-  background: #ffffff;
-}
-
-.el-radio__label {
-  color: #475569;
-}
-
-.el-radio__input.is-checked + .el-radio__label {
-  color: #1e3a8a;
-  font-weight: 500;
-}
-
-/* Radio Group 按钮样式 */
-.el-radio-group {
-  display: flex;
-  gap: 8px;
-}
-
-.el-radio-button__inner {
-  border-radius: var(--el-border-radius-round);
-  border: 1px solid #bfdbfe;
-  background: #ffffff;
-  color: #3b82f6;
-}
-
-.el-radio-button__original-radio:checked + .el-radio-button__inner {
-  background: linear-gradient(135deg, #3b82f6, #1e3a8a);
-  border-color: #3b82f6;
-  color: #ffffff;
-  box-shadow: none;
-}
-```
-
-#### el-date-picker
-
-```css
-/* 日期选择器 */
-.el-date-editor {
-  --el-date-editor-width: auto;
-}
-
-.el-date-editor .el-input__wrapper {
-  border-radius: var(--el-border-radius-round);
-}
-
-/* 日期面板 */
-.el-date-picker {
-  border-radius: 16px;
-  box-shadow: var(--el-box-shadow-dark);
-  border: 1px solid rgba(147, 197, 253, 0.3);
-}
-
-.el-date-picker__header {
-  margin: 16px 20px;
-  color: #1e3a8a;
-  font-weight: 600;
-}
-
-.el-date-table th {
-  color: #64748b;
-  font-weight: 500;
-}
-
-.el-date-table td.available:hover {
-  background: #f0f9ff;
-}
-
-.el-date-table td.today .el-date-table-cell__text {
-  background: linear-gradient(135deg, #3b82f6, #1e3a8a);
-  color: #ffffff;
-  border-radius: 50%;
-}
-
-.el-date-table td.current:not(.disabled) .el-date-table-cell__text {
-  background: linear-gradient(135deg, #3b82f6, #1e3a8a);
-  color: #ffffff;
-}
-
-.el-date-table td.in-range .el-date-table-cell {
-  background: #eff6ff;
-}
-
-.el-date-table td.start-date .el-date-table-cell__text,
-.el-date-table td.end-date .el-date-table-cell__text {
-  background: linear-gradient(135deg, #3b82f6, #1e3a8a);
-  color: #ffffff;
-  border-radius: 50%;
-}
-
-/* 时间选择器 */
-.el-time-select {
-  border-radius: 12px;
-}
-
-.el-time-panel {
-  border-radius: 16px;
-  box-shadow: var(--el-box-shadow-dark);
-}
-```
-
-#### el-cascader (如需使用)
-
-```css
-.el-cascader__tags {
-  flex-wrap: nowrap;
-  overflow-x: auto;
-}
-
-.el-cascader-node {
-  border-radius: var(--el-border-radius-small);
-  padding: 4px 8px;
-}
-
-.el-cascader-node.is-active {
-  color: #3b82f6;
-  font-weight: 500;
-}
-
-.el-cascader-node.in-active-path {
-  background: #eff6ff;
-}
-```
+| 规范 | 为什么必须 | 实施难度 | 当前状态 |
+|------|-----------|---------|---------|
+| 敏感信息不硬编码 | 硬编码凭证导致安全事故 | 低 | 已使用 ${DB_USER:root} 环境变量 |
+| 区分环境配置文件 | 环境配置混用导致数据污染 | 中 | 有 application.yaml + application-test.yaml，但 test.yaml 大量重复 |
+| application.yaml 按关注点拆分 | 单文件 150+ 行修改困难 | 中 | 未实现，application.yaml 是单一 154 行文件 |
 
 ---
 
-### 2.2 数据展示组件 (Data Display)
+## 二、目录组织：增强规范（Differentiators）
 
-#### el-table (补充完善)
+实施后可显著提升代码库长期维护性的模式。
 
-```css
-/* 现有已覆盖，主要补充以下细节 */
+### 2.1 前端增强规范
 
-/* 表头排序图标 */
-.el-table .ascending .sort-caret.ascending,
-.el-table .descending .sort-caret.descending {
-  border-bottom-color: #1e3a8a;
-}
+| 规范 | 价值 | 难度 | 建议阶段 |
+|------|------|------|---------|
+| components/ 划分 common/ 和 business/ 子目录 | common/ 存放纯 UI 组件（类似 Element Plus 的封装），business/ 存放复用业务组件。新开发者立即理解组件作用域 | 低 | Phase 1 |
+| views/ 内部使用 components/ 子目录存放页面私有组件 | 页面子组件不混入全局 components/。seckill/activity/components/ 模式值得推广 | 低 | Phase 1 |
+| API 模块按业务域分目录（api/modules/） | api/modules/rocketmq.ts 对应后端 RocketMQ 相关接口 | 低 | Phase 1 |
+| router/ 拆分为 modules/ + guards.ts | router/modules/rocketmq.ts 包含所有 RocketMQ 路由，主入口仅聚合 | 低 | Phase 1 |
+| 布局组件移入 components/layout/ | 布局组件（Layout.vue）不是业务页面，应独立于 views/ | 低 | Phase 1 |
+| 页面组件统一使用 Page 后缀 | LoginPage.vue, TopicListPage.vue 直接表达"这是一个页面" | 低 | Phase 2 |
+| TypeScript 类型定义按域拆分 | api/types.ts 当前 15KB+，应拆为 api/types/user.ts, api/types/rocketmq.ts 等 | 中 | Phase 2 |
+| 复杂页面使用页面级目录（page.vue + components/ + composables/ + types.ts） | 复杂页面（如 SeckillDetail）所有相关文件就近放置 | 中 | Phase 2 |
 
-/* 排序图标颜色 */
-.el-table .sort-caret {
-  border-color: transparent;
-  border-bottom-color: #93c5fd;
-}
+### 2.2 后端增强规范
 
-/* 斑马纹优化 */
-.el-table--striped .el-table__body tr.el-table__row--striped.current-row > td,
-.el-table--striped .el-table__body tr.current-row > td {
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
-}
+| 规范 | 价值 | 难度 | 建议阶段 |
+|------|------|------|---------|
+| 统一采用 package-by-feature（按业务域分包） | 消除当前混合风格（按层 vs 按域）的不一致性 | 中 | Phase 1 |
+| 为每个 feature 包建立统一子包结构 | 每个业务域内部结构一致：controller/service/mapper/entity/dto/ | 中 | Phase 1 |
+| 跨业务通用组件移至 shared/ 包 | shared/config/, shared/security/, shared/exception/, shared/util/ 等 | 中 | Phase 1 |
+| DTO/VO 命名统一：入参用 DTO，出参用 VO | 当前 dto/ 和 vo/ 并存，命名含义不清晰 | 低 | Phase 1 |
+| application.yaml 拆分为 5 个关注点文件 | 数据源、缓存、MQ、安全、业务配置各独立文件 | 中 | Phase 1 |
+| application-{profile}.yaml 仅包含环境差异 | 消除 test.yaml 中与主配置重复的内容 | 中 | Phase 1 |
+| @ConfigurationProperties 类型安全配置 | 避免 @Value 散布各处，集中类型安全的配置映射 | 中 | Phase 2 |
 
-/* 选中行 */
-.el-table__body tr.current-row > td {
-  background: #fef3c7 !important;
-}
+---
 
-/* 展开行 */
-.el-table__expand-icon {
-  color: #3b82f6;
-  font-size: 14px;
-}
+## 三、反模式（Anti-Features）
 
-/* 固定列阴影 */
-.el-table__fixed {
-  box-shadow: 4px 0 8px rgba(30, 58, 138, 0.05);
-}
+| 反模式 | 为什么有害 | 替代方案 |
+|--------|-----------|---------|
+| 后端包结构混用按层和按域两种风格 | 当前 controller/ 在根层（按层），而 seckill/controller/ 在子包（按域），令人困惑 | 全量迁移为按域分包，通用组件移至 shared/ |
+| 前端 components/ 不放任何子目录 | 10 个 .vue 文件平铺，查找困难 | 划分 common/（纯 UI）、business/（业务）和 layout/（布局） |
+| application-test.yaml 几乎完整复制主配置 | 修改主配置后测试环境未同步，背离 profile 的初衷 | test.yaml 仅覆盖差异项（数据库名、Redis 库号、连接池大小） |
+| Service 接口和实现类放在同一目录 | 违反阿里巴巴规约：暴露的服务应为接口，Impl 后缀与接口区分 | service/ 目录仅放接口，service/impl/ 放实现 |
+| router/index.ts 单文件包含所有路由和导航守卫 | 7KB+ 单文件，每增加一个页面都要修改 | 拆分为 router/modules/*.ts + router/guards.ts |
+| Controller 中包含业务逻辑 | RocketMQController 有大量 MQ 管理逻辑内嵌 | 复杂逻辑下沉到 Service 层，Controller 仅做参数校验和转发 |
+| 使用 type 而非 interface 定义对象类型 | type 不支持声明合并，extends 语法不如 interface 直观 | API 响应类型优先用 interface，联合类型可用 type |
+| 无用的 Vite 模板文件残留 | HelloWorld.vue, TheWelcome.vue, WelcomeItem.vue 从未使用 | 移除 |
 
-.el-table__fixed-right {
-  box-shadow: -4px 0 8px rgba(30, 58, 138, 0.05);
-}
+---
 
-/* 加载中 */
-.el-table__body-wrapper.is-scrolling-none {
-  /* 防止滚动时重排 */
-}
+## 四、推荐目录结构
 
-/* 空数据 */
-.el-table__empty-text {
-  color: #64748b;
-  padding: 48px 0;
-  font-size: 15px;
-}
+### 4.1 后端目标结构
 
-.el-table__empty-block {
-  background: linear-gradient(180deg, #f0f9ff, #eff6ff);
-}
+```
+springboot/src/main/java/cn/coderstory/springboot/
+├── shared/                          ← 跨业务通用层
+│   ├── config/                      ← 所有 @Configuration 类
+│   │   ├── CorsConfig.java
+│   │   ├── SecurityConfig.java
+│   │   ├── WebConfig.java
+│   │   ├── MyBatisPlusConfig.java
+│   │   └── RedissonConfig.java
+│   ├── security/                    ← JWT 过滤器等
+│   ├── aspect/                      ← AOP 切面
+│   ├── exception/                   ← 全局异常处理
+│   ├── util/                        ← 通用工具类
+│   ├── vo/                          ← 通用 VO (ApiResponse, ResultResponse)
+│   ├── limiter/                     ← 限流组件
+│   └── lock/                        ← 分布式锁组件
+│       └── impl/
+│
+├── auth/                            ← 认证业务域
+│   ├── controller/AuthController.java
+│   └── service/
+│       ├── AuthService.java
+│       └── impl/AuthServiceImpl.java
+│
+├── user/                            ← 用户管理业务域
+│   ├── controller/
+│   │   ├── UserController.java
+│   │   └── RoleController.java
+│   ├── service/
+│   │   ├── UserService.java
+│   │   ├── RoleService.java
+│   │   └── impl/
+│   ├── mapper/
+│   │   ├── UserMapper.java
+│   │   └── RoleMapper.java
+│   ├── entity/
+│   │   ├── User.java
+│   │   └── Role.java
+│   └── dto/
+│       └── UserQueryDTO.java
+│
+├── knowledge/                       ← 知识库业务域
+│   ├── controller/KnowledgeController.java
+│   ├── service/
+│   │   ├── KnowledgeService.java
+│   │   └── impl/
+│   ├── mapper/
+│   ├── entity/
+│   └── dto/
+│
+├── menu/                            ← 菜单/权限业务域
+│   ├── controller/MenuController.java
+│   ├── service/
+│   │   ├── MenuService.java
+│   │   └── impl/
+│   ├── mapper/MenuMapper.java
+│   └── entity/Menu.java
+│
+├── audit/                           ← 审计日志业务域
+│   ├── controller/AuditLogController.java
+│   ├── service/
+│   │   ├── AuditService.java
+│   │   └── impl/
+│   ├── mapper/
+│   └── entity/AuditLog.java
+│
+├── seckill/                         ← 秒杀业务域
+│   ├── controller/
+│   ├── service/impl/
+│   ├── mapper/
+│   ├── entity/
+│   ├── dto/
+│   └── vo/
+│
+├── order/                           ← 订单业务域
+│   ├── controller/
+│   ├── service/impl/
+│   ├── mapper/
+│   └── entity/
+│
+├── stock/                           ← 库存业务域
+│   ├── consumer/
+│   ├── service/impl/
+│   ├── mapper/
+│   └── entity/
+│
+├── rocketmq/                        ← RocketMQ 管理业务域
+│   ├── controller/
+│   │   ├── RocketMQController.java
+│   │   └── RocketMQDashboardController.java
+│   ├── service/
+│   │   ├── RocketMQAdminService.java
+│   │   └── impl/
+│   └── dto/
+│
+├── monitor/                         ← 监控业务域
+│   ├── controller/
+│   └── service/
+│
+├── mq/                              ← MQ 基础设施（非业务）
+│   ├── consumer/
+│   └── producer/
+│
+└── sse/                             ← SSE 基础设施
 ```
 
-#### el-card
+### 4.2 前端目标结构
 
-```css
-/* Login页面卡片 */
-.login-card {
-  border-radius: 16px;
-  box-shadow: var(--el-box-shadow-dark);
-  border: 1px solid rgba(147, 197, 253, 0.3);
-  overflow: hidden;
-}
-
-.el-card__header {
-  background: linear-gradient(135deg, #eff6ff, #dbeafe);
-  border-bottom: 1px solid rgba(147, 197, 253, 0.3);
-  padding: 20px 24px;
-  font-weight: 600;
-  color: #1e3a8a;
-}
-
-.el-card__body {
-  padding: 24px;
-}
-
-/* 通用卡片 - macos风格已定义 */
-.macos-card {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(147, 197, 253, 0.3);
-  border-radius: 16px;
-}
-
-/* 业务数据页面卡片 */
-.article-panel .el-card {
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-}
+```
+app-vue/src/
+├── api/
+│   ├── request.ts                   ← Axios 实例 + 拦截器
+│   ├── types/                       ← 类型定义按域拆分
+│   │   ├── index.ts                 ← 通用类型 (ApiResponse 等)
+│   │   ├── user.ts
+│   │   ├── rocketmq.ts
+│   │   └── seckill.ts
+│   ├── modules/                     ← API 模块按业务域拆分
+│   │   ├── auth.ts
+│   │   ├── user.ts
+│   │   ├── role.ts
+│   │   ├── menu.ts
+│   │   ├── rocketmq.ts
+│   │   ├── seckill.ts
+│   │   ├── knowledge.ts
+│   │   ├── audit.ts
+│   │   ├── monitor.ts
+│   │   ├── order.ts
+│   │   ├── goods.ts
+│   │   ├── activity.ts
+│   │   └── cart.ts
+│   └── index.ts                     ← 统一导出
+│
+├── assets/
+│   ├── styles/                      ← 全局样式
+│   │   ├── variables.css            ← CSS 变量
+│   │   ├── reset.css                ← 重置样式
+│   │   └── global.css               ← 全局样式
+│   ├── images/                      ← 静态图片
+│   └── icons/                       ← SVG 图标
+│
+├── components/
+│   ├── common/                      ← 纯 UI 组件（无业务状态依赖）
+│   │   ├── BaseButton.vue
+│   │   ├── BaseTable.vue
+│   │   ├── BaseDialog.vue
+│   │   └── BaseCard.vue
+│   ├── layout/                      ← 布局组件（从 views/layout/ 迁移）
+│   │   ├── AppHeader.vue
+│   │   ├── AppMenu.vue
+│   │   ├── AppTabs.vue
+│   │   └── AppLayout.vue
+│   └── business/                    ← 复用业务组件（依赖业务状态/API）
+│       ├── UserSelector.vue
+│       └── StatusBadge.vue
+│
+├── composables/
+│   ├── useAnimationToggle.ts
+│   ├── usePermission.ts
+│   ├── useTable.ts
+│   └── usePagination.ts
+│
+├── router/
+│   ├── index.ts                     ← 路由实例 + 全局配置
+│   ├── guards.ts                    ← 导航守卫
+│   └── modules/                     ← 路由模块
+│       ├── index.ts                 ← 聚合导出
+│       ├── auth.ts
+│       ├── dashboard.ts
+│       ├── system.ts
+│       ├── rocketmq.ts
+│       ├── seckill.ts
+│       ├── knowledge.ts
+│       ├── monitor.ts
+│       └── order.ts
+│
+├── store/
+│   ├── index.ts                     ← Pinia 实例
+│   ├── user.ts
+│   ├── app.ts                       ← 应用级状态（侧边栏折叠等）
+│   └── permission.ts                ← 权限/菜单状态
+│
+└── views/                           ← 页面组件（按业务域分目录）
+    ├── auth/
+    │   └── LoginPage.vue
+    ├── dashboard/
+    │   └── DashboardPage.vue
+    ├── error/
+    │   ├── NotFoundPage.vue
+    │   └── ForbiddenPage.vue
+    ├── system/
+    │   ├── UserManagementPage.vue
+    │   ├── UserDetailPage.vue
+    │   ├── RoleManagementPage.vue
+    │   └── MenuManagementPage.vue
+    ├── rocketmq/
+    │   ├── TopicListPage.vue
+    │   ├── ConsumerGroupListPage.vue
+    │   ├── ConsumerGroupDetailPage.vue
+    │   ├── MessageListPage.vue
+    │   ├── DashboardPage.vue
+    │   └── components/              ← 页面私有子组件
+    │       ├── BrokerStatusTable.vue
+    │       ├── OverviewCard.vue
+    │       ├── QpsChart.vue
+    │       ├── TopicBacklogTable.vue
+    │       └── ResetOffsetDialog.vue
+    ├── seckill/
+    │   ├── SeckillIndexPage.vue
+    │   ├── SeckillDetailPage.vue
+    │   ├── SeckillCartPage.vue
+    │   ├── SeckillRecordPage.vue
+    │   ├── MyReservationsPage.vue
+    │   ├── activity/
+    │   │   ├── ActivityListPage.vue
+    │   │   └── ActivityFormPage.vue
+    │   └── goods/
+    │       ├── GoodsListPage.vue
+    │       └── GoodsFormPage.vue
+    ├── order/
+    │   ├── OrderListPage.vue
+    │   └── OrderConfirmPage.vue
+    ├── monitor/
+    │   └── MonitorDashboardPage.vue
+    ├── audit/
+    │   └── AuditLogPage.vue
+    └── business/
+        └── BusinessDataPage.vue
 ```
 
-#### el-empty
+### 4.3 配置文件目标结构
 
-```css
-/* 空状态 */
-.el-empty__image {
-  width: 120px;
-  height: 120px;
-  opacity: 0.8;
-}
-
-.el-empty__description {
-  color: #64748b;
-  font-size: 14px;
-  margin-top: 16px;
-}
-
-.el-empty__image svg {
-  fill: #93c5fd;
-}
-
-/* 审计日志空状态 */
-.audit-table + .el-empty {
-  padding: 48px 0;
-}
+```
+springboot/src/main/resources/
+├── config/                          ← 拆分的配置文件
+│   ├── application-datasource.yaml      ← 数据源 + Flyway + MyBatis Plus
+│   ├── application-cache.yaml           ← Redis + Redisson
+│   ├── application-mq.yaml              ← RocketMQ
+│   ├── application-security.yaml        ← JWT + Security 白名单
+│   └── application-business.yaml        ← 秒杀业务配置 (seckill.*)
+├── application.yaml                 ← 主配置（应用名、端口、config import）
+├── application-dev.yaml             ← 开发环境覆盖（仅差异项）
+├── application-test.yaml            ← 测试环境覆盖（仅差异项）
+├── application-prod.yaml            ← 生产环境覆盖（仅差异项）
+├── db/
+│   └── migration/                   ← Flyway 迁移脚本（保持不变）
+│       └── V*.sql
+└── mapper/                          ← MyBatis Mapper XML（保持不变）
+    └── *.xml
 ```
 
-#### el-descriptions (如需使用)
+主配置 `application.yaml` 使用 `spring.config.import`：
 
-```css
-.el-descriptions__label {
-  color: #64748b;
-  font-weight: 500;
-  background: #f8fafc;
-  border-radius: var(--el-border-radius-small);
-  padding: 12px 16px;
-}
+```yaml
+spring:
+  application:
+    name: admin-system
+  config:
+    import:
+      - classpath:config/application-datasource.yaml
+      - classpath:config/application-cache.yaml
+      - classpath:config/application-mq.yaml
+      - classpath:config/application-security.yaml
+      - classpath:config/application-business.yaml
 
-.el-descriptions__content {
-  background: #ffffff;
-  padding: 12px 16px;
-  border-radius: var(--el-border-radius-small);
-}
+server:
+  port: 8080
 
-.el-descriptions--bordered .el-descriptions__cell {
-  border: 1px solid #e2e8f0;
-}
+logging:
+  level:
+    cn.coderstory: DEBUG
+    org.flywaydb: DEBUG
 ```
 
 ---
 
-### 2.3 导航组件 (Navigation)
+## 五、命名规范
 
-#### el-tree
+### 5.1 前端命名规范
 
-```css
-/* 权限树、分类树 */
-.el-tree {
-  --el-tree-node-hover-bg-color: #f0f9ff;
-  --el-tree-text-color: #475569;
-  --el-tree-expand-icon-color: #93c5fd;
-}
+| 元素 | 规范 | 示例 | 源 |
+|------|------|------|-----|
+| 页面组件文件 | PascalCase，推荐 Page 后缀 | `LoginPage.vue`, `TopicListPage.vue` | Vue 风格指南 + 项目实践 |
+| 公共 UI 组件 | PascalCase，Base/App 前缀 | `BaseButton.vue`, `BaseTable.vue` | Vue 风格指南 Priority B |
+| 业务组件 | PascalCase，描述性命名 | `UserSelector.vue`, `StatusBadge.vue` | Vue 风格指南 |
+| 页面私有子组件 | PascalCase，放在页面目录的 components/ 下 | `seckill/components/CountdownTimer.vue` | Vue 风格指南（紧密耦合组件规则） |
+| Composables | camelCase，use 前缀 | `useAnimationToggle.ts`, `usePermission.ts` | Vue 官方文档 |
+| Store | camelCase，描述性命名 | `user.ts`, `app.ts`, `permission.ts` | Pinia 官方建议 |
+| API 模块 | kebab-case，与后端 Controller 域对应 | `rocketmq.ts`, `seckill.ts` | 项目实践 |
+| 类型定义 | PascalCase 接口名，kebab-case 文件名 | `types/user.ts` 中 `interface UserInfo` | TypeScript 惯例 |
+| Router 模块 | kebab-case | `modules/rocketmq.ts` | Vue Router 惯例 |
+| 目录名 | kebab-case | `user-management/`, `rocketmq/` | 前端项目惯例 |
 
-.el-tree-node__content {
-  border-radius: var(--el-border-radius-small);
-  height: 36px;
-  margin-bottom: 4px;
-}
+### 5.2 后端命名规范
 
-.el-tree-node__content:hover {
-  background: linear-gradient(135deg, #f0f9ff, #eff6ff);
-}
+| 元素 | 规范 | 示例 | 源 |
+|------|------|------|-----|
+| Controller 类 | PascalCase + Controller 后缀 | `UserController.java` | Spring MVC 惯例 |
+| Service 接口 | PascalCase + Service 后缀 | `UserService.java` | 阿里巴巴规约 |
+| Service 实现 | PascalCase + ServiceImpl 后缀 | `UserServiceImpl.java` | 阿里巴巴规约（强制） |
+| Mapper 接口 | PascalCase + Mapper 后缀 | `UserMapper.java` | MyBatis Plus 惯例 |
+| Entity | PascalCase，与表名对应（下划线转驼峰） | `User.java`, `SeckillActivity.java` | MyBatis Plus 惯例 |
+| DTO（数据传输对象） | PascalCase + DTO 后缀 | `UserQueryDTO.java`, `SeckillRequestDTO.java` | 阿里巴巴规约 |
+| VO（视图对象） | PascalCase + VO 后缀 | `UserVO.java`, `SeckillResultVO.java` | 阿里巴巴规约 |
+| Config 类 | PascalCase + Config 后缀 | `CorsConfig.java`, `SecurityConfig.java` | Spring Boot 惯例 |
+| Utils 工具类 | PascalCase + Utils 后缀 | `JwtUtils.java`, `RedisUtils.java` | 阿里巴巴规约 |
+| Exception 类 | PascalCase + Exception 后缀 | `BusinessException.java` | 阿里巴巴规约（强制） |
+| 包名 | 全小写，单数形式，点分隔 | `cn.coderstory.springboot.seckill` | 阿里巴巴规约（强制） |
+| 方法名 | lowerCamelCase，动词前缀 | `getUserById()`, `listTopics()`, `updateStatus()` | 阿里巴巴规约（强制） |
 
-.el-tree-node.is-current > .el-tree-node__content {
-  background: linear-gradient(135deg, #fef3c7, #fde68a) !important;
-  color: #92400e;
-  font-weight: 500;
-}
+### 5.3 Service/DAO 方法命名前缀（阿里巴巴规约）
 
-.el-tree-node.is-expanded > .el-tree-node__content {
-  background: transparent;
-}
+| 前缀 | 用途 | 示例 |
+|------|------|------|
+| `get` | 获取单个对象 | `getUserById(Long id)` |
+| `list` | 获取多个对象 | `listUsersByRole(String role)` |
+| `count` | 获取统计值 | `countActiveUsers()` |
+| `save` / `insert` | 插入 | `saveUser(User user)` |
+| `remove` / `delete` | 删除 | `removeUser(Long id)` |
+| `update` | 修改 | `updateUserStatus(Long id, Integer status)` |
 
-/* 选中高亮 */
-.el-tree-node.is-current .el-tree-node__content .el-tree-node__label {
-  color: #92400e;
-  font-weight: 600;
-}
+---
 
-/* 连接线 */
-.el-tree > .el-tree-node__children > .el-tree-node {
-  position: relative;
-}
+## 六、包结构选择：package-by-feature vs package-by-layer
 
-.el-tree > .el-tree-node__children > .el-tree-node::before {
-  content: '';
-  position: absolute;
-  left: 12px;
-  top: 0;
-  height: 18px;
-  border-left: 1px dashed #bfdbfe;
-}
+### 6.1 结论：采用 package-by-feature（按业务域分包）
 
-/* 复选框 */
-.el-tree .el-checkbox__input.is-checked .el-checkbox__inner {
-  background: linear-gradient(135deg, #3b82f6, #1e3a8a);
-  border-color: #3b82f6;
-}
+**理由：**
 
-.el-tree .el-checkbox__input.is-indeterminate .el-checkbox__inner {
-  background: linear-gradient(135deg, #3b82f6, #1e3a8a);
-  border-color: #3b82f6;
-}
+1. **当前项目已部分采用**：seckill/, order/, stock/, monitor/ 已按域分包，是项目中最清晰的模块。继续朝此方向统一而非回退
+2. **业务域边界清晰**：项目有明确的业务域划分（用户管理、知识库、秒杀、RocketMQ 管理、审计），符合按域分包的前提条件
+3. **阿里巴巴规约推荐**：应用分层指南建议将 Web 层（Controller）、Service 层、DAO 层作为逻辑分层，具体组织可按业务模块划分
+4. **包内高内聚**：修改一个业务功能只需在一个包内操作（controller + service + mapper + entity 都在同一业务域包下）
+5. **新功能添加简单**：新增一个业务域只需新建一个包，复制标准子包结构即可
 
-/* 分类树头部 */
-.category-tree .tree-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px;
-  border-bottom: 1px solid #eee;
-  font-weight: 600;
-  color: #1e3a8a;
-}
+**边界情况处理：**
 
-/* 权限树容器 */
-.permission-tree-container {
-  max-height: 400px;
-  overflow-y: auto;
-  padding: 8px;
-}
+- **纯技术组件**（config/, security/, aspect/, exception/, util/, limiter/, lock/）→ 放入 `shared/` 包
+- **MQ 基础设施**（consumer/, producer/）→ 保留在 `mq/` 包，因为跨业务域共用
+- **SSE 基础设施** → 保留在 `sse/` 包
+- **简单 CRUD 模块**（audit/）→ 同样按域分包，保持一致性
 
-.permission-tree-container .el-tree {
-  background: transparent;
-}
+### 6.2 前端：继续保持 package-by-feature
+
+前端天然就是按域分视图的模式（views/rocketmq/, views/seckill/），只需要将其他目录（components/, api/, router/）也统一应用此模式即可。
+
+---
+
+## 七、规范依赖关系
+
 ```
+Phase 1 必须完成（阻断项）:
+    后端统一按域分包 ──→ 决定几乎所有后续后端规范的实现方式
+    application.yaml 拆分 ──→ 不依赖代码变更，可最早独立完成
+    消除 test.yaml 重复 ──→ 依赖 application.yaml 拆分结果
+    service/ 接口与实现分离 ──→ 与按域分包同时进行，避免二次移动
 
-#### el-tabs (补充完善)
+Phase 1 独立可执行:
+    前端 components/ 分区 ──→ 不依赖其他变更
+    前端 API 模块分目录 ──→ 不依赖其他变更
+    前端 router 模块拆分 ──→ 不依赖其他变更（但建议先调整 views 结构）
+    前端 views 内组件整理 ──→ 不依赖其他变更
 
-```css
-/* 已在enterprise-theme.css覆盖，可补充 */
-
-.el-tabs__nav-wrap::after {
-  height: 1px;
-  background: #e2e8f0;
-}
-
-/* 卡片样式标签页 */
-.el-tabs--card > .el-tabs__header .el-tabs__nav {
-  border: none;
-}
-
-.el-tabs--card > .el-tabs__header .el-tabs__item {
-  border: 1px solid #e2e8f0;
-  border-bottom: none;
-  border-radius: 8px 8px 0 0;
-  background: #f8fafc;
-  margin-right: 4px;
-}
-
-.el-tabs--card > .el-tabs__header .el-tabs__item.is-active {
-  background: #ffffff;
-  border-bottom: 1px solid #ffffff;
-  color: #3b82f6;
-}
-
-/* 胶囊样式标签页 */
-.el-tabs--border-card {
-  border-radius: 12px;
-  box-shadow: var(--el-box-shadow);
-}
-
-.el-tabs--border-card > .el-tabs__header {
-  background: linear-gradient(135deg, #eff6ff, #dbeafe);
-  margin: 0;
-}
-
-.el-tabs--border-card > .el-tabs__header .el-tabs__item {
-  color: #64748b;
-  font-weight: 500;
-}
-
-.el-tabs--border-card > .el-tabs__header .el-tabs__item.is-active {
-  color: #1e3a8a;
-  background: #ffffff;
-}
-```
-
-#### el-menu (侧边栏)
-
-```css
-/* 侧边栏渐变已在CSS变量定义 */
-.el-menu {
-  --el-menu-bg-color: linear-gradient(180deg, #1e3a8a 0%, #3b82f6 100%);
-  --el-menu-text-color: rgba(255, 255, 255, 0.9);
-  --el-menu-hover-bg-color: #fef3c7;
-  --el-menu-active-color: #1e3a8a;
-  --el-menu-item-height: 50px;
-  border: none !important;
-}
-
-.el-menu-item,
-.el-sub-menu__title {
-  color: rgba(255, 255, 255, 0.9);
-  transition: all 0.3s;
-}
-
-.el-menu-item:hover,
-.el-sub-menu__title:hover {
-  background: rgba(254, 243, 199, 0.2) !important;
-  color: #fef3c7;
-}
-
-.el-menu-item.is-active {
-  background: linear-gradient(135deg, rgba(254, 243, 199, 0.3), rgba(253, 230, 138, 0.2)) !important;
-  color: #fef3c7 !important;
-  font-weight: 600;
-}
-
-.el-menu-item.is-active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 60%;
-  background: #fbbf24;
-  border-radius: 0 4px 4px 0;
-}
-
-/* 子菜单 */
-.el-sub-menu .el-menu {
-  background: rgba(30, 58, 138, 0.3) !important;
-}
-
-.el-sub-menu.is-active .el-sub-menu__title {
-  color: #fef3c7 !important;
-}
-
-/* 折叠状态 */
-.el-menu--collapse {
-  width: 64px;
-}
-
-.el-menu--popup {
-  border-radius: 12px;
-  box-shadow: var(--el-box-shadow-dark);
-  border: 1px solid rgba(147, 197, 253, 0.3);
-}
+Phase 2 依赖 Phase 1:
+    Entity/DTO/VO 命名统一 ──→ 依赖后端统一分包完成
+    TS 类型定义拆分 ──→ 依赖 API 模块分目录完成
+    @ConfigurationProperties ──→ 依赖 application.yaml 拆分完成
+    页面级目录规范 ──→ 依赖 Phase 1 views 调整完成
 ```
 
 ---
 
-### 2.4 反馈组件 (Feedback)
+## 八、优先级矩阵
 
-#### el-message
-
-```css
-/* 消息提示已通过CSS变量部分覆盖 */
-.el-message {
-  --el-message-bg-color: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
-  box-shadow: var(--el-box-shadow-dark);
-  border: 1px solid rgba(147, 197, 253, 0.3);
-  backdrop-filter: blur(10px);
-}
-
-.el-message--success {
-  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-  border-color: #6ee7b7;
-}
-
-.el-message--warning {
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
-  border-color: #fcd34d;
-}
-
-.el-message--error {
-  background: linear-gradient(135deg, #fee2e2, #fecaca);
-  border-color: #fca5a5;
-}
-
-.el-message--info {
-  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-  border-color: #93c5fd;
-}
-```
-
-#### el-message-box
-
-```css
-/* 确认对话框 */
-.el-message-box {
-  border-radius: 16px;
-  box-shadow: var(--el-box-shadow-dark);
-  border: 1px solid rgba(147, 197, 253, 0.3);
-  padding: 24px;
-}
-
-.el-message-box__header {
-  padding-bottom: 16px;
-  border-bottom: 1px dashed rgba(147, 197, 253, 0.5);
-}
-
-.el-message-box__title {
-  color: #1e3a8a;
-  font-weight: 600;
-  font-size: 18px;
-}
-
-.el-message-box__content {
-  padding: 24px 0;
-  color: #475569;
-}
-
-.el-message-box__message {
-  color: #475569;
-}
-
-.el-message-box__input {
-  padding-top: 16px;
-}
-
-.el-message-box__input .el-input__wrapper {
-  border-radius: var(--el-border-radius-base);
-}
-
-.el-message-box__footer {
-  padding-top: 16px;
-  border-top: 1px dashed rgba(147, 197, 253, 0.5);
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-```
-
-#### el-loading
-
-```css
-/* 加载状态 */
-.el-loading-mask {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(4px);
-}
-
-.el-loading-spinner {
-  --el-loading-spinner-size: 42px;
-}
-
-.el-loading-spinner .circular {
-  width: 42px;
-  height: 42px;
-}
-
-.el-loading-spinner .path {
-  stroke: #3b82f6;
-  stroke-width: 3;
-}
-
-.el-loading-text {
-  color: #3b82f6;
-  font-size: 14px;
-  margin-top: 12px;
-}
-
-/* 组件内加载 */
-.el-table__body-wrapper.is-scrolling-none {
-  /* 配合virtual scroll优化 */
-}
-```
-
-#### el-popover / el-tooltip
-
-```css
-.el-popover.el-popper {
-  border-radius: 12px;
-  box-shadow: var(--el-box-shadow-dark);
-  border: 1px solid rgba(147, 197, 253, 0.3);
-  background: rgba(255, 255, 255, 0.98);
-}
-
-.el-tooltip__popper.is-dark {
-  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
-  border-radius: 8px;
-  padding: 8px 12px;
-}
-
-.el-tooltip__popper.is-dark .el-tooltip__arrow::before {
-  background: #3b82f6;
-}
-```
+| 规范 | 维护性价值 | 实施成本 | 优先级 |
+|------|-----------|---------|--------|
+| application.yaml 拆分 | 高（每次改配置受益） | 中 | P1 |
+| 消除 test.yaml 重复 | 高（防止配置不同步） | 低 | P1 |
+| 后端统一按域分包 | 高（新开发者定位代码） | 中 | P1 |
+| service/ 接口与实现分离 | 中（代码一致性） | 低 | P1 |
+| 前端 components/ 分区 | 中（查找组件效率） | 低 | P1 |
+| 前端 API 模块分目录 | 中（定位 API 效率） | 低 | P1 |
+| 前端 router 模块拆分 | 中（路由管理效率） | 低 | P1 |
+| rocketmq/ views 分离页面与子组件 | 中（目录整洁度） | 低 | P1 |
+| 前端 views/ 页面命名加 Page 后缀 | 低（视觉一致性） | 低 | P2 |
+| Entity/DTO/VO 命名统一 | 中（类型语义清晰） | 中 | P2 |
+| TS 类型定义拆分 | 中（类型管理效率） | 中 | P2 |
+| @ConfigurationProperties 配置类 | 中（配置类型安全） | 中 | P2 |
+| 页面级目录规范（复杂页面） | 中（仅复杂页面） | 中 | P2 |
+| 清理无用代码/模板 | 低 | 低 | P2 |
 
 ---
 
-### 2.5 布局组件 (Layout)
+## 九、实施检查清单
 
-#### el-header (Layout.vue)
+### Phase 1: 结构统一
 
-```css
-/* 头部玻璃效果 */
-.el-header {
-  --el-header-bg-color: rgba(255, 255, 255, 0.85);
-  --el-header-text-color: #1e293b;
-  --el-header-height: 60px;
-  background: var(--el-header-bg-color);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(147, 197, 253, 0.3);
-  display: flex;
-  align-items: center;
-  padding: 0 24px;
-  box-shadow: 0 2px 8px rgba(30, 58, 138, 0.05);
-}
+**配置文件：**
+- [ ] 创建 resources/config/ 目录，拆分 5 个关注点配置文件
+- [ ] 修改 application.yaml 添加 spring.config.import
+- [ ] 精简 application-test.yaml 仅保留环境差异
+- [ ] 验证应用在所有 profile 下正常启动
 
-/* 暗色模式 */
-.dark .el-header {
-  background: rgba(30, 41, 59, 0.85);
-  border-bottom-color: rgba(147, 197, 253, 0.2);
-}
-```
+**后端目录：**
+- [ ] 创建 shared/ 包，迁移 config/, security/, aspect/, exception/, util/, vo/, limiter/, lock/
+- [ ] 创建 user/ 包，迁移 UserController, RoleController 及相关 service/mapper/entity
+- [ ] 创建 auth/ 包，迁移 AuthController 及相关 service
+- [ ] 创建 menu/ 包，迁移 MenuController 及相关 service/mapper/entity
+- [ ] 创建 knowledge/ 包，迁移 KnowledgeController 及相关 service/mapper/entity
+- [ ] 创建 audit/ 包，迁移 AuditLogController 及相关 service/mapper/entity
+- [ ] 创建 rocketmq/ 包，迁移 RocketMQController, RocketMQDashboardController 及相关 service
+- [ ] 整理 service/impl/ 目录：所有实现类必须放在 impl/ 子目录中
+- [ ] 删除旧的根层 controller/, service/, entity/, mapper/, vo/ 目录
 
-#### el-main / el-aside
+**前端目录：**
+- [ ] components/ 划分为 common/, layout/, business/ 子目录
+- [ ] 将 AppHeader.vue, AppMenu.vue, AppTabs.vue 移入 components/layout/
+- [ ] views/layout/Layout.vue 移入 components/layout/AppLayout.vue
+- [ ] 移除无用模板文件（HelloWorld.vue, TheWelcome.vue, WelcomeItem.vue）
+- [ ] api/ 创建 modules/ 子目录，按业务域分类
+- [ ] api/types.ts 重度拆分可延后到 Phase 2
+- [ ] router/index.ts 拆分为 modules/ + guards.ts
+- [ ] views/rocketmq/ 页面子组件移入 rocketmq/components/
+- [ ] 更新所有 import 路径
 
-```css
-.el-main {
-  background: #f0f9ff;
-  padding: 20px;
-  min-height: calc(100vh - var(--el-header-height));
-}
+### Phase 2: 规范化
 
-.el-aside {
-  background: transparent;
-}
+**后端：**
+- [ ] Entity/DTO/VO 后缀统一
+- [ ] 引入 @ConfigurationProperties 类型安全配置
+- [ ] 补充 package-info.java
 
-/* 页面容器统一样式 */
-.page-container {
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: var(--el-box-shadow-light);
-}
-
-.page-title {
-  margin: 0 0 20px 0;
-  font-size: 20px;
-  font-weight: 600;
-  color: #1e3a8a;
-}
-
-.search-section {
-  background: #f8fafc;
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 16px;
-  border: 1px solid #e2e8f0;
-}
-```
-
-#### el-row / el-col
-
-```css
-/* 栅格系统基本不需要覆盖，但可补充间距 */
-.el-row {
-  --el-row-gap: 20px;
-}
-
-.el-col {
-  border-radius: var(--el-border-radius-base);
-}
-```
+**前端：**
+- [ ] views/ 页面组件统一加 Page 后缀
+- [ ] api/types/ 按域拆分类型定义
+- [ ] 复杂页面（SeckillDetail）实施页面级目录规范
 
 ---
 
-### 2.6 其他组件
+## 来源
 
-#### el-divider
-
-```css
-.el-divider {
-  --el-divider-bg-color: #e2e8f0;
-  --el-divider-text-color: #64748b;
-  border-radius: 4px;
-}
-
-.el-divider--horizontal {
-  margin: 20px 0;
-}
-
-.el-divider__text {
-  background: #ffffff;
-  padding: 0 16px;
-  color: #64748b;
-  font-weight: 500;
-}
-
-.el-divider--vertical {
-  margin: 0 16px;
-}
-```
-
-#### el-avatar
-
-```css
-.el-avatar {
-  --el-avatar-bg-color: #dbeafe;
-  border: 2px solid #ffffff;
-  box-shadow: 0 2px 8px rgba(30, 58, 138, 0.1);
-}
-
-.el-avatar--circle {
-  border-radius: 50%;
-}
-
-.el-avatar--square {
-  border-radius: 12px;
-}
-```
-
-#### el-badge
-
-```css
-.el-badge__content {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  border: none;
-  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
-}
-
-.el-badge__content.is-fixed {
-  top: 8px;
-  right: 12px;
-}
-
-.el-badge__content--danger {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-}
-```
-
-#### el-progress
-
-```css
-.el-progress-bar__outer {
-  background: #e2e8f0;
-  border-radius: 12px;
-}
-
-.el-progress-bar__inner {
-  background: linear-gradient(90deg, #3b82f6, #1e3a8a);
-  border-radius: 12px;
-}
-
-.el-progress__text {
-  color: #475569;
-  font-weight: 500;
-}
-
-.el-progress--circle .el-progress__text {
-  color: #1e3a8a;
-  font-weight: 600;
-}
-```
+- [Vue.js 官方风格指南 — Priority B: Strongly Recommended](https://vuejs.org/style-guide/rules-strongly-recommended) — HIGH 置信度（官方文档原始 Markdown 已获取）
+- [Vue.js Composables 官方文档](https://vuejs.org/guide/reusability/composables) — HIGH 置信度（官方文档原始 Markdown 已获取）
+- [阿里巴巴 Java 开发手册 — 工程结构/应用分层](https://github.com/alibaba/p3c) — HIGH 置信度（原始文档已获取）
+- [阿里巴巴 Java 开发手册 — 编程规约/命名风格](https://github.com/alibaba/p3c) — HIGH 置信度（原始文档已获取）
+- Spring Boot Reference Documentation — MEDIUM 置信度（未获取最新版本原始文档，基于广泛社区的惯例）
+- 现有项目代码分析（app-vue/src/ 和 springboot/src/main/java/）— HIGH 置信度（直接分析项目代码）
 
 ---
-
-## 三、主题变量完整清单
-
-```css
-:root {
-  /* === 主色调 === */
-  --el-color-primary: #3b82f6;
-  --el-color-primary-light-3: #60a5fa;
-  --el-color-primary-light-5: #93c5fd;
-  --el-color-primary-light-7: #bfdbfe;
-  --el-color-primary-light-8: #dbeafe;
-  --el-color-primary-light-9: #eff6ff;
-  --el-color-primary-dark-2: #1d4ed8;
-
-  /* === 语义色 === */
-  --el-color-success: #10b981;
-  --el-color-warning: #f59e0b;
-  --el-color-danger: #ef4444;
-  --el-color-info: #64748b;
-
-  /* === 文字色 === */
-  --el-text-color-primary: #1e293b;
-  --el-text-color-regular: #475569;
-  --el-text-color-secondary: #64748b;
-  --el-text-color-placeholder: #94a3b8;
-  --el-text-color-disabled: #cbd5e1;
-
-  /* === 背景色 === */
-  --el-bg-color: #ffffff;
-  --el-bg-color-page: #f0f9ff;
-  --el-bg-color-overlay: rgba(255, 255, 255, 0.9);
-
-  /* === 边框色 === */
-  --el-border-color: #bfdbfe;
-  --el-border-color-light: #dbeafe;
-  --el-border-color-lighter: #eff6ff;
-  --el-border-color-extra-light: #f0f9ff;
-  --el-border-color-dark: #93c5fd;
-  --el-border-color-darker: #60a5fa;
-
-  /* === 填充色 === */
-  --el-fill-color: #f0f9ff;
-  --el-fill-color-light: #f8fafc;
-  --el-fill-color-lighter: #fafafa;
-  --el-fill-color-blank: #ffffff;
-
-  /* === 阴影 === */
-  --el-box-shadow: 0 4px 16px rgba(30, 58, 138, 0.1);
-  --el-box-shadow-light: 0 2px 8px rgba(30, 58, 138, 0.06);
-  --el-box-shadow-lighter: 0 1px 4px rgba(30, 58, 138, 0.04);
-  --el-box-shadow-dark: 0 8px 32px rgba(30, 58, 138, 0.15);
-
-  /* === 圆角 === */
-  --el-border-radius-base: 12px;
-  --el-border-radius-small: 8px;
-  --el-border-radius-round: 24px;
-  --el-border-radius-circle: 50%;
-
-  /* === 字体 === */
-  --el-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --el-font-size-extra-large: 16px;
-  --el-font-size-large: 14px;
-  --el-font-size-base: 14px;
-  --el-font-size-small: 13px;
-  --el-font-size-extra-small: 12px;
-
-  /* === 组件变量 === */
-  --el-menu-bg-color: linear-gradient(180deg, #1e3a8a 0%, #3b82f6 100%);
-  --el-menu-text-color: rgba(255, 255, 255, 0.9);
-  --el-menu-hover-bg-color: #fef3c7;
-  --el-menu-active-color: #1e3a8a;
-  --el-menu-item-height: 50px;
-
-  --el-header-bg-color: rgba(255, 255, 255, 0.85);
-  --el-header-text-color: #1e293b;
-  --el-header-height: 60px;
-
-  --el-button-padding-horizontal: 24px;
-  --el-button-padding-vertical: 12px;
-  --el-button-font-size: 14px;
-
-  /* === 侧边栏 === */
-  --sidebar-bg: linear-gradient(180deg, #1e3a8a 0%, #3b82f6 100%);
-  --sidebar-width: 240px;
-
-  /* === 过渡 === */
-  --el-transition-duration: 0.3s;
-  --el-transition-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-```
-
----
-
-## 四、常见踩坑指南
-
-### 1. CSS选择器优先级问题
-
-**问题:** 使用`.el-button`选择器样式不生效
-
-**原因:** Element Plus组件使用BEM命名，且有`scoped`样式隔离
-
-**解决:**
-```css
-/* 错误 - scoped限制 */
-<style scoped>
-.el-button { /* 不生效 */ }
-</style>
-
-/* 正确 - 使用:deep() */
-<style scoped>
-:deep(.el-button) { /* 生效 */ }
-</style>
-
-/* 或者在全局样式文件中定义 */
-```
-
-### 2. CSS变量覆盖不生效
-
-**问题:** 修改`--el-color-primary`后组件颜色没变
-
-**原因:** 某些组件有硬编码颜色或使用其他变量
-
-**解决:**
-```css
-/* 需要同时覆盖关联变量 */
-:root {
-  --el-color-primary: #new-color;
-  --el-color-primary-light-3: #new-color-light-3;
-  --el-color-primary-dark-2: #new-color-dark-2;
-}
-
-/* 组件特定变量可能需要单独设置 */
-.el-button--primary {
-  --el-button-bg-color: #new-color;
-  --el-button-border-color: #new-color;
-  --el-button-hover-bg-color: #new-hover;
-  --el-button-hover-border-color: #new-hover;
-}
-```
-
-### 3. 渐变与纯色切换
-
-**问题:** 按钮hover效果从渐变变成纯色
-
-**原因:** hover状态没有定义渐变
-
-**解决:**
-```css
-.el-button--primary:hover {
-  background: linear-gradient(135deg, #60a5fa, #1e3a8a) !important;
-}
-```
-
-### 4. 深色模式冲突
-
-**问题:** 浅色主题样式被深色主题覆盖
-
-**原因:** 样式文件加载顺序问题
-
-**解决:**
-```css
-/* 确保浅色主题在深色主题之后加载 */
-/* 或使用更高优先级的选择器 */
-html:not([data-theme="dark"]) .el-button {
-  background: linear-gradient(135deg, #3b82f6, #1e3a8a);
-}
-```
-
-### 5. 第三方组件库冲突
-
-**问题:** wangeditor等第三方编辑器样式与主题不协调
-
-**原因:** 第三方组件使用独立样式系统
-
-**解决:**
-```css
-/* 在ArticleEditor组件中单独处理 */
-.wangEditor-theme {
-  --el-border-color: #dbeafe;
-  --el-border-radius-base: 12px;
-}
-
-/* 或覆盖wangeditor自身样式 */
-.w-e-toolbar {
-  background: #f8fafc !important;
-  border-color: #e2e8f0 !important;
-}
-
-.w-e-text-container {
-  border-color: #e2e8f0 !important;
-}
-```
-
-### 6. 响应式样式丢失
-
-**问题:** 移动端组件样式异常
-
-**原因:** 响应式样式没有覆盖
-
-**解决:**
-```css
-@media (max-width: 768px) {
-  :root {
-    --sidebar-width: 200px;
-    --el-header-height: 56px;
-  }
-
-  .el-dialog {
-    width: 95% !important;
-    margin: 10px auto !important;
-  }
-
-  .el-table {
-    font-size: 12px;
-  }
-}
-```
-
-### 7. 动画性能问题
-
-**问题:** 全局transition导致性能下降
-
-**原因:** 过度使用通配符transition
-
-**解决:**
-```css
-/* 移除全局通配符过渡 */
-/* 改为按组件或按类定义 */
-.no-transition * {
-  transition: none !important;
-}
-
-/* GPU加速关键动画 */
-.transform-gpu {
-  transform: translateZ(0);
-  will-change: transform;
-}
-```
-
----
-
-## 五、实施检查清单
-
-### Phase 1: 核心组件 (必须完成)
-
-- [ ] el-input / el-textarea
-- [ ] el-select dropdown
-- [ ] el-switch
-- [ ] el-radio / el-radio-group
-- [ ] el-date-picker
-- [ ] el-tree
-- [ ] el-card (Login)
-
-### Phase 2: 完善组件 (建议完成)
-
-- [ ] el-empty
-- [ ] el-link
-- [ ] el-message
-- [ ] el-message-box
-- [ ] el-loading
-- [ ] el-popover / el-tooltip
-- [ ] el-descriptions
-
-### Phase 3: 优化组件 (可选)
-
-- [ ] el-divider
-- [ ] el-avatar
-- [ ] el-badge
-- [ ] el-progress
-- [ ] el-skeleton
-
----
-
-## 六、测试验证点
-
-1. **登录页面**: 卡片、按钮、输入框样式一致
-2. **用户管理**: 表格、表单、对话框、Switch、Radio全部主题化
-3. **角色管理**: 权限树、对话框样式协调
-4. **审计日志**: 日期选择器、空状态、表格样式
-5. **业务数据**: 富文本编辑器、分类树样式融入主题
-6. **响应式**: 768px以下断点样式正常
-
----
-
-## 参考资料
-
-- [Element Plus Theming Guide](https://element-plus.org/en-US/guide/theming.html) - HIGH confidence
-- [Element Plus Component Docs](https://element-plus.org/en-US/component/overview) - HIGH confidence
-- [CSS Variables Reference](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties) - HIGH confidence
+*代码组织规范研究完成于: 2026-05-06*
+*适用于: v1.5 前后端代码重构与目录整理里程碑*
