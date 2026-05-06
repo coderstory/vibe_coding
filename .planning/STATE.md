@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: 代码深度清理与优化
-status: planning
-last_updated: "2026-05-07T00:00:00.000Z"
+status: active
+last_updated: "2026-05-07T12:00:00.000Z"
 last_activity: 2026-05-07
 progress:
   total_phases: 5
@@ -24,8 +24,8 @@ See: .planning/PROJECT.md (updated 2026-05-07)
 
 Phase: 22 of 26 (后端死代码清理)
 Plan: —
-Status: Ready to plan (roading created, awaiting first /gsd-plan-phase)
-Last activity: 2026-05-07 — v1.6 roadmap created (5 phases, 22 requirements)
+Status: Context gathered, ready to plan
+Last activity: 2026-05-07 — Phase 22 context gathered (mixed mode, batch commit, commented code rules)
 
 Progress: [░░░░░░░░░░] 0%
 
