@@ -17,10 +17,9 @@
 ## 交互要求
 
 1. **全程使用中文沟通** - 所有输出必须使用中文，包括回复内容、代码注释、错误信息、文档描述
-2. **禁止输出英文** - 除非：用户明确要求、代码本身是英文、技术术语无公认中文翻译  
-3. 当前操作系统是 Windows，调用 shell 时，**禁止使用 bash 命令**，而是使用 **PowerShell 7 命令**：`pwsh -Command "your command"`
-4. 回复简洁直接，不确定的主动询问
-5. 优先使用 Superpowers-ZH 技能框架进行中文优化
+2. **禁止输出英文** - 除非：用户明确要求、代码本身是英文、技术术语无公认中文翻译
+3. 回复简洁直接，不确定的主动询问
+4. 优先使用 Superpowers-ZH 技能框架进行中文优化
 
 ## 构建与开发命令
 
@@ -41,11 +40,11 @@ npm run lint       # ESLint 检查
 
 ```powershell
 cd springboot
-./gradlew bootRun          # 运行应用
-./gradlew build            # 编译打包
-./gradlew test             # 运行测试
-./gradlew test --tests "*ClassName"  # 运行单个测试类
-./gradlew build -x test    # 跳过测试打包
+./gradlew.bat bootRun          # 运行应用
+./gradlew.bat build            # 编译打包
+./gradlew.bat test             # 运行测试
+./gradlew.bat test --tests "*ClassName"  # 运行单个测试类
+./gradlew.bat build -x test    # 跳过测试打包
 ```
 
 ---
