@@ -81,3 +81,48 @@
 - 保持现有功能完全正常工作
 
 **Status:** ✅ Completed
+
+---
+
+## v1.5 — 前后端代码重构与目录整理
+
+**Date:** 2026-05-06 → 2026-05-07
+
+**Goal:** 重构前后端代码结构，整理代码和配置文件目录，消除技术债务
+
+**Delivered:**
+- Phase 17: 工具链搭建 — EditorConfig/ESLint 10.x/Stylelint/Checkstyle/ArchUnit/PMD/SpotBugs/JaCoCo/Error Prone
+- Phase 18: 后端包结构重组 — shared 通用层 + 10 个业务域包，71 个文件迁移
+- Phase 19: 配置文件整理 — application.yaml 拆分为 datasource/cache/mq/security/business 5 个关注点文件
+- Phase 20: 前端目录重组 — components/api/router 按域拆分
+- Phase 21: 代码规范统一 — PascalCase/Page 后缀，interface vs type 收敛，lint 零 warning
+
+**Status:** ✅ Completed
+
+---
+
+## v1.6 — 代码深度清理与优化
+
+**Date:** 2026-05-07 (planning)
+
+**Goal:** 全面清理前后端死代码（未使用方法/字段/导入/组件/API），清理无用依赖和冗余配置，提升代码库整洁度
+
+**Target features:**
+- 后端 Java 代码清理：死方法/字段/导入删除，工具类合并，DTO/VO 精简，Service 瘦身
+- 前端 Vue/TS 代码清理：无用组件删除，API 层精简，CSS 清理，类型合并
+- 依赖清理：Gradle 未用依赖移除，npm 未用包移除，依赖作用域修正
+- 配置清理：application.yaml 冗余属性清理，无引用 profile 清理，.env 清理
+
+**Constraints:**
+- 不新增任何业务功能
+- 不修改数据库 schema
+- 不重构核心架构
+- 仅清理现有代码
+
+**Phases:** 22-26 (5 phases, 22 requirements)
+
+**Status:** 🚧 Planning (roadmap created, awaiting first plan-phase)
+
+---
+
+*Last updated: 2026-05-07*

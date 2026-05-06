@@ -3,29 +3,31 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: 代码深度清理与优化
 status: planning
-last_updated: "2026-05-06T18:05:54.239Z"
-last_activity: 2026-05-06
+last_updated: "2026-05-07T00:00:00.000Z"
+last_activity: 2026-05-07
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
-  total_plans: 0
+  total_plans: 5
   completed_plans: 0
   percent: 0
 ---
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-06)
+See: .planning/PROJECT.md (updated 2026-05-07)
 
 **Core value:** 提供清晰、高效的企业级管理后台界面，通过夏日海滩风主题营造清爽专业的视觉体验。
-**Current focus:** v1.5 前后端代码重构与目录整理 — 建立代码质量工具链，按业务域重组前后端代码结构
+**Current focus:** v1.6 代码深度清理与优化 — 全面清理前后端死代码、无用依赖和冗余配置
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 22 of 26 (后端死代码清理)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-06 — Milestone v1.6 started
+Status: Ready to plan (roading created, awaiting first /gsd-plan-phase)
+Last activity: 2026-05-07 — v1.6 roadmap created (5 phases, 22 requirements)
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Milestone: v1.5 ✅ COMPLETED
 
@@ -43,7 +45,7 @@ Last activity: 2026-05-06 — Milestone v1.6 started
 
 **Velocity:**
 
-- Total plans completed: 36 (across v1.0-v1.4)
+- Total plans completed: 41 (across v1.0-v1.5)
 - Average duration: N/A
 - Total execution time: N/A
 
@@ -52,7 +54,8 @@ Last activity: 2026-05-06 — Milestone v1.6 started
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1-16 (v1.0-v1.4) | 36 | completed | N/A |
-| 17-21 (v1.5) | - | pending | - |
+| 17-21 (v1.5) | 5 | completed | N/A |
+| 22-26 (v1.6) | 0 | pending | - |
 
 *Updated after each plan completion*
 
@@ -62,19 +65,19 @@ Last activity: 2026-05-06 — Milestone v1.6 started
 
 Recent decisions affecting current work:
 
-- **v1.5 scoping:** 按业务域垂直切分包结构，后端 shared + 10 个业务域，前端同步按域拆分
-- **v1.5 tooling:** 集成 ArchUnit/Checkstyle/PMD/SpotBugs/JaCoCo/Error Prone 作为重构安全网
-- **v1.5 constraints:** 不新增业务功能，不修改数据库 schema，仅重构不重写
+- **v1.6 scoping:** 仅做代码清理，不新增业务功能，不修改数据库 schema，不重构核心架构
+- **v1.6 phase design:** 后端死代码清理先行（Phase 22），前后端代码清理并行（Phase 23 + 24），依赖和配置清理在后（Phase 25 + 26）
+- **v1.6 safety:** 每阶段以编译通过 + lint/check 零新增告警 + 功能回归验证为完成标准
 
 Full decision log: .planning/PROJECT.md Key Decisions
 
 ### Pending Todos
 
-None yet.
+无。
 
 ### Blockers/Concerns
 
-无。v1.5 里程碑全部完成。
+无。v1.5 里程碑全部完成，代码基线稳定，v1.6 可立即启动。
 
 ## Deferred Items
 
@@ -85,9 +88,9 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-05-07
-Stopped at: v1.5 里程碑全部完成（5/5 阶段）
-Resume file: None (handoff consumed)
+Stopped at: v1.6 roadmap created, awaiting first plan-phase
+Resume file: None
 
 ---
 
-*STATE.md updated: 2026-05-06 — v1.5 roadmap initialized*
+*STATE.md updated: 2026-05-07 — v1.6 roadmap created*
