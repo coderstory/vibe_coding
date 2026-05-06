@@ -14,6 +14,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.Set;
 
 @Slf4j
@@ -154,9 +155,10 @@ public class AuditAspect {
         }
         // 尝试从返回结果中提取ID
         try {
-            if (result instanceof Map<?, ?> map) {
-                if (map.get("id") != null) {
-                    return String.valueOf(map.get("id"));
+            if (result instanceof Map) {
+                Object id = ((Map<?, ?>) result).get("id");
+                if (id != null) {
+                    return String.valueOf(id);
                 }
             }
             // 尝试调用getId方法
