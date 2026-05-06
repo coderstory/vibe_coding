@@ -1,24 +1,24 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.4
-milestone_name: Maven→Gradle + Spring Boot 4.1 升级
+milestone: v1.5
+milestone_name: 前后端代码重构与目录整理
 status: planning
-last_updated: "2026-05-06T15:00:33.072Z"
-last_activity: 2026-04-30 — Phase 15 completed
+last_updated: "2026-05-06T15:10:10.321Z"
+last_activity: 2026-05-06
 progress:
-  total_phases: 4
-  completed_phases: 3
-  total_plans: 10
-  completed_plans: 7
-  percent: 70
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 ## Current Position
 
-Phase: 16 (构建验证)
+Phase: Not started (defining requirements)
 Plan: —
-Status: Ready to plan
-Last activity: 2026-04-30 — Phase 15 completed
+Status: Defining requirements
+Last activity: 2026-05-06 — Milestone v1.5 started
 
 ## Project Reference
 

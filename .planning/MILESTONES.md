@@ -68,15 +68,16 @@
 
 ## v1.4 — Maven→Gradle + Spring Boot 4.1 升级
 
-**Date:** 2026-04-29
+**Date:** 2026-04-29 → 2026-05-06
 
 **Goal:** 将后端从 Maven 迁移到 Gradle，同时升级 Spring Boot 到 4.1.0-RC1 并更新所有兼容依赖
 
-**Target features:**
-- Maven → Gradle 完整迁移（Gradle 9.4 + JDK 26）
+**Delivered:**
+- Maven → Gradle 完整迁移（Gradle 9.5 + JDK 26）
 - Spring Boot 4.0.5 → 4.1.0-RC1 升级
 - 所有依赖升级到最新兼容版本
-- 构建脚本优化（Groovy DSL）
+- 构建脚本优化（Kotlin DSL）
+- 修复 Gradle 测试中文路径 ClassNotFoundException（file.encoding=GBK）
 - 保持现有功能完全正常工作
 
-**Status:** In Progress
+**Status:** ✅ Completed
