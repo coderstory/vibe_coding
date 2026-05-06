@@ -1,263 +1,158 @@
-# Project Research Summary
+# 项目调研摘要
 
-**Project:** Ocean Breeze Admin - Beach Theme CSS Animations
-**Domain:** Vue 3 + Element Plus Admin Dashboard with Beach Theme
-**Researched:** 2026-04-03
-**Confidence:** HIGH
-
----
-
-## Executive Summary
-
-This project is a Vue 3 + Element Plus admin dashboard undergoing beach theme completion with CSS animations. The existing theme has foundational CSS variables and some keyframes, but animations are not integrated into layout components. Research across four dimensions—technology stack, component coverage, animation architecture, and pitfalls—reveals a clear path: use GPU-accelerated CSS animations (`transform`, `opacity`), organize animation CSS into modular files, and implement a toggle system using CSS custom properties.
-
-The recommended approach prioritizes performance: CSS-only animations with `transform` and `opacity` over JavaScript-driven RAF, modular file organization for maintainability, and a toggle mechanism respecting `prefers-reduced-motion`. Element Plus component theming requires attention to CSS specificity and BEM naming conventions.
+**项目:** Vue + Spring Boot 管理后台
+**域:** 代码重构与目录整理
+**调研日期:** 2026-05-06
+**置信度:** HIGH
 
 ---
 
-## Key Findings
+## 执行摘要
 
-### 1. Stack Additions — CSS Animation Techniques
+本次 v1.5 里程碑是一次**代码架构卫生工程**。核心问题是后端包结构混用按层/按域两种风格、前端目录扁平化严重、配置文件缺少关注点分离且敏感信息存在硬编码。推荐策略是**按业务领域统一垂直切分 + 增量迁移**。
 
-**Core Technologies:**
+后端建立 `shared/` 通用层和 `user/`、`auth/`、`menu/`、`role/`、`knowledge/`、`audit/`、`rocketmq/`、`seckill/`、`order/`、`monitor/` 等业务域包，合并零散 `mq/`/`stock/`/`sse/` 到 `seckill/` 域。前端同步按域拆分 `api/modules/`、`router/modules/`、`types/`。
 
-| Technique | Purpose | Why Recommended |
-|-----------|---------|-----------------|
-| `@keyframes` + `transform: translateY()` | Wave animations | GPU-accelerated, no layout recalc |
-| `@keyframes` + `transform: scale()` | Bubble effects | Smooth, performant |
-| `backdrop-filter: blur()` | Glassmorphism | Baseline 2024, widely supported |
-| CSS Custom Properties | Animation toggle | No JS needed, respects user preference |
-| `will-change: transform` | Performance hint | Use sparingly, last resort only |
+关键风险是 Vue Router 懒加载路径断裂（27 条动态 import）、MyBatis Mapper XML namespace 断裂、以及 Spring Component Scan 失效。所有风险可通过**先移动后修改的两步 commit 策略**和**每次移动后立即构建验证**来规避。
 
-**Performance Priority:**
-- ✅ Best: `transform`, `opacity`, `filter` (GPU-accelerated)
-- ⚠️ Moderate: `background-position` (can cause repaints)
-- ❌ Avoid: `box-shadow`, `width`, `height` during animation
+## 关键发现
 
-**Keyframe Patterns:**
-```css
-/* Wave: translateY + translateX for floating */
-@keyframes wave-float {
-  0%, 100% { transform: translateY(0) translateX(0); }
-  50% { transform: translateY(-15px) translateX(10px); }
-}
+### 1. 推荐工具链
 
-/* Bubble: rise with scale and opacity */
-@keyframes bubble-rise {
-  0% { transform: translateY(0) scale(1); opacity: 0; }
-  10% { opacity: 0.8; }
-  100% { transform: translateY(-100vh) scale(0.5); opacity: 0; }
-}
+**前端工具（需新增/升级）：**
+- ESLint 10.x flat config 升级（当前 9.x）
+- `@stylistic/eslint-plugin` 替代已废弃的 ESLint 核心风格规则
+- Stylelint 17.x + stylelint-config-standard（CSS 质量检查）
+- `vue-tsc` CI 集成（Vue SFC 类型检查）
+
+**后端工具（需新增）：**
+- ArchUnit 1.4.0 — 重构核心工具，定义"controller 不能直接调用 mapper"等架构规则
+- Checkstyle (Gradle 内置) — 代码风格检查
+- PMD (Gradle 内置) — 源码异味检测
+- SpotBugs 4.9.3 — 字节码 bug 检测
+- JaCoCo — 测试覆盖率
+- Error Prone 2.37.0 — 编译时错误检测
+
+### 2. 代码组织规范
+
+**后端问题（已确认）：**
+- Controller 直接注入 Mapper（UserController、SeckillController 等）
+- `MenuServiceImpl.java` 和 `RoleServiceImpl.java` 在 `service/` 根目录而非 `service/impl/`
+- DTO 层仅在 seckill 域存在，其他域使用 `Map<String, Object>` 作为请求体
+- 秒杀相关 `mq/`、`stock/`、`sse/` 模块松散分散
+
+**前端问题（已确认）：**
+- `components/` 扁平化含 10 个 `.vue` 文件
+- `api/` 扁平化含 15 个文件
+- `router/index.ts` 为 7KB 单一文件
+- 存在无用脚手架模板组件（`HelloWorld.vue`、`AboutView.vue` 等）
+- `vite.config.js` 应为 `vite.config.ts`
+
+### 3. 架构建议
+
+**后端架构** — 按业务域垂直切分：
+```
+cn.coderstory.springboot/
+├── shared/              # 跨业务通用组件
+│   ├── config/          # Security/Web/Cors/Redis 等配置
+│   ├── security/        # JWT 认证/授权
+│   ├── aspect/          # AOP 切面
+│   ├── exception/       # 全局异常处理
+│   ├── util/            # 工具类
+│   └── limiter/         # 限流组件
+├── user/                # 用户管理域
+│   ├── controller/      # UserController
+│   ├── service/         # UserService 接口
+│   ├── service/impl/    # UserServiceImpl
+│   ├── mapper/          # UserMapper
+│   ├── entity/          # User
+│   └── dto/             # UserRequest/UserResponse
+├── role/                # 角色管理域
+├── menu/                # 菜单管理域
+├── auth/                # 认证域
+├── audit/               # 审计日志域
+├── knowledge/           # 知识库域
+├── seckill/             # 秒杀域（含 mq/stock/sse）
+├── rocketmq/            # RocketMQ 监控域
+├── order/               # 订单域
+└── monitor/             # 系统监控域
 ```
 
-**Sources:** MDN official documentation (HIGH confidence)
-
----
-
-### 2. Component Coverage — Element Plus Theming Status
-
-**Already Covered (existing `enterprise-theme.css`):**
-- ✅ el-table (partial), el-button, el-tag, el-alert, el-pagination
-- ✅ el-dialog (partial), el-input, el-select (partial), el-dropdown-menu
-- ✅ el-tabs, el-form (partial), el-menu (sidebar)
-
-**Critical Gaps — HIGH Priority (used in business pages):**
-
-| Component | Selector Needed | Page Usage |
-|-----------|----------------|------------|
-| el-card | `.el-card__header`, `.el-card__body` | Login, business data |
-| el-tree | `.el-tree-node__content` | RoleManage, CategoryTree |
-| el-switch | `--el-switch-off/on-color` | UserManagement |
-| el-radio | `.el-radio__input.is-checked` | UserManagement |
-| el-date-picker | `.el-date-picker`, `.el-date-table` | AuditLog |
-
-**Medium Priority — Should Complete:**
-
-| Component | Purpose |
-|-----------|---------|
-| el-empty | AuditLog empty state |
-| el-link | Operation links |
-| el-message | Toast notifications (partially done) |
-| el-message-box | Confirmation dialogs |
-| el-loading | Global loading state |
-
-**Low Priority — Optional Polish:**
-
-| Component | Purpose |
-|-----------|---------|
-| el-divider | Section dividers |
-| el-avatar | User avatars |
-| el-badge | Notification badges |
-| el-progress | Progress indicators |
-
-**Sources:** Element Plus official theming guide (HIGH confidence)
-
----
-
-### 3. Animation Architecture — File Organization
-
-**Recommended Structure:**
+**前端架构** — 按域组织：
 ```
-app-vue/src/assets/themes/
-├── enterprise-theme.css      # Keep existing, remove animations
-└── animations/
-    ├── _keyframes.css        # All @keyframes definitions
-    ├── _bubble.css            # Bubble animation styles
-    ├── _wave.css              # Wave animation styles
-    └── _utilities.css         # Animation utility classes
+src/
+├── api/
+│   ├── modules/         # 按域: auth/user/role/menu/seckill/rocketmq...
+│   └── index.ts         # 统一导出
+├── components/
+│   ├── common/          # 通用组件 (BaseTable/BaseForm)
+│   ├── layout/          # 布局组件
+│   └── business/        # 业务组件
+├── composables/         # 按域拆分或单文件
+├── router/
+│   ├── modules/         # 按域拆分
+│   └── guards.ts        # 路由守卫
+├── store/               # 按域拆分
+├── types/               # 按域拆分
+└── views/               # 按域（已基本完成）
 ```
 
-**Toggle Architecture (CSS Custom Property Pattern):**
-```css
-:root {
-  --animation-enabled: 1;
-  --wave-animation-duration: 8s;
-}
+### 4. 关键重构陷阱
 
-.animations-disabled {
-  --animation-enabled: 0;
-}
+| 陷阱 | 风险 | 预防策略 |
+|------|------|---------|
+| Vue Router 懒加载路径断裂 | 移动 .vue 文件后运行时白屏 | 每次移动后 `npm run build`（非 `npm run dev`）|
+| MyBatis XML 三重绑定断裂 | XML 路径/namespace/@MapperScan 三处需同步 | 每次移动后 `./gradlew.bat test` |
+| 秒杀 Redis Key 不可修改 | 运行时 Redis 数据和 MQ 消息丢失 | 只提取常量引用，不改变 `seckill:stock:` 等值 |
+| JWT secret 硬编码 | 安全风险 | 重构时迁移到环境变量 |
+| 配置文件拆分级联失效 | spring.config.import 加载顺序导致配置缺失 | 双 profile 启动验证 |
 
-/* Usage */
-.wave {
-  animation: wave calc(var(--wave-animation-duration) * var(--animation-enabled)) linear infinite;
-}
-```
+## 路线图建议
 
-**Vue Integration:**
-```javascript
-// composables/useAnimationToggle.js
-export function useAnimationToggle() {
-  const animationsEnabled = ref(true)
-  function toggleAnimations() {
-    animationsEnabled.value = !animationsEnabled.value
-    document.body.classList.toggle('animations-disabled', !animationsEnabled.value)
-  }
-  return { animationsEnabled, toggleAnimations }
-}
-```
+基于调研，推荐 **5 个阶段**：
 
-**Z-Index Layers:**
-- Waves: 1-10
-- Glass containers: 20-30
-- Content: 40+
-- Modals/overlays: 100+
+### Phase 1: 基础设施搭建
+**先决条件：** 无（零依赖）
+**内容：** EditorConfig、ESLint flat config 升级、Prettier/Stylelint 配置、ArchUnit/Checkstyle/PMD/SpotBugs/JaCoCo 集成
+**验证：** `./gradlew.bat check` + `npm run lint` + `npx vue-tsc --noEmit`
 
-**Sources:** Architecture research (MEDIUM-HIGH confidence)
+### Phase 2: 后端包结构重组
+**先决条件：** Phase 1（工具链就绪）
+**内容：** 建 shared/ 通用层 → 逐个业务域迁移 → 合并零散模块 → 修复分层违规 → 统一 Service 接口+impl
+**验证：** `./gradlew.bat test`（每个域迁移后）
+**关键风险：** `@MapperScan` 通配符覆盖、Component Scan 路径
 
----
+### Phase 3: 配置文件拆分与安全加固
+**先决条件：** Phase 2（包结构确定后配置归属才明确）
+**内容：** 拆分 application.yaml → 消除 test.yaml 冗余 → JWT secret 强制环境变量 → 双 profile 验证
+**验证：** `./gradlew.bat bootRun` + `--spring.profiles.active=test`
 
-### 4. Watch Out For — Critical Pitfalls
+### Phase 4: 前端目录重组
+**先决条件：** 技术上独立，建议在 Phase 2-3 后（保持命名一致）
+**内容：** components/ 分区 → api/modules/ → router/modules/ → types/ 拆分 → 清理脚手架残留
+**验证：** `npm run build` + 手动登录全流程
 
-1. **Scoped Styles Breaking Vue Transitions**
-   - Use `:deep()` selector for transitioning child components
-   - Apply transitions at parent level, not inside scoped child components
+### Phase 5: 命名规范与质量收敛
+**先决条件：** Phase 2 + Phase 4（目录重组完成）
+**内容：** Page 后缀统一、DTO/VO 规范、TypeScript interface 规范、`@ConfigurationProperties` 类型安全配置、工具规则收紧
+**验证：** `./gradlew.bat check`（maxWarnings=0） + `npm run lint` + JaCoCo 覆盖率门槛
 
-2. **RAF Memory Leaks**
-   - Always cancel `requestAnimationFrame` in `onUnmounted`
-   - Store RAF ID in a ref
+## 置信度评估
 
-3. **CSS Variable Specificity Wars**
-   - Element Plus BEM classes have high specificity
-   - Use wrapping class with higher specificity: `.beach-theme .el-button`
-   - Or use Element Plus's SCSS variable override system
+| 领域 | 置信度 | 原因 |
+|------|--------|------|
+| 工具链 | HIGH | npm registry 实时版本 + Gradle 生态确认 |
+| 目录规范 | HIGH | Vue 官方风格指南 + 阿里巴巴 P3C + 逐文件审查 |
+| 架构 | HIGH | 82+ Java 文件 + 50+ Vue/TS 文件逐行分析 |
+| 陷阱 | HIGH | 基于实际代码路径检查（具体文件+行号） |
+| **总体** | **HIGH** | 所有维度基于实际代码库分析 |
 
-4. **Backdrop-Filter Performance on Mobile**
-   - Use `@supports (backdrop-filter: blur(1px))` to detect support
-   - Provide solid fallback: `background: rgba(255, 255, 255, 0.4)`
-   - Reduce blur radius on mobile (2-4px instead of 10-20px)
+### 待解决
 
-5. **Animation Jank (Waves Not Looping Cleanly)**
-   - Ensure wave width is exactly 50% or 100% of container
-   - Use `translateX(-50%)` to `translateX(0)` for seamless loop
-
-6. **Glassmorphism Text Unreadability**
-   - Ensure 4.5:1 contrast ratio minimum
-   - Add subtle `text-shadow` or separate text from glass panel
-   - Test over actual wave/animated backgrounds
-
-**Sources:** Pitfalls research (MEDIUM confidence — community patterns)
+- `@MapperScan` 通配符 `**` 在包重组后的覆盖验证（Phase 2 首个域迁移后立即验证）
+- RocketMQ Consumer 组件扫描路径验证（StockConsumer 当前已注释）
+- Flyway 迁移文件 checksum 保护（6 个已执行脚本不可修改）
 
 ---
-
-## Implications for Roadmap
-
-Based on research, suggested phase structure:
-
-### Phase 1: Core Component Theming
-**Rationale:** Must establish working override pattern before animation work. CSS variable specificity issues must be resolved first.
-**Delivers:** All critical Element Plus components fully themed (el-card, el-tree, el-switch, el-radio, el-date-picker)
-**Avoids:** "CSS Variable Specificity Wars" pitfall — establish correct override pattern early
-**Research Flag:** None — well-documented Element Plus patterns
-
-### Phase 2: Animation Infrastructure
-**Rationale:** Extract animations from theme, create modular file structure, add toggle system. Depends on Phase 1 completion.
-**Delivers:** Modular animation CSS files, `useAnimationToggle` composable, toggle UI in header
-**Uses:** CSS `@keyframes`, CSS Custom Properties toggle pattern
-**Implements:** Architecture from ARCHITECTURE.md
-**Avoids:** "RAF Memory Leaks" pitfall — composable handles cleanup
-
-### Phase 3: Wave/Bubble Animation Integration
-**Rationale:** Integrate animations into layout components. Requires Phase 2 infrastructure complete.
-**Delivers:** Animated wave backgrounds, bubble effects in appropriate containers
-**Uses:** GPU-accelerated transforms, staggered animation delays
-**Avoids:** "Animation Jank" pitfall — follow wave loop pattern exactly
-**Research Flag:** Performance testing on actual devices
-
-### Phase 4: Glassmorphism Polish
-**Rationale:** Add glass effects to key containers. Mobile considerations must be addressed.
-**Delivers:** Glass-effect cards, dialogs, headers with proper fallbacks
-**Uses:** `backdrop-filter` with `@supports` and fallback
-**Avoids:** "Backdrop-Filter Mobile Performance" and "Text Unreadability" pitfalls
-
-### Phase 5: Polish & Accessibility
-**Rationale:** Final integration, accessibility testing, responsive verification.
-**Delivers:** `prefers-reduced-motion` support, responsive breakpoints, z-index audit
-**Avoids:** Multiple moderate pitfalls (z-index layering, dark mode conflicts)
-
-### Phase Ordering Rationale
-
-1. **Component theming first** — Establishes correct CSS override pattern, prevents rework later
-2. **Animation infrastructure second** — Modular file structure and toggle must exist before animation integration
-3. **Animation integration third** — Actual animation work, depends on infrastructure
-4. **Glassmorphism fourth** — Performance-sensitive, needs fallback system ready
-5. **Polish last** — Accessibility, responsive, cross-browser verification
-
----
-
-## Confidence Assessment
-
-| Area | Confidence | Notes |
-|------|------------|-------|
-| Stack | HIGH | MDN official documentation, Baseline 2024 verified |
-| Features | HIGH | Element Plus official theming guide |
-| Architecture | MEDIUM-HIGH | Standard Vue patterns, well-established |
-| Pitfalls | MEDIUM | Community patterns, needs validation on actual project |
-
-**Overall confidence:** MEDIUM-HIGH
-
-### Gaps to Address
-
-- **Performance validation:** Need DevTools testing to verify GPU acceleration works as expected
-- **Mobile testing:** Glassmorphism blur effects need real device testing
-- **Animation sync:** Multiple bubble animations may drift over time — needs monitoring
-
----
-
-## Sources
-
-### Primary (HIGH confidence)
-- [MDN: backdrop-filter](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/backdrop-filter) — Baseline 2024, blur/filters support
-- [MDN: CSS Animations](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Animations/Using) — Keyframes, performance
-- [MDN: will-change](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/will-change) — Performance optimization
-- [Element Plus Theming Guide](https://element-plus.org/en-US/guide/theming.html) — Component override patterns
-
-### Secondary (MEDIUM confidence)
-- [Vue Transition API](https://vuejs.org/api/built-in-components.html#transition) — Vue-specific transition patterns
-- [CSS Animation Performance](https://developer.mozilla.org/en-US/docs/Web/Performance/Animation_performance) — GPU acceleration details
-- [Glassmorphism Best Practices](https://web.dev/glassmorphism/) — Mobile considerations, contrast
-
----
-
-*Research completed: 2026-04-03*
-*Ready for roadmap: yes*
+*调研完成: 2026-05-06*
+*可用于路线图: 是*
