@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 /**
  * 文章编辑器组件
  *
@@ -10,13 +10,19 @@
  *
  * @module components/knowledge/ArticleEditor
  */
-import { ref, watch, computed, shallowRef, onBeforeUnmount } from 'vue'
-import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
+import {computed, onBeforeUnmount, ref, shallowRef, watch} from 'vue'
+import {Editor, Toolbar} from '@wangeditor/editor-for-vue'
 import '@wangeditor/editor/dist/css/style.css'
-import { uploadFile } from '@/api/modules/knowledge'
-import { getArticleDetail, createArticle, updateArticle, getAllTags, createTag } from '@/api/modules/knowledge'
-import { ElMessage } from 'element-plus'
-import type { KnowledgeTag, CreateArticleParams, UpdateArticleParams } from '@/api/types'
+import {
+  createArticle,
+  createTag,
+  getAllTags,
+  getArticleDetail,
+  updateArticle,
+  uploadFile
+} from '@/api/modules/knowledge'
+import {ElMessage} from 'element-plus'
+import type {CreateArticleParams, KnowledgeTag, UpdateArticleParams} from '@/api/types'
 
 /** 文章表单数据结构 */
 interface ArticleForm {
@@ -102,7 +108,7 @@ const customUpload = (file: File, insertFn: (url: string, alt: string, href: str
  */
 const getAuthHeaders = (): Record<string, string> => {
   const token = localStorage.getItem('token')
-  return token ? { Authorization: `Bearer ${token}` } : {}
+  return token ? {Authorization: `Bearer ${token}`} : {}
 }
 
 /** 富文本编辑器配置 */
@@ -131,8 +137,7 @@ watch(visible, async (val) => {
     await loadTags()
     if (props.articleId) {
       await loadArticle()
-    }
-    else {
+    } else {
       resetForm()
     }
   }
@@ -145,8 +150,7 @@ async function loadTags() {
   try {
     const res = await getAllTags()
     allTags.value = res.data || []
-  }
-  catch (e) {
+  } catch (e) {
     console.error('加载标签失败', e)
   }
 }
@@ -169,8 +173,7 @@ async function loadArticle() {
       status: article.status
     }
     editorData.value = article.content || ''
-  }
-  catch {
+  } catch {
     ElMessage.error('加载文章失败')
   }
 }
@@ -206,7 +209,7 @@ async function handleSave() {
     let tagIds = [...form.value.tagIds]
     const newTagNames = tagIds.filter(id => typeof id === 'string') as string[]
     for (const name of newTagNames) {
-      const res = await createTag({ name, color: '#409EFF' })
+      const res = await createTag({name, color: '#409EFF'})
       tagIds = tagIds.map(id => id === name ? res.data.id : id)
       allTags.value.push(res.data)
     }
@@ -225,15 +228,13 @@ async function handleSave() {
     if (isEdit.value) {
       await updateArticle(props.articleId as number, data as UpdateArticleParams)
       ElMessage.success('更新成功')
-    }
-    else {
+    } else {
       await createArticle(data as CreateArticleParams)
       ElMessage.success('创建成功')
     }
     emit('success')
     visible.value = false
-  }
-  catch {
+  } catch {
     ElMessage.error(isEdit.value ? '更新失败' : '创建失败')
   }
 }
@@ -249,24 +250,24 @@ onBeforeUnmount(() => {
 <template>
   <el-dialog
     v-model="visible"
-    :title="isEdit ? '编辑知识' : '新建知识'"
-    width="80%"
     :close-on-click-modal="false"
-    lock-scroll
+    :title="isEdit ? '编辑知识' : '新建知识'"
     append-to-body
     class="article-editor-dialog"
+    lock-scroll
+    width="80%"
   >
     <el-form :model="form" label-width="80px">
       <el-form-item label="标题">
-        <el-input v-model="form.title" placeholder="请输入标题" maxlength="200" show-word-limit style="width: 300px" />
+        <el-input v-model="form.title" maxlength="200" placeholder="请输入标题" show-word-limit style="width: 300px"/>
         <span style="margin: 0 16px">标签</span>
         <!-- 标签选择器，支持创建新标签 -->
         <el-select
           v-model="form.tagIds"
-          multiple
-          filterable
           allow-create
           default-first-option
+          filterable
+          multiple
           placeholder="选择或输入新标签"
           style="width: 300px"
         >
@@ -278,12 +279,12 @@ onBeforeUnmount(() => {
       <!-- 富文本编辑器区域 -->
       <el-form-item class="editor-form-item">
         <div class="editor-container">
-          <Toolbar :editor="editorRef" :default-config="toolbarConfig" mode="default" />
+          <Toolbar :default-config="toolbarConfig" :editor="editorRef" mode="default"/>
           <Editor
             v-model="editorData"
             :default-config="editorConfig"
-            mode="default"
             class="editor-content"
+            mode="default"
             @onCreated="handleCreated"
           />
         </div>

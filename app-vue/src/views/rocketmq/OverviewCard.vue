@@ -1,7 +1,7 @@
-<script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { ElStatistic, ElCard } from 'element-plus'
-import { getClusterOverview, type ClusterOverviewVO } from '@/api/modules/rocketmq'
+<script lang="ts" setup>
+import {onMounted, ref} from 'vue'
+import {ElCard, ElStatistic} from 'element-plus'
+import {type ClusterOverviewVO, getClusterOverview} from '@/api/modules/rocketmq'
 
 const overview = ref<ClusterOverviewVO | null>(null)
 const loading = ref(false)
@@ -13,11 +13,9 @@ async function loadOverview() {
     if (res.code === 200) {
       overview.value = res.data
     }
-  }
-  catch (e) {
+  } catch (e) {
     console.error('加载集群概览失败', e)
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }
@@ -30,23 +28,23 @@ onMounted(() => {
 <template>
   <el-row :gutter="16">
     <el-col :span="6">
-      <el-card shadow="hover" v-loading="loading">
-        <el-statistic title="集群名称" :value="overview?.clusterName || '-'" />
+      <el-card v-loading="loading" shadow="hover">
+        <el-statistic :value="overview?.clusterName || '-'" title="集群名称"/>
       </el-card>
     </el-col>
     <el-col :span="6">
-      <el-card shadow="hover" v-loading="loading">
-        <el-statistic title="Broker 数量" :value="overview?.brokerCount || 0" />
+      <el-card v-loading="loading" shadow="hover">
+        <el-statistic :value="overview?.brokerCount || 0" title="Broker 数量"/>
       </el-card>
     </el-col>
     <el-col :span="6">
-      <el-card shadow="hover" v-loading="loading">
-        <el-statistic title="Topic 数量" :value="overview?.topicCount || 0" />
+      <el-card v-loading="loading" shadow="hover">
+        <el-statistic :value="overview?.topicCount || 0" title="Topic 数量"/>
       </el-card>
     </el-col>
     <el-col :span="6">
-      <el-card shadow="hover" v-loading="loading">
-        <el-statistic title="Consumer Group" :value="overview?.consumerGroupCount || 0" />
+      <el-card v-loading="loading" shadow="hover">
+        <el-statistic :value="overview?.consumerGroupCount || 0" title="Consumer Group"/>
       </el-card>
     </el-col>
   </el-row>

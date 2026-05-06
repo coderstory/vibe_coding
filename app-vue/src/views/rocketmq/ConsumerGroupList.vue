@@ -1,7 +1,7 @@
-<script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { getConsumerGroupList, deleteConsumerGroup, type ConsumerGroupVO } from '@/api/modules/rocketmq'
+<script lang="ts" setup>
+import {onMounted, reactive, ref} from 'vue'
+import {ElMessage, ElMessageBox} from 'element-plus'
+import {type ConsumerGroupVO, deleteConsumerGroup, getConsumerGroupList} from '@/api/modules/rocketmq'
 import ConsumerGroupDetail from './ConsumerGroupDetail.vue'
 
 // 状态
@@ -20,13 +20,13 @@ const currentGroup = ref('')
 
 // 表格列定义
 const columns = [
-  { prop: 'index', label: '序号', width: 80, align: 'center' as const },
-  { prop: 'group', label: 'Group 名称', minWidth: 120 },
-  { prop: 'groupType', label: '类型', width: 100, align: 'center' as const },
-  { prop: 'status', label: '状态', width: 100, align: 'center' as const },
-  { prop: 'consumerCount', label: '消费者数', width: 100, align: 'center' as const },
-  { prop: 'accumulatedDiff', label: '堆积量', width: 120, align: 'center' as const },
-  { prop: 'actions', label: '操作', width: 120, fixed: 'right' as const }
+  {prop: 'index', label: '序号', width: 80, align: 'center' as const},
+  {prop: 'group', label: 'Group 名称', minWidth: 120},
+  {prop: 'groupType', label: '类型', width: 100, align: 'center' as const},
+  {prop: 'status', label: '状态', width: 100, align: 'center' as const},
+  {prop: 'consumerCount', label: '消费者数', width: 100, align: 'center' as const},
+  {prop: 'accumulatedDiff', label: '堆积量', width: 120, align: 'center' as const},
+  {prop: 'actions', label: '操作', width: 120, fixed: 'right' as const}
 ]
 
 // 类型标签
@@ -93,11 +93,9 @@ async function loadData() {
     const res = await getConsumerGroupList(searchForm.keyword || undefined)
     consumerGroupList.value = res.data.records
     total.value = res.data.total
-  }
-  catch {
+  } catch {
     // 错误已在 request.ts 的响应拦截器中处理
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }
@@ -134,8 +132,7 @@ async function handleDelete(row: ConsumerGroupVO) {
     await deleteConsumerGroup(row.group)
     ElMessage.success('删除成功')
     loadData()
-  }
-  catch {
+  } catch {
     // 取消或错误已在 request.ts 拦截
   }
 }
@@ -155,8 +152,8 @@ onMounted(() => {
         <el-form-item label="Group 名称">
           <el-input
             v-model="searchForm.keyword"
-            placeholder="输入 Group 名称搜索"
             clearable
+            placeholder="输入 Group 名称搜索"
             style="width: 200px"
             @keyup.enter="handleSearch"
           />
@@ -172,44 +169,44 @@ onMounted(() => {
     <el-table
       v-loading="loading"
       :data="consumerGroupList"
-      stripe
       border
+      stripe
       style="width: 100%"
     >
-      <el-table-column type="index" label="序号" width="60" align="center" />
-      <el-table-column prop="group" label="Group 名称" min-width="200" show-overflow-tooltip>
+      <el-table-column align="center" label="序号" type="index" width="60"/>
+      <el-table-column label="Group 名称" min-width="200" prop="group" show-overflow-tooltip>
         <template #default="{ row }">
-          <el-button link type="primary" size="small" @click="handleView(row)">
+          <el-button link size="small" type="primary" @click="handleView(row)">
             {{ row.group }}
           </el-button>
         </template>
       </el-table-column>
-      <el-table-column prop="groupType" label="类型" width="100" align="center">
+      <el-table-column align="center" label="类型" prop="groupType" width="100">
         <template #default="{ row }">
           <el-tag :type="groupTypeTagType(row.groupType)" size="small">
             {{ groupTypeText(row.groupType) }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="status" label="状态" width="100" align="center">
+      <el-table-column align="center" label="状态" prop="status" width="100">
         <template #default="{ row }">
           <el-tag :type="statusTagType(row.status)" size="small">
             {{ statusText(row.status) }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="consumerCount" label="消费者数" width="100" align="center" />
-      <el-table-column prop="accumulatedDiff" label="堆积量" width="120" align="center">
+      <el-table-column align="center" label="消费者数" prop="consumerCount" width="100"/>
+      <el-table-column align="center" label="堆积量" prop="accumulatedDiff" width="120">
         <template #default="{ row }">
           {{ formatDiff(row.accumulatedDiff) }}
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="160" fixed="right">
+      <el-table-column fixed="right" label="操作" width="160">
         <template #default="{ row }">
-          <el-button link type="primary" size="small" @click="handleView(row)">
+          <el-button link size="small" type="primary" @click="handleView(row)">
             查看
           </el-button>
-          <el-button link type="danger" size="small" @click="handleDelete(row)">
+          <el-button link size="small" type="danger" @click="handleDelete(row)">
             删除
           </el-button>
         </template>
@@ -217,7 +214,7 @@ onMounted(() => {
     </el-table>
 
     <!-- 空状态 -->
-    <el-empty v-if="!loading && consumerGroupList.length === 0" description="暂无 Consumer Group" />
+    <el-empty v-if="!loading && consumerGroupList.length === 0" description="暂无 Consumer Group"/>
 
     <!-- 详情弹窗 -->
     <ConsumerGroupDetail

@@ -6,10 +6,10 @@
 
 ## 模块概述
 
-| 项目 | 版本 |
-|------|------|
-| Vue | 3.5+ |
-| Vite | 8.x |
+| 项目   | 版本                   |
+|------|----------------------|
+| Vue  | 3.5+                 |
+| Vite | 8.x                  |
 | Node | ^20.19.0 或 >=22.12.0 |
 
 ---
@@ -52,14 +52,14 @@ npm run format
 
 ## 技术栈
 
-| 技术 | 用途 | 备注 |
-|------|------|------|
-| Vue 3.5 | 核心框架 | 组合式 API (Script Setup) |
-| Pinia | 状态管理 | 替代 Vuex |
-| Vue Router | 路由 | history 模式 |
-| Element Plus | UI 组件库 | 图标使用 @element-plus/icons-vue |
-| Axios | HTTP 客户端 | 需配合拦截器使用 |
-| Vitest | 单元测试 | jsdom 环境 |
+| 技术           | 用途       | 备注                           |
+|--------------|----------|------------------------------|
+| Vue 3.5      | 核心框架     | 组合式 API (Script Setup)       |
+| Pinia        | 状态管理     | 替代 Vuex                      |
+| Vue Router   | 路由       | history 模式                   |
+| Element Plus | UI 组件库   | 图标使用 @element-plus/icons-vue |
+| Axios        | HTTP 客户端 | 需配合拦截器使用                     |
+| Vitest       | 单元测试     | jsdom 环境                     |
 
 ---
 
@@ -100,14 +100,14 @@ const computedValue = computed(() => localVar.value * 2)
 
 ### 命名规范
 
-| 类型 | 规范 | 示例 |
-|------|------|------|
-| 组件文件 | PascalCase | `UserProfile.vue` |
-| Props (defineProps) | camelCase | `propName` |
-| Props (模板) | kebab-case | `prop-name` |
-| Composables | camelCase + use 前缀 | `useAuth.js` |
-| CSS 类 | kebab-case | `.user-profile` |
-| 样式作用域 | 始终添加 `scoped` | `<style scoped>` |
+| 类型                  | 规范                 | 示例                |
+|---------------------|--------------------|-------------------|
+| 组件文件                | PascalCase         | `UserProfile.vue` |
+| Props (defineProps) | camelCase          | `propName`        |
+| Props (模板)          | kebab-case         | `prop-name`       |
+| Composables         | camelCase + use 前缀 | `useAuth.js`      |
+| CSS 类               | kebab-case         | `.user-profile`   |
+| 样式作用域               | 始终添加 `scoped`      | `<style scoped>`  |
 
 ### 导入顺序
 

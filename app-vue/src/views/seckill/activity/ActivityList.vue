@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 /**
  * 活动管理列表页面
  *
@@ -7,10 +7,10 @@
  * - 支持按状态筛选
  * - 新增/编辑/删除/发布活动
  */
-import { ref, onMounted, onActivated } from 'vue'
-import { activityApi } from '@/api/modules/seckill'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { useRouter } from 'vue-router'
+import {onActivated, onMounted, ref} from 'vue'
+import {activityApi} from '@/api/modules/seckill'
+import {ElMessage, ElMessageBox} from 'element-plus'
+import {useRouter} from 'vue-router'
 
 const router = useRouter()
 
@@ -26,11 +26,9 @@ async function loadActivities() {
     const res = await activityApi.list()
     activityList.value = res.data?.records || []
     total.value = res.data?.total || 0
-  }
-  catch (e) {
+  } catch (e) {
     ElMessage.error('加载活动列表失败')
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }
@@ -73,8 +71,7 @@ async function handlePublish(id: number) {
     await activityApi.publish(id)
     ElMessage.success('发布成功')
     loadActivities()
-  }
-  catch (e) {
+  } catch (e) {
     // 错误消息已由 axios 拦截器通过 ElMessage 显示，此处无需重复处理
     if (e === 'cancel') {
       // 用户取消确认对话框，不做任何处理
@@ -86,8 +83,7 @@ async function handlePreheat(id: number) {
   try {
     await activityApi.preheat(id)
     ElMessage.success('预热成功，Redis数据已更新')
-  }
-  catch (e) {
+  } catch (e) {
     // 错误由拦截器处理
   }
 }
@@ -100,8 +96,7 @@ async function handleEnd(id: number) {
     await activityApi.end(id)
     ElMessage.success('结束成功')
     loadActivities()
-  }
-  catch (e) {
+  } catch (e) {
     // 错误消息已由 axios 拦截器通过 ElMessage 显示，此处无需重复处理
     if (e === 'cancel') {
       // 用户取消确认对话框，不做任何处理
@@ -117,8 +112,7 @@ async function handleDelete(id: number) {
     await activityApi.delete(id)
     ElMessage.success('删除成功')
     loadActivities()
-  }
-  catch (e) {
+  } catch (e) {
     // 错误消息已由 axios 拦截器通过 ElMessage 显示，此处无需重复处理
     if (e === 'cancel') {
       // 用户取消确认对话框，不做任何处理
@@ -157,10 +151,10 @@ onActivated(() => {
         </div>
       </template>
 
-      <el-table :data="activityList" v-loading="loading" stripe>
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="name" label="活动名称" />
-        <el-table-column prop="description" label="活动描述" show-overflow-tooltip />
+      <el-table v-loading="loading" :data="activityList" stripe>
+        <el-table-column label="ID" prop="id" width="80"/>
+        <el-table-column label="活动名称" prop="name"/>
+        <el-table-column label="活动描述" prop="description" show-overflow-tooltip/>
         <el-table-column label="活动时间" width="220">
           <template #default="{ row }">
             {{ formatTime(row.startTime) }} ~ {{ formatTime(row.endTime) }}
@@ -178,33 +172,33 @@ onActivated(() => {
             {{ row.perLimit }} 件/人
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="300" fixed="right">
+        <el-table-column fixed="right" label="操作" width="300">
           <template #default="{ row }">
-            <el-button type="primary" link @click="handleEdit(row.id!)">编辑</el-button>
+            <el-button link type="primary" @click="handleEdit(row.id!)">编辑</el-button>
             <el-button
               v-if="row.status === 0"
-              type="success"
               link
+              type="success"
               @click="handlePublish(row.id!)"
             >
               发布
             </el-button>
             <el-button
               v-if="row.status === 1"
-              type="warning"
               link
+              type="warning"
               @click="handleEnd(row.id!)"
             >
               结束
             </el-button>
             <el-button
-              type="info"
               link
+              type="info"
               @click="handlePreheat(row.id!)"
             >
               预热
             </el-button>
-            <el-button type="danger" link @click="handleDelete(row.id!)">删除</el-button>
+            <el-button link type="danger" @click="handleDelete(row.id!)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -213,8 +207,8 @@ onActivated(() => {
         <el-pagination
           v-model:current-page="currentPage"
           v-model:page-size="pageSize"
-          :total="total"
           :page-sizes="[10, 20, 50, 100]"
+          :total="total"
           layout="total, sizes, prev, pager, next"
           @current-change="handlePageChange"
           @size-change="handleSizeChange"
@@ -228,11 +222,13 @@ onActivated(() => {
 .activity-list {
   padding: 20px;
 }
+
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .pagination {
   margin-top: 20px;
   display: flex;

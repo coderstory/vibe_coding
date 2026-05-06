@@ -1,7 +1,7 @@
-<script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { getTopicList, createTopic, deleteTopic, type TopicVO, type CreateTopicParams } from '@/api/modules/rocketmq'
+<script lang="ts" setup>
+import {onMounted, reactive, ref} from 'vue'
+import {ElMessage, ElMessageBox} from 'element-plus'
+import {createTopic, type CreateTopicParams, deleteTopic, getTopicList, type TopicVO} from '@/api/modules/rocketmq'
 
 // 状态
 const loading = ref(false)
@@ -46,11 +46,9 @@ async function loadData() {
     const res = await getTopicList(searchForm.keyword || undefined)
     topicList.value = res.data.records
     total.value = res.data.total
-  }
-  catch {
+  } catch {
     // 错误已在 request.ts 的响应拦截器中处理
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }
@@ -96,11 +94,9 @@ async function handleCreate() {
     ElMessage.success('Topic 创建成功')
     createDialogVisible.value = false
     loadData()
-  }
-  catch {
+  } catch {
     // 错误已在 request.ts 的响应拦截器中处理
-  }
-  finally {
+  } finally {
     createLoading.value = false
   }
 }
@@ -128,8 +124,7 @@ async function handleDelete(row: TopicVO) {
     await deleteTopic(row.topicName)
     ElMessage.success('删除成功')
     loadData()
-  }
-  catch {
+  } catch {
     // 如果用户取消，ElMessageBox 会抛出 'cancel' 字符串
     // 如果是其他错误，错误消息已在 request.ts 中处理
   }
@@ -151,8 +146,8 @@ onMounted(() => {
         <el-form-item label="Topic 名称">
           <el-input
             v-model="searchForm.keyword"
-            placeholder="输入 Topic 名称搜索"
             clearable
+            placeholder="输入 Topic 名称搜索"
             style="width: 200px"
             @keyup.enter="handleSearch"
           />
@@ -175,28 +170,28 @@ onMounted(() => {
     <el-table
       v-loading="loading"
       :data="topicList"
-      stripe
       border
+      stripe
       style="width: 100%"
     >
-      <el-table-column type="index" label="序号" width="80" align="center" />
-      <el-table-column prop="topicName" label="Topic 名称" min-width="120" show-overflow-tooltip />
-      <el-table-column prop="queueCount" label="队列数" width="100" align="center" />
-      <el-table-column prop="status" label="状态" width="100" align="center">
+      <el-table-column align="center" label="序号" type="index" width="80"/>
+      <el-table-column label="Topic 名称" min-width="120" prop="topicName" show-overflow-tooltip/>
+      <el-table-column align="center" label="队列数" prop="queueCount" width="100"/>
+      <el-table-column align="center" label="状态" prop="status" width="100">
         <template #default="{ row }">
           <el-tag :type="statusTagType(row.status)" size="small">
             {{ row.status }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="messageCount" label="消息数量" width="120" align="center" />
-      <el-table-column prop="createTime" label="创建时间" width="160" />
-      <el-table-column label="操作" width="180" fixed="right">
+      <el-table-column align="center" label="消息数量" prop="messageCount" width="120"/>
+      <el-table-column label="创建时间" prop="createTime" width="160"/>
+      <el-table-column fixed="right" label="操作" width="180">
         <template #default="{ row }">
-          <el-button link type="primary" size="small" @click="handleView(row)">
+          <el-button link size="small" type="primary" @click="handleView(row)">
             查看
           </el-button>
-          <el-button link type="danger" size="small" @click="handleDelete(row)">
+          <el-button link size="small" type="danger" @click="handleDelete(row)">
             删除
           </el-button>
         </template>
@@ -211,38 +206,38 @@ onMounted(() => {
     <!-- 创建对话框 (D-05, D-06, D-07) -->
     <el-dialog
       v-model="createDialogVisible"
+      :close-on-click-modal="false"
       title="新建 Topic"
       width="500px"
-      :close-on-click-modal="false"
     >
       <el-form :model="createForm" label-width="100px">
         <el-form-item label="Topic 名称" required>
           <el-input
             v-model="createForm.topicName"
-            placeholder="请输入 Topic 名称"
             :disabled="createLoading"
+            placeholder="请输入 Topic 名称"
           />
         </el-form-item>
         <el-form-item label="队列数">
           <el-input-number
             v-model="createForm.queueCount"
-            :min="1"
-            :max="16"
             :disabled="createLoading"
+            :max="16"
+            :min="1"
           />
           <span class="form-tip">1-16，默认 8</span>
         </el-form-item>
         <el-form-item label="权限">
           <el-select v-model="createForm.perm" :disabled="createLoading" style="width: 100%">
-            <el-option label="READ" value="READ" />
-            <el-option label="WRITE" value="WRITE" />
-            <el-option label="READ_WRITE" value="READ_WRITE" />
+            <el-option label="READ" value="READ"/>
+            <el-option label="WRITE" value="WRITE"/>
+            <el-option label="READ_WRITE" value="READ_WRITE"/>
           </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="createDialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="createLoading" @click="handleCreate">
+        <el-button :loading="createLoading" type="primary" @click="handleCreate">
           确定
         </el-button>
       </template>
@@ -263,7 +258,7 @@ onMounted(() => {
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="消息数量">{{ detailData.messageCount }}</el-descriptions-item>
-        <el-descriptions-item label="创建时间" :span="2">{{ detailData.createTime }}</el-descriptions-item>
+        <el-descriptions-item :span="2" label="创建时间">{{ detailData.createTime }}</el-descriptions-item>
       </el-descriptions>
       <template #footer>
         <el-button @click="detailDialogVisible = false">关闭</el-button>

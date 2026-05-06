@@ -3,7 +3,7 @@
  * 提供登录、登出、Token刷新等认证功能
  */
 import request from '../request'
-import type { ApiResponse, LoginParams, LoginResult, RefreshTokenResult } from '../types'
+import type {ApiResponse, LoginParams, LoginResult, RefreshTokenResult} from '../types'
 
 /**
  * 用户登录
@@ -18,7 +18,7 @@ export function login(data: LoginParams) {
  * 使用 refreshToken 获取新的访问令牌
  */
 export function refreshToken(refreshToken: string) {
-  return request.post<ApiResponse<RefreshTokenResult>>('/auth/refresh', { refreshToken })
+  return request.post<ApiResponse<RefreshTokenResult>>('/auth/refresh', {refreshToken})
 }
 
 /**

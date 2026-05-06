@@ -1,6 +1,6 @@
-<script setup lang="ts">
-import { ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+<script lang="ts" setup>
+import {ref, watch} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
 
 interface Tab {
   path: string;
@@ -11,14 +11,14 @@ const route = useRoute()
 const router = useRouter()
 
 const tabs = ref<Tab[]>([
-  { path: '/index', title: '首页' }
+  {path: '/index', title: '首页'}
 ])
 
 const activeTab = ref('/index')
 
 // 右键菜单状态
 const contextMenuVisible = ref(false)
-const contextMenuPosition = ref({ x: 0, y: 0 })
+const contextMenuPosition = ref({x: 0, y: 0})
 const rightClickedTab = ref<Tab | null>(null)
 
 watch(() => route.path, (newPath) => {
@@ -26,11 +26,11 @@ watch(() => route.path, (newPath) => {
     const title = (route.meta?.title as string) || newPath.split('/').pop() || ''
     const existing = tabs.value.find(t => t.path === newPath)
     if (!existing) {
-      tabs.value.push({ path: newPath, title })
+      tabs.value.push({path: newPath, title})
     }
     activeTab.value = newPath
   }
-}, { immediate: true })
+}, {immediate: true})
 
 function handleTabClick(tab: { props: { name: string } }) {
   router.push(tab.props.name)
@@ -64,7 +64,7 @@ function handleContextMenu(event: MouseEvent) {
 
   event.preventDefault()
   rightClickedTab.value = tab
-  contextMenuPosition.value = { x: event.clientX, y: event.clientY }
+  contextMenuPosition.value = {x: event.clientX, y: event.clientY}
   contextMenuVisible.value = true
 }
 
@@ -99,8 +99,7 @@ function refreshCurrentTab() {
   // 如果刷新的是当前激活的标签页，使用 router.replace 刷新
   if (rightClickedTab.value.path === activeTab.value) {
     router.replace(rightClickedTab.value.path)
-  }
-  else {
+  } else {
     // 如果刷新的是非激活标签页，先切换过去再刷新
     router.push(rightClickedTab.value.path)
     setTimeout(() => {
@@ -123,16 +122,16 @@ function handleDocumentClick() {
     <el-tabs
       v-model="activeTab"
       type="card"
+      @contextmenu="handleContextMenu"
       @tab-click="handleTabClick"
       @tab-remove="handleTabClose"
-      @contextmenu="handleContextMenu"
     >
       <el-tab-pane
         v-for="tab in tabs"
         :key="tab.path"
+        :closable="tab.path !== '/index'"
         :label="tab.title"
         :name="tab.path"
-        :closable="tab.path !== '/index'"
       />
     </el-tabs>
 
@@ -140,8 +139,8 @@ function handleDocumentClick() {
     <Teleport to="body">
       <div
         v-if="contextMenuVisible"
-        class="context-menu"
         :style="{ left: contextMenuPosition.x + 'px', top: contextMenuPosition.y + 'px' }"
+        class="context-menu"
         @click.stop
       >
         <div class="context-menu-item" @click="refreshCurrentTab">

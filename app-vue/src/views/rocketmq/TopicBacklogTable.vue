@@ -1,7 +1,7 @@
-<script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { ElTable, ElTableColumn } from 'element-plus'
-import { getTopicBacklogList, type TopicBacklogVO } from '@/api/modules/rocketmq'
+<script lang="ts" setup>
+import {onMounted, ref} from 'vue'
+import {ElTable, ElTableColumn} from 'element-plus'
+import {getTopicBacklogList, type TopicBacklogVO} from '@/api/modules/rocketmq'
 
 const loading = ref(false)
 const topics = ref<TopicBacklogVO[]>([])
@@ -13,11 +13,9 @@ async function loadTopics() {
     if (res.code === 200) {
       topics.value = res.data.records || []
     }
-  }
-  catch (e) {
+  } catch (e) {
     console.error('加载 Topic 堆积量失败', e)
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }
@@ -35,9 +33,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <el-table :data="topics" v-loading="loading" stripe border size="small" max-height="300">
-    <el-table-column prop="topicName" label="Topic 名称" min-width="150" show-overflow-tooltip />
-    <el-table-column prop="diff" label="堆积量" width="100" align="center">
+  <el-table v-loading="loading" :data="topics" border max-height="300" size="small" stripe>
+    <el-table-column label="Topic 名称" min-width="150" prop="topicName" show-overflow-tooltip/>
+    <el-table-column align="center" label="堆积量" prop="diff" width="100">
       <template #default="{ row }">
         <span :class="{ 'text-danger': row.diff > 10000 }">
           {{ formatDiff(row.diff) }}

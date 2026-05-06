@@ -11,16 +11,16 @@
 import request from '../request'
 import type {
   ApiResponse,
-  KnowledgeCategory,
-  KnowledgeArticle,
-  KnowledgeTag,
   ArticleFile,
-  PageResult,
   ArticleQueryParams,
-  CreateCategoryParams,
-  UpdateCategoryParams,
   CreateArticleParams,
-  UpdateArticleParams
+  CreateCategoryParams,
+  KnowledgeArticle,
+  KnowledgeCategory,
+  KnowledgeTag,
+  PageResult,
+  UpdateArticleParams,
+  UpdateCategoryParams
 } from '../types'
 
 /**
@@ -65,7 +65,7 @@ export function deleteCategory(id: number) {
  * @returns 分页后的文章列表
  */
 export function getArticlePage(params: ArticleQueryParams) {
-  return request.get<ApiResponse<PageResult<KnowledgeArticle>>>('/knowledge/articles', { params })
+  return request.get<ApiResponse<PageResult<KnowledgeArticle>>>('/knowledge/articles', {params})
 }
 
 /**
@@ -153,7 +153,7 @@ export function uploadFile(articleId: number, fileName: string, file: File) {
   formData.append('articleId', String(articleId))
   formData.append('fileName', fileName)
   return request.post<ApiResponse<void>>('/knowledge/files', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
+    headers: {'Content-Type': 'multipart/form-data'}
   })
 }
 
@@ -193,6 +193,6 @@ export function getArticleFiles(articleId: number) {
  */
 export function searchArticles(keyword: string) {
   return request.get<ApiResponse<KnowledgeArticle[]>>('/knowledge/search', {
-    params: { keyword }
+    params: {keyword}
   })
 }

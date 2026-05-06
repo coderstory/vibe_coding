@@ -1,11 +1,11 @@
-<script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+<script lang="ts" setup>
+import {onMounted, onUnmounted, ref} from 'vue'
 import VChart from 'vue-echarts'
-import { use } from 'echarts/core'
-import { CanvasRenderer } from 'echarts/renderers'
-import { LineChart } from 'echarts/charts'
-import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components'
-import { getBrokerMetrics, getBrokerStatusList, type BrokerStatusVO } from '@/api/modules/rocketmq'
+import {use} from 'echarts/core'
+import {CanvasRenderer} from 'echarts/renderers'
+import {LineChart} from 'echarts/charts'
+import {GridComponent, LegendComponent, TooltipComponent} from 'echarts/components'
+import {type BrokerStatusVO, getBrokerMetrics, getBrokerStatusList} from '@/api/modules/rocketmq'
 
 use([CanvasRenderer, LineChart, GridComponent, TooltipComponent, LegendComponent])
 
@@ -29,13 +29,11 @@ async function loadMetrics() {
       if (res.data.sendTps && res.data.consumeTps) {
         hasData.value = true
         updateChart(res.data)
-      }
-      else {
+      } else {
         hasData.value = false
       }
     }
-  }
-  catch (e) {
+  } catch (e) {
     console.error('加载 Broker 指标失败', e)
     hasData.value = false
   }
@@ -45,7 +43,7 @@ function updateChart(data: any) {
   chartOption.value = {
     tooltip: {
       trigger: 'axis',
-      axisPointer: { type: 'cross' }
+      axisPointer: {type: 'cross'}
     },
     legend: {
       data: ['发送TPS', '消费TPS', '读写TPS']
@@ -106,7 +104,7 @@ onUnmounted(() => {
       </div>
     </template>
     <template v-else>
-      <v-chart :option="chartOption" autoresize style="height: 100%" />
+      <v-chart :option="chartOption" autoresize style="height: 100%"/>
     </template>
   </div>
 </template>

@@ -1,8 +1,8 @@
-<script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted, h } from 'vue'
-import { useRouter } from 'vue-router'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import { useUserStore } from '@/store/user'
+<script lang="ts" setup>
+import {h, onMounted, onUnmounted, reactive, ref} from 'vue'
+import {useRouter} from 'vue-router'
+import {ElMessage, type FormInstance, type FormRules} from 'element-plus'
+import {useUserStore} from '@/store/user'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -17,10 +17,10 @@ const loginFormRef = ref<FormInstance | null>(null)
 
 const rules: FormRules = {
   username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' }
+    {required: true, message: '请输入用户名', trigger: 'blur'}
   ],
   password: [
-    { required: true, message: '请输入密码', trigger: 'blur' }
+    {required: true, message: '请输入密码', trigger: 'blur'}
   ]
 }
 
@@ -35,12 +35,10 @@ async function handleLogin() {
       await userStore.login(loginForm.username, loginForm.password)
       ElMessage.success('登录成功')
       router.push('/index')
-    }
-    catch (error: unknown) {
+    } catch (error: unknown) {
       const err = error as Error
       ElMessage.error(err.message || '用户名或密码错误')
-    }
-    finally {
+    } finally {
       loading.value = false
     }
   })
@@ -163,8 +161,8 @@ const UserIcon = {
       'width': '18',
       'height': '18'
     }, [
-      h('path', { d: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2' }),
-      h('circle', { cx: '12', cy: '7', r: '4' })
+      h('path', {d: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'}),
+      h('circle', {cx: '12', cy: '7', r: '4'})
     ])
   }
 }
@@ -180,8 +178,8 @@ const LockIcon = {
       'width': '18',
       'height': '18'
     }, [
-      h('rect', { x: '3', y: '11', width: '18', height: '11', rx: '2', ry: '2' }),
-      h('path', { d: 'M7 11V7a5 5 0 0 1 10 0v4' })
+      h('rect', {x: '3', y: '11', width: '18', height: '11', rx: '2', ry: '2'}),
+      h('path', {d: 'M7 11V7a5 5 0 0 1 10 0v4'})
     ])
   }
 }
@@ -189,12 +187,12 @@ const LockIcon = {
 
 <template>
   <div class="login-container" @keydown="handleKeydown">
-    <canvas ref="canvasRef" class="particle-canvas" />
+    <canvas ref="canvasRef" class="particle-canvas"/>
 
     <div class="wave-container">
-      <div class="wave wave1" />
-      <div class="wave wave2" />
-      <div class="wave wave3" />
+      <div class="wave wave1"/>
+      <div class="wave wave2"/>
+      <div class="wave wave3"/>
     </div>
 
     <div class="login-content">
@@ -203,10 +201,13 @@ const LockIcon = {
           <div class="login-header">
             <div class="logo-container">
               <div class="logo-icon">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2"/>
+                  <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2"/>
+                  <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2"/>
                 </svg>
               </div>
             </div>
@@ -224,31 +225,31 @@ const LockIcon = {
           <el-form-item prop="username">
             <el-input
               v-model="loginForm.username"
-              placeholder="请输入用户名"
-              size="large"
               :prefix-icon="UserIcon"
               class="cyber-input"
+              placeholder="请输入用户名"
+              size="large"
             />
           </el-form-item>
 
           <el-form-item prop="password">
             <el-input
               v-model="loginForm.password"
-              type="password"
-              placeholder="请输入密码"
-              size="large"
-              show-password
               :prefix-icon="LockIcon"
               class="cyber-input"
+              placeholder="请输入密码"
+              show-password
+              size="large"
+              type="password"
             />
           </el-form-item>
 
           <el-form-item>
             <el-button
-              type="primary"
-              size="large"
               :loading="loading"
               class="cyber-button"
+              size="large"
+              type="primary"
               @click="handleLogin"
             >
               <span v-if="!loading">登 录</span>
@@ -260,9 +261,9 @@ const LockIcon = {
     </div>
 
     <div class="cyber-lines">
-      <div class="line line1" />
-      <div class="line line2" />
-      <div class="line line3" />
+      <div class="line line1"/>
+      <div class="line line2"/>
+      <div class="line line3"/>
     </div>
   </div>
 </template>
@@ -350,10 +351,9 @@ const LockIcon = {
   backdrop-filter: blur(20px);
   border: 1px solid rgba(0, 136, 255, 0.3);
   border-radius: 16px;
-  box-shadow:
-    0 0 40px rgba(0, 136, 255, 0.15),
-    0 25px 50px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 40px rgba(0, 136, 255, 0.15),
+  0 25px 50px rgba(0, 0, 0, 0.4),
+  inset 0 1px 0 rgba(255, 255, 255, 0.1);
   animation: cardFloat 3s ease-in-out infinite;
 }
 

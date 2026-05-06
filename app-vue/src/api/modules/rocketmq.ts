@@ -3,7 +3,7 @@
  * 提供 Topic 的列表查询、详情查看、创建、删除等操作
  */
 import request from '../request'
-import type { ApiResponse } from '../types'
+import type {ApiResponse} from '../types'
 
 /**
 
@@ -42,7 +42,7 @@ export interface CreateTopicParams {
  */
 export function getTopicList(keyword?: string) {
   return request.get<ApiResponse<{ records: TopicVO[]; total: number }>>('/rocketmq/topics', {
-    params: { keyword }
+    params: {keyword}
   })
 }
 
@@ -106,7 +106,7 @@ export interface ResetOffsetParams {
  */
 export function getConsumerGroupList(keyword?: string) {
   return request.get<ApiResponse<{ records: ConsumerGroupVO[]; total: number }>>('/rocketmq/consumer-groups', {
-    params: { keyword }
+    params: {keyword}
   })
 }
 
@@ -184,8 +184,11 @@ export interface MessageTraceVO {
  * @param maxMsg 最大消息数
  */
 export function getMessageList(topic: string, startTime?: number, endTime?: number, maxMsg?: number, keyword?: string) {
-  return request.get<ApiResponse<{ records: MessageVO[]; total: number }>>(`/rocketmq/messages/${encodeURIComponent(topic)}`, {
-    params: { startTime, endTime, maxMsg, keyword }
+  return request.get<ApiResponse<{
+    records: MessageVO[];
+    total: number
+  }>>(`/rocketmq/messages/${encodeURIComponent(topic)}`, {
+    params: {startTime, endTime, maxMsg, keyword}
   })
 }
 
@@ -229,7 +232,7 @@ export interface SendMessageResult {
  * @param body 消息内容
  */
 export function sendMessage(topic: string, body: string, tags?: string, keys?: string) {
-  return request.post<ApiResponse<SendMessageResult>>('/rocketmq/messages', { topic, tags, keys, body })
+  return request.post<ApiResponse<SendMessageResult>>('/rocketmq/messages', {topic, tags, keys, body})
 }
 
 // ==================== Dashboard 监控面板 ====================

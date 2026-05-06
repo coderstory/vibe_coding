@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { ElButton, ElInput, ElTable, ElPagination } from 'element-plus'
+import {beforeEach, describe, expect, it, vi} from 'vitest'
+import {mount} from '@vue/test-utils'
+import {ElButton, ElInput, ElPagination, ElTable} from 'element-plus'
 import ConsumerGroupList from '@/views/rocketmq/ConsumerGroupList.vue'
-import { getConsumerGroupList } from '@/api/modules/rocketmq'
+import {getConsumerGroupList} from '@/api/modules/rocketmq'
 
 // Mock API
 vi.mock('@/api/modules/rocketmq', () => ({
@@ -34,10 +34,10 @@ describe('ConsumerGroupList.vue', () => {
 
     it('初始加载时调用 API', async () => {
       const mockGroups = [
-        { group: 'TestGroup1', groupType: 'CLUSTERING', status: 'OK', consumerCount: 3 },
-        { group: 'TestGroup2', groupType: 'BROADCASTING', status: 'OK', consumerCount: 5 }
-      ]
-      ;(getConsumerGroupList as any).mockResolvedValue({ data: { records: mockGroups, total: 2 } })
+          {group: 'TestGroup1', groupType: 'CLUSTERING', status: 'OK', consumerCount: 3},
+          {group: 'TestGroup2', groupType: 'BROADCASTING', status: 'OK', consumerCount: 5}
+        ]
+      ;(getConsumerGroupList as any).mockResolvedValue({data: {records: mockGroups, total: 2}})
 
       mount(ConsumerGroupList, {
         global: {
@@ -57,7 +57,7 @@ describe('ConsumerGroupList.vue', () => {
 
   describe('搜索功能', () => {
     it('应能输入关键字搜索', async () => {
-      ;(getConsumerGroupList as any).mockResolvedValue({ data: { records: [], total: 0 } })
+      ;(getConsumerGroupList as any).mockResolvedValue({data: {records: [], total: 0}})
 
       const wrapper = mount(ConsumerGroupList, {
         global: {
@@ -81,7 +81,7 @@ describe('ConsumerGroupList.vue', () => {
     })
 
     it('应能重置搜索条件', async () => {
-      ;(getConsumerGroupList as any).mockResolvedValue({ data: { records: [], total: 0 } })
+      ;(getConsumerGroupList as any).mockResolvedValue({data: {records: [], total: 0}})
 
       const wrapper = mount(ConsumerGroupList, {
         global: {
@@ -108,15 +108,15 @@ describe('ConsumerGroupList.vue', () => {
   describe('表格展示', () => {
     it('应正确显示 Consumer Group 数据', async () => {
       const mockGroups = [
-        {
-          group: 'TestGroup1',
-          groupType: 'CLUSTERING',
-          status: 'OK',
-          consumerCount: 3,
-          accumulatedDiff: 100
-        }
-      ]
-      ;(getConsumerGroupList as any).mockResolvedValue({ data: { records: mockGroups, total: 1 } })
+          {
+            group: 'TestGroup1',
+            groupType: 'CLUSTERING',
+            status: 'OK',
+            consumerCount: 3,
+            accumulatedDiff: 100
+          }
+        ]
+      ;(getConsumerGroupList as any).mockResolvedValue({data: {records: mockGroups, total: 1}})
 
       const wrapper = mount(ConsumerGroupList, {
         global: {
@@ -139,9 +139,9 @@ describe('ConsumerGroupList.vue', () => {
 
     it('应正确显示类型标签 - CLUSTERING', async () => {
       const mockGroups = [
-        { group: 'ClusterGroup', groupType: 'CLUSTERING', status: 'OK', consumerCount: 3 }
-      ]
-      ;(getConsumerGroupList as any).mockResolvedValue({ data: { records: mockGroups, total: 1 } })
+          {group: 'ClusterGroup', groupType: 'CLUSTERING', status: 'OK', consumerCount: 3}
+        ]
+      ;(getConsumerGroupList as any).mockResolvedValue({data: {records: mockGroups, total: 1}})
 
       const wrapper = mount(ConsumerGroupList, {
         global: {
@@ -162,9 +162,9 @@ describe('ConsumerGroupList.vue', () => {
 
     it('应正确显示类型标签 - BROADCASTING', async () => {
       const mockGroups = [
-        { group: 'BroadcastGroup', groupType: 'BROADCASTING', status: 'OK', consumerCount: 5 }
-      ]
-      ;(getConsumerGroupList as any).mockResolvedValue({ data: { records: mockGroups, total: 1 } })
+          {group: 'BroadcastGroup', groupType: 'BROADCASTING', status: 'OK', consumerCount: 5}
+        ]
+      ;(getConsumerGroupList as any).mockResolvedValue({data: {records: mockGroups, total: 1}})
 
       const wrapper = mount(ConsumerGroupList, {
         global: {
@@ -187,9 +187,9 @@ describe('ConsumerGroupList.vue', () => {
   describe('详情弹窗', () => {
     it('点击 Group 名称应打开详情弹窗', async () => {
       const mockGroups = [
-        { group: 'TestGroup1', groupType: 'CLUSTERING', status: 'OK', consumerCount: 3 }
-      ]
-      ;(getConsumerGroupList as any).mockResolvedValue({ data: { records: mockGroups, total: 1 } })
+          {group: 'TestGroup1', groupType: 'CLUSTERING', status: 'OK', consumerCount: 3}
+        ]
+      ;(getConsumerGroupList as any).mockResolvedValue({data: {records: mockGroups, total: 1}})
 
       const wrapper = mount(ConsumerGroupList, {
         global: {
@@ -215,9 +215,9 @@ describe('ConsumerGroupList.vue', () => {
 
     it('CLUSTERING 类型应显示重置位点按钮', async () => {
       const mockGroups = [
-        { group: 'TestGroup1', groupType: 'CLUSTERING', status: 'OK', consumerCount: 3 }
-      ]
-      ;(getConsumerGroupList as any).mockResolvedValue({ data: { records: mockGroups, total: 1 } })
+          {group: 'TestGroup1', groupType: 'CLUSTERING', status: 'OK', consumerCount: 3}
+        ]
+      ;(getConsumerGroupList as any).mockResolvedValue({data: {records: mockGroups, total: 1}})
 
       const wrapper = mount(ConsumerGroupList, {
         global: {
@@ -245,9 +245,9 @@ describe('ConsumerGroupList.vue', () => {
 
     it('BROADCASTING 类型不应显示重置位点按钮', async () => {
       const mockGroups = [
-        { group: 'TestGroup2', groupType: 'BROADCASTING', status: 'OK', consumerCount: 5 }
-      ]
-      ;(getConsumerGroupList as any).mockResolvedValue({ data: { records: mockGroups, total: 1 } })
+          {group: 'TestGroup2', groupType: 'BROADCASTING', status: 'OK', consumerCount: 5}
+        ]
+      ;(getConsumerGroupList as any).mockResolvedValue({data: {records: mockGroups, total: 1}})
 
       const wrapper = mount(ConsumerGroupList, {
         global: {

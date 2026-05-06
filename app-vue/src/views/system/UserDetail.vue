@@ -1,9 +1,9 @@
-<script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import { getUserDetail, updateUser, getAllRoles } from '@/api/modules/user'
-import type { UserVO, Role, UpdateUserParams } from '@/api/types'
+<script lang="ts" setup>
+import {onMounted, reactive, ref} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {ElMessage, type FormInstance, type FormRules} from 'element-plus'
+import {getAllRoles, getUserDetail, updateUser} from '@/api/modules/user'
+import type {Role, UpdateUserParams, UserVO} from '@/api/types'
 
 const route = useRoute()
 const router = useRouter()
@@ -30,8 +30,8 @@ const userForm = reactive({
 })
 
 const userFormRules: FormRules = {
-  name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
-  roleId: [{ required: true, message: '请选择角色', trigger: 'change' }]
+  name: [{required: true, message: '请输入姓名', trigger: 'blur'}],
+  roleId: [{required: true, message: '请选择角色', trigger: 'change'}]
 }
 
 async function loadUser() {
@@ -39,11 +39,9 @@ async function loadUser() {
   try {
     const res = await getUserDetail(Number(route.params.id))
     user.value = res.data
-  }
-  catch {
+  } catch {
     ElMessage.error('加载用户详情失败')
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }
@@ -52,8 +50,7 @@ async function loadRoles() {
   try {
     const res = await getAllRoles()
     roles.value = res.data || []
-  }
-  catch {
+  } catch {
     ElMessage.error('加载角色列表失败')
   }
 }
@@ -98,11 +95,9 @@ async function handleSave() {
       ElMessage.success('用户更新成功')
       dialogVisible.value = false
       loadUser()
-    }
-    catch {
+    } catch {
       ElMessage.error('用户更新失败')
-    }
-    finally {
+    } finally {
       saving.value = false
     }
   })
@@ -115,7 +110,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="page-container" v-loading="loading">
+  <div v-loading="loading" class="page-container">
     <h2 class="page-title">用户详情</h2>
     <el-button @click="goBack">返回列表</el-button>
     <el-button type="primary" @click="openEditDialog">编辑</el-button>
@@ -136,10 +131,10 @@ onMounted(() => {
     </el-descriptions>
 
     <!-- 编辑对话框 -->
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="600px" :close-on-click-modal="false">
+    <el-dialog v-model="dialogVisible" :close-on-click-modal="false" :title="dialogTitle" width="600px">
       <el-form ref="userFormRef" :model="userForm" :rules="userFormRules" label-width="100px">
         <el-form-item label="姓名" prop="name">
-          <el-input v-model="userForm.name" placeholder="请输入姓名" />
+          <el-input v-model="userForm.name" placeholder="请输入姓名"/>
         </el-form-item>
         <el-form-item label="性别" prop="gender">
           <el-radio-group v-model="userForm.gender">
@@ -148,16 +143,16 @@ onMounted(() => {
           </el-radio-group>
         </el-form-item>
         <el-form-item label="手机" prop="phone">
-          <el-input v-model="userForm.phone" placeholder="请输入手机号" />
+          <el-input v-model="userForm.phone" placeholder="请输入手机号"/>
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
-          <el-input v-model="userForm.email" placeholder="请输入邮箱" />
+          <el-input v-model="userForm.email" placeholder="请输入邮箱"/>
         </el-form-item>
         <el-form-item label="部门" prop="department">
-          <el-input v-model="userForm.department" placeholder="请输入部门" />
+          <el-input v-model="userForm.department" placeholder="请输入部门"/>
         </el-form-item>
         <el-form-item label="岗位" prop="position">
-          <el-input v-model="userForm.position" placeholder="请输入岗位" />
+          <el-input v-model="userForm.position" placeholder="请输入岗位"/>
         </el-form-item>
         <el-form-item label="角色" prop="roleId">
           <el-select v-model="userForm.roleId" placeholder="请选择角色" style="width: 100%">
@@ -178,7 +173,7 @@ onMounted(() => {
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="saving" @click="handleSave">保存</el-button>
+        <el-button :loading="saving" type="primary" @click="handleSave">保存</el-button>
       </template>
     </el-dialog>
   </div>
@@ -190,6 +185,7 @@ onMounted(() => {
   padding: 20px;
   border-radius: 4px;
 }
+
 .page-title {
   margin: 0 0 20px 0;
   font-size: 20px;

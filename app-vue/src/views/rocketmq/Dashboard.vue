@@ -1,6 +1,6 @@
-<script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { ElCard, ElRow, ElCol } from 'element-plus'
+<script lang="ts" setup>
+import {onMounted, onUnmounted} from 'vue'
+import {ElCard, ElCol, ElRow} from 'element-plus'
 import OverviewCard from './OverviewCard.vue'
 import BrokerStatusTable from './BrokerStatusTable.vue'
 import TopicBacklogTable from './TopicBacklogTable.vue'
@@ -30,14 +30,14 @@ onUnmounted(() => {
     <h2 class="page-title">RocketMQ 监控面板</h2>
 
     <!-- 概览卡片 -->
-    <OverviewCard />
+    <OverviewCard/>
 
     <!-- Broker QPS 图表 -->
     <el-card shadow="hover" style="margin-top: 16px">
       <template #header>
         <span>Broker TPS 监控</span>
       </template>
-      <QpsChart />
+      <QpsChart/>
     </el-card>
 
     <!-- Broker 状态和 Topic 堆积 -->
@@ -47,7 +47,7 @@ onUnmounted(() => {
           <template #header>
             <span>Broker 状态</span>
           </template>
-          <BrokerStatusTable />
+          <BrokerStatusTable/>
         </el-card>
       </el-col>
       <el-col :span="12">
@@ -55,7 +55,7 @@ onUnmounted(() => {
           <template #header>
             <span>Topic 堆积量</span>
           </template>
-          <TopicBacklogTable />
+          <TopicBacklogTable/>
         </el-card>
       </el-col>
     </el-row>

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 /**
  * 秒杀详情页面
  *
@@ -20,11 +20,11 @@
  * - status=1 (进行中): 显示"立即抢购"按钮
  * - status=2 (已结束): 按钮禁用，显示"活动已结束"
  */
-import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { Loading } from '@element-plus/icons-vue'
-import { seckillApi, activityApi, type ActivityDetail, type Goods, type SeckillResponse } from '@/api/modules/seckill'
+import {computed, onMounted, onUnmounted, ref} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {ElMessage} from 'element-plus'
+import {Loading} from '@element-plus/icons-vue'
+import {activityApi, type ActivityDetail, seckillApi, type SeckillResponse} from '@/api/modules/seckill'
 
 const route = useRoute()
 const router = useRouter()
@@ -57,7 +57,7 @@ const queueing = ref(false)
  */
 const statusText = computed(() => {
   if (!activity.value) return '加载中'
-  const map: Record<number, string> = { 0: '未开始', 1: '进行中', 2: '已结束' }
+  const map: Record<number, string> = {0: '未开始', 1: '进行中', 2: '已结束'}
   return map[activity.value.status] || '未知'
 })
 
@@ -70,7 +70,7 @@ const statusText = computed(() => {
  */
 const statusType = computed(() => {
   if (!activity.value) return 'info'
-  const map: Record<number, string> = { 0: 'warning', 1: 'success', 2: 'info' }
+  const map: Record<number, string> = {0: 'warning', 1: 'success', 2: 'info'}
   return map[activity.value.status] || 'info'
 })
 
@@ -106,16 +106,13 @@ async function loadActivity() {
       activity.value = res.data
       // 活动信息加载成功后，获取库存
       await loadStock()
-    }
-    else {
+    } else {
       ElMessage.error(res.message || '加载活动详情失败')
     }
-  }
-  catch (error) {
+  } catch (error) {
     console.error('加载活动详情失败', error)
     ElMessage.error('加载活动详情失败，请重试')
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }
@@ -136,8 +133,7 @@ async function loadStock() {
   try {
     const res = await seckillApi.getStock(activity.value.id)
     stock.value = res.data
-  }
-  catch (error) {
+  } catch (error) {
     console.error('加载库存失败', error)
     ElMessage.error('加载库存失败，请重试')
   }
@@ -189,8 +185,7 @@ async function handleSeckill() {
       const signRes = await seckillApi.getSign(activity.value.goods.id)
       sign = signRes.data.sign
       timestamp = signRes.data.timestamp
-    }
-    catch (e) {
+    } catch (e) {
       console.error('获取签名失败', e)
       ElMessage.error('获取签名失败，请刷新页面重试')
       eventSource?.close()
@@ -216,15 +211,13 @@ async function handleSeckill() {
       eventSource = null
       queueing.value = false
     }
-  }
-  catch (error) {
+  } catch (error) {
     console.error('抢购失败', error)
     ElMessage.error('抢购失败，请稍后重试')
     eventSource?.close()
     eventSource = null
     queueing.value = false
-  }
-  finally {
+  } finally {
     seckilling.value = false
   }
 }
@@ -263,12 +256,10 @@ function subscribeSeckillResult(queueId: string) {
         ElMessage.success('恭喜！抢购成功！')
         // 跳转到订单确认页面
         router.push('/order/confirm')
-      }
-      else if (data.status === 2) {
+      } else if (data.status === 2) {
         // status=2: 抢购失败
         ElMessage.error(data.message || '抢购失败')
-      }
-      else {
+      } else {
         // status=0: 排队中或其他状态
         ElMessage.info(data.message || '处理中...')
       }
@@ -298,8 +289,7 @@ async function handleReserve() {
   try {
     await activityApi.reserve(activity.value.id)
     ElMessage.success('预约成功，活动开始前会通知您')
-  }
-  catch (error) {
+  } catch (error) {
     console.error('预约失败', error)
     ElMessage.error('预约失败，请重试')
   }
@@ -358,7 +348,7 @@ onUnmounted(() => {
         <div v-if="activity.goods" class="goods-section">
           <h3>秒杀商品</h3>
           <div class="goods-card">
-            <img v-if="activity.goods.imageUrl" :src="activity.goods.imageUrl" class="goods-image" />
+            <img v-if="activity.goods.imageUrl" :src="activity.goods.imageUrl" class="goods-image"/>
             <div v-else class="goods-image goods-image-placeholder">暂无图片</div>
             <div class="goods-info">
               <div class="goods-name">{{ activity.goods.name }}</div>
@@ -381,9 +371,9 @@ onUnmounted(() => {
         <div class="action-buttons">
           <el-button
             v-if="activity.status === 1 && activity.goods && stock > 0"
-            type="danger"
-            size="large"
             :loading="seckilling"
+            size="large"
+            type="danger"
             @click="handleSeckill"
           >
             {{ seckilling ? '正在抢购...' : '立即抢购' }}
@@ -391,17 +381,17 @@ onUnmounted(() => {
 
           <el-button
             v-else-if="activity.status === 1 && activity.goods && stock <= 0"
-            type="info"
-            size="large"
             disabled
+            size="large"
+            type="info"
           >
             库存不足
           </el-button>
 
           <el-button
             v-else-if="activity.status === 0"
-            type="warning"
             size="large"
+            type="warning"
             @click="handleReserve"
           >
             预约提醒
@@ -409,9 +399,9 @@ onUnmounted(() => {
 
           <el-button
             v-else
-            type="info"
-            size="large"
             disabled
+            size="large"
+            type="info"
           >
             活动已结束
           </el-button>
@@ -439,15 +429,17 @@ onUnmounted(() => {
     <!-- 排队中模态窗 -->
     <el-dialog
       v-model="queueing"
-      title="正在处理您的请求"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
       :show-close="false"
-      width="300px"
       center
+      title="正在处理您的请求"
+      width="300px"
     >
       <div style="text-align: center; padding: 20px 0;">
-        <el-icon class="is-loading" size="48"><Loading /></el-icon>
+        <el-icon class="is-loading" size="48">
+          <Loading/>
+        </el-icon>
         <p style="margin-top: 16px; color: #666;">排队中，请稍候...</p>
         <p style="margin-top: 8px; color: #999; font-size: 12px;">请勿关闭页面或刷新</p>
       </div>

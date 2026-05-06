@@ -1,7 +1,7 @@
-<script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { monitorApi } from '@/api/modules/monitor'
-import type { MonitorMetrics } from '@/api/modules/monitor'
+<script lang="ts" setup>
+import {onMounted, onUnmounted, ref} from 'vue'
+import type {MonitorMetrics} from '@/api/modules/monitor'
+import {monitorApi} from '@/api/modules/monitor'
 
 const metrics = ref<MonitorMetrics | null>(null)
 const loading = ref(false)
@@ -23,8 +23,7 @@ async function loadMetrics() {
   try {
     const res = await monitorApi.getMetrics()
     metrics.value = res.data
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }
@@ -38,10 +37,10 @@ async function loadMetrics() {
       </template>
       <el-row :gutter="20">
         <el-col :span="8">
-          <el-statistic title="当前并发数" :value="metrics?.concurrentCount || 0" />
+          <el-statistic :value="metrics?.concurrentCount || 0" title="当前并发数"/>
         </el-col>
         <el-col :span="8">
-          <el-statistic title="QPS Key数量" :value="metrics?.qpsKeys || 0" />
+          <el-statistic :value="metrics?.qpsKeys || 0" title="QPS Key数量"/>
         </el-col>
         <el-col :span="8">
           <el-statistic title="更新时间">

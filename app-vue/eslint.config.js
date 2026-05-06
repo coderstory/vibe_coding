@@ -28,8 +28,7 @@ export default [
     plugins: {
       vue: vuePlugin
     },
-    rules: {
-    }
+    rules: {}
   },
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js'],

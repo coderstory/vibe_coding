@@ -8,8 +8,8 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+<script lang="ts" setup>
+import {onBeforeUnmount, onMounted, ref} from 'vue'
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 let animationId: number | null = null
@@ -57,12 +57,12 @@ function initCanvas() {
   canvas.height = canvas.offsetHeight
 
   const waves: Wave[] = [
-    { amplitude: 60, frequency: 0.008, speed: 0.02, phase: 0, color: 'rgba(26, 82, 118, 0.8)', yOffset: 0.7 },
-    { amplitude: 50, frequency: 0.012, speed: 0.025, phase: 1, color: 'rgba(36, 113, 163, 0.7)', yOffset: 0.72 },
-    { amplitude: 45, frequency: 0.015, speed: 0.03, phase: 2, color: 'rgba(52, 152, 219, 0.6)', yOffset: 0.74 },
-    { amplitude: 40, frequency: 0.018, speed: 0.035, phase: 3, color: 'rgba(93, 173, 226, 0.5)', yOffset: 0.76 },
-    { amplitude: 35, frequency: 0.02, speed: 0.04, phase: 4, color: 'rgba(133, 193, 233, 0.4)', yOffset: 0.78 },
-    { amplitude: 30, frequency: 0.025, speed: 0.05, phase: 5, color: 'rgba(180, 220, 245, 0.3)', yOffset: 0.8 }
+    {amplitude: 60, frequency: 0.008, speed: 0.02, phase: 0, color: 'rgba(26, 82, 118, 0.8)', yOffset: 0.7},
+    {amplitude: 50, frequency: 0.012, speed: 0.025, phase: 1, color: 'rgba(36, 113, 163, 0.7)', yOffset: 0.72},
+    {amplitude: 45, frequency: 0.015, speed: 0.03, phase: 2, color: 'rgba(52, 152, 219, 0.6)', yOffset: 0.74},
+    {amplitude: 40, frequency: 0.018, speed: 0.035, phase: 3, color: 'rgba(93, 173, 226, 0.5)', yOffset: 0.76},
+    {amplitude: 35, frequency: 0.02, speed: 0.04, phase: 4, color: 'rgba(133, 193, 233, 0.4)', yOffset: 0.78},
+    {amplitude: 30, frequency: 0.025, speed: 0.05, phase: 5, color: 'rgba(180, 220, 245, 0.3)', yOffset: 0.8}
   ]
 
   const ambientBubbles: Bubble[] = []
@@ -130,8 +130,7 @@ function initCanvas() {
     // 到达边界转向
     if (whale.x > canvas.width + whale.size * 2) {
       whale.direction = -1
-    }
-    else if (whale.x < -whale.size * 2) {
+    } else if (whale.x < -whale.size * 2) {
       whale.direction = 1
     }
   }
@@ -423,7 +422,11 @@ onBeforeUnmount(() => {
 }
 
 @keyframes glow {
-  0%, 100% { text-shadow: 0 0 40px rgba(0, 150, 255, 0.5); }
-  50% { text-shadow: 0 0 60px rgba(0, 200, 255, 0.8), 0 0 80px rgba(0, 150, 255, 0.6); }
+  0%, 100% {
+    text-shadow: 0 0 40px rgba(0, 150, 255, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 60px rgba(0, 200, 255, 0.8), 0 0 80px rgba(0, 150, 255, 0.6);
+  }
 }
 </style>

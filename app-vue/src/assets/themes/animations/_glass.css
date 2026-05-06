@@ -33,13 +33,32 @@
   }
 }
 
-@supports not (backdrop-filter: blur(1px)) and (not (-webkit-backdrop-filter: blur(1px))) {
-  .glass,
-  .glass-card,
-  .glass-dialog,
-  .glass-header {
-    background: rgb(255 255 255 / 85%);
-  }
+@supports not (backdrop-filter: blur(1px))
+
+and
+
+(
+not
+
+(
+-webkit-backdrop-filter:
+
+blur
+(
+1
+px
+
+)
+)
+)
+{
+.glass,
+.glass-card,
+.glass-dialog,
+.glass-header {
+  background: rgb(255 255 255 / 85%);
+}
+
 }
 
 @media (width <= 768px) {

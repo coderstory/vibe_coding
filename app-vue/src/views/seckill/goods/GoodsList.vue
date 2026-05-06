@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 /**
  * 商品管理列表页面
  *
@@ -8,10 +8,10 @@
  * - 支持搜索
  * - 新增/编辑/删除商品
  */
-import { ref, onMounted, onActivated } from 'vue'
-import { goodsApi, type SeckillGoods } from '@/api/modules/goods'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { useRouter } from 'vue-router'
+import {onActivated, onMounted, ref} from 'vue'
+import {goodsApi, type SeckillGoods} from '@/api/modules/goods'
+import {ElMessage, ElMessageBox} from 'element-plus'
+import {useRouter} from 'vue-router'
 
 const router = useRouter()
 
@@ -28,11 +28,9 @@ async function loadGoods() {
     const res = await goodsApi.getGoodsPage(currentPage.value, pageSize.value, activityId.value)
     goodsList.value = res.data.records
     total.value = res.data.total
-  }
-  catch (e) {
+  } catch (e) {
     ElMessage.error('加载商品列表失败')
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }
@@ -53,8 +51,7 @@ async function handleDelete(id: number) {
     await goodsApi.deleteGoods(id)
     ElMessage.success('删除成功')
     loadGoods()
-  }
-  catch (e) {
+  } catch (e) {
     // 错误消息已由 axios 拦截器通过 ElMessage 显示，此处无需重复处理
     if (e === 'cancel') {
       // 用户取消确认对话框，不做任何处理
@@ -93,25 +90,25 @@ onActivated(() => {
         </div>
       </template>
 
-      <el-table :data="goodsList" v-loading="loading" stripe>
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="name" label="商品名称" />
-        <el-table-column prop="originalPrice" label="原价" width="100">
+      <el-table v-loading="loading" :data="goodsList" stripe>
+        <el-table-column label="ID" prop="id" width="80"/>
+        <el-table-column label="商品名称" prop="name"/>
+        <el-table-column label="原价" prop="originalPrice" width="100">
           <template #default="{ row }">
             ¥{{ row.originalPrice }}
           </template>
         </el-table-column>
-        <el-table-column prop="seckillPrice" label="秒杀价" width="100">
+        <el-table-column label="秒杀价" prop="seckillPrice" width="100">
           <template #default="{ row }">
             <span style="color: #f56c6c; font-weight: bold;">¥{{ row.seckillPrice }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="stock" label="库存" width="100" />
-        <el-table-column prop="sold" label="已售" width="100" />
-        <el-table-column label="操作" width="150" fixed="right">
+        <el-table-column label="库存" prop="stock" width="100"/>
+        <el-table-column label="已售" prop="sold" width="100"/>
+        <el-table-column fixed="right" label="操作" width="150">
           <template #default="{ row }">
-            <el-button type="primary" link @click="handleEdit(row.id!)">编辑</el-button>
-            <el-button type="danger" link @click="handleDelete(row.id!)">删除</el-button>
+            <el-button link type="primary" @click="handleEdit(row.id!)">编辑</el-button>
+            <el-button link type="danger" @click="handleDelete(row.id!)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -120,8 +117,8 @@ onActivated(() => {
         <el-pagination
           v-model:current-page="currentPage"
           v-model:page-size="pageSize"
-          :total="total"
           :page-sizes="[10, 20, 50, 100]"
+          :total="total"
           layout="total, sizes, prev, pager, next"
           @current-change="handlePageChange"
           @size-change="handleSizeChange"
@@ -135,11 +132,13 @@ onActivated(() => {
 .goods-list {
   padding: 20px;
 }
+
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .pagination {
   margin-top: 20px;
   display: flex;

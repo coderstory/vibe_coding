@@ -1,10 +1,10 @@
-<script setup lang="ts">
-import { ref, onMounted } from 'vue'
+<script lang="ts" setup>
+import {onMounted, ref} from 'vue'
 import CategoryTree from '@/components/business/knowledge/CategoryTree.vue'
 import ArticleEditor from '@/components/business/knowledge/ArticleEditor.vue'
-import { getArticlePage, deleteArticle, searchArticles } from '@/api/modules/knowledge'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import type { KnowledgeArticle, KnowledgeCategory, ArticleQueryParams } from '@/api/types'
+import {deleteArticle, getArticlePage, searchArticles} from '@/api/modules/knowledge'
+import {ElMessage, ElMessageBox} from 'element-plus'
+import type {ArticleQueryParams, KnowledgeArticle, KnowledgeCategory} from '@/api/types'
 
 const categoryTreeRef = ref<InstanceType<typeof CategoryTree> | null>(null)
 const showMobileTree = ref(false)
@@ -26,8 +26,7 @@ async function loadArticles() {
       res = await searchArticles(searchKeyword.value)
       articleList.value = res.data || []
       pagination.value.total = articleList.value.length
-    }
-    else {
+    } else {
       const params: ArticleQueryParams = {
         page: pagination.value.page,
         size: pagination.value.size
@@ -40,8 +39,7 @@ async function loadArticles() {
       articleList.value = data.records || []
       pagination.value.total = data.total || 0
     }
-  }
-  catch {
+  } catch {
     ElMessage.error('加载知识列表失败')
   }
 }
@@ -74,12 +72,11 @@ function handleEdit(row: KnowledgeArticle) {
 
 async function handleDelete(row: KnowledgeArticle) {
   try {
-    await ElMessageBox.confirm('确定删除该知识吗？', '警告', { type: 'warning' })
+    await ElMessageBox.confirm('确定删除该知识吗？', '警告', {type: 'warning'})
     await deleteArticle(row.id)
     ElMessage.success('删除成功')
     loadArticles()
-  }
-  catch {
+  } catch {
     // user cancelled
   }
 }
@@ -100,12 +97,12 @@ onMounted(() => {
       选择分类
     </el-button>
 
-    <div class="category-panel" :class="{ 'mobile-show': showMobileTree }">
-      <CategoryTree ref="categoryTreeRef" @select="handleCategorySelect" />
+    <div :class="{ 'mobile-show': showMobileTree }" class="category-panel">
+      <CategoryTree ref="categoryTreeRef" @select="handleCategorySelect"/>
       <el-button
         v-if="showMobileTree"
-        text
         class="mobile-close-btn"
+        text
         @click="showMobileTree = false"
       >
         关闭
@@ -116,8 +113,8 @@ onMounted(() => {
       <div class="search-bar">
         <el-input
           v-model="searchKeyword"
-          placeholder="搜索标题、内容、标签..."
           clearable
+          placeholder="搜索标题、内容、标签..."
           @clear="handleSearch"
           @keyup.enter="handleSearch"
         >
@@ -128,24 +125,24 @@ onMounted(() => {
         <el-button type="primary" @click="handleCreate">新建知识</el-button>
       </div>
 
-      <el-table :data="articleList" stripe class="article-table">
-        <el-table-column prop="title" label="标题" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="tags" label="标签" width="150">
+      <el-table :data="articleList" class="article-table" stripe>
+        <el-table-column label="标题" min-width="200" prop="title" show-overflow-tooltip/>
+        <el-table-column label="标签" prop="tags" width="150">
           <template #default="{ row }">
-            <el-tag v-for="tag in row.tags" :key="tag" size="small" class="tag-item">
+            <el-tag v-for="tag in row.tags" :key="tag" class="tag-item" size="small">
               {{ tag }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="160">
+        <el-table-column label="创建时间" prop="createTime" width="160">
           <template #default="{ row }">
             {{ row.createTime }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="150" fixed="right">
+        <el-table-column fixed="right" label="操作" width="150">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
-            <el-button link type="danger" size="small" @click="handleDelete(row)">删除</el-button>
+            <el-button link size="small" type="primary" @click="handleEdit(row)">编辑</el-button>
+            <el-button link size="small" type="danger" @click="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -155,10 +152,10 @@ onMounted(() => {
         v-model:page-size="pagination.size"
         :page-sizes="[10, 20, 50]"
         :total="pagination.total"
+        class="pagination"
         layout="total, sizes, prev, pager, next"
         @size-change="loadArticles"
         @current-change="loadArticles"
-        class="pagination"
       />
     </div>
 

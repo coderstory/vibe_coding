@@ -1,7 +1,17 @@
-<script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue'
-import { ElMessage } from 'element-plus'
-import { getTopicList, getMessageList, getMessageDetail, getMessageTrace, sendMessage, type TopicVO, type MessageVO, type MessageDetailVO, type MessageTraceVO } from '@/api/modules/rocketmq'
+<script lang="ts" setup>
+import {onMounted, reactive, ref} from 'vue'
+import {ElMessage} from 'element-plus'
+import {
+  getMessageDetail,
+  getMessageList,
+  getMessageTrace,
+  getTopicList,
+  type MessageDetailVO,
+  type MessageTraceVO,
+  type MessageVO,
+  sendMessage,
+  type TopicVO
+} from '@/api/modules/rocketmq'
 
 // 状态
 const loading = ref(false)
@@ -35,11 +45,11 @@ const searchForm = reactive({
 
 // 快捷时间选择
 const timeShortcuts = [
-  { text: '最近 1 小时', value: () => Date.now() - 60 * 60 * 1000 },
-  { text: '最近 6 小时', value: () => Date.now() - 6 * 60 * 60 * 1000 },
-  { text: '最近 12 小时', value: () => Date.now() - 12 * 60 * 60 * 1000 },
-  { text: '最近 24 小时', value: () => Date.now() - 24 * 60 * 60 * 1000 },
-  { text: '最近 7 天', value: () => Date.now() - 7 * 24 * 60 * 60 * 1000 }
+  {text: '最近 1 小时', value: () => Date.now() - 60 * 60 * 1000},
+  {text: '最近 6 小时', value: () => Date.now() - 6 * 60 * 60 * 1000},
+  {text: '最近 12 小时', value: () => Date.now() - 12 * 60 * 60 * 1000},
+  {text: '最近 24 小时', value: () => Date.now() - 24 * 60 * 60 * 1000},
+  {text: '最近 7 天', value: () => Date.now() - 7 * 24 * 60 * 60 * 1000}
 ]
 
 // 详情对话框
@@ -70,8 +80,7 @@ async function loadTopics() {
   try {
     const res = await getTopicList()
     topicList.value = res.data.records || []
-  }
-  catch {
+  } catch {
     // 错误已在 request.ts 的响应拦截器中处理
   }
 }
@@ -97,11 +106,9 @@ async function loadMessages() {
     )
     messageList.value = res.data.records || []
     total.value = res.data.total
-  }
-  catch {
+  } catch {
     // 错误已在 request.ts 的响应拦截器中处理
-  }
-  finally {
+  } finally {
     messageLoading.value = false
   }
 }
@@ -112,8 +119,7 @@ async function handleViewDetail(row: MessageVO) {
     const res = await getMessageDetail(selectedTopic.value, row.msgId)
     detailData.value = res.data
     detailDialogVisible.value = true
-  }
-  catch {
+  } catch {
     // 错误已在 request.ts 的响应拦截器中处理
   }
 }
@@ -125,11 +131,9 @@ async function handleViewTrace(row: MessageVO) {
   try {
     const res = await getMessageTrace(selectedTopic.value, row.msgId)
     traceList.value = res.data?.consumeTraceList || []
-  }
-  catch {
+  } catch {
     // 错误已在 request.ts 的响应拦截器中处理
-  }
-  finally {
+  } finally {
     traceLoading.value = false
   }
 }
@@ -174,11 +178,9 @@ async function handleSend() {
     ElMessage.success(`消息发送成功，MsgId: ${res.data.msgId}`)
     sendDialogVisible.value = false
     // 发送成功后不自动刷新列表，让用户自己决定是否刷新
-  }
-  catch {
+  } catch {
     // 错误已在 request.ts 的响应拦截器中处理
-  }
-  finally {
+  } finally {
     sendLoading.value = false
   }
 }
@@ -199,9 +201,9 @@ onMounted(() => {
         <el-form-item label="选择 Topic">
           <el-select
             v-model="selectedTopic"
-            placeholder="请选择 Topic"
-            filterable
             clearable
+            filterable
+            placeholder="请选择 Topic"
             style="width: 240px"
             @change="loadMessages"
           >
@@ -216,37 +218,37 @@ onMounted(() => {
         <el-form-item label="关键字">
           <el-input
             v-model="searchForm.keyword"
-            placeholder="msgId/tag/key 模糊搜索"
             clearable
+            placeholder="msgId/tag/key 模糊搜索"
             style="width: 180px"
           />
         </el-form-item>
         <el-form-item label="开始时间">
           <el-date-picker
             v-model="searchForm.startTime"
-            type="datetime"
             placeholder="选择开始时间"
             style="width: 180px"
+            type="datetime"
           />
         </el-form-item>
         <el-form-item label="结束时间">
           <el-date-picker
             v-model="searchForm.endTime"
-            type="datetime"
             placeholder="选择结束时间"
             style="width: 180px"
+            type="datetime"
           />
         </el-form-item>
         <el-form-item label="最大条数">
           <el-input-number
             v-model="searchForm.maxMsg"
-            :min="1"
             :max="1000"
+            :min="1"
             style="width: 120px"
           />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" :loading="messageLoading" @click="loadMessages">
+          <el-button :loading="messageLoading" type="primary" @click="loadMessages">
             查询
           </el-button>
           <el-button type="success" @click="openSendDialog">
@@ -258,7 +260,7 @@ onMounted(() => {
 
     <!-- 提示信息 -->
     <div class="info-tip">
-      <el-alert type="info" :closable="false">
+      <el-alert :closable="false" type="info">
         <template #title>
           <span>提示：消息查询默认返回最近 7 天的数据，最多返回 1000 条。查询时间范围越小，返回速度越快。</span>
         </template>
@@ -269,28 +271,28 @@ onMounted(() => {
     <el-table
       v-loading="messageLoading"
       :data="messageList"
-      stripe
       border
-      style="width: 100%; margin-top: 16px"
       empty-text="请先选择 Topic 后查询消息"
+      stripe
+      style="width: 100%; margin-top: 16px"
     >
-      <el-table-column type="index" label="序号" width="80" align="center" />
-      <el-table-column prop="msgId" label="消息 ID" min-width="180" show-overflow-tooltip />
-      <el-table-column prop="tags" label="Tags" min-width="120" show-overflow-tooltip />
-      <el-table-column prop="keys" label="Keys" min-width="120" show-overflow-tooltip />
-      <el-table-column prop="timestamp" label="存储时间" width="160">
+      <el-table-column align="center" label="序号" type="index" width="80"/>
+      <el-table-column label="消息 ID" min-width="180" prop="msgId" show-overflow-tooltip/>
+      <el-table-column label="Tags" min-width="120" prop="tags" show-overflow-tooltip/>
+      <el-table-column label="Keys" min-width="120" prop="keys" show-overflow-tooltip/>
+      <el-table-column label="存储时间" prop="timestamp" width="160">
         <template #default="{ row }">
           {{ formatTime(row.timestamp) }}
         </template>
       </el-table-column>
-      <el-table-column prop="queueId" label="队列 ID" width="100" align="center" />
-      <el-table-column prop="queueOffset" label="队列 Offset" width="120" align="center" />
-      <el-table-column label="操作" width="180" fixed="right">
+      <el-table-column align="center" label="队列 ID" prop="queueId" width="100"/>
+      <el-table-column align="center" label="队列 Offset" prop="queueOffset" width="120"/>
+      <el-table-column fixed="right" label="操作" width="180">
         <template #default="{ row }">
-          <el-button link type="primary" size="small" @click="handleViewDetail(row)">
+          <el-button link size="small" type="primary" @click="handleViewDetail(row)">
             详情
           </el-button>
-          <el-button link type="success" size="small" @click="handleViewTrace(row)">
+          <el-button link size="small" type="success" @click="handleViewTrace(row)">
             轨迹
           </el-button>
         </template>
@@ -309,17 +311,17 @@ onMounted(() => {
       width="700px"
     >
       <el-descriptions v-if="detailData" :column="2" border>
-        <el-descriptions-item label="消息 ID" :span="2">{{ detailData.msgId }}</el-descriptions-item>
+        <el-descriptions-item :span="2" label="消息 ID">{{ detailData.msgId }}</el-descriptions-item>
         <el-descriptions-item label="Topic">{{ detailData.topic }}</el-descriptions-item>
         <el-descriptions-item label="Tags">{{ detailData.tags || '-' }}</el-descriptions-item>
         <el-descriptions-item label="Keys">{{ detailData.keys || '-' }}</el-descriptions-item>
         <el-descriptions-item label="队列 ID">{{ detailData.queueId }}</el-descriptions-item>
         <el-descriptions-item label="队列 Offset">{{ detailData.queueOffset }}</el-descriptions-item>
-        <el-descriptions-item label="存储时间" :span="2">{{ formatTime(detailData.timestamp) }}</el-descriptions-item>
-        <el-descriptions-item label="消息内容" :span="2">
+        <el-descriptions-item :span="2" label="存储时间">{{ formatTime(detailData.timestamp) }}</el-descriptions-item>
+        <el-descriptions-item :span="2" label="消息内容">
           <div class="message-body">{{ detailData.body }}</div>
         </el-descriptions-item>
-        <el-descriptions-item label="属性" :span="2">
+        <el-descriptions-item :span="2" label="属性">
           <div v-if="detailData.properties && Object.keys(detailData.properties).length > 0">
             <el-tag v-for="(value, key) in detailData.properties" :key="key" size="small" style="margin: 2px">
               {{ key }}: {{ value }}
@@ -342,29 +344,29 @@ onMounted(() => {
       <el-table
         v-loading="traceLoading"
         :data="traceList"
-        stripe
         border
-        style="width: 100%"
         empty-text="暂无轨迹数据"
+        stripe
+        style="width: 100%"
       >
-        <el-table-column type="index" label="步骤" width="80" align="center" />
-        <el-table-column prop="traceType" label="轨迹类型" width="120" />
-        <el-table-column prop="traceTime" label="时间" width="160">
+        <el-table-column align="center" label="步骤" type="index" width="80"/>
+        <el-table-column label="轨迹类型" prop="traceType" width="120"/>
+        <el-table-column label="时间" prop="traceTime" width="160">
           <template #default="{ row }">
             {{ formatTime(row.traceTime) }}
           </template>
         </el-table-column>
-        <el-table-column prop="groupName" label="消费组" min-width="150" show-overflow-tooltip />
-        <el-table-column prop="traceStatus" label="状态" width="120" align="center">
+        <el-table-column label="消费组" min-width="150" prop="groupName" show-overflow-tooltip/>
+        <el-table-column align="center" label="状态" prop="traceStatus" width="120">
           <template #default="{ row }">
             <el-tag :type="statusTagType(row.traceStatus)" size="small">
               {{ row.traceStatus }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="costTime" label="耗时(ms)" width="100" align="center" />
-        <el-table-column prop="clientHost" label="客户端" min-width="120" show-overflow-tooltip />
-        <el-table-column prop="serverHost" label="服务端" min-width="120" show-overflow-tooltip />
+        <el-table-column align="center" label="耗时(ms)" prop="costTime" width="100"/>
+        <el-table-column label="客户端" min-width="120" prop="clientHost" show-overflow-tooltip/>
+        <el-table-column label="服务端" min-width="120" prop="serverHost" show-overflow-tooltip/>
       </el-table>
       <template #footer>
         <el-button @click="traceDialogVisible = false">关闭</el-button>
@@ -381,8 +383,8 @@ onMounted(() => {
         <el-form-item label="Topic" required>
           <el-select
             v-model="sendForm.topic"
-            placeholder="请选择 Topic"
             filterable
+            placeholder="请选择 Topic"
             style="width: 100%"
           >
             <el-option
@@ -394,23 +396,23 @@ onMounted(() => {
           </el-select>
         </el-form-item>
         <el-form-item label="Tags">
-          <el-input v-model="sendForm.tags" placeholder="可选，如: order, payment" />
+          <el-input v-model="sendForm.tags" placeholder="可选，如: order, payment"/>
         </el-form-item>
         <el-form-item label="Keys">
-          <el-input v-model="sendForm.keys" placeholder="可选，用于消息检索" />
+          <el-input v-model="sendForm.keys" placeholder="可选，用于消息检索"/>
         </el-form-item>
         <el-form-item label="消息内容" required>
           <el-input
             v-model="sendForm.body"
-            type="textarea"
             :rows="4"
             placeholder="请输入消息内容"
+            type="textarea"
           />
         </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="sendDialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="sendLoading" @click="handleSend">
+        <el-button :loading="sendLoading" type="primary" @click="handleSend">
           发送
         </el-button>
       </template>

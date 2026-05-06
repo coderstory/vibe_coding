@@ -1,7 +1,7 @@
-<script setup lang="ts">
-import { ref, watch } from 'vue'
-import { ElMessage } from 'element-plus'
-import { getConsumerGroupDetail, type ConsumerGroupDetailVO } from '@/api/modules/rocketmq'
+<script lang="ts" setup>
+import {ref, watch} from 'vue'
+import {ElMessage} from 'element-plus'
+import {type ConsumerGroupDetailVO, getConsumerGroupDetail} from '@/api/modules/rocketmq'
 import ResetOffsetDialog from './ResetOffsetDialog.vue'
 
 const props = defineProps<{
@@ -33,11 +33,9 @@ async function loadDetail() {
   try {
     const res = await getConsumerGroupDetail(props.groupName)
     detailData.value = res.data
-  }
-  catch (error: any) {
+  } catch (error: any) {
     ElMessage.error(error.message || '获取详情失败')
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }
@@ -46,7 +44,7 @@ watch(() => props.groupName, () => {
   if (dialogVisible.value) {
     loadDetail()
   }
-}, { immediate: true })
+}, {immediate: true})
 
 // 重置位点弹窗
 const resetDialogVisible = ref(false)
@@ -76,10 +74,14 @@ const groupTypeText = (type: string): string => {
 // 状态文本
 const statusText = (status: string): string => {
   switch (status) {
-    case 'OK': return '正常'
-    case 'REBALANCE_NOT_INIT': return '重试中'
-    case 'OFFLINE': return '离线'
-    default: return '未知'
+    case 'OK':
+      return '正常'
+    case 'REBALANCE_NOT_INIT':
+      return '重试中'
+    case 'OFFLINE':
+      return '离线'
+    default:
+      return '未知'
   }
 }
 </script>
@@ -116,19 +118,19 @@ const statusText = (status: string): string => {
       <el-tabs v-model="activeTab">
         <el-tab-pane label="消费进度" name="progress">
           <el-table :data="[]" max-height="300">
-            <el-table-column prop="topic" label="Topic" />
-            <el-table-column prop="queueId" label="队列ID" width="100" />
-            <el-table-column prop="consumerOffset" label="消费位点" width="120" />
-            <el-table-column prop="brokerOffset" label="存储位点" width="120" />
-            <el-table-column prop="diff" label="堆积量" width="100" />
+            <el-table-column label="Topic" prop="topic"/>
+            <el-table-column label="队列ID" prop="queueId" width="100"/>
+            <el-table-column label="消费位点" prop="consumerOffset" width="120"/>
+            <el-table-column label="存储位点" prop="brokerOffset" width="120"/>
+            <el-table-column label="堆积量" prop="diff" width="100"/>
           </el-table>
         </el-tab-pane>
 
         <el-tab-pane label="订阅关系" name="subscription">
           <el-table :data="detailData?.subscriptions || []" max-height="300">
-            <el-table-column prop="topic" label="Topic" />
-            <el-table-column prop="filterExpression" label="过滤表达式" />
-            <el-table-column prop="startPosition" label="起始位置" width="100" />
+            <el-table-column label="Topic" prop="topic"/>
+            <el-table-column label="过滤表达式" prop="filterExpression"/>
+            <el-table-column label="起始位置" prop="startPosition" width="100"/>
           </el-table>
         </el-tab-pane>
 
@@ -139,7 +141,7 @@ const statusText = (status: string): string => {
               <span>消费位点: {{ offset }}</span>
             </el-card>
           </div>
-          <el-empty v-else description="暂无位点信息" />
+          <el-empty v-else description="暂无位点信息"/>
         </el-tab-pane>
       </el-tabs>
     </div>

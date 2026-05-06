@@ -1,9 +1,9 @@
-<script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
-import { getMenuTree, createMenu, updateMenu, deleteMenu } from '@/api/modules/menu'
-import type { MenuTree, Menu } from '@/api/types'
-import type { ElTree } from 'element-plus'
+<script lang="ts" setup>
+import {onMounted, reactive, ref} from 'vue'
+import type {ElTree} from 'element-plus'
+import {ElMessage, ElMessageBox, type FormInstance, type FormRules} from 'element-plus'
+import {createMenu, deleteMenu, getMenuTree, updateMenu} from '@/api/modules/menu'
+import type {Menu, MenuTree} from '@/api/types'
 
 // 菜单树数据
 const menuTreeData = ref<MenuTree[]>([])
@@ -32,8 +32,8 @@ const isEdit = ref(false)
 
 // 表单验证
 const menuFormRules: FormRules = {
-  name: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }],
-  path: [{ required: true, message: '请输入菜单路径', trigger: 'blur' }]
+  name: [{required: true, message: '请输入菜单名称', trigger: 'blur'}],
+  path: [{required: true, message: '请输入菜单路径', trigger: 'blur'}]
 }
 
 // 加载菜单树
@@ -42,11 +42,9 @@ async function loadMenuTree() {
   try {
     const res = await getMenuTree()
     menuTreeData.value = res.data || []
-  }
-  catch {
+  } catch {
     ElMessage.error('加载菜单列表失败')
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }
@@ -54,6 +52,7 @@ async function loadMenuTree() {
 // 获取所有菜单节点（扁平化）
 function getAllMenuNodes(): Menu[] {
   const nodes: Menu[] = []
+
   function flatten(list: MenuTree[]) {
     list.forEach((item) => {
       nodes.push(item)
@@ -62,6 +61,7 @@ function getAllMenuNodes(): Menu[] {
       }
     })
   }
+
   flatten(menuTreeData.value)
   return nodes
 }
@@ -113,11 +113,11 @@ function handleDelete(row: Menu) {
       await deleteMenu(row.id)
       ElMessage.success('菜单删除成功')
       loadMenuTree()
-    }
-    catch {
+    } catch {
       ElMessage.error('菜单删除失败')
     }
-  }).catch(() => {})
+  }).catch(() => {
+  })
 }
 
 // 保存菜单
@@ -131,15 +131,13 @@ async function handleSaveMenu() {
       if (isEdit.value) {
         await updateMenu(menuForm.id as number, menuForm)
         ElMessage.success('菜单更新成功')
-      }
-      else {
+      } else {
         await createMenu(menuForm)
         ElMessage.success('菜单创建成功')
       }
       dialogVisible.value = false
       loadMenuTree()
-    }
-    catch {
+    } catch {
       ElMessage.error(isEdit.value ? '菜单更新失败' : '菜单创建失败')
     }
   })
@@ -167,38 +165,38 @@ onMounted(() => {
 
     <!-- 菜单树 -->
     <el-table
-      :data="menuTreeData"
-      stripe
-      border
       v-loading="loading"
-      row-key="id"
-      class="menu-table"
+      :data="menuTreeData"
       :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+      border
+      class="menu-table"
+      row-key="id"
+      stripe
     >
-      <el-table-column prop="name" label="菜单名称" min-width="150" />
-      <el-table-column prop="path" label="路由路径" min-width="200" />
-      <el-table-column prop="icon" label="图标" width="100" align="center">
+      <el-table-column label="菜单名称" min-width="150" prop="name"/>
+      <el-table-column label="路由路径" min-width="200" prop="path"/>
+      <el-table-column align="center" label="图标" prop="icon" width="100">
         <template #default="{ row }">
           <span v-if="row.icon">{{ row.icon }}</span>
           <span v-else>-</span>
         </template>
       </el-table-column>
-      <el-table-column prop="sortOrder" label="排序" width="80" align="center" />
-      <el-table-column label="操作" width="220" fixed="right">
+      <el-table-column align="center" label="排序" prop="sortOrder" width="80"/>
+      <el-table-column fixed="right" label="操作" width="220">
         <template #default="{ row }">
-          <el-button link type="primary" size="small" @click="handleAddChild(row)">添加子菜单</el-button>
-          <el-button link type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
-          <el-button link type="danger" size="small" @click="handleDelete(row)">删除</el-button>
+          <el-button link size="small" type="primary" @click="handleAddChild(row)">添加子菜单</el-button>
+          <el-button link size="small" type="primary" @click="handleEdit(row)">编辑</el-button>
+          <el-button link size="small" type="danger" @click="handleDelete(row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <!-- 新建/编辑菜单对话框 -->
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px" :close-on-click-modal="false">
+    <el-dialog v-model="dialogVisible" :close-on-click-modal="false" :title="dialogTitle" width="500px">
       <el-form ref="menuFormRef" :model="menuForm" :rules="menuFormRules" label-width="100px">
         <el-form-item label="上级菜单" prop="parentId">
           <el-select v-model="menuForm.parentId" placeholder="请选择上级菜单" style="width: 100%">
-            <el-option label="顶级菜单" :value="0" />
+            <el-option :value="0" label="顶级菜单"/>
             <el-option
               v-for="item in getParentMenuOptions()"
               :key="item.id"
@@ -208,16 +206,16 @@ onMounted(() => {
           </el-select>
         </el-form-item>
         <el-form-item label="菜单名称" prop="name">
-          <el-input v-model="menuForm.name" placeholder="请输入菜单名称" />
+          <el-input v-model="menuForm.name" placeholder="请输入菜单名称"/>
         </el-form-item>
         <el-form-item label="路由路径" prop="path">
-          <el-input v-model="menuForm.path" placeholder="请输入路由路径，如：/system/user" />
+          <el-input v-model="menuForm.path" placeholder="请输入路由路径，如：/system/user"/>
         </el-form-item>
         <el-form-item label="图标" prop="icon">
-          <el-input v-model="menuForm.icon" placeholder="请输入图标名称" />
+          <el-input v-model="menuForm.icon" placeholder="请输入图标名称"/>
         </el-form-item>
         <el-form-item label="排序" prop="sortOrder">
-          <el-input-number v-model="menuForm.sortOrder" :min="0" :max="9999" />
+          <el-input-number v-model="menuForm.sortOrder" :max="9999" :min="0"/>
         </el-form-item>
       </el-form>
       <template #footer>

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 /**
  * 我的预约页面
  *
@@ -10,9 +10,9 @@
  * 数据来源：
  * - GET /api/reservation/my - 获取当前用户的预约列表
  */
-import { ref, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
-import { activityApi, type Reservation } from '@/api/modules/seckill'
+import {onMounted, ref} from 'vue'
+import {ElMessage} from 'element-plus'
+import {activityApi, type Reservation} from '@/api/modules/seckill'
 
 /** 预约记录（包含活动详情） */
 interface ReservationWithActivity extends Reservation {
@@ -42,12 +42,10 @@ onMounted(async () => {
 
     // 补充活动详情（需要分别调用活动详情接口）
     await enrichActivityDetails()
-  }
-  catch (error) {
+  } catch (error) {
     console.error('加载预约列表失败', error)
     ElMessage.error('加载预约列表失败，请重试')
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 })
@@ -68,8 +66,7 @@ async function enrichActivityDetails() {
         reservation.activityEndTime = res.data.endTime
         reservation.activityStatus = res.data.status
       }
-    }
-    catch (error) {
+    } catch (error) {
       console.error('加载活动详情失败', error)
     }
   }
@@ -147,7 +144,7 @@ function goToDetail(activityId: number) {
       <template #header>
         <div class="card-header">
           <span>我的预约</span>
-          <el-button type="primary" link @click="$router.push('/seckill')">
+          <el-button link type="primary" @click="$router.push('/seckill')">
             浏览秒杀活动
           </el-button>
         </div>
@@ -204,9 +201,9 @@ function goToDetail(activityId: number) {
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" width="120" fixed="right">
+        <el-table-column fixed="right" label="操作" width="120">
           <template #default="{ row }">
-            <el-button type="primary" link @click="goToDetail(row.activityId)">
+            <el-button link type="primary" @click="goToDetail(row.activityId)">
               查看详情
             </el-button>
           </template>

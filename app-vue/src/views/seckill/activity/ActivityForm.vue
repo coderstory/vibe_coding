@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 /**
  * 活动表单页面
  *
@@ -7,10 +7,10 @@
  * - 表单验证
  * - 保存后返回列表
  */
-import { ref, onMounted, watch } from 'vue'
-import { activityApi } from '@/api/modules/seckill'
-import { ElMessage } from 'element-plus'
-import { useRouter, useRoute } from 'vue-router'
+import {onMounted, ref, watch} from 'vue'
+import {activityApi} from '@/api/modules/seckill'
+import {ElMessage} from 'element-plus'
+import {useRoute, useRouter} from 'vue-router'
 
 const router = useRouter()
 const route = useRoute()
@@ -43,12 +43,10 @@ async function loadActivity(id: number) {
       enableCaptcha: data.enableCaptcha,
       enableIpLimit: data.enableIpLimit
     }
-  }
-  catch (e) {
+  } catch (e) {
     ElMessage.error('加载活动失败')
     router.back()
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }
@@ -76,17 +74,14 @@ async function handleSubmit() {
     if (isEdit.value) {
       await activityApi.update(Number(route.params.id), form.value)
       ElMessage.success('更新成功')
-    }
-    else {
+    } else {
       await activityApi.create(form.value)
       ElMessage.success('创建成功')
     }
     router.push('/seckill/activity')
-  }
-  catch (e) {
+  } catch (e) {
     ElMessage.error(isEdit.value ? '更新失败' : '创建失败')
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }
@@ -112,8 +107,7 @@ function checkRouteAndInit() {
   if (id) {
     isEdit.value = true
     loadActivity(Number(id))
-  }
-  else {
+  } else {
     // 新增模式，重置表单
     isEdit.value = false
     form.value = {
@@ -137,41 +131,41 @@ function checkRouteAndInit() {
         <span>{{ isEdit ? '编辑活动' : '新增活动' }}</span>
       </template>
 
-      <el-form :model="form" label-width="120px" v-loading="loading">
+      <el-form v-loading="loading" :model="form" label-width="120px">
         <el-form-item label="活动名称" required>
-          <el-input v-model="form.name" placeholder="请输入活动名称" style="width: 300px;" />
+          <el-input v-model="form.name" placeholder="请输入活动名称" style="width: 300px;"/>
         </el-form-item>
 
         <el-form-item label="活动描述">
           <el-input
             v-model="form.description"
-            type="textarea"
-            placeholder="请输入活动描述"
             :rows="3"
+            placeholder="请输入活动描述"
             style="width: 400px;"
+            type="textarea"
           />
         </el-form-item>
 
         <el-form-item label="开始时间" required>
           <el-date-picker
             v-model="form.startTime"
-            type="datetime"
             placeholder="选择开始时间"
             style="width: 220px;"
+            type="datetime"
           />
         </el-form-item>
 
         <el-form-item label="结束时间" required>
           <el-date-picker
             v-model="form.endTime"
-            type="datetime"
             placeholder="选择结束时间"
             style="width: 220px;"
+            type="datetime"
           />
         </el-form-item>
 
         <el-form-item label="每人限购">
-          <el-input-number v-model="form.perLimit" :min="1" :max="10" style="width: 200px;" />
+          <el-input-number v-model="form.perLimit" :max="10" :min="1" style="width: 200px;"/>
           <span style="margin-left: 10px; color: #999;">件/人</span>
         </el-form-item>
 

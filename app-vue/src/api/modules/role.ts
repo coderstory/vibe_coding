@@ -3,20 +3,13 @@
  * 提供角色 CRUD 和权限分配操作
  */
 import request from '../request'
-import type {
-  ApiResponse,
-  Role,
-  PageResult,
-  RoleQueryParams,
-  CreateRoleParams,
-  UpdateRoleParams
-} from '../types'
+import type {ApiResponse, CreateRoleParams, PageResult, Role, RoleQueryParams, UpdateRoleParams} from '../types'
 
 /**
  * 获取角色分页列表
  */
 export function getRoleList(params: RoleQueryParams) {
-  return request.get<ApiResponse<PageResult<Role>>>('/roles', { params })
+  return request.get<ApiResponse<PageResult<Role>>>('/roles', {params})
 }
 
 /**

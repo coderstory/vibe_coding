@@ -32,11 +32,11 @@ export const goodsApi = {
    * 获取商品分页列表
    */
   getGoodsPage(page: number = 1, size: number = 20, activityId?: number) {
-    const params: Record<string, any> = { page, size }
+    const params: Record<string, any> = {page, size}
     if (activityId) {
       params.activityId = activityId
     }
-    return request.get<PageResult<SeckillGoods>>('/goods', { params })
+    return request.get<PageResult<SeckillGoods>>('/goods', {params})
   },
 
   /**
@@ -72,7 +72,7 @@ export const goodsApi = {
    */
   getGoodsByActivity(activityId: number, page: number = 1, size: number = 20) {
     return request.get<PageResult<SeckillGoods>>(`/goods/activity/${activityId}`, {
-      params: { page, size }
+      params: {page, size}
     })
   }
 }

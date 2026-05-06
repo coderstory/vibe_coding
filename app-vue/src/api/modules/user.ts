@@ -5,13 +5,13 @@
 import request from '../request'
 import type {
   ApiResponse,
-  User,
-  UserVO,
-  Role,
-  PageResult,
-  UserQueryParams,
   CreateUserParams,
-  UpdateUserParams
+  PageResult,
+  Role,
+  UpdateUserParams,
+  User,
+  UserQueryParams,
+  UserVO
 } from '../types'
 
 /**
@@ -19,7 +19,7 @@ import type {
  * 支持多条件筛选查询
  */
 export function getUserList(params: UserQueryParams) {
-  return request.get<ApiResponse<PageResult<User>>>('/users', { params })
+  return request.get<ApiResponse<PageResult<User>>>('/users', {params})
 }
 
 /**
@@ -59,7 +59,7 @@ export function deleteUser(id: number) {
  * 新密码由调用方生成，服务端仅加密存储
  */
 export function resetUserPassword(id: number, password: string) {
-  return request.put<ApiResponse<void>>(`/users/${id}/password`, { password })
+  return request.put<ApiResponse<void>>(`/users/${id}/password`, {password})
 }
 
 /**
@@ -75,5 +75,5 @@ export function getAllRoles() {
  * enabled: 1=启用, 0=禁用
  */
 export function updateUserStatus(id: number, enabled: number) {
-  return request.patch<ApiResponse<void>>(`/users/${id}/status`, { enabled })
+  return request.patch<ApiResponse<void>>(`/users/${id}/status`, {enabled})
 }

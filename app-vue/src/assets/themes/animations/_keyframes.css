@@ -14,19 +14,35 @@
 }
 
 @keyframes wave {
-  0% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-30%) translateY(-5px); }
-  100% { transform: translateX(-50%) translateY(0); }
+  0% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-30%) translateY(-5px);
+  }
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
-  50% { transform: translateY(-20px) scale(1.05); opacity: 0.8; }
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-20px) scale(1.05);
+    opacity: 0.8;
+  }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.8; }
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
 }
 
 @keyframes bubble-rise {
@@ -50,14 +66,28 @@
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 @keyframes wave-float {
-  0% { transform: translateX(-50%) translateY(0); }
-  25% { transform: translateX(-40%) translateY(-10px); }
-  50% { transform: translateX(-50%) translateY(-5px); }
-  75% { transform: translateX(-60%) translateY(-10px); }
-  100% { transform: translateX(-50%) translateY(0); }
+  0% {
+    transform: translateX(-50%) translateY(0);
+  }
+  25% {
+    transform: translateX(-40%) translateY(-10px);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-5px);
+  }
+  75% {
+    transform: translateX(-60%) translateY(-10px);
+  }
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
 }

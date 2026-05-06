@@ -1,17 +1,17 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 /**
  * 应用顶部导航栏组件
  * 显示用户信息和动画切换控制
  */
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { ElMessageBox } from 'element-plus'
-import { useUserStore } from '@/store/user'
-import { useAnimationToggle } from '@/composables/useAnimationToggle'
+import {computed} from 'vue'
+import {useRouter} from 'vue-router'
+import {ElMessageBox} from 'element-plus'
+import {useUserStore} from '@/store/user'
+import {useAnimationToggle} from '@/composables/useAnimationToggle'
 
 const router = useRouter()
 const userStore = useUserStore()
-const { animationsEnabled, toggleAnimations } = useAnimationToggle()
+const {animationsEnabled, toggleAnimations} = useAnimationToggle()
 
 // 显示用户名，取 name 或 username
 const username = computed(() => userStore.user?.name || userStore.user?.username || '未登录')
@@ -32,12 +32,10 @@ async function handleCommand(command: string) {
 
       await userStore.logout()
       router.push('/login')
-    }
-    catch {
+    } catch {
       // 用户取消操作
     }
-  }
-  else if (command === 'profile') {
+  } else if (command === 'profile') {
     // TODO: 跳转到个人中心
   }
 }
@@ -48,7 +46,7 @@ async function handleCommand(command: string) {
     <div class="header-right">
       <!-- 动画开关按钮 -->
       <el-tooltip :content="animationsEnabled ? '关闭动画' : '开启动画'" placement="bottom">
-        <el-button :icon="animationsEnabled ? 'VideoPause' : 'VideoPlay'" circle @click="toggleAnimations" />
+        <el-button :icon="animationsEnabled ? 'VideoPause' : 'VideoPlay'" circle @click="toggleAnimations"/>
       </el-tooltip>
 
       <!-- 用户下拉菜单 -->
@@ -58,16 +56,22 @@ async function handleCommand(command: string) {
             {{ avatar }}
           </el-avatar>
           <span class="username">{{ username }}</span>
-          <el-icon><ArrowDown /></el-icon>
+          <el-icon>
+            <ArrowDown/>
+          </el-icon>
         </div>
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item command="profile">
-              <el-icon><User /></el-icon>
+              <el-icon>
+                <User/>
+              </el-icon>
               个人中心
             </el-dropdown-item>
             <el-dropdown-item command="logout" divided>
-              <el-icon><SwitchButton /></el-icon>
+              <el-icon>
+                <SwitchButton/>
+              </el-icon>
               退出登录
             </el-dropdown-item>
           </el-dropdown-menu>

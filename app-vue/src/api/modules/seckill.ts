@@ -244,8 +244,7 @@ export const seckillApi = {
         const data = JSON.parse(event.data) as SeckillResponse
         console.log('收到秒杀结果:', data)
         onMessage?.(data)
-      }
-      catch (error) {
+      } catch (error) {
         console.error('解析秒杀结果失败', error)
       }
     })
@@ -256,8 +255,7 @@ export const seckillApi = {
         const data = JSON.parse(event.data)
         console.log('状态更新:', data)
         // 可以在这里更新页面上的状态显示
-      }
-      catch (error) {
+      } catch (error) {
         console.error('解析状态更新失败', error)
       }
     })
@@ -432,7 +430,7 @@ export const activityApi = {
    * ```
    */
   list(page: number = 1, size: number = 20) {
-    return request.get<{ records: Activity[]; total: number }>('/seckill/activity', { params: { page, size } })
+    return request.get<{ records: Activity[]; total: number }>('/seckill/activity', {params: {page, size}})
   },
 
   /**

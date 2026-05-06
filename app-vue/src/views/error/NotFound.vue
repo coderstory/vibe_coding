@@ -1,6 +1,6 @@
-<script setup lang="ts">
-import { ref, onBeforeUnmount } from 'vue'
-import { useRouter } from 'vue-router'
+<script lang="ts" setup>
+import {onBeforeUnmount, ref} from 'vue'
+import {useRouter} from 'vue-router'
 
 const router = useRouter()
 const countdown = ref(5)

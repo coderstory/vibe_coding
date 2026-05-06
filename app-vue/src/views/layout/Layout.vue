@@ -1,5 +1,5 @@
-<script setup lang="ts">
-import { ref } from 'vue'
+<script lang="ts" setup>
+import {ref} from 'vue'
 import AppMenu from '@/components/layout/AppMenu.vue'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import AppTabs from '@/components/layout/AppTabs.vue'
@@ -38,25 +38,28 @@ function toggleCollapse() {
         <span v-if="!collapsed">AI驱动的管理系统</span>
         <span v-else>M</span>
       </div>
-      <AppMenu :collapsed="collapsed" />
+      <AppMenu :collapsed="collapsed"/>
     </el-aside>
 
     <el-container class="main-container">
       <el-header class="layout-header">
         <div class="header-left">
-          <el-button text @click="toggleCollapse" class="collapse-btn">
-            <el-icon size="20"><Fold v-if="!collapsed" /><Expand v-else /></el-icon>
+          <el-button class="collapse-btn" text @click="toggleCollapse">
+            <el-icon size="20">
+              <Fold v-if="!collapsed"/>
+              <Expand v-else/>
+            </el-icon>
           </el-button>
         </div>
-        <AppHeader />
+        <AppHeader/>
       </el-header>
 
-      <AppTabs />
+      <AppTabs/>
 
       <el-main class="layout-main">
         <router-view v-slot="{ Component }">
           <keep-alive>
-            <component :is="Component" />
+            <component :is="Component"/>
           </keep-alive>
         </router-view>
       </el-main>

@@ -12,7 +12,7 @@ export const cartApi = {
     return request.get<Cart[]>('/cart/my')
   },
   addToCart(goodsId: number, quantity: number = 1) {
-    return request.post('/cart/add', null, { params: { goodsId, quantity } })
+    return request.post('/cart/add', null, {params: {goodsId, quantity}})
   },
   removeFromCart(goodsId: number) {
     return request.delete<Boolean>(`/cart/${goodsId}`)

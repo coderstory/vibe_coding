@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted } from 'vue'
+import {onMounted, onUnmounted, ref} from 'vue'
 
 export function useAnimationToggle() {
   const animationsEnabled = ref(true)

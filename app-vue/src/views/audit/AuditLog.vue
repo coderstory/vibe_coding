@@ -1,7 +1,7 @@
-<script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { getAuditLogs } from '@/api/modules/audit'
-import type { AuditLog, AuditLogQueryParams } from '@/api/types'
+<script lang="ts" setup>
+import {onMounted, reactive, ref} from 'vue'
+import {getAuditLogs} from '@/api/modules/audit'
+import type {AuditLog, AuditLogQueryParams} from '@/api/types'
 
 // 查询表单
 const searchForm = reactive({
@@ -24,12 +24,12 @@ const pagination = reactive({
 
 // 操作类型选项
 const operationTypeOptions = [
-  { value: null, label: '全部' },
-  { value: 'LOGIN', label: '登录' },
-  { value: 'LOGOUT', label: '登出' },
-  { value: '新增', label: '新增' },
-  { value: '编辑', label: '编辑' },
-  { value: '删除', label: '删除' }
+  {value: null, label: '全部'},
+  {value: 'LOGIN', label: '登录'},
+  {value: 'LOGOUT', label: '登出'},
+  {value: '新增', label: '新增'},
+  {value: '编辑', label: '编辑'},
+  {value: '删除', label: '删除'}
 ]
 
 // 加载审计日志列表
@@ -48,11 +48,9 @@ async function loadAuditLogs() {
     const res = await getAuditLogs(params)
     auditList.value = res.data.records
     total.value = res.data.total
-  }
-  catch (error) {
+  } catch (error) {
     console.error('加载审计日志失败', error)
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }
@@ -138,23 +136,23 @@ onMounted(() => {
         <el-form-item label="操作时间">
           <el-date-picker
             v-model="searchForm.startTime"
-            type="datetime"
             placeholder="开始时间"
             style="width: 180px"
+            type="datetime"
           />
           <span style="margin: 0 8px;">至</span>
           <el-date-picker
             v-model="searchForm.endTime"
-            type="datetime"
             placeholder="结束时间"
             style="width: 180px"
+            type="datetime"
           />
         </el-form-item>
         <el-form-item label="操作人">
-          <el-input v-model="searchForm.operator" placeholder="请输入操作人" clearable style="width: 150px" />
+          <el-input v-model="searchForm.operator" clearable placeholder="请输入操作人" style="width: 150px"/>
         </el-form-item>
         <el-form-item label="操作类型">
-          <el-select v-model="searchForm.operationType" placeholder="全部" clearable style="width: 120px">
+          <el-select v-model="searchForm.operationType" clearable placeholder="全部" style="width: 120px">
             <el-option
               v-for="item in operationTypeOptions"
               :key="item.value"
@@ -171,25 +169,25 @@ onMounted(() => {
     </div>
 
     <!-- 审计日志列表 -->
-    <el-table :data="auditList" stripe v-loading="loading" class="audit-table">
-      <el-table-column type="index" label="序号" width="60" align="center" />
-      <el-table-column prop="username" label="操作人" min-width="120" />
-      <el-table-column prop="createTime" label="操作时间" min-width="160" />
-      <el-table-column prop="operation" label="操作类型" width="100" align="center">
+    <el-table v-loading="loading" :data="auditList" class="audit-table" stripe>
+      <el-table-column align="center" label="序号" type="index" width="60"/>
+      <el-table-column label="操作人" min-width="120" prop="username"/>
+      <el-table-column label="操作时间" min-width="160" prop="createTime"/>
+      <el-table-column align="center" label="操作类型" prop="operation" width="100">
         <template #default="{ row }">
           {{ formatOperationType(row.operation) }}
         </template>
       </el-table-column>
-      <el-table-column prop="targetType" label="目标" min-width="120">
+      <el-table-column label="目标" min-width="120" prop="targetType">
         <template #default="{ row }">
           {{ row.targetType }} {{ row.targetId ? '#' + row.targetId : '' }}
         </template>
       </el-table-column>
-      <el-table-column prop="ipAddress" label="IP地址" min-width="140" />
+      <el-table-column label="IP地址" min-width="140" prop="ipAddress"/>
     </el-table>
 
     <!-- 空状态 -->
-    <el-empty v-if="!loading && auditList.length === 0" description="暂无审计日志" />
+    <el-empty v-if="!loading && auditList.length === 0" description="暂无审计日志"/>
 
     <!-- 分页 -->
     <div class="pagination-section">
@@ -198,8 +196,8 @@ onMounted(() => {
         v-model:page-size="pagination.size"
         :page-sizes="[10, 20, 50, 100]"
         :total="total"
-        layout="total, sizes, prev, pager, next"
         background
+        layout="total, sizes, prev, pager, next"
         @current-change="handlePageChange"
         @size-change="handleSizeChange"
       />

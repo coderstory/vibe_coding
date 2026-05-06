@@ -1,7 +1,7 @@
-<script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { orderApi } from '@/api/modules/order'
-import type { Order } from '@/api/modules/order'
+<script lang="ts" setup>
+import {onMounted, ref} from 'vue'
+import type {Order} from '@/api/modules/order'
+import {orderApi} from '@/api/modules/order'
 
 const orders = ref<Order[]>([])
 const loading = ref(false)
@@ -11,8 +11,7 @@ onMounted(async () => {
   try {
     const res = await orderApi.getMyOrders()
     orders.value = res.data || []
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 })
@@ -22,7 +21,7 @@ function formatTime(time: string) {
 }
 
 function getStatusText(status: number) {
-  const map = { 0: '待支付', 1: '已支付', 2: '已取消', 3: '超时取消' }
+  const map = {0: '待支付', 1: '已支付', 2: '已取消', 3: '超时取消'}
   return map[status as keyof typeof map] || '未知'
 }
 </script>
@@ -37,18 +36,18 @@ function getStatusText(status: number) {
         暂无抢购记录
       </div>
       <el-table v-else :data="orders" style="width: 100%">
-        <el-table-column prop="orderNo" label="订单号" width="200" />
-        <el-table-column prop="goodsId" label="商品ID" width="100" />
-        <el-table-column prop="quantity" label="数量" width="80" />
-        <el-table-column prop="price" label="价格" width="100" />
-        <el-table-column prop="status" label="状态" width="100">
+        <el-table-column label="订单号" prop="orderNo" width="200"/>
+        <el-table-column label="商品ID" prop="goodsId" width="100"/>
+        <el-table-column label="数量" prop="quantity" width="80"/>
+        <el-table-column label="价格" prop="price" width="100"/>
+        <el-table-column label="状态" prop="status" width="100">
           <template #default="{ row }">
             <el-tag :type="row.status === 1 ? 'success' : row.status === 0 ? 'warning' : 'info'">
               {{ getStatusText(row.status) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="下单时间">
+        <el-table-column label="下单时间" prop="createTime">
           <template #default="{ row }">
             {{ formatTime(row.createTime) }}
           </template>
@@ -62,6 +61,7 @@ function getStatusText(status: number) {
 .seckill-record {
   padding: 20px;
 }
+
 .empty-tip {
   text-align: center;
   color: #999;

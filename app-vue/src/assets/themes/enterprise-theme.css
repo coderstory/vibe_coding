@@ -26,17 +26,17 @@
   --ocean-medium: #3b82f6;
   --ocean-light: #93c5fd;
   --ocean-pale: #dbeafe;
-  
+
   /* Beach Colors */
   --sand: #fef3c7;
   --sand-dark: #fde68a;
   --sun: #d97706;
   --sun-light: #fbbf24;
-  
+
   /* Cloud & Base */
   --cloud: #f8fafc;
   --cloud-white: #fff;
-  
+
   /* Brand Colors */
   --el-color-primary: #3b82f6;
   --el-color-primary-light-3: #60a5fa;
@@ -122,24 +122,44 @@
 
 /* ===== Wave Animation Keyframes ===== */
 @keyframes wave {
-  0% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-30%) translateY(-5px); }
-  100% { transform: translateX(-50%) translateY(0); }
+  0% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-30%) translateY(-5px);
+  }
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
-  50% { transform: translateY(-20px) scale(1.05); opacity: 0.8; }
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-20px) scale(1.05);
+    opacity: 0.8;
+  }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.8; }
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 /* ===== Bubble Animation Classes ===== */
@@ -151,10 +171,33 @@
   z-index: 5;
 }
 
-.bubble-1 { width: 20px; height: 20px; left: 10%; animation-delay: 0s; }
-.bubble-2 { width: 15px; height: 15px; left: 30%; animation-delay: 1s; }
-.bubble-3 { width: 25px; height: 25px; left: 60%; animation-delay: 2s; }
-.bubble-4 { width: 12px; height: 12px; left: 80%; animation-delay: 3s; }
+.bubble-1 {
+  width: 20px;
+  height: 20px;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.bubble-2 {
+  width: 15px;
+  height: 15px;
+  left: 30%;
+  animation-delay: 1s;
+}
+
+.bubble-3 {
+  width: 25px;
+  height: 25px;
+  left: 60%;
+  animation-delay: 2s;
+}
+
+.bubble-4 {
+  width: 12px;
+  height: 12px;
+  left: 80%;
+  animation-delay: 3s;
+}
 
 /* ===== Wave Background ===== */
 .wave-bg {
@@ -169,12 +212,12 @@
   left: 0;
   width: 200%;
   height: 80px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgb(147 197 253 / 40%) 25%,
-    rgb(147 197 253 / 60%) 50%,
-    rgb(147 197 253 / 40%) 75%,
-    transparent 100%);
+  background: linear-gradient(90deg,
+  transparent 0%,
+  rgb(147 197 253 / 40%) 25%,
+  rgb(147 197 253 / 60%) 50%,
+  rgb(147 197 253 / 40%) 75%,
+  transparent 100%);
   animation: wave 8s linear infinite;
   z-index: 1;
 }
@@ -254,7 +297,7 @@
   border-radius: 16px;
   box-shadow: var(--el-box-shadow);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .el-card:hover {
@@ -803,10 +846,10 @@
 /* ===== Global Transitions ===== */
 * {
   transition: background-color var(--el-transition-duration) var(--el-transition-function),
-              border-color var(--el-transition-duration) var(--el-transition-function),
-              color var(--el-transition-duration) var(--el-transition-function),
-              box-shadow var(--el-transition-duration) var(--el-transition-function),
-              transform var(--el-transition-duration) var(--el-transition-function);
+  border-color var(--el-transition-duration) var(--el-transition-function),
+  color var(--el-transition-duration) var(--el-transition-function),
+  box-shadow var(--el-transition-duration) var(--el-transition-function),
+  transform var(--el-transition-duration) var(--el-transition-function);
 }
 
 /* ===== Performance Optimization ===== */
@@ -824,16 +867,16 @@
   :root {
     --sidebar-width: 200px;
   }
-  
+
   .wave-bg::before {
     height: 40px;
     animation-duration: 12s;
   }
-  
+
   .bubble {
     display: none;
   }
-  
+
   .macos-card {
     border-radius: 12px;
   }
@@ -975,12 +1018,12 @@
 
 .el-switch:hover:not(.is-disabled) .el-switch__core {
   box-shadow: 0 0 0 3px rgb(147 197 253 / 30%),
-              inset 0 2px 4px rgb(30 58 138 / 10%);
+  inset 0 2px 4px rgb(30 58 138 / 10%);
 }
 
 .el-switch.is-checked:hover:not(.is-disabled) .el-switch__core {
   box-shadow: 0 0 0 3px rgb(253 230 138 / 40%),
-              inset 0 2px 4px rgb(217 119 6 / 20%);
+  inset 0 2px 4px rgb(217 119 6 / 20%);
 }
 
 /* ===== Radio (el-radio) ===== */
@@ -1013,7 +1056,7 @@
   border-color: #3b82f6;
   background: #fff;
   box-shadow: inset 0 2px 4px rgb(30 58 138 / 15%),
-              0 0 0 3px rgb(59 130 246 / 15%);
+  0 0 0 3px rgb(59 130 246 / 15%);
 }
 
 .el-radio__inner::after {
@@ -1526,10 +1569,10 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgb(255 255 255 / 30%) 50%, 
-    transparent 100%);
+  background: linear-gradient(90deg,
+  transparent 0%,
+  rgb(255 255 255 / 30%) 50%,
+  transparent 100%);
   animation: shimmer 2s ease-in-out infinite;
   background-size: 200% 100%;
 }

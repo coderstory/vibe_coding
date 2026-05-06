@@ -1,7 +1,7 @@
-<script setup lang="ts">
-import { ref, watch, reactive } from 'vue'
-import { ElMessage } from 'element-plus'
-import { resetConsumerOffset, getTopicList } from '@/api/modules/rocketmq'
+<script lang="ts" setup>
+import {reactive, ref, watch} from 'vue'
+import {ElMessage} from 'element-plus'
+import {getTopicList, resetConsumerOffset} from '@/api/modules/rocketmq'
 
 const props = defineProps<{
   modelValue: boolean;
@@ -37,8 +37,7 @@ async function loadTopics() {
   try {
     const res = await getTopicList()
     topicList.value = res.data.records
-  }
-  catch {
+  } catch {
     // 忽略错误
   }
 }
@@ -63,11 +62,9 @@ async function handleSubmit() {
     ElMessage.success('位点重置成功')
     emit('success')
     emit('update:modelValue', false)
-  }
-  catch (error: any) {
+  } catch (error: any) {
     ElMessage.error(error.message || '重置失败')
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }
@@ -94,9 +91,9 @@ async function handleSubmit() {
       <el-form-item label="重置时间" required>
         <el-date-picker
           v-model="form.timestamp"
-          type="datetime"
           placeholder="选择日期和时间"
           style="width: 100%"
+          type="datetime"
         />
       </el-form-item>
       <el-form-item>
@@ -106,7 +103,7 @@ async function handleSubmit() {
 
     <template #footer>
       <el-button @click="emit('update:modelValue', false)">取消</el-button>
-      <el-button type="primary" :loading="loading" @click="handleSubmit">
+      <el-button :loading="loading" type="primary" @click="handleSubmit">
         确定
       </el-button>
     </template>

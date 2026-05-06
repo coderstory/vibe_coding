@@ -1,9 +1,17 @@
-<script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
-import { getRoleList, createRole, updateRole, deleteRole, getRoleMenus, assignRoleMenus, getMenuTree } from '@/api/modules/role'
-import type { Role, MenuTree, CreateRoleParams, UpdateRoleParams } from '@/api/types'
-import type { ElTree } from 'element-plus'
+<script lang="ts" setup>
+import {onMounted, reactive, ref} from 'vue'
+import type {ElTree} from 'element-plus'
+import {ElMessage, ElMessageBox, type FormInstance, type FormRules} from 'element-plus'
+import {
+  assignRoleMenus,
+  createRole,
+  deleteRole,
+  getMenuTree,
+  getRoleList,
+  getRoleMenus,
+  updateRole
+} from '@/api/modules/role'
+import type {CreateRoleParams, MenuTree, Role, UpdateRoleParams} from '@/api/types'
 
 // 搜索表单
 const searchForm = reactive({
@@ -32,8 +40,8 @@ const roleForm = reactive({
 })
 const roleFormRef = ref<FormInstance | null>(null)
 const roleFormRules: FormRules = {
-  roleName: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
-  roleCode: [{ required: true, message: '请输入角色编码', trigger: 'blur' }]
+  roleName: [{required: true, message: '请输入角色名称', trigger: 'blur'}],
+  roleCode: [{required: true, message: '请输入角色编码', trigger: 'blur'}]
 }
 const isEdit = ref(false)
 
@@ -65,11 +73,9 @@ async function loadRoleList() {
     const res = await getRoleList(params)
     roleList.value = res.data.records
     total.value = res.data.total
-  }
-  catch {
+  } catch {
     ElMessage.error('加载角色列表失败')
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }
@@ -133,11 +139,11 @@ function handleDelete(row: Role) {
       await deleteRole(row.id)
       ElMessage.success('角色删除成功')
       loadRoleList()
-    }
-    catch {
+    } catch {
       ElMessage.error('角色删除失败')
     }
-  }).catch(() => {})
+  }).catch(() => {
+  })
 }
 
 // 分配权限
@@ -156,8 +162,7 @@ async function handleAssignPermission(row: Role) {
     checkedMenuIds.value = roleMenuRes.data || []
 
     permissionDialogVisible.value = true
-  }
-  catch {
+  } catch {
     ElMessage.error('加载权限数据失败')
   }
 }
@@ -177,8 +182,7 @@ async function handleSaveRole() {
         }
         await updateRole(roleForm.id as number, params)
         ElMessage.success('角色更新成功')
-      }
-      else {
+      } else {
         const params: CreateRoleParams = {
           roleName: roleForm.roleName,
           roleCode: roleForm.roleCode,
@@ -189,8 +193,7 @@ async function handleSaveRole() {
       }
       dialogVisible.value = false
       loadRoleList()
-    }
-    catch {
+    } catch {
       ElMessage.error(isEdit.value ? '角色更新失败' : '角色创建失败')
     }
   })
@@ -209,8 +212,7 @@ async function handleSavePermission() {
     await assignRoleMenus(currentRoleId.value as number, allSelected)
     ElMessage.success('权限保存成功')
     permissionDialogVisible.value = false
-  }
-  catch {
+  } catch {
     ElMessage.error('权限保存失败')
   }
 }
@@ -240,7 +242,7 @@ onMounted(() => {
     <div class="search-section">
       <el-form :model="searchForm" inline>
         <el-form-item label="角色名称">
-          <el-input v-model="searchForm.roleName" placeholder="请输入角色名称" clearable style="width: 200px" />
+          <el-input v-model="searchForm.roleName" clearable placeholder="请输入角色名称" style="width: 200px"/>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">查询</el-button>
@@ -255,17 +257,17 @@ onMounted(() => {
     </div>
 
     <!-- 角色列表 -->
-    <el-table :data="roleList" stripe border v-loading="loading" class="role-table">
-      <el-table-column type="index" label="序号" width="60" align="center" />
-      <el-table-column prop="roleName" label="角色名称" min-width="120" />
-      <el-table-column prop="roleCode" label="角色编码" min-width="120" />
-      <el-table-column prop="description" label="描述" min-width="200" />
-      <el-table-column prop="createTime" label="创建时间" min-width="160" />
-      <el-table-column label="操作" width="200" fixed="right">
+    <el-table v-loading="loading" :data="roleList" border class="role-table" stripe>
+      <el-table-column align="center" label="序号" type="index" width="60"/>
+      <el-table-column label="角色名称" min-width="120" prop="roleName"/>
+      <el-table-column label="角色编码" min-width="120" prop="roleCode"/>
+      <el-table-column label="描述" min-width="200" prop="description"/>
+      <el-table-column label="创建时间" min-width="160" prop="createTime"/>
+      <el-table-column fixed="right" label="操作" width="200">
         <template #default="{ row }">
-          <el-button link type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
-          <el-button link type="danger" size="small" @click="handleDelete(row)">删除</el-button>
-          <el-button link type="warning" size="small" @click="handleAssignPermission(row)">分配权限</el-button>
+          <el-button link size="small" type="primary" @click="handleEdit(row)">编辑</el-button>
+          <el-button link size="small" type="danger" @click="handleDelete(row)">删除</el-button>
+          <el-button link size="small" type="warning" @click="handleAssignPermission(row)">分配权限</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -277,24 +279,24 @@ onMounted(() => {
         v-model:page-size="pagination.size"
         :page-sizes="[10, 20, 50, 100]"
         :total="total"
-        layout="total, sizes, prev, pager, next"
         background
+        layout="total, sizes, prev, pager, next"
         @current-change="handlePageChange"
         @size-change="handleSizeChange"
       />
     </div>
 
     <!-- 新建/编辑角色对话框 -->
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px" :close-on-click-modal="false">
+    <el-dialog v-model="dialogVisible" :close-on-click-modal="false" :title="dialogTitle" width="500px">
       <el-form ref="roleFormRef" :model="roleForm" :rules="roleFormRules" label-width="100px">
         <el-form-item label="角色名称" prop="roleName">
-          <el-input v-model="roleForm.roleName" placeholder="请输入角色名称" />
+          <el-input v-model="roleForm.roleName" placeholder="请输入角色名称"/>
         </el-form-item>
         <el-form-item label="角色编码" prop="roleCode">
-          <el-input v-model="roleForm.roleCode" :disabled="isEdit" placeholder="请输入角色编码" />
+          <el-input v-model="roleForm.roleCode" :disabled="isEdit" placeholder="请输入角色编码"/>
         </el-form-item>
         <el-form-item label="描述" prop="description">
-          <el-input v-model="roleForm.description" type="textarea" :rows="3" placeholder="请输入描述" />
+          <el-input v-model="roleForm.description" :rows="3" placeholder="请输入描述" type="textarea"/>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -304,16 +306,17 @@ onMounted(() => {
     </el-dialog>
 
     <!-- 分配权限对话框 -->
-    <el-dialog v-model="permissionDialogVisible" :title="permissionDialogTitle" width="500px" :close-on-click-modal="false">
+    <el-dialog v-model="permissionDialogVisible" :close-on-click-modal="false" :title="permissionDialogTitle"
+               width="500px">
       <div class="permission-tree-container">
         <el-tree
           ref="menuTreeRef"
           :data="menuTreeData"
+          :default-checked-keys="checkedMenuIds"
+          :default-expand-all="true"
           :props="treeProps"
           node-key="id"
           show-checkbox
-          :default-expand-all="true"
-          :default-checked-keys="checkedMenuIds"
         />
       </div>
       <template #footer>

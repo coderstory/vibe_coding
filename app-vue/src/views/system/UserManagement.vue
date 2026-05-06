@@ -1,9 +1,18 @@
-<script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
-import { getUserList, getUserDetail, createUser, updateUser, deleteUser, resetUserPassword, getAllRoles, updateUserStatus } from '@/api/modules/user'
-import type { User, Role, CreateUserParams, UpdateUserParams } from '@/api/types'
+<script lang="ts" setup>
+import {onMounted, reactive, ref} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {ElMessage, ElMessageBox, type FormInstance, type FormRules} from 'element-plus'
+import {
+  createUser,
+  deleteUser,
+  getAllRoles,
+  getUserDetail,
+  getUserList,
+  resetUserPassword,
+  updateUser,
+  updateUserStatus
+} from '@/api/modules/user'
+import type {CreateUserParams, Role, UpdateUserParams, User} from '@/api/types'
 
 const router = useRouter()
 const route = useRoute()
@@ -51,12 +60,16 @@ const userForm = reactive({
 })
 const userFormRef = ref<FormInstance | null>(null)
 const userFormRules: FormRules = {
-  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-  name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
-  roleId: [{ required: true, message: '请选择角色', trigger: 'change' }],
-  phone: [{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号格式', trigger: 'blur' }],
-  email: [{ pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: '请输入正确的邮箱格式', trigger: 'blur' }]
+  username: [{required: true, message: '请输入用户名', trigger: 'blur'}],
+  password: [{required: true, message: '请输入密码', trigger: 'blur'}],
+  name: [{required: true, message: '请输入姓名', trigger: 'blur'}],
+  roleId: [{required: true, message: '请选择角色', trigger: 'change'}],
+  phone: [{pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号格式', trigger: 'blur'}],
+  email: [{
+    pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+    message: '请输入正确的邮箱格式',
+    trigger: 'blur'
+  }]
 }
 const isEdit = ref(false)
 
@@ -69,21 +82,21 @@ const passwordForm = reactive({
   confirmPassword: ''
 })
 const passwordRules: FormRules = {
-  password: [{ required: true, message: '请输入新密码', trigger: 'blur' }],
-  confirmPassword: [{ required: true, message: '请确认密码', trigger: 'blur' }]
+  password: [{required: true, message: '请输入新密码', trigger: 'blur'}],
+  confirmPassword: [{required: true, message: '请确认密码', trigger: 'blur'}]
 }
 
 // 状态选项
 const statusOptions = [
-  { value: null as number | null, label: '全部' },
-  { value: 1, label: '启用' },
-  { value: 0, label: '禁用' }
+  {value: null as number | null, label: '全部'},
+  {value: 1, label: '启用'},
+  {value: 0, label: '禁用'}
 ]
 
 // 性别选项
 const genderOptions = [
-  { value: 1, label: '男' },
-  { value: 0, label: '女' }
+  {value: 1, label: '男'},
+  {value: 0, label: '女'}
 ]
 
 // 加载用户列表
@@ -103,11 +116,9 @@ async function loadUserList() {
     const res = await getUserList(params)
     userList.value = res.data.records
     total.value = res.data.total
-  }
-  catch {
+  } catch {
     ElMessage.error('加载用户列表失败')
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }
@@ -117,8 +128,7 @@ async function loadRoles() {
   try {
     const res = await getAllRoles()
     roleList.value = res.data
-  }
-  catch {
+  } catch {
     ElMessage.error('加载角色列表失败')
   }
 }
@@ -204,8 +214,7 @@ async function confirmResetPassword() {
     await resetUserPassword(passwordForm.id!, passwordForm.password)
     ElMessage.success('密码重置成功')
     passwordDialogVisible.value = false
-  }
-  catch {
+  } catch {
     ElMessage.error('密码重置失败')
   }
 }
@@ -225,11 +234,11 @@ function handleDelete(row: User) {
       await deleteUser(row.id)
       ElMessage.success('用户删除成功')
       loadUserList()
-    }
-    catch {
+    } catch {
       ElMessage.error('用户删除失败')
     }
-  }).catch(() => {})
+  }).catch(() => {
+  })
 }
 
 // 保存用户
@@ -257,8 +266,7 @@ async function handleSaveUser() {
         }
         await updateUser(userForm.id, updateData)
         ElMessage.success('用户更新成功')
-      }
-      else {
+      } else {
         const createData: CreateUserParams = {
           username: userForm.username,
           password: userForm.password,
@@ -277,8 +285,7 @@ async function handleSaveUser() {
       }
       dialogVisible.value = false
       loadUserList()
-    }
-    catch {
+    } catch {
       ElMessage.error(isEdit.value ? '用户更新失败' : '用户创建失败')
     }
   })
@@ -319,8 +326,7 @@ async function handleStatusChange(row: User) {
   try {
     await updateUserStatus(row.id, row.enabled!)
     ElMessage.success(row.enabled === 1 ? '用户已启用' : '用户已禁用')
-  }
-  catch {
+  } catch {
     // 恢复原状态
     row.enabled = row.enabled === 1 ? 0 : 1
     ElMessage.error('状态更新失败')
@@ -336,9 +342,8 @@ onMounted(async () => {
     try {
       const res = await getUserDetail(Number(editId))
       handleEdit(res.data)
-      router.replace({ path: '/system/user' })
-    }
-    catch {
+      router.replace({path: '/system/user'})
+    } catch {
       ElMessage.error('加载用户信息失败')
     }
   }
@@ -353,19 +358,19 @@ onMounted(async () => {
     <div class="search-section">
       <el-form :model="searchForm" inline>
         <el-form-item label="用户名">
-          <el-input v-model="searchForm.username" placeholder="请输入用户名" clearable style="width: 150px" />
+          <el-input v-model="searchForm.username" clearable placeholder="请输入用户名" style="width: 150px"/>
         </el-form-item>
         <el-form-item label="姓名">
-          <el-input v-model="searchForm.name" placeholder="请输入姓名" clearable style="width: 150px" />
+          <el-input v-model="searchForm.name" clearable placeholder="请输入姓名" style="width: 150px"/>
         </el-form-item>
         <el-form-item label="部门">
-          <el-input v-model="searchForm.department" placeholder="请输入部门" clearable style="width: 150px" />
+          <el-input v-model="searchForm.department" clearable placeholder="请输入部门" style="width: 150px"/>
         </el-form-item>
         <el-form-item label="手机号">
-          <el-input v-model="searchForm.phone" placeholder="请输入手机号" clearable style="width: 150px" />
+          <el-input v-model="searchForm.phone" clearable placeholder="请输入手机号" style="width: 150px"/>
         </el-form-item>
         <el-form-item label="状态">
-          <el-select v-model="searchForm.enabled" placeholder="全部" clearable style="width: 120px">
+          <el-select v-model="searchForm.enabled" clearable placeholder="全部" style="width: 120px">
             <el-option
               v-for="item in statusOptions"
               :key="item.value"
@@ -387,20 +392,20 @@ onMounted(async () => {
     </div>
 
     <!-- 用户列表 -->
-    <el-table :data="userList" stripe border v-loading="loading" class="user-table" @row-click="handleRowClick">
-      <el-table-column type="index" label="序号" width="60" align="center" />
-      <el-table-column prop="username" label="用户名" min-width="120" />
-      <el-table-column prop="name" label="姓名" min-width="100" />
-      <el-table-column prop="gender" label="性别" width="80" align="center">
+    <el-table v-loading="loading" :data="userList" border class="user-table" stripe @row-click="handleRowClick">
+      <el-table-column align="center" label="序号" type="index" width="60"/>
+      <el-table-column label="用户名" min-width="120" prop="username"/>
+      <el-table-column label="姓名" min-width="100" prop="name"/>
+      <el-table-column align="center" label="性别" prop="gender" width="80">
         <template #default="{ row }">
           {{ formatGender(row.gender) }}
         </template>
       </el-table-column>
-      <el-table-column prop="department" label="部门" min-width="120" />
-      <el-table-column prop="position" label="岗位" min-width="100" />
-      <el-table-column prop="phone" label="手机" min-width="120" />
-      <el-table-column prop="email" label="邮箱" min-width="150" />
-      <el-table-column prop="enabled" label="状态" width="100" align="center">
+      <el-table-column label="部门" min-width="120" prop="department"/>
+      <el-table-column label="岗位" min-width="100" prop="position"/>
+      <el-table-column label="手机" min-width="120" prop="phone"/>
+      <el-table-column label="邮箱" min-width="150" prop="email"/>
+      <el-table-column align="center" label="状态" prop="enabled" width="100">
         <template #default="{ row }">
           <el-switch
             v-model="row.enabled"
@@ -410,12 +415,12 @@ onMounted(async () => {
           />
         </template>
       </el-table-column>
-      <el-table-column prop="createTime" label="创建时间" min-width="160" />
-      <el-table-column label="操作" width="200" fixed="right">
+      <el-table-column label="创建时间" min-width="160" prop="createTime"/>
+      <el-table-column fixed="right" label="操作" width="200">
         <template #default="{ row }">
-          <el-button link type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
-          <el-button link type="danger" size="small" @click="handleDelete(row)">删除</el-button>
-          <el-button link type="warning" size="small" @click="handleResetPassword(row)">重置密码</el-button>
+          <el-button link size="small" type="primary" @click="handleEdit(row)">编辑</el-button>
+          <el-button link size="small" type="danger" @click="handleDelete(row)">删除</el-button>
+          <el-button link size="small" type="warning" @click="handleResetPassword(row)">重置密码</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -427,30 +432,30 @@ onMounted(async () => {
         v-model:page-size="pagination.size"
         :page-sizes="[10, 20, 50, 100]"
         :total="total"
-        layout="total, sizes, prev, pager, next"
         background
+        layout="total, sizes, prev, pager, next"
         @current-change="handlePageChange"
         @size-change="handleSizeChange"
       />
     </div>
 
     <!-- 新建/编辑用户对话框 -->
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="600px" :close-on-click-modal="false">
+    <el-dialog v-model="dialogVisible" :close-on-click-modal="false" :title="dialogTitle" width="600px">
       <el-form ref="userFormRef" :model="userForm" :rules="userFormRules" label-width="100px">
         <el-form-item label="用户名" prop="username">
-          <el-input v-model="userForm.username" :disabled="isEdit" placeholder="请输入用户名" />
+          <el-input v-model="userForm.username" :disabled="isEdit" placeholder="请输入用户名"/>
         </el-form-item>
         <el-form-item v-if="!isEdit" label="密码" prop="password">
-          <el-input v-model="userForm.password" type="password" show-password placeholder="请输入密码" />
+          <el-input v-model="userForm.password" placeholder="请输入密码" show-password type="password"/>
         </el-form-item>
         <el-form-item v-if="isEdit && userForm.changePassword" label="密码" prop="password">
-          <el-input v-model="userForm.password" type="password" show-password placeholder="请输入新密码" />
+          <el-input v-model="userForm.password" placeholder="请输入新密码" show-password type="password"/>
         </el-form-item>
         <el-form-item v-if="isEdit" label="">
           <el-checkbox v-model="userForm.changePassword">修改密码</el-checkbox>
         </el-form-item>
         <el-form-item label="姓名" prop="name">
-          <el-input v-model="userForm.name" placeholder="请输入姓名" />
+          <el-input v-model="userForm.name" placeholder="请输入姓名"/>
         </el-form-item>
         <el-form-item label="性别" prop="gender">
           <el-radio-group v-model="userForm.gender">
@@ -460,16 +465,16 @@ onMounted(async () => {
           </el-radio-group>
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
-          <el-input v-model="userForm.email" placeholder="请输入邮箱" />
+          <el-input v-model="userForm.email" placeholder="请输入邮箱"/>
         </el-form-item>
         <el-form-item label="手机" prop="phone">
-          <el-input v-model="userForm.phone" placeholder="请输入手机号" />
+          <el-input v-model="userForm.phone" placeholder="请输入手机号"/>
         </el-form-item>
         <el-form-item label="部门" prop="department">
-          <el-input v-model="userForm.department" placeholder="请输入部门" />
+          <el-input v-model="userForm.department" placeholder="请输入部门"/>
         </el-form-item>
         <el-form-item label="岗位" prop="position">
-          <el-input v-model="userForm.position" placeholder="请输入岗位" />
+          <el-input v-model="userForm.position" placeholder="请输入岗位"/>
         </el-form-item>
         <el-form-item label="角色" prop="roleId">
           <el-select v-model="userForm.roleId" placeholder="请选择角色" style="width: 100%">
@@ -504,10 +509,10 @@ onMounted(async () => {
           <span>{{ passwordForm.username }}</span>
         </el-form-item>
         <el-form-item label="新密码" prop="password">
-          <el-input v-model="passwordForm.password" type="password" show-password placeholder="请输入新密码" />
+          <el-input v-model="passwordForm.password" placeholder="请输入新密码" show-password type="password"/>
         </el-form-item>
         <el-form-item label="确认密码" prop="confirmPassword">
-          <el-input v-model="passwordForm.confirmPassword" type="password" show-password placeholder="请确认密码" />
+          <el-input v-model="passwordForm.confirmPassword" placeholder="请确认密码" show-password type="password"/>
         </el-form-item>
       </el-form>
       <template #footer>

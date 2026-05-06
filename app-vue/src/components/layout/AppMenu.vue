@@ -1,12 +1,12 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 /**
  * 侧边栏菜单组件
  * 从后端加载菜单树，支持折叠和动态路由
  */
-import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { getMenuTree } from '@/api/modules/menu'
-import type { Menu } from '@/api/types'
+import {computed, onMounted, ref} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
+import {getMenuTree} from '@/api/modules/menu'
+import type {Menu} from '@/api/types'
 
 interface MenuItem {
   path: string;
@@ -38,8 +38,7 @@ async function loadMenus() {
     const res = await getMenuTree()
     const menus: Menu[] = res.data || []
     menuItems.value = convertToMenuItems(menus)
-  }
-  catch (error) {
+  } catch (error) {
     console.error('获取菜单失败', error)
     menuItems.value = []
   }
@@ -56,11 +55,9 @@ function convertToMenuItems(menus: Menu[]): MenuItem[] {
       // 后端返回 /dashboard 作为首页，实际路由是 /index
       if (menu.path === '/dashboard') {
         fullPath = '/index'
-      }
-      else if (menu.path.startsWith('/')) {
+      } else if (menu.path.startsWith('/')) {
         fullPath = menu.path
-      }
-      else {
+      } else {
         fullPath = `/${menu.path}`
       }
     }
@@ -100,8 +97,8 @@ onMounted(() => {
 
 <template>
   <el-menu
-    :default-active="defaultActive"
     :collapse="collapsed"
+    :default-active="defaultActive"
     :router="false"
     class="app-menu"
     @select="handleSelect"
@@ -110,7 +107,9 @@ onMounted(() => {
       <!-- 有子菜单的菜单项 -->
       <el-sub-menu v-if="item.children && item.children.length > 0" :index="String(item.id)">
         <template #title>
-          <el-icon><component :is="item.icon" /></el-icon>
+          <el-icon>
+            <component :is="item.icon"/>
+          </el-icon>
           <span>{{ item.title }}</span>
         </template>
         <el-menu-item
@@ -118,14 +117,18 @@ onMounted(() => {
           :key="child.id"
           :index="child.path"
         >
-          <el-icon><component :is="child.icon" /></el-icon>
+          <el-icon>
+            <component :is="child.icon"/>
+          </el-icon>
           <span>{{ child.title }}</span>
         </el-menu-item>
       </el-sub-menu>
 
       <!-- 无子菜单的菜单项 -->
       <el-menu-item v-else :index="item.path">
-        <el-icon><component :is="item.icon" /></el-icon>
+        <el-icon>
+          <component :is="item.icon"/>
+        </el-icon>
         <span>{{ item.title }}</span>
       </el-menu-item>
     </template>

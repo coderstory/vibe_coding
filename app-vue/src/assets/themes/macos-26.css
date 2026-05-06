@@ -252,13 +252,33 @@
 }
 
 /* ===== Icon Color Classes ===== */
-.icon-dashboard { color: var(--icon-dashboard); }
-.icon-system { color: var(--icon-system); }
-.icon-audit { color: var(--icon-audit); }
-.icon-business { color: var(--icon-business); }
-.icon-user { color: var(--icon-user); }
-.icon-role { color: var(--icon-role); }
-.icon-settings { color: var(--icon-settings); }
+.icon-dashboard {
+  color: var(--icon-dashboard);
+}
+
+.icon-system {
+  color: var(--icon-system);
+}
+
+.icon-audit {
+  color: var(--icon-audit);
+}
+
+.icon-business {
+  color: var(--icon-business);
+}
+
+.icon-user {
+  color: var(--icon-user);
+}
+
+.icon-role {
+  color: var(--icon-role);
+}
+
+.icon-settings {
+  color: var(--icon-settings);
+}
 
 /* ===== Zebra Striping for Tables ===== */
 .el-table--striped .el-table__body tr.el-table__row:nth-child(even) {
@@ -406,7 +426,7 @@
 /* ===== Global Transitions ===== */
 * {
   transition: background-color var(--el-transition-duration) var(--el-transition-function),
-              border-color var(--el-transition-duration) var(--el-transition-function),
-              color var(--el-transition-duration) var(--el-transition-function),
-              box-shadow var(--el-transition-duration) var(--el-transition-function);
+  border-color var(--el-transition-duration) var(--el-transition-function),
+  color var(--el-transition-duration) var(--el-transition-function),
+  box-shadow var(--el-transition-duration) var(--el-transition-function);
 }
