@@ -262,10 +262,6 @@ public class ActivityServiceImpl implements ActivityService {
 
     // ========== 类型转换工具方法 ==========
 
-    /**
-     * 安全解析 Long 类型
-     * 处理空值和转换异常
-     */
     private Long parseLong(Object value) {
         if (value == null || value.toString().isEmpty()) {
             return null;
@@ -277,10 +273,6 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
 
-    /**
-     * 安全解析 Integer 类型
-     * 处理空值和转换异常
-     */
     private Integer parseInteger(Object value) {
         if (value == null || value.toString().isEmpty()) {
             return 0;
@@ -292,10 +284,6 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
 
-    /**
-     * 安全解析 Boolean 类型
-     * 处理空值和转换异常
-     */
     private Boolean parseBoolean(Object value) {
         if (value == null || value.toString().isEmpty()) {
             return false;
@@ -303,10 +291,6 @@ public class ActivityServiceImpl implements ActivityService {
         return Boolean.parseBoolean(value.toString());
     }
 
-    /**
-     * 安全解析 LocalDateTime 类型
-     * 使用 ISO 格式解析，处理异常情况
-     */
     private LocalDateTime parseLocalDateTime(Object value) {
         if (value == null || value.toString().isEmpty()) {
             return null;
