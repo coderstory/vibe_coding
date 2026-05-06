@@ -201,15 +201,16 @@
 **Plans**: TBD
 
 ### Phase 23: 后端结构体优化
-**Goal**: 后端代码结构精简——合并零散工具类、删除无用 DTO/VO/实体字段、精简 Mapper XML、移除未引用的 Service 方法
+**Goal**: 后端代码结构精简——合并零散工具类、拆分臃肿大类、删除无用 DTO/VO/实体字段、精简 Mapper XML、移除未引用的 Service 方法
 **Depends on**: Phase 22（死代码清理后剩余代码引用关系清晰）
-**Requirements**: BAC-04, BAC-05, BAC-07, BAC-08
+**Requirements**: BAC-04, BAC-05, BAC-07, BAC-08, BAC-09, BAC-09
 **Success Criteria** (what must be TRUE):
   1. 合并后工具类（Util/Helper）的公共调用点功能无变化
-  2. 删除无用 DTO/VO 和冗余实体字段后 `./gradlew.bat build` 编译通过
-  3. Mapper XML 精简后所有现有数据库查询正常返回结果
-  4. 删除未引用 Service 方法后所有现有 Controller 接口功能完整
-  5. `./gradlew.bat test` 全部通过，测试覆盖率不低于清理前水平
+  2. 拆分后的大类各子类职责单一清晰，`./gradlew.bat build` 编译通过
+  3. 删除无用 DTO/VO 和冗余实体字段后编译通过
+  4. Mapper XML 精简后所有现有数据库查询正常返回结果
+  5. 删除未引用 Service 方法后所有现有 Controller 接口功能完整
+  6. `./gradlew.bat test` 全部通过，测试覆盖率不低于清理前水平
 **Plans**: TBD
 
 ### Phase 24: 前端代码清理

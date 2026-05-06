@@ -15,6 +15,7 @@
 - [ ] **BAC-06**: 删除注释掉的代码块
 - [ ] **BAC-07**: 精简冗余的 Mapper XML 映射配置
 - [ ] **BAC-08**: 检查并删除未被任何 Controller 引用的 Service 方法
+- [ ] **BAC-09**: 拆分过于臃肿的大类（上帝类），按职责拆分为多个小类
 
 ### 前端代码清理 (FEC)
 
@@ -64,6 +65,7 @@
 | BAC-06 | Phase 22 | Pending |
 | BAC-07 | Phase 23 | Pending |
 | BAC-08 | Phase 23 | Pending |
+| BAC-09 | Phase 23 | Pending |
 | FEC-01 | Phase 24 | Pending |
 | FEC-02 | Phase 24 | Pending |
 | FEC-03 | Phase 24 | Pending |
@@ -80,8 +82,8 @@
 | COC-03 | Phase 26 | Pending |
 
 **Coverage:**
-- v1.6 requirements: 22 total
-- Mapped to phases: 22
+- v1.6 requirements: 23 total
+- Mapped to phases: 23
 - Unmapped: 0
 
 ---
