@@ -2,7 +2,7 @@ package cn.coderstory.springboot.order.controller;
 
 import cn.coderstory.springboot.order.entity.Order;
 import cn.coderstory.springboot.order.service.OrderService;
-import cn.coderstory.springboot.vo.ApiResponse;
+import cn.coderstory.springboot.shared.vo.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;

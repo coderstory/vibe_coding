@@ -1,6 +1,6 @@
 package cn.coderstory.springboot.monitor.controller;
 
-import cn.coderstory.springboot.vo.ApiResponse;
+import cn.coderstory.springboot.shared.vo.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;

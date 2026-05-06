@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.coderstory.springboot.mapper.UserMapper">
+<mapper namespace="cn.coderstory.springboot.user.mapper.UserMapper">
 
-    <resultMap id="UserVO" type="cn.coderstory.springboot.vo.UserVO">
+    <resultMap id="UserVO" type="cn.coderstory.springboot.user.dto.UserVO">
         <id column="id" property="id"/>
         <result column="username" property="username"/>
         <result column="nickname" property="nickname"/>
@@ -23,7 +23,7 @@
         WHERE u.id = #{id} AND u.deleted = 0
     </select>
 
-    <select id="findByUsername" resultType="cn.coderstory.springboot.entity.User">
+    <select id="findByUsername" resultType="cn.coderstory.springboot.user.entity.User">
         SELECT *
         FROM sys_user
         WHERE username = #{username} AND deleted = 0
