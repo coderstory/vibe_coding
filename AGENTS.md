@@ -2,12 +2,28 @@
 
 本文件为 AI 编码代理提供项目规范和代码风格指南。
 
-## 交互要求
+## AI 通信配置
 
-1. **全程思考使用中文**
-2. 当前操作系统是windows，调用shell时，**禁止生成bash命令**，而是使用**PowerShell 7 命令**：`pwsh -Command "your command"`
-3. 回复简洁直接，不确定的主动询问
-4. 当前只能使用MiniMax-M2.7模型，禁止调用gpt系列模型
+### 默认语言设置
+- **首选语言：中文** - AI 默认使用简体中文进行所有沟通
+- **自动检测：** AI 会自动识别上下文并优先使用中文
+- **强制切换：** 如检测到英文输出，AI 会立即纠正为中文
+
+### 交互要求
+
+1. **全程使用中文沟通** - 所有输出必须使用中文，包括回复内容、代码注释、错误信息、文档描述
+2. **禁止输出英文** - 除非：用户明确要求、代码本身是英文、技术术语无公认中文翻译
+3. **系统环境** - 当前操作系统是 Windows，调用 shell 时，**禁止使用 bash 命令**，而是使用 **PowerShell 7 命令**：`pwsh -Command "your command"`
+4. **回复风格** - 简洁直接，不确定的主动询问
+5. **AI 框架** - 优先使用 Superpowers-ZH 技能框架进行中文优化
+6. **模型限制** - 当前只能使用 MiniMax-M2.7 模型，禁止调用 gpt 系列模型
+
+## 语言检测与纠正
+
+如果发现自己即将输出英文，应立即切换为中文：
+- "I'll..." → "我将..."
+- "Error:" → "错误："
+- "Loading..." → "加载中..."
 
 ---
 
@@ -16,7 +32,7 @@
 | 模块 | 技术栈 | 版本 |
 |------|--------|------|
 | **app-vue** | Vue 3.5 + Vite 8 + TypeScript | 0.0.0 |
-| **springboot** | Spring Boot 4.0.5 + Java 21 | 0.0.1-SNAPSHOT |
+| **springboot** | Spring Boot 4.0.5 + Java 26 + Gradle 9.4 | 0.0.1-SNAPSHOT |
 
 **核心功能**：系统管理、知识库、秒杀系统、审计日志
 
@@ -81,9 +97,9 @@ npm run lint       # Lint 检查
 
 ```powershell
 cd springboot
-.\mvnw.cmd spring-boot:run    # 运行应用
-.\mvnw.cmd package            # 打包
-.\mvnw.cmd package -DskipTests  # 跳过测试打包
+gradlew.bat bootRun          # 运行应用
+gradlew.bat build            # 打包
+gradlew.bat build -x test    # 跳过测试打包
 ```
 
 ---
@@ -211,7 +227,7 @@ public class KnowledgeServiceImpl implements KnowledgeService {
 ## 技术要求
 
 - **前端**：Node.js v20.19+ / v22.12+
-- **后端**：Java 21+
+- **后端**：Java 26+ / Gradle 9.4+ (Maven 已废弃)
 - **数据库**：MySQL（`admin_system`，默认 root/123456）
 - **缓存**：Redis 8.0+（秒杀必需）
 - **消息队列**：RocketMQ 5.3.2（秒杀必需）
@@ -225,3 +241,4 @@ public class KnowledgeServiceImpl implements KnowledgeService {
 - **2026-04-02**: 集成 Flyway 数据库迁移
 - **2026-04-20**: 更新目录结构、知识库模块、审计系统
 - **2026-04-28**: 添加秒杀系统、浏览器自动化指南
+- **2026-04-29**: 后端从 Maven 迁移到 Gradle（Spring Boot 4.0.5 + JDK 26 + Gradle 9.4）

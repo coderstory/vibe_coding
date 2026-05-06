@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pwsh *)",
+      "Bash(git -C springboot branch -a)",
+      "Bash(git *)",
+      "Skill(update-config)",
+      "Skill(gsd:plan-phase)",
+      "Skill(gsd:execute-phase)",
+      "Bash(./gradlew.bat --version)",
+      "Bash(./gradlew.bat tasks *)",
+      "Bash(mkdir -p gradle)",
+      "Bash(mv springboot/gradle/libs.versions.toml gradle/libs.versions.toml)",
+      "Bash(rmdir springboot/gradle)",
+      "Bash(./gradlew.bat :springboot:tasks --no-daemon)",
+      "Bash(./gradlew.bat build *)",
+      "Bash(./gradlew.bat build *)",
+      "Bash(java *)",
+      "Bash(curl *)",
+      "Bash(./gradlew.bat test *)",
+      "Bash(./gradlew.bat cleanTest test --info)",
+      "Bash(./gradlew.bat cleanTest *)",
+      "Bash(./gradlew.bat dependencies *)",
+      "Bash(javap -verbose -cp build/classes/java/test cn.coderstory.springboot.PasswordHashTest)",
+      "Bash(./gradlew.bat clean *)",
+      "Bash(cygpath -w /tmp)",
+      "Bash(echo -cp)",
+      "Bash(echo \"D:\\\\\\\\Data\\\\\\\\桌面\\\\\\\\vibe_coding\\\\\\\\springboot\\\\\\\\build\\\\\\\\classes\\\\\\\\java\\\\\\\\test;D:\\\\\\\\Data\\\\\\\\桌面\\\\\\\\vibe_coding\\\\\\\\springboot\\\\\\\\build\\\\\\\\classes\\\\\\\\java\\\\\\\\main;D:\\\\\\\\Data\\\\\\\\桌面\\\\\\\\vibe_coding\\\\\\\\springboot\\\\\\\\build\\\\\\\\resources\\\\\\\\main;/tmp\")",
+      "Bash(xxd /c/Users/coder/.gradle/.tmp/gradle-worker-classpath9749870557537219802txt)",
+      "Bash(mysqladmin ping *)",
+      "Bash(redis-cli -h 127.0.0.1 -p 6379 ping)",
+      "Bash(cmd //c \"where mysql 2>&1\")",
+      "Bash(cmd //c \"where mysqladmin 2>&1\")",
+      "Bash(cmd //c \"where redis-cli 2>&1\")",
+      "Bash(cmd //c \"netstat -an | findstr 3306\")",
+      "Bash(cmd //c \"netstat -an | findstr 6379\")",
+      "Bash(cmd //c \"netstat -an | findstr 9876\")",
+      "Bash(./gradlew.bat bootRun)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'code={d.get\\(\\\\\"code\\\\\"\\)}'\\)\")",
+      "Bash(cmd *)"
+    ]
+  }
+}

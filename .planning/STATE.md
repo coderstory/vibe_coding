@@ -1,42 +1,54 @@
+---
+gsd_state_version: 1.0
+milestone: v1.4
+milestone_name: Maven→Gradle + Spring Boot 4.1 升级
+status: planning
+last_updated: "2026-05-06T15:00:33.072Z"
+last_activity: 2026-04-30 — Phase 15 completed
+progress:
+  total_phases: 4
+  completed_phases: 3
+  total_plans: 10
+  completed_plans: 7
+  percent: 70
+---
+
 ## Current Position
 
-Phase: 12 — 监控面板
-Plan: 1/1 completed
-Status: Phase 12 completed, v1.3 milestone complete
-Last activity: 2026-04-29 — v1.3 RocketMQ 管理功能完成
+Phase: 16 (构建验证)
+Plan: —
+Status: Ready to plan
+Last activity: 2026-04-30 — Phase 15 completed
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-04-29)
-See: .planning/ROADMAP.md (v1.3 completed)
 See: .planning/MILESTONES.md
+See: .planning/REQUIREMENTS.md (v1.4 requirements defined)
+See: .planning/ROADMAP.md (4 phases planned)
 
 **Core value:** 提供清晰、高效的企业级管理后台界面，通过夏日海滩风主题营造清爽专业的视觉体验。
 
-**Current focus:** v1.3 完成，等待下一里程碑规划
+**Current focus:** v1.4 Maven→Gradle + Spring Boot 4.1 升级
 
 ## Phase Context
 
-| Phase | Directory | Status |
-|-------|-----------|--------|
-| Phase 9 | 09-topic-mgmt | Completed |
-| Phase 10 | 10-consumer-group-mgmt | Completed |
-| Phase 11 | 11-msg-mgmt | Completed |
-| Phase 12 | 12-monitoring | Completed |
+| Phase | Name | Status | Directory |
+|-------|------|--------|-----------|
+| 13 | 迁移准备 | Pending | .planning/phases/13-migration-prep |
+| 14 | 依赖升级 | Pending | .planning/phases/14-dependency-upgrade |
+| 15 | 配置迁移 | Complete | .planning/phases/15-config-migration |
+| 16 | 构建验证 | Pending | .planning/phases/16-build-verification |
 
 ## Roadmap Summary
 
 | Phase | 名称 | 任务数 | 状态 |
 |-------|------|--------|------|
-| Phase 9 | Topic 管理 | - | Completed |
-| Phase 10 | Consumer Group 管理 | - | Completed |
-| Phase 11 | 消息管理 | - | Completed |
-| Phase 12 | 监控面板 | - | Completed |
+| 13 | 迁移准备 | 5 | Pending |
+| 14 | 依赖升级 | 7 | Pending |
+| 15 | 配置迁移 | 6 | Pending |
+| 16 | 构建验证 | 14 | Pending |
 
-**v1.3 已完成：4 phases, 全部完成 ✓**
+**v1.4 进行中：4 phases, 34 requirements**
 
 ## Key Decisions Made
-
-- RocketMQ 管理界面采用自建模式（不同于集成 Dashboard）
-- 保持夏日海滩风主题统一风格
-- 使用 ApiResponse 统一响应格式

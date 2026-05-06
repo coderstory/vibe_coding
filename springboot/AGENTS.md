@@ -10,6 +10,7 @@
 |------|------|
 | Spring Boot | 4.0.5 |
 | Java | 26 |
+| Gradle | 9.4 |
 | MyBatis Plus | 3.5.x |
 | Flyway | 数据库迁移 |
 | JWT | 认证 |
@@ -21,19 +22,19 @@
 ```powershell
 # Windows
 cd springboot
-.\mvnw.cmd spring-boot:run
+gradlew.bat bootRun
 
 # 编译打包
-mvn package
+gradlew.bat build
 
 # 运行所有测试
-mvn test
+gradlew.bat test
 
 # 运行单个测试类
-mvn test -Dtest=SpringbootApplicationTests
+gradlew.bat test --tests SpringbootApplicationTests
 
 # 跳过测试打包
-mvn package -DskipTests
+gradlew.bat build -x test
 ```
 
 ---
