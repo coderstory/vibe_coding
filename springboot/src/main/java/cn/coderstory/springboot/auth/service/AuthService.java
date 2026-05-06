@@ -1,11 +1,11 @@
 package cn.coderstory.springboot.auth.service;
 
-import cn.coderstory.springboot.user.entity.User;
+import cn.coderstory.springboot.audit.service.AuditService;
 import cn.coderstory.springboot.shared.exception.BusinessException;
-import cn.coderstory.springboot.user.mapper.UserMapper;
 import cn.coderstory.springboot.shared.security.JwtTokenProvider;
 import cn.coderstory.springboot.shared.security.PasswordEncoder;
-import cn.coderstory.springboot.audit.service.AuditService;
+import cn.coderstory.springboot.user.entity.User;
+import cn.coderstory.springboot.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,7 +43,7 @@ public class AuthService {
 
         // 记录登录审计日志
         auditService.log(user.getId(), user.getUsername(), "LOGIN", "USER",
-                String.valueOf(user.getId()), ipAddress);
+            String.valueOf(user.getId()), ipAddress);
 
         Map<String, Object> data = new HashMap<>();
         data.put("token", token);
@@ -96,7 +96,7 @@ public class AuthService {
     public void logout(Long userId, String username, String ipAddress) {
         if (userId != null) {
             auditService.log(userId, username, "LOGOUT", "USER",
-                    String.valueOf(userId), ipAddress);
+                String.valueOf(userId), ipAddress);
         }
     }
 

@@ -1,7 +1,7 @@
 package cn.coderstory.springboot.limiter;
-import cn.coderstory.springboot.shared.limiter.QpsLimiter;
 
 import cn.coderstory.springboot.SpringbootApplication;
+import cn.coderstory.springboot.shared.limiter.QpsLimiter;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,11 +10,11 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * QpsLimiter 集成测试
- *
+ * <p>
  * 使用 @SpringBootTest 进行集成测试，连接实际 Redis
  * 测试数据会在 @AfterEach 中清理
  *
@@ -27,13 +27,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class QpsLimiterTest {
 
+    private final Set<String> testKeys = new HashSet<>();
     @Autowired
     private QpsLimiter qpsLimiter;
-
     @Autowired
     private StringRedisTemplate redisTemplate;
-
-    private final Set<String> testKeys = new HashSet<>();
 
     @AfterEach
     void tearDown() {

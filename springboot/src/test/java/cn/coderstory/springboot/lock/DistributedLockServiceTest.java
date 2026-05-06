@@ -1,7 +1,7 @@
 package cn.coderstory.springboot.lock;
-import cn.coderstory.springboot.shared.lock.DistributedLockService;
 
 import cn.coderstory.springboot.SpringbootApplication;
+import cn.coderstory.springboot.shared.lock.DistributedLockService;
 import org.junit.jupiter.api.*;
 import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * DistributedLockService 集成测试
- *
+ * <p>
  * 使用 @SpringBootTest 进行集成测试，连接实际 Redis
  * 测试数据会在 @AfterEach 中清理
  *
@@ -31,13 +31,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class DistributedLockServiceTest {
 
+    private final Set<String> testLockKeys = new HashSet<>();
     @Autowired
     private DistributedLockService distributedLockService;
-
     @Autowired
     private StringRedisTemplate redisTemplate;
-
-    private final Set<String> testLockKeys = new HashSet<>();
 
     @AfterEach
     void tearDown() {

@@ -32,9 +32,9 @@ public class RoleController {
      */
     @GetMapping
     public ResponseEntity<ApiResponse<Map<String, Object>>> getRolePage(
-            @RequestParam(required = false) String roleName,
-            @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "20") Integer size) {
+        @RequestParam(required = false) String roleName,
+        @RequestParam(defaultValue = "1") Integer page,
+        @RequestParam(defaultValue = "20") Integer size) {
 
         Page<Role> pageParam = new Page<>(page, size);
         IPage<Role> result = roleService.getRolePage(pageParam, roleName);
@@ -114,8 +114,8 @@ public class RoleController {
      */
     @PutMapping("/{id}/menus")
     public ResponseEntity<ApiResponse<Void>> assignMenus(
-            @PathVariable Long id,
-            @RequestBody Map<String, List<Long>> request) {
+        @PathVariable Long id,
+        @RequestBody Map<String, List<Long>> request) {
 
         List<Long> menuIds = request.get("menuIds");
         boolean success = roleService.assignMenus(id, menuIds);

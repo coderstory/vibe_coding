@@ -4,7 +4,8 @@ import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.lang.ArchRule;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
+
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 /**
  * 架构规则测试 — 确保分层依赖关系正确。

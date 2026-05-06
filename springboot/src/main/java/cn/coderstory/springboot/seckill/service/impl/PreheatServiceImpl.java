@@ -20,22 +20,22 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 秒杀活动预热服务
- *
+ * <p>
  * 核心功能：
  * 在活动发布前，将活动信息和商品库存预先加载到 Redis
  * 这样秒杀开始后，系统可以直接从 Redis 读取，不用查数据库
- *
+ * <p>
  * 设计理念："秒杀过程不操作数据库"
  * - 预热阶段：数据库 -> Redis
  * - 秒杀阶段：全部读写 Redis，不碰数据库
  * - 数据库只在活动发布和结算时使用
- *
+ * <p>
  * Redis 数据结构设计：
  * | Key 前缀              | 类型   | 说明                          |
  * | seckill:activity:{id} | Hash   | 活动详情（预热时写入）         |
  * | seckill:stock:{goodsId} | String | 商品库存（预热时写入）         |
  * | seckill:reservation:{activityId} | Set | 预约用户ID集合               |
- *
+ * <p>
  * 预热时机：
  * - 管理员在后台发布活动时调用 /api/seckill/activity/{id}/publish
  * - publishActivity() 会自动调用 preheatActivity() 进行预热
@@ -47,16 +47,24 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class PreheatServiceImpl implements PreheatService {
 
-    /** Redis 中商品库存的 Key 前缀，格式：seckill:stock:{goodsId} */
+    /**
+     * Redis 中商品库存的 Key 前缀，格式：seckill:stock:{goodsId}
+     */
     private static final String STOCK_KEY_PREFIX = "seckill:stock:";
 
-    /** Redis 中活动信息的 Key 前缀，格式：seckill:activity:{activityId} */
+    /**
+     * Redis 中活动信息的 Key 前缀，格式：seckill:activity:{activityId}
+     */
     private static final String ACTIVITY_KEY_PREFIX = "seckill:activity:";
 
-    /** Redis 中预约信息的 Key 前缀，格式：seckill:reservation:{activityId} */
+    /**
+     * Redis 中预约信息的 Key 前缀，格式：seckill:reservation:{activityId}
+     */
     private static final String RESERVATION_KEY_PREFIX = "seckill:reservation:";
 
-    /** 活动缓存过期时间基数：活动结束后额外保留1小时 */
+    /**
+     * 活动缓存过期时间基数：活动结束后额外保留1小时
+     */
     private static final long ACTIVITY_CACHE_EXPIRE_HOURS = 1;
 
     private final SeckillActivityMapper activityMapper;
@@ -66,14 +74,14 @@ public class PreheatServiceImpl implements PreheatService {
 
     /**
      * 预热活动数据和商品库存到 Redis
-     *
+     * <p>
      * 预热流程：
      * 1. 从数据库读取活动信息
      * 2. 查询该活动关联的所有商品
      * 3. 将每个商品的库存写入 Redis（String 类型）
      * 4. 将活动详情写入 Redis（Hash 类型）
      * 5. 设置过期时间
-     *
+     * <p>
      * 为什么分开存储？
      * - 库存需要频繁读写（每次抢购都要扣减），用 String 类型更方便用 DECR 命令
      * - 活动详情只需要读取，用 Hash 可以按字段获取，且方便管理
@@ -132,7 +140,7 @@ public class PreheatServiceImpl implements PreheatService {
 
     /**
      * 预热活动的预约用户到 Redis Set
-     *
+     * <p>
      * Redis Set 用于快速判断用户是否已预约
      * - SISMEMBER: O(1) 判断用户是否已预约
      * - SCARD: O(1) 获取预约人数
@@ -162,8 +170,8 @@ public class PreheatServiceImpl implements PreheatService {
 
         // 设置过期时间（与活动缓存一致）
         long expireSeconds = calculateExpireSeconds(
-                activityMapper.selectById(activityId).getEndTime(),
-                ACTIVITY_CACHE_EXPIRE_HOURS
+            activityMapper.selectById(activityId).getEndTime(),
+            ACTIVITY_CACHE_EXPIRE_HOURS
         );
         redisTemplate.expire(reservationKey, expireSeconds, TimeUnit.SECONDS);
 
@@ -172,11 +180,11 @@ public class PreheatServiceImpl implements PreheatService {
 
     /**
      * 计算缓存过期时间
-     *
+     * <p>
      * 过期时间 = 活动结束时间 - 当前时间 + 额外缓冲时间
      * 最短保留下限：extraHours * 3600 秒
      *
-     * @param endTime 活动结束时间
+     * @param endTime    活动结束时间
      * @param extraHours 活动结束后额外保留的小时数
      * @return 过期秒数（保证至少等于 extraHours * 3600）
      */
@@ -187,8 +195,8 @@ public class PreheatServiceImpl implements PreheatService {
         }
         // 计算到活动结束后 extraHours 小时的秒数
         long seconds = java.time.Duration.between(
-                java.time.LocalDateTime.now(),
-                endTime.plusHours(extraHours)
+            java.time.LocalDateTime.now(),
+            endTime.plusHours(extraHours)
         ).getSeconds();
         // 确保至少有 extraHours 小时，防止负数或过短的有效期
         return Math.max(seconds, extraHours * 3600);
@@ -196,7 +204,7 @@ public class PreheatServiceImpl implements PreheatService {
 
     /**
      * 获取预热状态
-     *
+     * <p>
      * 用于管理后台查看活动是否已预热、预热了多少商品等
      *
      * @param activityId 活动ID
@@ -243,10 +251,10 @@ public class PreheatServiceImpl implements PreheatService {
 
     /**
      * 获取活动的总库存
-     *
+     * <p>
      * 从 Redis 读取所有关联商品的库存并求和
      * 这是秒杀详情页显示库存的接口
-     *
+     * <p>
      * 注意：这里只计算已预热的商品库存
      * 如果 Redis 中没有某个商品的库存数据，说明还没预热，不计入
      *
@@ -278,7 +286,7 @@ public class PreheatServiceImpl implements PreheatService {
 
     /**
      * 获取活动预约人数
-     *
+     * <p>
      * 从 Redis Set 获取基数（SCARD）
      *
      * @param activityId 活动ID
@@ -293,11 +301,11 @@ public class PreheatServiceImpl implements PreheatService {
 
     /**
      * 检查用户是否已预约
-     *
+     * <p>
      * 使用 SISMEMBER 命令，O(1) 时间复杂度
      *
      * @param activityId 活动ID
-     * @param userId 用户ID
+     * @param userId     用户ID
      * @return true=已预约，false=未预约
      */
     @Override
@@ -309,11 +317,11 @@ public class PreheatServiceImpl implements PreheatService {
 
     /**
      * 添加用户到活动的预约集合
-     *
+     * <p>
      * 当用户预约成功时，调用此方法将用户ID添加到 Redis Set
      *
      * @param activityId 活动ID
-     * @param userId 用户ID
+     * @param userId     用户ID
      */
     @Override
     public void addReservation(Long activityId, Long userId) {

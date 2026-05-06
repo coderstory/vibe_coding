@@ -1,16 +1,16 @@
 package cn.coderstory.springboot.rocketmq.service.impl;
 
-import cn.coderstory.springboot.shared.exception.BusinessException;
 import cn.coderstory.springboot.rocketmq.service.RocketMQAdminService;
+import cn.coderstory.springboot.shared.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.QueryResult;
 import org.apache.rocketmq.client.consumer.DefaultMQPullConsumer;
 import org.apache.rocketmq.client.consumer.PullResult;
+import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.common.TopicConfig;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.common.message.MessageQueue;
-import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.remoting.protocol.admin.ConsumeStats;
 import org.apache.rocketmq.remoting.protocol.body.ClusterInfo;
 import org.apache.rocketmq.remoting.protocol.body.KVTable;
@@ -28,7 +28,7 @@ import java.util.*;
 /**
  * RocketMQ Admin 服务实现
  * 使用 DefaultMQAdminExt 实现 Topic 管理功能
- *
+ * <p>
  * 注意: 此实现需要 rocketmq-tools 依赖
  */
 @Slf4j
@@ -64,8 +64,8 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
      */
     private boolean isSystemTopic(String topicName) {
         return SYSTEM_TOPIC_PREFIXES.stream().anyMatch(topicName::startsWith) ||
-               topicName.contains("_BACKUP") ||
-               topicName.equals("DEFAULT_TOPIC");
+            topicName.contains("_BACKUP") ||
+            topicName.equals("DEFAULT_TOPIC");
     }
 
     /**
@@ -73,9 +73,9 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
      */
     private boolean isSystemGroup(String groupName) {
         return SYSTEM_GROUP_PREFIXES.stream().anyMatch(groupName::startsWith) ||
-               groupName.contains("CID_ONSAPI") ||
-               groupName.contains("OWNER") ||
-               groupName.contains("_BACKUP");
+            groupName.contains("CID_ONSAPI") ||
+            groupName.contains("OWNER") ||
+            groupName.contains("_BACKUP");
     }
 
     @Override
@@ -100,7 +100,7 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
 
                 // 过滤关键字
                 if (keyword != null && !keyword.isEmpty()
-                        && !topicName.toLowerCase().contains(keyword.toLowerCase())) {
+                    && !topicName.toLowerCase().contains(keyword.toLowerCase())) {
                     continue;
                 }
 
@@ -253,7 +253,7 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
             }
 
             log.info("创建 Topic 成功: {}, queueCount: {}, perm: {}, 成功创建 Broker 数: {}",
-                    topicName, queueCount, perm, successCount);
+                topicName, queueCount, perm, successCount);
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
@@ -380,7 +380,7 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
 
                 // 过滤关键字
                 if (keyword != null && !keyword.isEmpty()
-                        && !group.toLowerCase().contains(keyword.toLowerCase())) {
+                    && !group.toLowerCase().contains(keyword.toLowerCase())) {
                     continue;
                 }
 
@@ -418,7 +418,7 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
                     item.put("groupType", "UNKNOWN");
                     item.put("status", "OFFLINE");
                 }
-                    item.put("status", "OK");
+                item.put("status", "OK");
 
 
                 result.add(item);
@@ -614,7 +614,9 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
             log.info("查询 Topic {} 的队列，数量: {}", topic, mqs.size());
 
             for (MessageQueue mq : mqs) {
-                if (result.size() >= maxMsg) { break; }
+                if (result.size() >= maxMsg) {
+                    break;
+                }
 
                 try {
                     long minOffset = consumer.minOffset(mq);
@@ -640,7 +642,9 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
                             }
 
                             for (MessageExt msg : pullResult.getMsgFoundList()) {
-                                if (result.size() >= maxMsg) { break; }
+                                if (result.size() >= maxMsg) {
+                                    break;
+                                }
 
                                 long storeTime = msg.getStoreTimestamp();
                                 // 按时间范围过滤
@@ -868,7 +872,7 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
                         try {
                             ConsumeStats stats = defaultMQAdminExt.examineConsumeStats(group);
                             if (stats != null && stats.getOffsetTable() != null) {
-                                for ( var entry : stats.getOffsetTable().entrySet()) {
+                                for (var entry : stats.getOffsetTable().entrySet()) {
                                     long brokerOffset = entry.getValue().getBrokerOffset();
                                     long consumerOffset = entry.getValue().getConsumerOffset();
                                     long diff = brokerOffset - consumerOffset;
@@ -918,7 +922,7 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
             result.put("total", brokers.size());
             return result;
         } catch (Exception e) {
-           log.error("获取 Broker 状态列表失败", e);
+            log.error("获取 Broker 状态列表失败", e);
             throw BusinessException.badRequest("获取 Broker 状态列表失败: " + e.getMessage());
         }
     }
@@ -941,7 +945,9 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
             Map<String, Long> topicDiffMap = new HashMap<>();
             for (var entry : subGroupWrapper.getSubscriptionGroupTable().entrySet()) {
                 String group = entry.getKey();
-                if (isSystemGroup(group)) { continue; }
+                if (isSystemGroup(group)) {
+                    continue;
+                }
 
                 try {
                     ConsumeStats stats = defaultMQAdminExt.examineConsumeStats(group);
@@ -964,7 +970,9 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
             // 获取 Topic 列表
             TopicList topicList = defaultMQAdminExt.fetchAllTopicList();
             for (String topicName : topicList.getTopicList()) {
-                if (isSystemTopic(topicName)) { continue; }
+                if (isSystemTopic(topicName)) {
+                    continue;
+                }
 
                 Map<String, Object> topic = new HashMap<>();
                 topic.put("topicName", topicName);
@@ -1032,7 +1040,7 @@ public class RocketMQAdminServiceImpl implements RocketMQAdminService {
             // 构造 10 个数据点（模拟实时监控）
             long now = System.currentTimeMillis();
             for (int i = 9; i >= 0; i--) {
-                times.add(now - i * 1000);
+                times.add(now - i * 1000L);
                 // 解析当前 TPS 值，加入小幅随机波动
                 double baseSendTps = parseTpsValue(statsTable.get("putTps"));
                 double baseConsumeTps = parseTpsValue(statsTable.get("getFoundTps"));

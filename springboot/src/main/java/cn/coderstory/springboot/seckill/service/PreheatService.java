@@ -27,18 +27,18 @@ public interface PreheatService {
      * 检查用户是否已预约
      *
      * @param activityId 活动ID
-     * @param userId 用户ID
+     * @param userId     用户ID
      * @return true=已预约，false=未预约
      */
     boolean isUserReserved(Long activityId, Long userId);
 
     /**
      * 添加用户到活动的预约集合
-     *
+     * <p>
      * 当用户预约时，调用此方法将用户ID添加到 Redis Set
      *
      * @param activityId 活动ID
-     * @param userId 用户ID
+     * @param userId     用户ID
      */
     void addReservation(Long activityId, Long userId);
 }

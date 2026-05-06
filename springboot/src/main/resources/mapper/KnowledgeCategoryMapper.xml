@@ -8,5 +8,5 @@
         WHERE deleted = 0
         ORDER BY sort_order ASC
     </select>
-    
+
 </mapper>

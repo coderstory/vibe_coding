@@ -1,8 +1,5 @@
 package cn.coderstory.springboot.seckill.service.impl;
 
-import cn.coderstory.springboot.shared.exception.BusinessException;
-import cn.coderstory.springboot.shared.lock.DistributedLockService;
-import cn.coderstory.springboot.shared.lock.impl.DistributedLockServiceImpl;
 import cn.coderstory.springboot.seckill.entity.SeckillActivity;
 import cn.coderstory.springboot.seckill.entity.SeckillGoods;
 import cn.coderstory.springboot.seckill.mapper.SeckillActivityMapper;
@@ -10,6 +7,9 @@ import cn.coderstory.springboot.seckill.service.ActivityService;
 import cn.coderstory.springboot.seckill.service.GoodsService;
 import cn.coderstory.springboot.seckill.service.PreheatService;
 import cn.coderstory.springboot.seckill.vo.ActivityDetailVO;
+import cn.coderstory.springboot.shared.exception.BusinessException;
+import cn.coderstory.springboot.shared.lock.DistributedLockService;
+import cn.coderstory.springboot.shared.lock.impl.DistributedLockServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -27,17 +27,17 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 秒杀活动服务实现类
- *
+ * <p>
  * 核心功能：
  * 1. 活动 CRUD 操作
  * 2. 活动详情缓存（Redis Hash 存储）
  * 3. 分布式锁防止缓存击穿
- *
+ * <p>
  * 缓存策略说明：
  * - 活动发布时，PreheatService 会将活动信息预热到 Redis Hash
  * - 读取活动时，优先从 Redis 读取，缓存不存在时使用分布式锁查库
  * - 使用分布式锁防止缓存击穿（大量请求同时发现缓存不存在，都去查库）
- *
+ * <p>
  * Redis Key 设计：
  * - seckill:activity:{id} - 存储活动详情（Hash 类型）
  *
@@ -48,7 +48,9 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class ActivityServiceImpl implements ActivityService {
 
-    /** Redis 中活动缓存的 Key 前缀 */
+    /**
+     * Redis 中活动缓存的 Key 前缀
+     */
     private static final String ACTIVITY_KEY_PREFIX = "seckill:activity:";
 
     private final SeckillActivityMapper activityMapper;
@@ -59,7 +61,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     /**
      * 获取活动详情（带缓存和分布式锁）
-     *
+     * <p>
      * 读取流程：
      * 1. 先尝试从 Redis Hash 读取活动信息
      * 2. 缓存不存在时，使用分布式锁防止缓存击穿
@@ -82,31 +84,31 @@ public class ActivityServiceImpl implements ActivityService {
         // 只有获取到锁的线程才能查库并回填缓存，其他线程需要等待
         String lockKey = DistributedLockServiceImpl.getActivityLockKey(activityId);
         SeckillActivity result = distributedLockService.executeWithLock(
-                lockKey,                      // 锁的 key
-                5, TimeUnit.SECONDS,         // 锁的持有时间，防止死锁
-                () -> {
-                    // ===== 双重检查锁定（Double-Check Locking）=====
-                    // 获取锁后再次检查缓存，可能其他线程已经回填了缓存
-                    SeckillActivity cached = getActivityFromCache(activityId);
-                    if (cached != null) {
-                        return cached;
-                    }
-
-                    // 缓存仍然不存在，查数据库
-                    SeckillActivity activity = activityMapper.selectById(activityId);
-
-                    // MyBatis Plus 的 selectById 在数据不存在时返回空对象（字段为null）而非null
-                    // 所以需要额外检查 id 是否有效
-                    if (activity == null || activity.getId() == null) {
-                        log.warn("活动 {} 在数据库中不存在", activityId);
-                        return null;
-                    }
-
-                    // 查库成功后回填缓存，供后续请求使用
-                    saveActivityToCache(activity);
-                    log.debug("活动 {} 已从数据库读取并回填缓存", activityId);
-                    return activity;
+            lockKey,                      // 锁的 key
+            5, TimeUnit.SECONDS,         // 锁的持有时间，防止死锁
+            () -> {
+                // ===== 双重检查锁定（Double-Check Locking）=====
+                // 获取锁后再次检查缓存，可能其他线程已经回填了缓存
+                SeckillActivity cached = getActivityFromCache(activityId);
+                if (cached != null) {
+                    return cached;
                 }
+
+                // 缓存仍然不存在，查数据库
+                SeckillActivity activity = activityMapper.selectById(activityId);
+
+                // MyBatis Plus 的 selectById 在数据不存在时返回空对象（字段为null）而非null
+                // 所以需要额外检查 id 是否有效
+                if (activity == null || activity.getId() == null) {
+                    log.warn("活动 {} 在数据库中不存在", activityId);
+                    return null;
+                }
+
+                // 查库成功后回填缓存，供后续请求使用
+                saveActivityToCache(activity);
+                log.debug("活动 {} 已从数据库读取并回填缓存", activityId);
+                return activity;
+            }
         );
 
         // 查库后仍为 null，说明活动不存在
@@ -118,7 +120,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     /**
      * 获取活动详情（包含商品信息）
-     *
+     * <p>
      * 用于秒杀详情页，返回活动信息及关联的商品
      * 一个活动只关联一个商品
      *
@@ -154,7 +156,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     /**
      * 从 Redis Hash 读取活动缓存
-     *
+     * <p>
      * Redis 数据结构：
      * - Key: seckill:activity:{id}
      * - Type: Hash
@@ -209,7 +211,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     /**
      * 保存活动信息到 Redis Hash
-     *
+     * <p>
      * 使用 Hash 类型的好处是可以单独访问某个字段，
      * 比如只需要活动名称时不需要获取全部数据
      *
@@ -252,8 +254,8 @@ public class ActivityServiceImpl implements ActivityService {
         }
         // 计算到活动结束后1小时的秒数
         long seconds = java.time.Duration.between(
-                LocalDateTime.now(),
-                endTime.plusHours(1)
+            LocalDateTime.now(),
+            endTime.plusHours(1)
         ).getSeconds();
         return Math.max(seconds, 3600); // 确保至少1小时
     }
@@ -265,7 +267,9 @@ public class ActivityServiceImpl implements ActivityService {
      * 处理空值和转换异常
      */
     private Long parseLong(Object value) {
-        if (value == null || value.toString().isEmpty()) { return null; }
+        if (value == null || value.toString().isEmpty()) {
+            return null;
+        }
         try {
             return Long.parseLong(value.toString());
         } catch (NumberFormatException e) {
@@ -278,7 +282,9 @@ public class ActivityServiceImpl implements ActivityService {
      * 处理空值和转换异常
      */
     private Integer parseInteger(Object value) {
-        if (value == null || value.toString().isEmpty()) { return 0; }
+        if (value == null || value.toString().isEmpty()) {
+            return 0;
+        }
         try {
             return Integer.parseInt(value.toString());
         } catch (NumberFormatException e) {
@@ -291,7 +297,9 @@ public class ActivityServiceImpl implements ActivityService {
      * 处理空值和转换异常
      */
     private Boolean parseBoolean(Object value) {
-        if (value == null || value.toString().isEmpty()) { return false; }
+        if (value == null || value.toString().isEmpty()) {
+            return false;
+        }
         return Boolean.parseBoolean(value.toString());
     }
 
@@ -300,7 +308,9 @@ public class ActivityServiceImpl implements ActivityService {
      * 使用 ISO 格式解析，处理异常情况
      */
     private LocalDateTime parseLocalDateTime(Object value) {
-        if (value == null || value.toString().isEmpty()) { return null; }
+        if (value == null || value.toString().isEmpty()) {
+            return null;
+        }
         try {
             return LocalDateTime.parse(value.toString(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         } catch (Exception e) {
@@ -389,7 +399,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     /**
      * 结束活动（手动结束）
-     *
+     * <p>
      * 结束流程：
      * 1. 更新数据库状态为已结束（status=2）
      * 2. 删除 Redis 活动缓存（强制后续请求从 DB 读取最新状态）
@@ -420,7 +430,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     /**
      * 发布活动
-     *
+     * <p>
      * 发布流程：
      * 1. 检查活动是否已关联商品（至少要有一个商品才能发布）
      * 2. 更新活动状态为已发布
@@ -452,7 +462,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     /**
      * 获取活动总库存
-     *
+     * <p>
      * 库存数据来自 Redis（预热时写入），不查数据库
      *
      * @param activityId 活动ID

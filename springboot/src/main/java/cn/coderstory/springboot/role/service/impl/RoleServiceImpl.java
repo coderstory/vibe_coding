@@ -1,10 +1,10 @@
 package cn.coderstory.springboot.role.service.impl;
 
 import cn.coderstory.springboot.menu.entity.Menu;
+import cn.coderstory.springboot.menu.mapper.MenuMapper;
 import cn.coderstory.springboot.role.entity.Role;
 import cn.coderstory.springboot.role.entity.RoleMenuPermission;
 import cn.coderstory.springboot.role.mapper.RoleMapper;
-import cn.coderstory.springboot.menu.mapper.MenuMapper;
 import cn.coderstory.springboot.role.mapper.RoleMenuPermissionMapper;
 import cn.coderstory.springboot.role.service.RoleService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -14,22 +14,23 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class RoleServiceImpl implements RoleService {
-    
+
     private final RoleMapper roleMapper;
     private final MenuMapper menuMapper;
     private final RoleMenuPermissionMapper roleMenuPermissionMapper;
-    
+
     @Override
     public Role getById(Long id) {
         return roleMapper.selectById(id);
     }
-    
+
     @Override
     public IPage<Role> getRolePage(Page<Role> page, String roleName) {
         LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
@@ -39,33 +40,33 @@ public class RoleServiceImpl implements RoleService {
         wrapper.orderByDesc(Role::getCreateTime);
         return roleMapper.selectPage(page, wrapper);
     }
-    
+
     @Override
     public boolean saveRole(Role role) {
         return roleMapper.insert(role) > 0;
     }
-    
+
     @Override
     public boolean updateRole(Role role) {
         return roleMapper.updateById(role) > 0;
     }
-    
+
     @Override
     public boolean deleteRole(Long id) {
         return roleMapper.deleteById(id) > 0;
     }
-    
+
     @Override
     public List<Menu> getMenusByRoleId(Long roleId) {
         return menuMapper.selectByRoleId(roleId);
     }
-    
+
     @Override
     @Transactional
     public boolean assignMenus(Long roleId, List<Long> menuIds) {
         // Delete existing role-menu permissions
         roleMenuPermissionMapper.deleteByRoleId(roleId);
-        
+
         // Insert new permissions
         if (menuIds != null && !menuIds.isEmpty()) {
             for (Long menuId : menuIds) {
@@ -75,7 +76,7 @@ public class RoleServiceImpl implements RoleService {
                 roleMenuPermissionMapper.insert(rmp);
             }
         }
-        
+
         return true;
     }
 }

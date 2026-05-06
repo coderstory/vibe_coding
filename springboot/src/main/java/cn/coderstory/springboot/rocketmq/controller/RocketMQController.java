@@ -31,7 +31,7 @@ public class RocketMQController {
      */
     @GetMapping("/topics")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getTopicList(
-            @RequestParam(required = false) String keyword) {
+        @RequestParam(required = false) String keyword) {
         List<Map<String, Object>> list = rocketMQAdminService.getTopicList(keyword);
 
         Map<String, Object> data = new HashMap<>();
@@ -47,7 +47,7 @@ public class RocketMQController {
      */
     @GetMapping("/topics/{topicName}")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getTopicDetail(
-            @PathVariable String topicName) {
+        @PathVariable String topicName) {
         Map<String, Object> detail = rocketMQAdminService.getTopicDetail(topicName);
         return ResponseEntity.ok(ApiResponse.success(detail));
     }
@@ -92,7 +92,7 @@ public class RocketMQController {
      */
     @GetMapping("/consumer-groups")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getConsumerGroupList(
-            @RequestParam(required = false) String keyword) {
+        @RequestParam(required = false) String keyword) {
         List<Map<String, Object>> list = rocketMQAdminService.getConsumerGroupList(keyword);
 
         Map<String, Object> data = new HashMap<>();
@@ -108,7 +108,7 @@ public class RocketMQController {
      */
     @GetMapping("/consumer-groups/{group}")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getConsumerGroupDetail(
-            @PathVariable String group) {
+        @PathVariable String group) {
         Map<String, Object> detail = rocketMQAdminService.getConsumerGroupDetail(group);
         return ResponseEntity.ok(ApiResponse.success(detail));
     }
@@ -120,8 +120,8 @@ public class RocketMQController {
      */
     @PostMapping("/consumer-groups/{group}/reset-offset")
     public ResponseEntity<ApiResponse<Void>> resetConsumerOffset(
-            @PathVariable String group,
-            @RequestBody Map<String, Object> request) {
+        @PathVariable String group,
+        @RequestBody Map<String, Object> request) {
         String topic = (String) request.get("topic");
         Long timestamp = ((Number) request.get("timestamp")).longValue();
 
@@ -148,11 +148,11 @@ public class RocketMQController {
      */
     @GetMapping("/messages/{topic}")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getMessageList(
-            @PathVariable String topic,
-            @RequestParam(required = false) Long startTime,
-            @RequestParam(required = false) Long endTime,
-            @RequestParam(defaultValue = "100") Integer maxMsg,
-            @RequestParam(required = false) String keyword) {
+        @PathVariable String topic,
+        @RequestParam(required = false) Long startTime,
+        @RequestParam(required = false) Long endTime,
+        @RequestParam(defaultValue = "100") Integer maxMsg,
+        @RequestParam(required = false) String keyword) {
         List<Map<String, Object>> list = rocketMQAdminService.getMessageList(topic, startTime != null ? startTime : 0, endTime != null ? endTime : System.currentTimeMillis(), maxMsg);
         Map<String, Object> data = new HashMap<>();
         data.put("records", list);
@@ -166,8 +166,8 @@ public class RocketMQController {
      */
     @GetMapping("/messages/{topic}/{msgId}")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getMessageDetail(
-            @PathVariable String topic,
-            @PathVariable String msgId) {
+        @PathVariable String topic,
+        @PathVariable String msgId) {
         Map<String, Object> result = rocketMQAdminService.getMessageDetail(topic, msgId);
         return ResponseEntity.ok(ApiResponse.success(result));
     }
@@ -178,8 +178,8 @@ public class RocketMQController {
      */
     @GetMapping("/messages/{topic}/{msgId}/trace")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getMessageTrace(
-            @PathVariable String topic,
-            @PathVariable String msgId) {
+        @PathVariable String topic,
+        @PathVariable String msgId) {
         Map<String, Object> result = rocketMQAdminService.getMessageTrace(topic, msgId);
         return ResponseEntity.ok(ApiResponse.success(result));
     }

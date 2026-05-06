@@ -5,6 +5,7 @@ import cn.coderstory.springboot.order.mapper.OrderMapper;
 import cn.coderstory.springboot.seckill.entity.SeckillGoods;
 import cn.coderstory.springboot.seckill.mapper.SeckillGoodsMapper;
 import cn.coderstory.springboot.seckill.sse.SeckillSseService;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.producer.TransactionListener;
 import org.apache.rocketmq.client.producer.TransactionMQProducer;
@@ -12,18 +13,19 @@ import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import jakarta.annotation.PostConstruct;
+
 import java.util.UUID;
 
 @Slf4j
 @Component
 public class OrderTransactionProducer {
 
+    private static final String ORDER_CREATE_TOPIC = "seckill_order_create";
+    private static final String STOCK_DEDUCT_TOPIC = "seckill_stock_deduct";
     private final OrderMapper orderMapper;
     private final SeckillGoodsMapper goodsMapper;
     private final SeckillSseService sseService;
     private TransactionMQProducer transactionProducer;
-
     @Value("${rocketmq.name-server}")
     private String nameServer;
 
@@ -100,9 +102,6 @@ public class OrderTransactionProducer {
             log.error("TransactionMQProducer 启动失败", e);
         }
     }
-
-    private static final String ORDER_CREATE_TOPIC = "seckill_order_create";
-    private static final String STOCK_DEDUCT_TOPIC = "seckill_stock_deduct";
 
     public void sendOrderCreateMsg(Long userId, Long goodsId, Long activityId, String queueId) throws Exception {
         String message = userId + ":" + goodsId + ":" + activityId + ":" + queueId;

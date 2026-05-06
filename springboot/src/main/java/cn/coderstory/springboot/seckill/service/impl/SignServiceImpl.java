@@ -17,9 +17,9 @@ import java.util.Base64;
 @Service
 @RequiredArgsConstructor
 public class SignServiceImpl implements SignService {
-    private final StringRedisTemplate redisTemplate;
     private static final long SIGN_EXPIRE_MS = 5 * 60 * 1000;
     private static final String BITMAP_KEY_PREFIX = "seckill:sign:bitmap:";
+    private final StringRedisTemplate redisTemplate;
 
     @Override
     public SignResult generateSign(Long userId, Long goodsId, String activitySignKey) {

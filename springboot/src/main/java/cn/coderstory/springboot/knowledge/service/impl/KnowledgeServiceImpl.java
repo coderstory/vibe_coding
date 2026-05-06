@@ -1,10 +1,6 @@
 package cn.coderstory.springboot.knowledge.service.impl;
 
-import cn.coderstory.springboot.knowledge.entity.KnowledgeArticle;
-import cn.coderstory.springboot.knowledge.entity.KnowledgeArticleTag;
-import cn.coderstory.springboot.knowledge.entity.KnowledgeCategory;
-import cn.coderstory.springboot.knowledge.entity.KnowledgeFile;
-import cn.coderstory.springboot.knowledge.entity.KnowledgeTag;
+import cn.coderstory.springboot.knowledge.entity.*;
 import cn.coderstory.springboot.knowledge.mapper.*;
 import cn.coderstory.springboot.knowledge.service.KnowledgeService;
 import cn.coderstory.springboot.shared.util.ZstdUtil;
@@ -22,46 +18,46 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class KnowledgeServiceImpl implements KnowledgeService {
-    
+
     private final KnowledgeCategoryMapper categoryMapper;
     private final KnowledgeArticleMapper articleMapper;
     private final KnowledgeTagMapper tagMapper;
     private final KnowledgeArticleTagMapper articleTagMapper;
     private final KnowledgeFileMapper fileMapper;
-    
+
     @Override
     public List<KnowledgeCategory> getCategoryTree() {
         List<KnowledgeCategory> all = categoryMapper.selectTree();
         return buildTree(all);
     }
-    
+
     private List<KnowledgeCategory> buildTree(List<KnowledgeCategory> list) {
         Map<Long, List<KnowledgeCategory>> group = list.stream()
-                .collect(Collectors.groupingBy(KnowledgeCategory::getParentId));
+            .collect(Collectors.groupingBy(KnowledgeCategory::getParentId));
         for (KnowledgeCategory cat : list) {
             cat.setChildren(group.getOrDefault(cat.getId(), new ArrayList<>()));
         }
         return list.stream().filter(c -> c.getParentId() == 0L).collect(Collectors.toList());
     }
-    
+
     @Override
     public KnowledgeCategory createCategory(KnowledgeCategory category) {
         categoryMapper.insert(category);
         return category;
     }
-    
+
     @Override
     public KnowledgeCategory updateCategory(Long id, KnowledgeCategory category) {
         category.setId(id);
         categoryMapper.updateById(category);
         return category;
     }
-    
+
     @Override
     public boolean deleteCategory(Long id) {
         return categoryMapper.deleteById(id) > 0;
     }
-    
+
     @Override
     public Map<String, Object> getArticlePage(String keyword, Long categoryId, int page, int size) {
         Page<KnowledgeArticle> pageParam = new Page<>(page, size);
@@ -71,7 +67,7 @@ public class KnowledgeServiceImpl implements KnowledgeService {
         }
         wrapper.orderByDesc(KnowledgeArticle::getCreateTime);
         Page<KnowledgeArticle> result = articleMapper.selectPage(pageParam, wrapper);
-        
+
         Map<String, Object> data = new HashMap<>();
         data.put("records", result.getRecords());
         data.put("total", result.getTotal());
@@ -80,7 +76,7 @@ public class KnowledgeServiceImpl implements KnowledgeService {
         data.put("pages", result.getPages());
         return data;
     }
-    
+
     @Override
     public KnowledgeArticle getArticleById(Long id) {
         KnowledgeArticle article = articleMapper.selectById(id);
@@ -90,7 +86,7 @@ public class KnowledgeServiceImpl implements KnowledgeService {
         }
         return article;
     }
-    
+
     @Override
     @Transactional
     public KnowledgeArticle createArticle(KnowledgeArticle article, List<Long> tagIds) {
@@ -100,7 +96,7 @@ public class KnowledgeServiceImpl implements KnowledgeService {
         }
         return article;
     }
-    
+
     @Override
     @Transactional
     public KnowledgeArticle updateArticle(Long id, KnowledgeArticle article, List<Long> tagIds) {
@@ -117,7 +113,7 @@ public class KnowledgeServiceImpl implements KnowledgeService {
         }
         return article;
     }
-    
+
     private void saveArticleTags(Long articleId, List<Long> tagIds) {
         for (Long tagId : tagIds) {
             KnowledgeArticleTag at = new KnowledgeArticleTag();
@@ -126,12 +122,12 @@ public class KnowledgeServiceImpl implements KnowledgeService {
             articleTagMapper.insert(at);
         }
     }
-    
+
     @Override
     public boolean deleteArticle(Long id) {
         return articleMapper.deleteById(id) > 0;
     }
-    
+
     @Override
     public void incrementViewCount(Long id) {
         KnowledgeArticle article = articleMapper.selectById(id);
@@ -140,23 +136,23 @@ public class KnowledgeServiceImpl implements KnowledgeService {
             articleMapper.updateById(article);
         }
     }
-    
+
     @Override
     public List<KnowledgeTag> getAllTags() {
         return tagMapper.selectList(new LambdaQueryWrapper<>());
     }
-    
+
     @Override
     public KnowledgeTag createTag(KnowledgeTag tag) {
         tagMapper.insert(tag);
         return tag;
     }
-    
+
     @Override
     public boolean deleteTag(Long id) {
         return tagMapper.deleteById(id) > 0;
     }
-    
+
     @Override
     public List<KnowledgeTag> getTagsByArticleId(Long articleId) {
         List<Long> tagIds = articleTagMapper.selectTagIdsByArticleId(articleId);
@@ -165,7 +161,7 @@ public class KnowledgeServiceImpl implements KnowledgeService {
         }
         return tagMapper.selectByIds(tagIds);
     }
-    
+
     @Override
     public KnowledgeFile uploadFile(Long articleId, String fileName, byte[] data, String contentType) {
         byte[] compressed = ZstdUtil.compress(data);
@@ -179,7 +175,7 @@ public class KnowledgeServiceImpl implements KnowledgeService {
         fileMapper.insert(file);
         return file;
     }
-    
+
     @Override
     public byte[] downloadFile(Long fileId) {
         KnowledgeFile file = fileMapper.selectById(fileId);
@@ -188,22 +184,22 @@ public class KnowledgeServiceImpl implements KnowledgeService {
         }
         return ZstdUtil.decompress(file.getCompressedData(), file.getFileSize());
     }
-    
+
     @Override
     public KnowledgeFile getFileMetadata(Long fileId) {
         return fileMapper.selectById(fileId);
     }
-    
+
     @Override
     public boolean deleteFile(Long fileId) {
         return fileMapper.deleteById(fileId) > 0;
     }
-    
+
     @Override
     public List<KnowledgeFile> getFilesByArticleId(Long articleId) {
         return fileMapper.selectByArticleId(articleId);
     }
-    
+
     @Override
     public List<KnowledgeArticle> searchArticles(String keyword) {
         return articleMapper.searchArticles(keyword, null);

@@ -1,9 +1,9 @@
 package cn.coderstory.springboot.seckill.service.impl;
 
-import cn.coderstory.springboot.shared.exception.BusinessException;
 import cn.coderstory.springboot.seckill.entity.SeckillGoods;
 import cn.coderstory.springboot.seckill.mapper.SeckillGoodsMapper;
 import cn.coderstory.springboot.seckill.service.GoodsService;
+import cn.coderstory.springboot.shared.exception.BusinessException;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -72,14 +72,14 @@ public class GoodsServiceImpl implements GoodsService {
     @Override
     public long countByActivityId(Long activityId) {
         return goodsMapper.selectCount(new LambdaQueryWrapper<SeckillGoods>()
-                .eq(SeckillGoods::getActivityId, activityId));
+            .eq(SeckillGoods::getActivityId, activityId));
     }
 
     @Override
     public SeckillGoods getGoodsByActivityId(Long activityId) {
         return goodsMapper.selectOne(new LambdaQueryWrapper<SeckillGoods>()
-                .eq(SeckillGoods::getActivityId, activityId)
-                .last("LIMIT 1"));
+            .eq(SeckillGoods::getActivityId, activityId)
+            .last("LIMIT 1"));
     }
 
     @Override

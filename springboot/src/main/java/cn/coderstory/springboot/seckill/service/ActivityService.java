@@ -9,7 +9,7 @@ public interface ActivityService {
 
     /**
      * 获取活动详情（包含商品列表）
-     *
+     * <p>
      * 用于秒杀详情页，展示活动信息及关联商品
      * 一个活动可以关联多个商品
      *

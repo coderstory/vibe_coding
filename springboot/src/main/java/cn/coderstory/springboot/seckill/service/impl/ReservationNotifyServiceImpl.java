@@ -15,12 +15,12 @@ import java.util.List;
 
 /**
  * 预约提醒服务实现
- *
+ * <p>
  * 定时任务：
  * - 每分钟执行一次（@Scheduled(fixedDelay = 60000)）
  * - 扫描活动开始前30分钟内的预约
  * - 发送提醒并更新状态
- *
+ * <p>
  * 提醒逻辑：
  * 1. 查询所有活动开始时间在 [now, now + 30分钟] 内的活动
  * 2. 查询这些活动的未提醒预约
@@ -32,18 +32,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReservationNotifyServiceImpl {
 
-    private final SeckillReservationMapper reservationMapper;
-    private final SeckillActivityMapper activityMapper;
-
     /**
      * 提醒提前时间（分钟）
      * 活动开始前多少分钟发送提醒
      */
     private static final int NOTIFY_BEFORE_MINUTES = 30;
+    private final SeckillReservationMapper reservationMapper;
+    private final SeckillActivityMapper activityMapper;
 
     /**
      * 扫描并发送预约提醒
-     *
+     * <p>
      * 每分钟执行一次，查询即将开始的活动并发送提醒
      */
     @Scheduled(fixedDelay = 60000)
@@ -97,7 +96,7 @@ public class ReservationNotifyServiceImpl {
 
     /**
      * 发送提醒通知
-     *
+     * <p>
      * 当前实现只是打印日志。
      * 实际可以扩展为：
      * - 发送站内信通知
@@ -106,15 +105,15 @@ public class ReservationNotifyServiceImpl {
      * - 发送消息队列通知（如 RocketMQ）
      *
      * @param reservation 预约记录
-     * @param activity 活动信息
+     * @param activity    活动信息
      */
     private void sendNotification(SeckillReservation reservation, SeckillActivity activity) {
         // TODO: 实现实际的提醒通知逻辑
         // 例如：发送邮件、短信、站内信、消息队列等
 
         log.info("发送预约提醒：用户 {}，活动《{}》，开始时间 {}",
-                reservation.getUserId(),
-                activity.getName(),
-                activity.getStartTime());
+            reservation.getUserId(),
+            activity.getName(),
+            activity.getStartTime());
     }
 }

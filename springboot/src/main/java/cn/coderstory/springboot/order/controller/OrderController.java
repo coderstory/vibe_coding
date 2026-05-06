@@ -5,15 +5,16 @@ import cn.coderstory.springboot.order.service.OrderService;
 import cn.coderstory.springboot.shared.vo.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 /**
  * 订单控制器
- *
+ * <p>
  * 功能描述：
  * - 提供订单查询、支付、取消等操作接口
  * - 支持用户查看自己的订单列表
- *
+ * <p>
  * 接口列表：
  * - GET /api/order/my: 获取当前用户的订单列表
  * - POST /api/order/{orderNo}/pay: 支付订单
@@ -54,7 +55,7 @@ public class OrderController {
 
     /**
      * 取消订单
-     *
+     * <p>
      * 只能取消状态为"待支付"的订单
      *
      * @param orderNo 订单号

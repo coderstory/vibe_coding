@@ -12,17 +12,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * SSE 实时通知服务
- *
+ * <p>
  * 功能说明：
  * - 管理 SSE 连接，提供实时消息推送能力
  * - 用于秒杀结果的实时通知
- *
+ * <p>
  * 核心功能：
  * 1. 订阅接口 - 建立 SSE 连接
  * 2. 推送消息 - 向指定连接推送消息
  * 3. 取消订阅 - 关闭 SSE 连接
  * 4. 心跳检测 - 保持连接活跃
- *
+ * <p>
  * 工作流程：
  * 1. 用户发起抢购请求，获取 queueId
  * 2. 前端建立 SSE 连接，订阅该 queueId
@@ -40,33 +40,29 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SeckillSseService {
 
     /**
+     * 默认超时时间（毫秒）
+     */
+    private static final long DEFAULT_TIMEOUT = 300000L;
+    /**
      * SSE 连接池：queueId -> SseEmitter
      * 使用 ConcurrentHashMap 保证线程安全
      */
     private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
-
     /**
      * 秒杀业务配置
      */
     private final SeckillProperties seckillProperties;
 
     /**
-     * 默认超时时间（毫秒）
-     */
-    private static final long DEFAULT_TIMEOUT = 300000L;
-
-    /**
      * 建立 SSE 订阅
-     *
+     * <p>
      * 功能说明：
      * - 为指定的 queueId 建立 SSE 连接
      * - 返回 SseEmitter 对象供 Spring MVC 使用
      *
      * @param queueId 队列ID（唯一标识一个秒杀请求）
      * @return SseEmitter SSE 连接对象
-     *
-     * @example
-     * <pre>
+     * @example <pre>
      *     SseEmitter emitter = sseService.subscribe("queue-123");
      *     // 在 Controller 中返回 emitter
      * </pre>
@@ -85,8 +81,8 @@ public class SeckillSseService {
     public SseEmitter subscribe(String queueId, long timeout) {
         // 获取配置的超时时间，如果为0或负数则使用默认值
         long effectiveTimeout = seckillProperties.getSse().getTimeout() > 0
-                ? seckillProperties.getSse().getTimeout()
-                : timeout;
+            ? seckillProperties.getSse().getTimeout()
+            : timeout;
 
         log.info("建立 SSE 连接: queueId={}, timeout={}ms", queueId, effectiveTimeout);
 
@@ -119,8 +115,8 @@ public class SeckillSseService {
         // 发送初始连接成功事件
         try {
             emitter.send(SseEmitter.event()
-                    .name("connected")
-                    .data("SSE 连接已建立，queueId: " + queueId));
+                .name("connected")
+                .data("SSE 连接已建立，queueId: " + queueId));
         } catch (IOException e) {
             log.error("发送初始事件失败: queueId={}", queueId, e);
             emitter.complete();
@@ -131,18 +127,16 @@ public class SeckillSseService {
 
     /**
      * 推送消息到指定队列
-     *
+     * <p>
      * 功能说明：
      * - 向指定 queueId 的连接推送消息
      * - 通常用于推送秒杀结果
      *
-     * @param queueId 队列ID
+     * @param queueId   队列ID
      * @param eventName 事件名称
-     * @param data 消息数据
+     * @param data      消息数据
      * @return 是否推送成功
-     *
-     * @example
-     * <pre>
+     * @example <pre>
      *     // 推送秒杀成功结果
      *     sseService.sendToQueue("queue-123", "seckill_result", "{\"status\": 1, \"message\": \"抢购成功\"}");
      * </pre>
@@ -157,8 +151,8 @@ public class SeckillSseService {
 
         try {
             emitter.send(SseEmitter.event()
-                    .name(eventName)
-                    .data(data));
+                .name(eventName)
+                .data(data));
 
             log.info("SSE 消息推送成功: queueId={}, event={}", queueId, eventName);
             return true;
@@ -179,9 +173,9 @@ public class SeckillSseService {
      */
     public boolean sendSuccess(String queueId, Long orderId, String message) {
         Map<String, Object> result = Map.of(
-                "status", 1,
-                "message", message != null ? message : "抢购成功",
-                "orderId", orderId
+            "status", 1,
+            "message", message != null ? message : "抢购成功",
+            "orderId", orderId
         );
         return sendToQueue(queueId, "seckill_result", result);
     }
@@ -190,13 +184,13 @@ public class SeckillSseService {
      * 推送秒杀失败结果
      *
      * @param queueId 队列ID
-     * @param reason 失败原因
+     * @param reason  失败原因
      * @return 是否推送成功
      */
     public boolean sendFailed(String queueId, String reason) {
         Map<String, Object> result = Map.of(
-                "status", 2,
-                "message", reason != null ? reason : "抢购失败"
+            "status", 2,
+            "message", reason != null ? reason : "抢购失败"
         );
         return sendToQueue(queueId, "seckill_result", result);
     }
@@ -210,15 +204,15 @@ public class SeckillSseService {
      */
     public boolean sendWaiting(String queueId, String message) {
         Map<String, Object> result = Map.of(
-                "status", 0,
-                "message", message != null ? message : "排队处理中"
+            "status", 0,
+            "message", message != null ? message : "排队处理中"
         );
         return sendToQueue(queueId, "seckill_status", result);
     }
 
     /**
      * 发送心跳检测
-     *
+     * <p>
      * 功能说明：
      * - 定期发送心跳，保持连接活跃
      * - 防止长连接因空闲被中间设备断开
@@ -232,7 +226,7 @@ public class SeckillSseService {
 
     /**
      * 取消订阅
-     *
+     * <p>
      * 功能说明：
      * - 手动关闭 SSE 连接
      * - 从连接池中移除
@@ -251,15 +245,15 @@ public class SeckillSseService {
      * 强制完成连接
      *
      * @param queueId 队列ID
-     * @param reason 完成原因
+     * @param reason  完成原因
      */
     public void complete(String queueId, String reason) {
         SseEmitter emitter = emitters.remove(queueId);
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event()
-                        .name("completed")
-                        .data(reason));
+                    .name("completed")
+                    .data(reason));
                 emitter.complete();
                 log.info("SSE 连接已完成: queueId={}, reason={}", queueId, reason);
             } catch (IOException e) {

@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * OrderService 集成测试
- *
+ * <p>
  * 使用 @SpringBootTest 进行集成测试，连接实际 MySQL
  * 测试数据会在 @AfterEach 中清理
  *
@@ -29,14 +29,12 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class OrderServiceTest {
 
-    @Autowired
-    private OrderService orderService;
-
-    @Autowired
-    private OrderMapper orderMapper;
-
     private final Set<Long> testOrderIds = new HashSet<>();
     private final List<String> testOrderNos = new ArrayList<>();
+    @Autowired
+    private OrderService orderService;
+    @Autowired
+    private OrderMapper orderMapper;
 
     @AfterEach
     void tearDown() {

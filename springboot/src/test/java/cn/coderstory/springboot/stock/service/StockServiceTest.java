@@ -1,9 +1,9 @@
 package cn.coderstory.springboot.stock.service;
-import cn.coderstory.springboot.seckill.stock.service.StockService;
 
 import cn.coderstory.springboot.SpringbootApplication;
 import cn.coderstory.springboot.seckill.stock.entity.Stock;
 import cn.coderstory.springboot.seckill.stock.mapper.StockMapper;
+import cn.coderstory.springboot.seckill.stock.service.StockService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +20,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class StockServiceTest {
 
-    @Autowired
-    private StockService stockService;
-
-    @Autowired
-    private StockMapper stockMapper;
-
-    @Autowired
-    private StringRedisTemplate redisTemplate;
-
     private final Set<Long> testGoodsIds = new HashSet<>();
     private final Set<String> testRedisKeys = new HashSet<>();
+    @Autowired
+    private StockService stockService;
+    @Autowired
+    private StockMapper stockMapper;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     @AfterEach
     void tearDown() {

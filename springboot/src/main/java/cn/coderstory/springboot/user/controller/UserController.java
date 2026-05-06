@@ -1,11 +1,11 @@
 package cn.coderstory.springboot.user.controller;
 
 import cn.coderstory.springboot.role.entity.Role;
-import cn.coderstory.springboot.user.entity.User;
 import cn.coderstory.springboot.role.mapper.RoleMapper;
-import cn.coderstory.springboot.user.service.UserService;
 import cn.coderstory.springboot.shared.vo.ApiResponse;
 import cn.coderstory.springboot.user.dto.UserVO;
+import cn.coderstory.springboot.user.entity.User;
+import cn.coderstory.springboot.user.service.UserService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -36,13 +36,13 @@ public class UserController {
      */
     @GetMapping
     public ResponseEntity<ApiResponse<Map<String, Object>>> getUserPage(
-            @RequestParam(required = false) String username,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String department,
-            @RequestParam(required = false) Integer enabled,
-            @RequestParam(required = false) String phone,
-            @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "20") Integer size) {
+        @RequestParam(required = false) String username,
+        @RequestParam(required = false) String name,
+        @RequestParam(required = false) String department,
+        @RequestParam(required = false) Integer enabled,
+        @RequestParam(required = false) String phone,
+        @RequestParam(defaultValue = "1") Integer page,
+        @RequestParam(defaultValue = "20") Integer size) {
 
         Page<User> pageParam = new Page<>(page, size);
         IPage<User> result = userService.getUserPage(pageParam, username, name, department, enabled, phone);
@@ -142,8 +142,8 @@ public class UserController {
      */
     @PatchMapping("/{id}/status")
     public ResponseEntity<ApiResponse<Void>> updateUserStatus(
-            @PathVariable Long id,
-            @RequestBody Map<String, Integer> request) {
+        @PathVariable Long id,
+        @RequestBody Map<String, Integer> request) {
         Integer enabled = request.get("enabled");
         userService.updateUserStatus(id, enabled);
         return ResponseEntity.ok(ApiResponse.success("状态更新成功", null));

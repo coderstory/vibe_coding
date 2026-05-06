@@ -5,7 +5,7 @@ import cn.coderstory.springboot.seckill.dto.SeckillResponse;
 
 /**
  * 秒杀服务接口 - 核心业务逻辑
- *
+ * <p>
  * 工作原理：
  * ┌────────────────────────────────────────────────────────────────────────────┐
  * │                           三层保护机制                                      │
@@ -25,7 +25,7 @@ import cn.coderstory.springboot.seckill.dto.SeckillResponse;
  * │   - UPDATE时使用version字段防止超卖                                         │
  * │   - 确保即使MQ出现问题也能保证数据正确                                       │
  * └────────────────────────────────────────────────────────────────────────────┘
- *
+ * <p>
  * 秒杀流程：
  * 1. 接收用户抢购请求，验证签名防篡改
  * 2. 检查用户是否在黑名单（风控）
@@ -35,7 +35,7 @@ import cn.coderstory.springboot.seckill.dto.SeckillResponse;
  * 6. 发送RocketMQ事务消息
  * 7. 返回排队编号，用户等待异步处理
  * 8. MQ消费者处理消息，创建订单并最终扣减数据库库存
- *
+ * <p>
  * 使用场景：
  * - 高并发秒杀活动
  * - 限时抢购场景
@@ -50,17 +50,17 @@ public interface SeckillService {
      * 执行秒杀操作
      *
      * @param request 秒杀请求参数，包含：
-     *   - goodsId: 商品ID
-     *   - activityId: 活动ID
-     *   - sign: 签名（防篡改）
-     *   - timestamp: 时间戳
-     *   - idempotentKey: 幂等键
-     * @param userId 用户ID
+     *                - goodsId: 商品ID
+     *                - activityId: 活动ID
+     *                - sign: 签名（防篡改）
+     *                - timestamp: 时间戳
+     *                - idempotentKey: 幂等键
+     * @param userId  用户ID
      * @return SeckillResponse 包含：
-     *   - queueId: 排队编号（用于查询结果）
-     *   - status: 状态 (0-排队中 1-成功 2-失败)
-     *   - message: 状态消息
-     *
+     * - queueId: 排队编号（用于查询结果）
+     * - status: 状态 (0-排队中 1-成功 2-失败)
+     * - message: 状态消息
+     * <p>
      * 业务逻辑：
      * 1. 验证签名是否正确
      * 2. 检查黑名单
@@ -82,25 +82,25 @@ public interface SeckillService {
 
     /**
      * 预热商品库存到 Redis
-     *
+     * <p>
      * 功能说明：
      * - 在秒杀开始前调用
      * - 将数据库中的库存数据同步到 Redis
      * - 保证秒杀开始时无需查询数据库
      *
      * @param goodsId 商品ID
-     * @param stock 库存数量
+     * @param stock   库存数量
      */
     void preloadStock(Long goodsId, int stock);
 
     /**
      * 回滚 Redis 中的库存
-     *
+     * <p>
      * 功能说明：
      * - 当订单创建失败或超时取消时调用
      * - 将之前扣减的库存返还到 Redis
      *
-     * @param goodsId 商品ID
+     * @param goodsId  商品ID
      * @param quantity 回滚数量
      */
     void rollbackStock(Long goodsId, int quantity);

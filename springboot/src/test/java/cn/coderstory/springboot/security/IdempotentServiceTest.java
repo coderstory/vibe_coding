@@ -1,7 +1,7 @@
 package cn.coderstory.springboot.security;
-import cn.coderstory.springboot.shared.security.IdempotentService;
 
 import cn.coderstory.springboot.SpringbootApplication;
+import cn.coderstory.springboot.shared.security.IdempotentService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,20 +11,19 @@ import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(classes = SpringbootApplication.class)
 @DisplayName("IdempotentService 集成测试")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class IdempotentServiceTest {
 
+    private final Set<String> testKeys = new HashSet<>();
     @Autowired
     private IdempotentService idempotentService;
-
     @Autowired
     private StringRedisTemplate redisTemplate;
-
-    private final Set<String> testKeys = new HashSet<>();
 
     @AfterEach
     void tearDown() {

@@ -17,13 +17,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class SignServiceTest {
 
+    private final Set<String> testKeys = new HashSet<>();
     @Autowired
     private SignService signService;
-
     @Autowired
     private StringRedisTemplate redisTemplate;
-
-    private final Set<String> testKeys = new HashSet<>();
 
     @AfterEach
     void tearDown() {
@@ -45,9 +43,9 @@ class SignServiceTest {
         SignService.SignResult result = signService.generateSign(1L, 1L, "test-secret-key");
 
         assertNotNull(result);
-        assertNotNull(result.getSign());
-        assertFalse(result.getSign().isEmpty());
-        assertTrue(result.getTimestamp() > 0);
+        assertNotNull(result.sign());
+        assertFalse(result.sign().isEmpty());
+        assertTrue(result.timestamp() > 0);
     }
 
     @Test
@@ -57,7 +55,7 @@ class SignServiceTest {
         SignService.SignResult result1 = signService.generateSign(1L, 1L, "test-secret-key");
         SignService.SignResult result2 = signService.generateSign(2L, 1L, "test-secret-key");
 
-        assertNotEquals(result1.getSign(), result2.getSign());
+        assertNotEquals(result1.sign(), result2.sign());
     }
 
     @Test
@@ -67,7 +65,7 @@ class SignServiceTest {
         SignService.SignResult result1 = signService.generateSign(1L, 1L, "test-secret-key");
         SignService.SignResult result2 = signService.generateSign(1L, 2L, "test-secret-key");
 
-        assertNotEquals(result1.getSign(), result2.getSign());
+        assertNotEquals(result1.sign(), result2.sign());
     }
 
     @Test
@@ -78,7 +76,7 @@ class SignServiceTest {
         addBitmapKey(activityId);
         SignService.SignResult result = signService.generateSign(1L, 1L, "test-secret-key");
 
-        boolean verifyResult = signService.verifySign(result.getSign(), result.getTimestamp(), activityId, Duration.ofHours(2));
+        boolean verifyResult = signService.verifySign(result.sign(), result.timestamp(), activityId, Duration.ofHours(2));
 
         assertTrue(verifyResult);
     }
@@ -104,10 +102,10 @@ class SignServiceTest {
         addBitmapKey(activityId);
         SignService.SignResult result = signService.generateSign(1L, 1L, "test-secret-key");
 
-        boolean firstVerify = signService.verifySign(result.getSign(), result.getTimestamp(), activityId, Duration.ofHours(2));
+        boolean firstVerify = signService.verifySign(result.sign(), result.timestamp(), activityId, Duration.ofHours(2));
         assertTrue(firstVerify);
 
-        boolean secondVerify = signService.verifySign(result.getSign(), result.getTimestamp(), activityId, Duration.ofHours(2));
+        boolean secondVerify = signService.verifySign(result.sign(), result.timestamp(), activityId, Duration.ofHours(2));
         assertFalse(secondVerify);
     }
 
@@ -119,8 +117,8 @@ class SignServiceTest {
         addBitmapKey(activityId);
         SignService.SignResult result = signService.generateSign(1L, 1L, "test-secret-key");
 
-        boolean firstVerify = signService.verifySign(result.getSign(), result.getTimestamp(), activityId, Duration.ofHours(2));
-        boolean secondVerify = signService.verifySign(result.getSign(), result.getTimestamp(), activityId, Duration.ofHours(2));
+        boolean firstVerify = signService.verifySign(result.sign(), result.timestamp(), activityId, Duration.ofHours(2));
+        boolean secondVerify = signService.verifySign(result.sign(), result.timestamp(), activityId, Duration.ofHours(2));
 
         assertTrue(firstVerify);
         assertFalse(secondVerify);
@@ -136,10 +134,10 @@ class SignServiceTest {
         addBitmapKey(activityId2);
 
         SignService.SignResult result1 = signService.generateSign(1L, 1L, "test-secret-key");
-        boolean verifyInActivity1 = signService.verifySign(result1.getSign(), result1.getTimestamp(), activityId1, Duration.ofHours(2));
+        boolean verifyInActivity1 = signService.verifySign(result1.sign(), result1.timestamp(), activityId1, Duration.ofHours(2));
         assertTrue(verifyInActivity1);
 
-        boolean verifySameInActivity2 = signService.verifySign(result1.getSign(), result1.getTimestamp(), activityId2, Duration.ofHours(2));
+        boolean verifySameInActivity2 = signService.verifySign(result1.sign(), result1.timestamp(), activityId2, Duration.ofHours(2));
         assertTrue(verifySameInActivity2);
     }
 
@@ -151,7 +149,7 @@ class SignServiceTest {
         addBitmapKey(activityId);
         SignService.SignResult result = signService.generateSign(1L, 1L, "test-secret-key");
 
-        signService.verifySign(result.getSign(), result.getTimestamp(), activityId, Duration.ofHours(3));
+        signService.verifySign(result.sign(), result.timestamp(), activityId, Duration.ofHours(3));
 
         Long ttl = redisTemplate.getExpire("seckill:sign:bitmap:" + activityId);
         assertNotNull(ttl);

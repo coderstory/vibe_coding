@@ -17,8 +17,8 @@ public class SeckillActivityController {
 
     @GetMapping
     public ApiResponse<IPage<SeckillActivity>> getActivityPage(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size) {
+        @RequestParam(defaultValue = "1") int page,
+        @RequestParam(defaultValue = "20") int size) {
         return ApiResponse.success(activityService.getActivityPage(page, size));
     }
 
@@ -29,7 +29,7 @@ public class SeckillActivityController {
 
     /**
      * 获取活动详情（包含商品列表）
-     *
+     * <p>
      * 用于秒杀详情页，返回活动信息及关联的所有商品
      * 用户可以选择要抢购的商品
      *

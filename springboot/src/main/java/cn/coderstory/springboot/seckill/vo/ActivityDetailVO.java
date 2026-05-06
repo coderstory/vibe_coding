@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 
 /**
  * 活动详情 VO（包含活动信息和商品信息）
- *
+ * <p>
  * 用于秒杀详情页，一个活动只关联一个商品
  */
 @Data

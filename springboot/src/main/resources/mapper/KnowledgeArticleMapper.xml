@@ -12,7 +12,7 @@
         <result column="deleted" property="deleted"/>
         <result column="create_time" property="createTime"/>
     </resultMap>
-    
+
     <select id="searchArticles" resultMap="BaseResultMap">
         SELECT id, category_id, title, content, status, view_count, deleted, create_time
         FROM knowledge_article
@@ -25,5 +25,5 @@
         </if>
         ORDER BY create_time DESC
     </select>
-    
+
 </mapper>

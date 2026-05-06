@@ -10,12 +10,12 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Redisson 单机模式配置类
- *
+ * <p>
  * 功能说明：
  * - 基于 Spring Boot 的 Redisson 自动配置
  * - 提供 RedissonClient Bean 供全局使用
  * - 支持分布式锁、分布式缓存等场景
- *
+ * <p>
  * 使用示例：
  * <pre>
  *     @Autowired
@@ -44,6 +44,52 @@ public class RedissonConfig {
      * 单机模式配置
      */
     private SingleServerConfig singleServerConfig;
+
+    /**
+     * 创建 RedissonClient 单机模式客户端
+     * <p>
+     * 配置说明：
+     * - 使用单节点模式，适用于开发测试和单机部署场景
+     * - 生产环境建议使用集群模式或哨兵模式
+     *
+     * @return RedissonClient 实例
+     */
+    @Bean(destroyMethod = "shutdown")
+    @SuppressWarnings("deprecation")
+    public RedissonClient redissonClient() {
+        Config config = new Config();
+
+        // 设置单机模式连接
+        String address = singleServerConfig != null && singleServerConfig.getAddress() != null
+            ? singleServerConfig.getAddress()
+            : "redis://localhost:6379";
+
+        var serverConfig = config.useSingleServer()
+            .setAddress(address)
+            .setConnectionMinimumIdleSize(
+                singleServerConfig != null ? singleServerConfig.getConnectionMinimumIdleSize() : 5
+            )
+            .setConnectionPoolSize(
+                singleServerConfig != null ? singleServerConfig.getConnectionPoolSize() : 20
+            )
+            .setIdleConnectionTimeout(
+                singleServerConfig != null ? singleServerConfig.getIdleConnectionTimeout() : 10000
+            )
+            .setConnectTimeout(
+                singleServerConfig != null ? singleServerConfig.getConnectTimeout() : 10000
+            )
+            .setTimeout(
+                singleServerConfig != null ? singleServerConfig.getTimeout() : 3000
+            )
+            .setRetryAttempts(
+                singleServerConfig != null ? singleServerConfig.getRetryAttempts() : 3
+            )
+            .setRetryInterval(
+                singleServerConfig != null ? singleServerConfig.getRetryInterval() : 1500
+            );
+
+        return Redisson.create(config);
+    }
 
     @Data
     public static class SingleServerConfig {
@@ -87,51 +133,5 @@ public class RedissonConfig {
          * 重试间隔(ms)
          */
         private int retryInterval = 1500;
-    }
-
-    /**
-     * 创建 RedissonClient 单机模式客户端
-     *
-     * 配置说明：
-     * - 使用单节点模式，适用于开发测试和单机部署场景
-     * - 生产环境建议使用集群模式或哨兵模式
-     *
-     * @return RedissonClient 实例
-     */
-    @Bean(destroyMethod = "shutdown")
-    @SuppressWarnings("deprecation")
-    public RedissonClient redissonClient() {
-        Config config = new Config();
-
-        // 设置单机模式连接
-        String address = singleServerConfig != null && singleServerConfig.getAddress() != null
-            ? singleServerConfig.getAddress()
-            : "redis://localhost:6379";
-
-        var serverConfig = config.useSingleServer()
-            .setAddress(address)
-            .setConnectionMinimumIdleSize(
-                singleServerConfig != null ? singleServerConfig.getConnectionMinimumIdleSize() : 5
-            )
-            .setConnectionPoolSize(
-                singleServerConfig != null ? singleServerConfig.getConnectionPoolSize() : 20
-            )
-            .setIdleConnectionTimeout(
-                singleServerConfig != null ? singleServerConfig.getIdleConnectionTimeout() : 10000
-            )
-            .setConnectTimeout(
-                singleServerConfig != null ? singleServerConfig.getConnectTimeout() : 10000
-            )
-            .setTimeout(
-                singleServerConfig != null ? singleServerConfig.getTimeout() : 3000
-            )
-            .setRetryAttempts(
-                singleServerConfig != null ? singleServerConfig.getRetryAttempts() : 3
-            )
-            .setRetryInterval(
-                singleServerConfig != null ? singleServerConfig.getRetryInterval() : 1500
-            );
-
-        return Redisson.create(config);
     }
 }

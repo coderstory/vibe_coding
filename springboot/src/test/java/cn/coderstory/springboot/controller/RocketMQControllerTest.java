@@ -1,9 +1,8 @@
 package cn.coderstory.springboot.controller;
 
-import cn.coderstory.springboot.shared.exception.BusinessException;
 import cn.coderstory.springboot.rocketmq.controller.RocketMQController;
 import cn.coderstory.springboot.rocketmq.service.RocketMQAdminService;
-import cn.coderstory.springboot.shared.vo.ApiResponse;
+import cn.coderstory.springboot.shared.exception.BusinessException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,14 +18,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * RocketMQController 单元测试
- *
+ * <p>
  * 测试 RocketMQ 管理 API 的完整流程：
  * 1. Topic 列表查询
  * 2. Topic 详情查询
@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * 5. Consumer Group 列表查询
  * 6. Consumer Group 详情查询
  * 7. Consumer Group 位点重置
- *
+ * <p>
  * 注意: 这些测试使用 MockMvcBuilders.standaloneSetup() 进行单元测试
  * 不依赖 Spring Boot Web 测试切片
  *
@@ -50,7 +50,7 @@ class RocketMQControllerTest {
 
     private MockMvc mockMvc;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Mock
     private RocketMQAdminService rocketMQAdminService;
@@ -136,8 +136,8 @@ class RocketMQControllerTest {
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(rocketMQController)
-                .setControllerAdvice(new cn.coderstory.springboot.shared.exception.GlobalExceptionHandler())
-                .build();
+            .setControllerAdvice(new cn.coderstory.springboot.shared.exception.GlobalExceptionHandler())
+            .build();
     }
 
     // ==================== Topic API 测试 ====================
@@ -150,12 +150,12 @@ class RocketMQControllerTest {
         when(rocketMQAdminService.getTopicList(isNull())).thenReturn(mockTopics);
 
         mockMvc.perform(get("/api/rocketmq/topics"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data.records").isArray())
-                .andExpect(jsonPath("$.data.records[0].topicName").value("TestTopic1"))
-                .andExpect(jsonPath("$.data.records[1].topicName").value("TestTopic2"))
-                .andExpect(jsonPath("$.data.total").value(2));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.data.records").isArray())
+            .andExpect(jsonPath("$.data.records[0].topicName").value("TestTopic1"))
+            .andExpect(jsonPath("$.data.records[1].topicName").value("TestTopic2"))
+            .andExpect(jsonPath("$.data.total").value(2));
     }
 
     @Test
@@ -172,11 +172,11 @@ class RocketMQControllerTest {
         when(rocketMQAdminService.getTopicList("Filtered")).thenReturn(mockTopics);
 
         mockMvc.perform(get("/api/rocketmq/topics")
-                        .param("keyword", "Filtered"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data.records").isArray())
-                .andExpect(jsonPath("$.data.records[0].topicName").value("FilteredTopic"));
+                .param("keyword", "Filtered"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.data.records").isArray())
+            .andExpect(jsonPath("$.data.records[0].topicName").value("FilteredTopic"));
     }
 
     @Test
@@ -188,11 +188,11 @@ class RocketMQControllerTest {
         when(rocketMQAdminService.getTopicDetail(topicName)).thenReturn(mockDetail);
 
         mockMvc.perform(get("/api/rocketmq/topics/{topicName}", topicName))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data.topicName").value(topicName))
-                .andExpect(jsonPath("$.data.queueCount").value(8))
-                .andExpect(jsonPath("$.data.status").value("ACTIVE"));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.data.topicName").value(topicName))
+            .andExpect(jsonPath("$.data.queueCount").value(8))
+            .andExpect(jsonPath("$.data.status").value("ACTIVE"));
     }
 
     @Test
@@ -205,11 +205,11 @@ class RocketMQControllerTest {
         request.put("perm", "READ_WRITE");
 
         mockMvc.perform(post("/api/rocketmq/topics")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.message").value("Topic 创建成功"));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.message").value("Topic 创建成功"));
     }
 
     @Test
@@ -219,9 +219,9 @@ class RocketMQControllerTest {
         String topicName = "ToDeleteTopic";
 
         mockMvc.perform(delete("/api/rocketmq/topics/{topicName}", topicName))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.message").value("Topic 删除成功"));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.message").value("Topic 删除成功"));
     }
 
     // ==================== Consumer Group API 测试 ====================
@@ -234,14 +234,14 @@ class RocketMQControllerTest {
         when(rocketMQAdminService.getConsumerGroupList(isNull())).thenReturn(mockGroups);
 
         mockMvc.perform(get("/api/rocketmq/consumer-groups"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data.records").isArray())
-                .andExpect(jsonPath("$.data.records[0].group").value("TestGroup1"))
-                .andExpect(jsonPath("$.data.records[0].groupType").value("CLUSTERING"))
-                .andExpect(jsonPath("$.data.records[1].group").value("TestGroup2"))
-                .andExpect(jsonPath("$.data.records[1].groupType").value("BROADCASTING"))
-                .andExpect(jsonPath("$.data.total").value(2));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.data.records").isArray())
+            .andExpect(jsonPath("$.data.records[0].group").value("TestGroup1"))
+            .andExpect(jsonPath("$.data.records[0].groupType").value("CLUSTERING"))
+            .andExpect(jsonPath("$.data.records[1].group").value("TestGroup2"))
+            .andExpect(jsonPath("$.data.records[1].groupType").value("BROADCASTING"))
+            .andExpect(jsonPath("$.data.total").value(2));
     }
 
     @Test
@@ -259,11 +259,11 @@ class RocketMQControllerTest {
         when(rocketMQAdminService.getConsumerGroupList("Searched")).thenReturn(mockGroups);
 
         mockMvc.perform(get("/api/rocketmq/consumer-groups")
-                        .param("keyword", "Searched"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data.records").isArray())
-                .andExpect(jsonPath("$.data.records[0].group").value("SearchedGroup"));
+                .param("keyword", "Searched"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.data.records").isArray())
+            .andExpect(jsonPath("$.data.records[0].group").value("SearchedGroup"));
     }
 
     @Test
@@ -275,12 +275,12 @@ class RocketMQControllerTest {
         when(rocketMQAdminService.getConsumerGroupDetail(groupName)).thenReturn(mockDetail);
 
         mockMvc.perform(get("/api/rocketmq/consumer-groups/{group}", groupName))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data.group").value(groupName))
-                .andExpect(jsonPath("$.data.groupType").value("CLUSTERING"))
-                .andExpect(jsonPath("$.data.consumerCount").value(3))
-                .andExpect(jsonPath("$.data.offsetTable").isMap());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.data.group").value(groupName))
+            .andExpect(jsonPath("$.data.groupType").value("CLUSTERING"))
+            .andExpect(jsonPath("$.data.consumerCount").value(3))
+            .andExpect(jsonPath("$.data.offsetTable").isMap());
     }
 
     @Test
@@ -293,11 +293,11 @@ class RocketMQControllerTest {
         request.put("timestamp", System.currentTimeMillis());
 
         mockMvc.perform(post("/api/rocketmq/consumer-groups/{group}/reset-offset", groupName)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.message").value("位点重置成功"));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.message").value("位点重置成功"));
     }
 
     // ==================== 异常场景测试 ====================
@@ -308,11 +308,11 @@ class RocketMQControllerTest {
     void shouldReturnErrorWhenTopicNotFound() throws Exception {
         String topicName = "NonExistentTopic";
         when(rocketMQAdminService.getTopicDetail(topicName))
-                .thenThrow(new BusinessException("Topic 不存在: " + topicName));
+            .thenThrow(new BusinessException("Topic 不存在: " + topicName));
 
         mockMvc.perform(get("/api/rocketmq/topics/{topicName}", topicName))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(400));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(400));
     }
 
     @Test
@@ -321,10 +321,10 @@ class RocketMQControllerTest {
     void shouldReturnErrorWhenConsumerGroupNotFound() throws Exception {
         String groupName = "NonExistentGroup";
         when(rocketMQAdminService.getConsumerGroupDetail(groupName))
-                .thenThrow(new BusinessException("Consumer Group 不存在: " + groupName));
+            .thenThrow(new BusinessException("Consumer Group 不存在: " + groupName));
 
         mockMvc.perform(get("/api/rocketmq/consumer-groups/{group}", groupName))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(400));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(400));
     }
 }

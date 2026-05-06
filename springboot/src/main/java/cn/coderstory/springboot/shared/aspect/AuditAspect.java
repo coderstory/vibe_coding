@@ -1,7 +1,7 @@
 package cn.coderstory.springboot.shared.aspect;
 
-import cn.coderstory.springboot.shared.security.JwtTokenProvider;
 import cn.coderstory.springboot.audit.service.AuditService;
+import cn.coderstory.springboot.shared.security.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,35 +22,33 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AuditAspect {
 
+    // 使用 ThreadLocal 避免同一线程内重复记录
+    private static final ThreadLocal<Boolean> AUDIT_FLAG = ThreadLocal.withInitial(() -> false);
+    // 写操作方法前缀
+    private static final Set<String> WRITE_METHOD_PREFIXES = Set.of(
+        "save", "create", "add", "insert",
+        "update", "edit", "modify", "change",
+        "delete", "remove", "drop", "truncate",
+        "assign", "grant", "revoke",
+        "reset", "enable", "disable",
+        "upload", "download", "import", "export"
+    );
+    // 不记录的方法（系统内部操作）
+    private static final Set<String> EXCLUDED_METHODS = Set.of(
+        "getAuditLogPage", "getMenuTree", "getMenuTreeByRoleId",
+        "getUserPage", "getUserById", "getCurrentUser",
+        "getRolePage", "getRoleById", "getMenusByRoleId",
+        "findByUsername", "selectPage", "selectById", "selectList",
+        "getCategoryTree", "getArticlePage", "getArticleById",
+        "getAllTags", "getTagsByArticleId", "getFilesByArticleId",
+        "getFileMetadata", "downloadFile", "searchArticles"
+    );
     private final AuditService auditService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    // 使用 ThreadLocal 避免同一线程内重复记录
-    private static final ThreadLocal<Boolean> AUDIT_FLAG = ThreadLocal.withInitial(() -> false);
-
-    // 写操作方法前缀
-    private static final Set<String> WRITE_METHOD_PREFIXES = Set.of(
-            "save", "create", "add", "insert",
-            "update", "edit", "modify", "change",
-            "delete", "remove", "drop", "truncate",
-            "assign", "grant", "revoke",
-            "reset", "enable", "disable",
-            "upload", "download", "import", "export"
-    );
-
-    // 不记录的方法（系统内部操作）
-    private static final Set<String> EXCLUDED_METHODS = Set.of(
-            "getAuditLogPage", "getMenuTree", "getMenuTreeByRoleId",
-            "getUserPage", "getUserById", "getCurrentUser",
-            "getRolePage", "getRoleById", "getMenusByRoleId",
-            "findByUsername", "selectPage", "selectById", "selectList",
-            "getCategoryTree", "getArticlePage", "getArticleById",
-            "getAllTags", "getTagsByArticleId", "getFilesByArticleId",
-            "getFileMetadata", "downloadFile", "searchArticles"
-    );
-
     @Pointcut("execution(* cn.coderstory.springboot.service..*(..)) && !execution(* cn.coderstory.springboot.service.AuditService.*(..))")
-    public void servicePointcut() {}
+    public void servicePointcut() {
+    }
 
     @Around("servicePointcut()")
     public Object auditAround(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -122,10 +120,10 @@ public class AuditAspect {
         for (String prefix : WRITE_METHOD_PREFIXES) {
             if (lowerName.startsWith(prefix)) {
                 if (prefix.equals("save") || prefix.equals("create") || prefix.equals("add") ||
-                        prefix.equals("insert")) {
+                    prefix.equals("insert")) {
                     return OperationType.CREATE;
                 } else if (prefix.equals("update") || prefix.equals("edit") ||
-                        prefix.equals("modify") || prefix.equals("change")) {
+                    prefix.equals("modify") || prefix.equals("change")) {
                     return OperationType.UPDATE;
                 } else if (prefix.equals("delete") || prefix.equals("remove")) {
                     return OperationType.DELETE;
@@ -156,8 +154,7 @@ public class AuditAspect {
         }
         // 尝试从返回结果中提取ID
         try {
-            if (result instanceof java.util.Map) {
-                java.util.Map<?, ?> map = (java.util.Map<?, ?>) result;
+            if (result instanceof Map<?, ?> map) {
                 if (map.get("id") != null) {
                     return String.valueOf(map.get("id"));
                 }
@@ -174,8 +171,8 @@ public class AuditAspect {
     private String buildOperationDescription(String className, String methodName, Object[] args) {
         StringBuilder sb = new StringBuilder();
         sb.append(className.replace("ServiceImpl", "").replace("Service", ""))
-                .append(".")
-                .append(methodName);
+            .append(".")
+            .append(methodName);
 
         // 添加关键参数信息
         if (args != null && args.length > 0) {
@@ -192,12 +189,12 @@ public class AuditAspect {
 
     private boolean isSimpleType(Class<?> type) {
         return type.isPrimitive() ||
-                type.equals(String.class) ||
-                type.equals(Integer.class) ||
-                type.equals(Long.class) ||
-                type.equals(Boolean.class) ||
-                type.equals(Double.class) ||
-                type.equals(Float.class);
+            type.equals(String.class) ||
+            type.equals(Integer.class) ||
+            type.equals(Long.class) ||
+            type.equals(Boolean.class) ||
+            type.equals(Double.class) ||
+            type.equals(Float.class);
     }
 
     private String getTokenFromRequest(HttpServletRequest request) {

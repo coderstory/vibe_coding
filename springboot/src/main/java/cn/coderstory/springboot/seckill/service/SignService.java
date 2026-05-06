@@ -1,6 +1,5 @@
 package cn.coderstory.springboot.seckill.service;
 
-import lombok.Data;
 import java.time.Duration;
 
 public interface SignService {
@@ -8,9 +7,6 @@ public interface SignService {
 
     boolean verifySign(String sign, long timestamp, Long activityId, Duration duration);
 
-    @Data
-    class SignResult {
-        private final String sign;
-        private final long timestamp;
+    record SignResult(String sign, long timestamp) {
     }
 }

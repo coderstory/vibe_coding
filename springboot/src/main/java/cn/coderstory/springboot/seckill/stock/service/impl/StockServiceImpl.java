@@ -1,10 +1,10 @@
 package cn.coderstory.springboot.seckill.stock.service.impl;
 
-import cn.coderstory.springboot.shared.lock.DistributedLockService;
-import cn.coderstory.springboot.shared.lock.impl.DistributedLockServiceImpl;
 import cn.coderstory.springboot.seckill.stock.entity.Stock;
 import cn.coderstory.springboot.seckill.stock.mapper.StockMapper;
 import cn.coderstory.springboot.seckill.stock.service.StockService;
+import cn.coderstory.springboot.shared.lock.DistributedLockService;
+import cn.coderstory.springboot.shared.lock.impl.DistributedLockServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +32,8 @@ public class StockServiceImpl implements StockService {
         String lockKey = DistributedLockServiceImpl.getStockLockKey(goodsId);
 
         Boolean result = distributedLockService.executeWithLock(
-                lockKey,
-                () -> doDeductStock(goodsId, quantity)
+            lockKey,
+            () -> doDeductStock(goodsId, quantity)
         );
 
         if (Boolean.TRUE.equals(result)) {
@@ -48,8 +48,8 @@ public class StockServiceImpl implements StockService {
 
     private boolean doDeductStock(Long goodsId, Integer quantity) {
         Stock stock = stockMapper.selectOne(
-                new LambdaQueryWrapper<Stock>()
-                        .eq(Stock::getGoodsId, goodsId)
+            new LambdaQueryWrapper<Stock>()
+                .eq(Stock::getGoodsId, goodsId)
         );
 
         if (stock == null) {
@@ -59,17 +59,17 @@ public class StockServiceImpl implements StockService {
 
         if (stock.getAvailableStock() < quantity) {
             log.warn("库存不足: goodsId={}, available={}, required={}",
-                    goodsId, stock.getAvailableStock(), quantity);
+                goodsId, stock.getAvailableStock(), quantity);
             return false;
         }
 
         LambdaUpdateWrapper<Stock> updateWrapper = new LambdaUpdateWrapper<Stock>()
-                .setSql("available_stock = available_stock - " + quantity)
-                .setSql("locked_stock = locked_stock + " + quantity)
-                .setSql("version = version + 1")
-                .eq(Stock::getGoodsId, goodsId)
-                .eq(Stock::getVersion, stock.getVersion())
-                .ge(Stock::getAvailableStock, quantity);
+            .setSql("available_stock = available_stock - " + quantity)
+            .setSql("locked_stock = locked_stock + " + quantity)
+            .setSql("version = version + 1")
+            .eq(Stock::getGoodsId, goodsId)
+            .eq(Stock::getVersion, stock.getVersion())
+            .ge(Stock::getAvailableStock, quantity);
 
         int result = stockMapper.update(null, updateWrapper);
 
@@ -89,8 +89,8 @@ public class StockServiceImpl implements StockService {
         String lockKey = DistributedLockServiceImpl.getStockLockKey(goodsId);
 
         Boolean result = distributedLockService.executeWithLock(
-                lockKey,
-                () -> doRollbackStock(goodsId, quantity)
+            lockKey,
+            () -> doRollbackStock(goodsId, quantity)
         );
 
         if (Boolean.TRUE.equals(result)) {
@@ -105,8 +105,8 @@ public class StockServiceImpl implements StockService {
 
     private boolean doRollbackStock(Long goodsId, Integer quantity) {
         Stock stock = stockMapper.selectOne(
-                new LambdaQueryWrapper<Stock>()
-                        .eq(Stock::getGoodsId, goodsId)
+            new LambdaQueryWrapper<Stock>()
+                .eq(Stock::getGoodsId, goodsId)
         );
 
         if (stock == null) {
@@ -115,11 +115,11 @@ public class StockServiceImpl implements StockService {
         }
 
         LambdaUpdateWrapper<Stock> updateWrapper = new LambdaUpdateWrapper<Stock>()
-                .setSql("available_stock = available_stock + " + quantity)
-                .setSql("locked_stock = GREATEST(0, locked_stock - " + quantity + ")")
-                .setSql("version = version + 1")
-                .eq(Stock::getGoodsId, goodsId)
-                .eq(Stock::getVersion, stock.getVersion());
+            .setSql("available_stock = available_stock + " + quantity)
+            .setSql("locked_stock = GREATEST(0, locked_stock - " + quantity + ")")
+            .setSql("version = version + 1")
+            .eq(Stock::getGoodsId, goodsId)
+            .eq(Stock::getVersion, stock.getVersion());
 
         int result = stockMapper.update(null, updateWrapper);
 
@@ -136,8 +136,8 @@ public class StockServiceImpl implements StockService {
         }
 
         Stock dbStock = stockMapper.selectOne(
-                new LambdaQueryWrapper<Stock>()
-                        .eq(Stock::getGoodsId, goodsId)
+            new LambdaQueryWrapper<Stock>()
+                .eq(Stock::getGoodsId, goodsId)
         );
 
         if (dbStock != null) {

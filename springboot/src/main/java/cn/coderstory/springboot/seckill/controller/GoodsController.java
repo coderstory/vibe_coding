@@ -16,9 +16,9 @@ public class GoodsController {
 
     @GetMapping
     public ApiResponse<IPage<SeckillGoods>> getGoodsPage(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(required = false) Long activityId) {
+        @RequestParam(defaultValue = "1") int page,
+        @RequestParam(defaultValue = "20") int size,
+        @RequestParam(required = false) Long activityId) {
         return ApiResponse.success(goodsService.getGoodsPage(page, size, activityId));
     }
 
@@ -44,9 +44,9 @@ public class GoodsController {
 
     @GetMapping("/activity/{activityId}")
     public ApiResponse<IPage<SeckillGoods>> getGoodsByActivity(
-            @PathVariable Long activityId,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size) {
+        @PathVariable Long activityId,
+        @RequestParam(defaultValue = "1") int page,
+        @RequestParam(defaultValue = "20") int size) {
         return ApiResponse.success(goodsService.getGoodsPage(page, size, activityId));
     }
 }

@@ -6,12 +6,12 @@ import org.springframework.stereotype.Component;
 
 /**
  * 秒杀业务配置属性类
- *
+ * <p>
  * 功能说明：
  * - 集中管理秒杀系统的业务配置参数
  * - 从 application.yaml 中读取配置
  * - 提供类型安全的配置访问
- *
+ * <p>
  * 配置项说明：
  * - limiter: 限流器相关配置（QPS、并发数、IP限流）
  * - lock: 分布式锁相关配置（等待时间、持有时间）
@@ -49,7 +49,7 @@ public class SeckillProperties {
 
     /**
      * 限流器配置类
-     *
+     * <p>
      * 用于控制秒杀请求的流量，防止系统过载
      */
     @Data
@@ -78,7 +78,7 @@ public class SeckillProperties {
 
     /**
      * 分布式锁配置类
-     *
+     * <p>
      * 用于控制分布式环境下的并发访问
      */
     @Data
@@ -100,7 +100,7 @@ public class SeckillProperties {
 
     /**
      * 订单配置类
-     *
+     * <p>
      * 用于控制订单的生命周期
      */
     @Data
@@ -115,7 +115,7 @@ public class SeckillProperties {
 
     /**
      * SSE实时通知配置类
-     *
+     * <p>
      * 用于控制服务器推送事件的生命周期
      */
     @Data

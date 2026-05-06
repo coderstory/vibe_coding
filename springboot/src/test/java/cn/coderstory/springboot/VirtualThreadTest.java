@@ -11,22 +11,16 @@ import java.lang.management.ThreadMXBean;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * JDK 21 虚拟线程特性演示测试类
- *
+ * <p>
  * 本测试类展示虚拟线程的核心特性和使用方法，包括：
  * - 虚拟线程的创建方式
  * - 虚拟线程 vs 平台线程的性能对比
@@ -66,12 +60,12 @@ public class VirtualThreadTest {
         @DisplayName("方式二：VirtualThread.builder()")
         void testCreateVirtualThreadWithBuilder() throws Exception {
             Thread virtualThread = Thread.ofVirtual()
-                    .name("my-virtual-thread")
-                    .start(() -> {
-                        assertTrue(Thread.currentThread().isVirtual());
-                        assertEquals("my-virtual-thread", Thread.currentThread().getName());
-                        log.info("自定义名称的虚拟线程: {}", Thread.currentThread().getName());
-                    });
+                .name("my-virtual-thread")
+                .start(() -> {
+                    assertTrue(Thread.currentThread().isVirtual());
+                    assertEquals("my-virtual-thread", Thread.currentThread().getName());
+                    log.info("自定义名称的虚拟线程: {}", Thread.currentThread().getName());
+                });
 
             virtualThread.join();
             log.info("方式二测试通过: 使用 Thread.ofVirtual().name().start() 创建具名虚拟线程");

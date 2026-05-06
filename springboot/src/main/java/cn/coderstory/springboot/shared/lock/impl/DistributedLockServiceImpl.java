@@ -13,17 +13,17 @@ import java.util.function.Supplier;
 
 /**
  * 分布式锁服务实现类
- *
+ * <p>
  * 功能描述：
  * - 基于 Redisson 实现的分布式锁服务
  * - 提供多种获取和释放锁的方式
  * - 提供带锁执行的模板方法，简化业务代码
- *
+ * <p>
  * 实现特点：
  * - 使用 Redisson 的可重入锁（RLock）
  * - 支持公平锁和非公平锁
  * - 自动处理锁的获取和释放
- *
+ * <p>
  * 使用场景：
  * - 秒杀活动的并发控制
  * - 商品库存的原子操作
@@ -41,30 +41,63 @@ public class DistributedLockServiceImpl implements DistributedLockService {
     // ==================== 依赖注入 ====================
 
     /**
+     * 秒杀活动锁前缀（与活动数据key区分）
+     */
+    private static final String ACTIVITY_LOCK_PREFIX = "seckill:lock:activity:";
+    /**
+     * 商品库存锁前缀
+     */
+    private static final String STOCK_LOCK_PREFIX = "seckill:lock:stock:";
+
+    // ==================== 锁键前缀常量 ====================
+    /**
+     * 用户订单锁前缀
+     */
+    private static final String ORDER_LOCK_PREFIX = "seckill:order:";
+    /**
      * Redisson 客户端
      * - 用于获取各种分布式锁
      * - 由 RedissonConfig 配置类自动注入
      */
     private final RedissonClient redissonClient;
-
     /**
      * 秒杀业务配置
      * - 用于获取默认的锁等待时间和持有时间
      */
     private final SeckillProperties seckillProperties;
 
-    // ==================== 锁键前缀常量 ====================
-
-    /** 秒杀活动锁前缀（与活动数据key区分） */
-    private static final String ACTIVITY_LOCK_PREFIX = "seckill:lock:activity:";
-
-    /** 商品库存锁前缀 */
-    private static final String STOCK_LOCK_PREFIX = "seckill:lock:stock:";
-
-    /** 用户订单锁前缀 */
-    private static final String ORDER_LOCK_PREFIX = "seckill:order:";
-
     // ==================== 公共方法 ====================
+
+    /**
+     * 获取秒杀活动锁
+     *
+     * @param activityId 活动ID
+     * @return 活动锁键
+     */
+    public static String getActivityLockKey(Long activityId) {
+        return ACTIVITY_LOCK_PREFIX + activityId;
+    }
+
+    /**
+     * 获取商品库存锁
+     *
+     * @param goodsId 商品ID
+     * @return 库存锁键
+     */
+    public static String getStockLockKey(Long goodsId) {
+        return STOCK_LOCK_PREFIX + goodsId;
+    }
+
+    /**
+     * 获取用户订单锁
+     *
+     * @param userId  用户ID
+     * @param goodsId 商品ID
+     * @return 订单锁键
+     */
+    public static String getOrderLockKey(Long userId, Long goodsId) {
+        return ORDER_LOCK_PREFIX + userId + ":" + goodsId;
+    }
 
     /**
      * 获取分布式锁（不等待）
@@ -84,9 +117,9 @@ public class DistributedLockServiceImpl implements DistributedLockService {
     /**
      * 尝试获取锁（带等待时间）
      *
-     * @param lockKey 锁的键
+     * @param lockKey  锁的键
      * @param waitTime 等待时间
-     * @param unit 时间单位
+     * @param unit     时间单位
      * @return 是否获取成功
      */
     @Override
@@ -98,10 +131,10 @@ public class DistributedLockServiceImpl implements DistributedLockService {
     /**
      * 尝试获取锁（带等待时间和持有时间）
      *
-     * @param lockKey 锁的键
-     * @param waitTime 等待时间
+     * @param lockKey   锁的键
+     * @param waitTime  等待时间
      * @param leaseTime 持有时间
-     * @param unit 时间单位
+     * @param unit      时间单位
      * @return 是否获取成功
      */
     @Override
@@ -173,7 +206,7 @@ public class DistributedLockServiceImpl implements DistributedLockService {
     /**
      * 执行带锁的业务逻辑（使用默认等待和持有时间）
      *
-     * @param lockKey 锁的键
+     * @param lockKey  锁的键
      * @param supplier 业务逻辑
      * @return 业务执行结果
      */
@@ -184,12 +217,14 @@ public class DistributedLockServiceImpl implements DistributedLockService {
         return executeWithLock(lockKey, waitTime, unit, supplier);
     }
 
+    // ==================== 便捷方法 ====================
+
     /**
      * 执行带锁的业务逻辑（带等待时间）
      *
-     * @param lockKey 锁的键
+     * @param lockKey  锁的键
      * @param waitTime 等待获取锁的时间
-     * @param unit 时间单位
+     * @param unit     时间单位
      * @param supplier 业务逻辑
      * @return 业务执行结果，获取锁失败返回 null
      */
@@ -231,7 +266,7 @@ public class DistributedLockServiceImpl implements DistributedLockService {
     /**
      * 执行带锁的业务逻辑（无返回值，使用默认时间）
      *
-     * @param lockKey 锁的键
+     * @param lockKey  锁的键
      * @param runnable 业务逻辑
      */
     @Override
@@ -245,9 +280,9 @@ public class DistributedLockServiceImpl implements DistributedLockService {
     /**
      * 执行带锁的业务逻辑（带等待时间，无返回值）
      *
-     * @param lockKey 锁的键
+     * @param lockKey  锁的键
      * @param waitTime 等待获取锁的时间
-     * @param unit 时间单位
+     * @param unit     时间单位
      * @param runnable 业务逻辑
      */
     @Override
@@ -256,38 +291,5 @@ public class DistributedLockServiceImpl implements DistributedLockService {
             runnable.run();
             return null;
         });
-    }
-
-    // ==================== 便捷方法 ====================
-
-    /**
-     * 获取秒杀活动锁
-     *
-     * @param activityId 活动ID
-     * @return 活动锁键
-     */
-    public static String getActivityLockKey(Long activityId) {
-        return ACTIVITY_LOCK_PREFIX + activityId;
-    }
-
-    /**
-     * 获取商品库存锁
-     *
-     * @param goodsId 商品ID
-     * @return 库存锁键
-     */
-    public static String getStockLockKey(Long goodsId) {
-        return STOCK_LOCK_PREFIX + goodsId;
-    }
-
-    /**
-     * 获取用户订单锁
-     *
-     * @param userId 用户ID
-     * @param goodsId 商品ID
-     * @return 订单锁键
-     */
-    public static String getOrderLockKey(Long userId, Long goodsId) {
-        return ORDER_LOCK_PREFIX + userId + ":" + goodsId;
     }
 }

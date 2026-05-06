@@ -15,9 +15,6 @@ import java.util.Collections;
 @RequiredArgsConstructor
 // @RocketMQMessageListener(topic = "seckill_stock_deduct", consumerGroup = "seckill_stock_consumer")
 public class StockConsumer implements RocketMQListener<String> {
-    private final SeckillSseService sseService;
-    private final StringRedisTemplate redisTemplate;
-
     /**
      * Redis 扣减库存 Lua 脚本
      * KEYS[1]: 库存 key
@@ -30,6 +27,8 @@ public class StockConsumer implements RocketMQListener<String> {
         if tonumber(stock) < tonumber(ARGV[1]) then return -2 end
         return redis.call('DECRBY', KEYS[1], ARGV[1])
         """;
+    private final SeckillSseService sseService;
+    private final StringRedisTemplate redisTemplate;
 
     @Override
     public void onMessage(String message) {
@@ -47,9 +46,9 @@ public class StockConsumer implements RocketMQListener<String> {
         // 直接从 Redis 扣减库存（秒杀专用，不操作数据库）
         String stockKey = "seckill:stock:" + goodsId;
         Long remaining = redisTemplate.execute(
-                RedisScript.of(DEDUCT_STOCK_LUA, Long.class),
-                Collections.singletonList(stockKey),
-                quantity.toString()
+            RedisScript.of(DEDUCT_STOCK_LUA, Long.class),
+            Collections.singletonList(stockKey),
+            quantity.toString()
         );
 
         if (remaining == null || remaining < 0) {

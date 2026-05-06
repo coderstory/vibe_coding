@@ -3,18 +3,20 @@ package cn.coderstory.springboot.monitor.controller;
 import cn.coderstory.springboot.shared.vo.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * 监控控制器
- *
+ * <p>
  * 功能描述：
  * - 提供系统监控指标查询接口
  * - 提供健康检查接口
- *
+ * <p>
  * 监控指标：
  * - 当前并发处理数
  * - 请求 QPS
@@ -33,7 +35,7 @@ public class MonitorController {
 
     /**
      * 获取系统监控指标
-     *
+     * <p>
      * 返回当前系统的实时监控数据，包括：
      * - concurrentCount: 当前正在处理的请求数
      * - timestamp: 服务器时间戳
@@ -55,7 +57,7 @@ public class MonitorController {
 
     /**
      * 健康检查接口
-     *
+     * <p>
      * 用于负载均衡器和监控系统的健康探测
      *
      * @return 健康状态

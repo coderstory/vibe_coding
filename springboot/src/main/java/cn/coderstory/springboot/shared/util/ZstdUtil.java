@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ZstdUtil {
-    
+
     public static byte[] compress(byte[] data) {
         if (data == null || data.length == 0) {
             return null;
@@ -17,7 +17,7 @@ public class ZstdUtil {
             return null;
         }
     }
-    
+
     public static byte[] decompress(byte[] compressed, long originalSize) {
         if (compressed == null || compressed.length == 0) {
             return null;

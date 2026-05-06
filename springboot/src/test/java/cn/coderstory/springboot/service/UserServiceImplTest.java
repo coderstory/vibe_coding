@@ -1,12 +1,11 @@
 package cn.coderstory.springboot.service;
 
-import cn.coderstory.springboot.user.entity.User;
 import cn.coderstory.springboot.shared.exception.BusinessException;
-import cn.coderstory.springboot.user.mapper.UserMapper;
 import cn.coderstory.springboot.shared.security.PasswordEncoder;
-import cn.coderstory.springboot.user.service.impl.UserServiceImpl;
 import cn.coderstory.springboot.user.dto.UserVO;
-
+import cn.coderstory.springboot.user.entity.User;
+import cn.coderstory.springboot.user.mapper.UserMapper;
+import cn.coderstory.springboot.user.service.impl.UserServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -21,7 +20,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UserService 单元测试")

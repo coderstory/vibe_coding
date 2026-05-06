@@ -34,9 +34,9 @@ public class SeckillSseController {
     public Object getConnectionStatus(@PathVariable String queueId) {
         boolean online = seckillSseService.isOnline(queueId);
         return java.util.Map.of(
-                "queueId", queueId,
-                "online", online,
-                "message", online ? "连接在线" : "连接已断开或不存在"
+            "queueId", queueId,
+            "online", online,
+            "message", online ? "连接在线" : "连接已断开或不存在"
         );
     }
 }

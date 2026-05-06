@@ -1,18 +1,18 @@
 package cn.coderstory.springboot.seckill.service.impl;
 
-import cn.coderstory.springboot.shared.limiter.ConcurrencyLimiter;
-import cn.coderstory.springboot.shared.limiter.QpsLimiter;
-import cn.coderstory.springboot.shared.lock.DistributedLockService;
-import cn.coderstory.springboot.shared.lock.impl.DistributedLockServiceImpl;
-import cn.coderstory.springboot.seckill.mq.producer.OrderTransactionProducer;
-import cn.coderstory.springboot.shared.security.IdempotentService;
 import cn.coderstory.springboot.seckill.dto.SeckillRequest;
 import cn.coderstory.springboot.seckill.dto.SeckillResponse;
 import cn.coderstory.springboot.seckill.entity.SeckillActivity;
 import cn.coderstory.springboot.seckill.mapper.SeckillActivityMapper;
-import cn.coderstory.springboot.seckill.service.SignService;
+import cn.coderstory.springboot.seckill.mq.producer.OrderTransactionProducer;
 import cn.coderstory.springboot.seckill.service.SeckillService;
+import cn.coderstory.springboot.seckill.service.SignService;
 import cn.coderstory.springboot.seckill.sse.SeckillSseService;
+import cn.coderstory.springboot.shared.limiter.ConcurrencyLimiter;
+import cn.coderstory.springboot.shared.limiter.QpsLimiter;
+import cn.coderstory.springboot.shared.lock.DistributedLockService;
+import cn.coderstory.springboot.shared.lock.impl.DistributedLockServiceImpl;
+import cn.coderstory.springboot.shared.security.IdempotentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -24,11 +24,11 @@ import java.util.Collections;
 
 /**
  * 秒杀服务实现类
- *
+ * <p>
  * 功能描述：
  * - 实现秒杀抢购的核心业务逻辑
  * - 提供高并发场景下的商品限时抢购能力
- *
+ * <p>
  * 核心流程：
  * 1. 幂等性检查 - 防止重复请求
  * 2. QPS 限流 - 控制每秒请求数
@@ -37,7 +37,7 @@ import java.util.Collections;
  * 5. 签名验证 - 验证请求合法性
  * 6. Redis 原子扣库存 - 利用 Redis 单线程保证原子性
  * 7. 发送事务消息 - 创建订单
- *
+ * <p>
  * 技术要点：
  * - 使用 Redis Lua 脚本保证库存扣减原子性
  * - 使用分布式锁保证活动级别的并发安全
@@ -56,12 +56,12 @@ public class SeckillServiceImpl implements SeckillService {
 
     /**
      * Redis 原子扣库存 Lua 脚本
-     *
+     * <p>
      * 脚本逻辑：
      * 1. 检查库存 key 是否存在
      * 2. 检查库存是否充足
      * 3. 执行库存扣减
-     *
+     * <p>
      * 返回值：
      * - -1: key 不存在
      * - 0: 库存不足
@@ -74,48 +74,68 @@ public class SeckillServiceImpl implements SeckillService {
         return redis.call('DECRBY', KEYS[1], ARGV[1])
         """;
 
-    /** 库存 Key 前缀 */
+    /**
+     * 库存 Key 前缀
+     */
     private static final String STOCK_KEY_PREFIX = "seckill:stock:";
 
     // ==================== 依赖注入 ====================
 
-    /** 秒杀活动 Mapper */
+    /**
+     * 秒杀活动 Mapper
+     */
     private final SeckillActivityMapper activityMapper;
 
-    /** Redis 模板，用于执行 Lua 脚本和操作 String 类型数据 */
+    /**
+     * Redis 模板，用于执行 Lua 脚本和操作 String 类型数据
+     */
     private final StringRedisTemplate redisTemplate;
 
-    /** 签名服务，用于生成和验证请求签名 */
+    /**
+     * 签名服务，用于生成和验证请求签名
+     */
     private final SignService signService;
 
-    /** QPS 限流器，控制每秒请求数 */
+    /**
+     * QPS 限流器，控制每秒请求数
+     */
     private final QpsLimiter qpsLimiter;
 
-    /** 并发限流器，控制最大并发处理数 */
+    /**
+     * 并发限流器，控制最大并发处理数
+     */
     private final ConcurrencyLimiter concurrencyLimiter;
 
-    /** 幂等性服务，防止重复请求 */
+    /**
+     * 幂等性服务，防止重复请求
+     */
     private final IdempotentService idempotentService;
 
-    /** 订单事务消息生产者 */
+    /**
+     * 订单事务消息生产者
+     */
     private final OrderTransactionProducer orderTransactionProducer;
 
-    /** SSE 服务，用于实时推送秒杀结果 */
+    /**
+     * SSE 服务，用于实时推送秒杀结果
+     */
     private final SeckillSseService sseService;
 
-    /** 分布式锁服务 */
+    /**
+     * 分布式锁服务
+     */
     private final DistributedLockService distributedLockService;
 
     // ==================== 业务方法 ====================
 
     /**
      * 执行秒杀抢购
-     *
+     * <p>
      * 功能描述：
      * - 处理用户的秒杀抢购请求
      * - 采用多层防护策略保证系统稳定性
      * - 使用 Redis 原子扣减保证不超卖
-     *
+     * <p>
      * 处理流程：
      * 1. 生成队列ID，用于追踪请求状态
      * 2. 幂等性检查，同一请求短时间内只能处理一次
@@ -127,9 +147,8 @@ public class SeckillServiceImpl implements SeckillService {
      * 8. 发送事务消息，异步创建订单
      *
      * @param request 秒杀请求参数（包含商品ID、活动ID、签名等）
-     * @param userId 用户ID
+     * @param userId  用户ID
      * @return 秒杀响应（包含队列ID、状态、消息）
-     *
      * @throws Exception 系统内部错误
      */
     @Override
@@ -141,13 +160,13 @@ public class SeckillServiceImpl implements SeckillService {
         }
         String queueId = request.getQueueId();
         log.info("开始处理秒杀请求: userId={}, goodsId={}, activityId={}, queueId={}",
-                userId, request.getGoodsId(), request.getActivityId(), queueId);
+            userId, request.getGoodsId(), request.getActivityId(), queueId);
 
         // ========== 第一层防护：幂等性检查 ==========
         // 使用 Redis SETNX 保证同一请求短时间内只能处理一次
         if (!idempotentService.tryAcquire(request.getIdempotentKey(), Duration.ofMinutes(10))) {
             log.warn("重复请求被拒绝: userId={}, goodsId={}, idempotentKey={}",
-                    userId, request.getGoodsId(), request.getIdempotentKey());
+                userId, request.getGoodsId(), request.getIdempotentKey());
             return SeckillResponse.failed("重复请求");
         }
 
@@ -176,7 +195,7 @@ public class SeckillServiceImpl implements SeckillService {
             }
             if (activity.getStatus() != 1) {
                 log.warn("活动未开始或已结束: activityId={}, status={}",
-                        request.getActivityId(), activity.getStatus());
+                    request.getActivityId(), activity.getStatus());
                 return SeckillResponse.failed("活动未开始或已结束");
             }
 
@@ -199,11 +218,11 @@ public class SeckillServiceImpl implements SeckillService {
             // 使用分布式锁保证活动维度的并发安全
             String activityLockKey = DistributedLockServiceImpl.getActivityLockKey(request.getActivityId());
             Boolean lockAcquired = distributedLockService.executeWithLock(
-                    activityLockKey,
-                    () -> {
-                        // 执行库存扣减
-                        return deductStockInRedis(request.getGoodsId());
-                    }
+                activityLockKey,
+                () -> {
+                    // 执行库存扣减
+                    return deductStockInRedis(request.getGoodsId());
+                }
             );
 
             if (lockAcquired == null || !lockAcquired) {
@@ -217,10 +236,10 @@ public class SeckillServiceImpl implements SeckillService {
             // 发送订单创建消息，MQ 会保证消息和本地事务的一致性
             try {
                 orderTransactionProducer.sendOrderCreateMsg(
-                        userId,
-                        request.getGoodsId(),
-                        request.getActivityId(),
-                        queueId
+                    userId,
+                    request.getGoodsId(),
+                    request.getActivityId(),
+                    queueId
                 );
                 log.info("订单创建消息发送成功: queueId={}", queueId);
             } catch (Exception e) {
@@ -237,7 +256,7 @@ public class SeckillServiceImpl implements SeckillService {
 
         } catch (Exception e) {
             log.error("秒杀处理异常: userId={}, goodsId={}, error={}",
-                    userId, request.getGoodsId(), e.getMessage(), e);
+                userId, request.getGoodsId(), e.getMessage(), e);
             return SeckillResponse.failed("系统错误，请稍后重试");
         } finally {
             // 释放并发限流器
@@ -247,7 +266,7 @@ public class SeckillServiceImpl implements SeckillService {
 
     /**
      * 在 Redis 中原子扣减库存
-     *
+     * <p>
      * 功能描述：
      * - 使用 Lua 脚本保证扣减操作的原子性
      * - Redis 单线程执行特性保证并发安全
@@ -260,9 +279,9 @@ public class SeckillServiceImpl implements SeckillService {
 
         // 执行 Lua 脚本，保证原子性
         Long remaining = redisTemplate.execute(
-                RedisScript.of(DEDUCT_STOCK_LUA, Long.class),
-                Collections.singletonList(stockKey),
-                "1"  // 每次扣减 1 件
+            RedisScript.of(DEDUCT_STOCK_LUA, Long.class),
+            Collections.singletonList(stockKey),
+            "1"  // 每次扣减 1 件
         );
 
         if (remaining == null) {
@@ -297,13 +316,13 @@ public class SeckillServiceImpl implements SeckillService {
 
     /**
      * 预热商品库存到 Redis
-     *
+     * <p>
      * 功能描述：
      * - 在秒杀开始前，将库存数据预加载到 Redis
      * - 避免秒杀开始时大量请求直接打到数据库
      *
      * @param goodsId 商品ID
-     * @param stock 库存数量
+     * @param stock   库存数量
      */
     @Override
     public void preloadStock(Long goodsId, int stock) {
@@ -314,12 +333,12 @@ public class SeckillServiceImpl implements SeckillService {
 
     /**
      * 回滚 Redis 中的库存
-     *
+     * <p>
      * 功能描述：
      * - 当订单创建失败或超时取消时，回滚 Redis 库存
      * - 保证库存数据的最终一致性
      *
-     * @param goodsId 商品ID
+     * @param goodsId  商品ID
      * @param quantity 回滚数量
      */
     @Override

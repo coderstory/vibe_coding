@@ -7,12 +7,12 @@ import java.util.function.Supplier;
 
 /**
  * 分布式锁服务接口
- *
+ * <p>
  * 功能说明：
  * - 提供基于 Redisson 的分布式锁操作能力
  * - 支持公平锁、非公平锁等多种锁类型
  * - 提供便捷的带锁执行模板方法
- *
+ * <p>
  * 锁键命名规范：
  * - 秒杀活动锁: seckill:lock:activity:{activityId}
  * - 商品库存锁: seckill:lock:stock:{goodsId}
@@ -29,9 +29,7 @@ public interface DistributedLockService {
      *
      * @param lockKey 锁的键
      * @return 锁对象，获取失败返回 null
-     *
-     * @example
-     * <pre>
+     * @example <pre>
      *     RLock lock = lockService.getLock("seckill:lock:stock:1");
      *     if (lock != null && lock.tryLock()) {
      *         try {
@@ -47,13 +45,11 @@ public interface DistributedLockService {
     /**
      * 尝试获取锁（带等待时间）
      *
-     * @param lockKey 锁的键
+     * @param lockKey  锁的键
      * @param waitTime 等待时间
-     * @param unit 时间单位
+     * @param unit     时间单位
      * @return 是否获取成功
-     *
-     * @example
-     * <pre>
+     * @example <pre>
      *     boolean acquired = lockService.tryLock("seckill:activity:1", 5, TimeUnit.SECONDS);
      *     if (acquired) {
      *         // 获取锁成功
@@ -65,10 +61,10 @@ public interface DistributedLockService {
     /**
      * 尝试获取锁（带等待时间和持有时间）
      *
-     * @param lockKey 锁的键
-     * @param waitTime 等待时间
+     * @param lockKey   锁的键
+     * @param waitTime  等待时间
      * @param leaseTime 持有时间（自动释放时间）
-     * @param unit 时间单位
+     * @param unit      时间单位
      * @return 是否获取成功
      */
     boolean tryLock(String lockKey, long waitTime, long leaseTime, TimeUnit unit);
@@ -77,9 +73,7 @@ public interface DistributedLockService {
      * 释放锁
      *
      * @param lockKey 锁的键
-     *
-     * @example
-     * <pre>
+     * @example <pre>
      *     lockService.unlock("seckill:lock:stock:1");
      * </pre>
      */
@@ -96,12 +90,10 @@ public interface DistributedLockService {
     /**
      * 执行带锁的业务逻辑（自动获取和释放锁）
      *
-     * @param lockKey 锁的键
+     * @param lockKey  锁的键
      * @param supplier 业务逻辑
      * @return 业务执行结果
-     *
-     * @example
-     * <pre>
+     * @example <pre>
      *     String result = lockService.executeWithLock("seckill:lock:stock:1", () -> {
      *         // 库存扣减业务逻辑
      *         return stockService.deductStock(goodsId, quantity);
@@ -113,9 +105,9 @@ public interface DistributedLockService {
     /**
      * 执行带锁的业务逻辑（带等待时间）
      *
-     * @param lockKey 锁的键
+     * @param lockKey  锁的键
      * @param waitTime 等待获取锁的时间
-     * @param unit 时间单位
+     * @param unit     时间单位
      * @param supplier 业务逻辑
      * @return 业务执行结果，获取锁失败返回 null
      */
@@ -124,7 +116,7 @@ public interface DistributedLockService {
     /**
      * 执行带锁的业务逻辑（无返回值）
      *
-     * @param lockKey 锁的键
+     * @param lockKey  锁的键
      * @param runnable 业务逻辑
      */
     void executeWithLock(String lockKey, Runnable runnable);
@@ -132,9 +124,9 @@ public interface DistributedLockService {
     /**
      * 执行带锁的业务逻辑（带等待时间，无返回值）
      *
-     * @param lockKey 锁的键
+     * @param lockKey  锁的键
      * @param waitTime 等待获取锁的时间
-     * @param unit 时间单位
+     * @param unit     时间单位
      * @param runnable 业务逻辑
      */
     void executeWithLock(String lockKey, long waitTime, TimeUnit unit, Runnable runnable);

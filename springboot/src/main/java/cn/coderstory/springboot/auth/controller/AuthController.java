@@ -1,15 +1,15 @@
 package cn.coderstory.springboot.auth.controller;
 
-import cn.coderstory.springboot.user.entity.User;
-import cn.coderstory.springboot.shared.security.JwtTokenProvider;
 import cn.coderstory.springboot.auth.service.AuthService;
+import cn.coderstory.springboot.shared.security.JwtTokenProvider;
 import cn.coderstory.springboot.shared.vo.ApiResponse;
+import cn.coderstory.springboot.user.entity.User;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,8 +32,8 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<Map<String, Object>>> login(
-            @RequestBody Map<String, String> request,
-            HttpServletRequest httpRequest) {
+        @RequestBody Map<String, String> request,
+        HttpServletRequest httpRequest) {
         String username = request.get("username");
         String password = request.get("password");
         String ipAddress = getClientIp(httpRequest);

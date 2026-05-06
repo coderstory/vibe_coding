@@ -14,16 +14,16 @@ import java.util.List;
 
 /**
  * 预约控制器
- *
+ * <p>
  * 核心功能：
  * 1. 用户预约活动
  * 2. 查询我的预约列表
- *
+ * <p>
  * 缓存策略：
  * - 预约时：先写 Redis Set（SADD），再异步写数据库
  * - 查询时：直接查数据库（需要完整预约信息）
  * - 判断是否已预约：查 Redis Set（SISMEMBER），O(1) 复杂度
- *
+ * <p>
  * Redis Key 设计：
  * - seckill:reservation:{activityId} - 预约用户ID集合（Set 类型）
  *
@@ -40,14 +40,14 @@ public class ReservationController {
 
     /**
      * 用户预约活动
-     *
+     * <p>
      * 流程：
      * 1. 先用 Redis SISMEMBER 检查是否已预约（O(1)）
      * 2. 已预约则直接返回 false
      * 3. 未预约则 SADD 写入 Redis，同时写数据库持久化
      *
      * @param activityId 活动ID
-     * @param userId 用户ID（从请求头获取）
+     * @param userId     用户ID（从请求头获取）
      * @return true=预约成功，false=已预约
      */
     @PostMapping("/{activityId}")
@@ -102,7 +102,7 @@ public class ReservationController {
 
     /**
      * 查询我的预约列表
-     *
+     * <p>
      * 直接从数据库查询，返回完整的预约信息
      *
      * @param userId 用户ID（从请求头获取）

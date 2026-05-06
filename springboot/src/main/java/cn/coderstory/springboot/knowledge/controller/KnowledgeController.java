@@ -17,13 +17,13 @@ import java.util.List;
 
 /**
  * 知识库管理控制器
- *
+ * <p>
  * 功能描述：
  * - 提供知识库文章的 CRUD 操作接口
  * - 提供分类管理和标签管理
  * - 提供文件上传下载功能
  * - 支持文章搜索和全文检索
- *
+ * <p>
  * 接口列表：
  * - 文章管理：列表、详情、创建、更新、删除、搜索
  * - 分类管理：树形结构、创建、更新、删除
@@ -67,7 +67,7 @@ public class KnowledgeController {
     /**
      * 更新分类
      *
-     * @param id 分类 ID
+     * @param id       分类 ID
      * @param category 分类信息
      * @return 更新后的分类
      */
@@ -96,18 +96,18 @@ public class KnowledgeController {
     /**
      * 分页获取文章列表
      *
-     * @param keyword 搜索关键字（可选）
+     * @param keyword    搜索关键字（可选）
      * @param categoryId 分类 ID（可选）
-     * @param page 页码，默认 1
-     * @param size 每页数量，默认 20
+     * @param page       页码，默认 1
+     * @param size       每页数量，默认 20
      * @return 分页后的文章列表
      */
     @GetMapping("/articles")
     public ResponseEntity<ApiResponse<Object>> getArticlePage(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) Long categoryId,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size) {
+        @RequestParam(required = false) String keyword,
+        @RequestParam(required = false) Long categoryId,
+        @RequestParam(defaultValue = "1") int page,
+        @RequestParam(defaultValue = "20") int size) {
         Object data = knowledgeService.getArticlePage(keyword, categoryId, page, size);
         return ResponseEntity.ok(ApiResponse.success(data));
     }
@@ -141,7 +141,7 @@ public class KnowledgeController {
     /**
      * 更新文章
      *
-     * @param id 文章 ID
+     * @param id      文章 ID
      * @param article 文章信息
      * @return 更新后的文章
      */
@@ -223,15 +223,15 @@ public class KnowledgeController {
      * 上传文件到文章
      *
      * @param articleId 关联的文章 ID
-     * @param fileName 文件名
-     * @param file 文件数据
+     * @param fileName  文件名
+     * @param file      文件数据
      * @return 上传的文件元信息
      */
     @PostMapping("/files")
     public ResponseEntity<ApiResponse<KnowledgeFile>> uploadFile(
-            @RequestParam Long articleId,
-            @RequestParam String fileName,
-            @RequestParam MultipartFile file) throws Exception {
+        @RequestParam Long articleId,
+        @RequestParam String fileName,
+        @RequestParam MultipartFile file) throws Exception {
         byte[] data = file.getBytes();
         String contentType = file.getContentType();
         KnowledgeFile uploaded = knowledgeService.uploadFile(articleId, fileName, data, contentType);
@@ -252,9 +252,9 @@ public class KnowledgeController {
         }
         byte[] data = knowledgeService.downloadFile(id);
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFileName() + "\"")
-                .contentType(MediaType.parseMediaType(file.getContentType() != null ? file.getContentType() : "application/octet-stream"))
-                .body(data);
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFileName() + "\"")
+            .contentType(MediaType.parseMediaType(file.getContentType() != null ? file.getContentType() : "application/octet-stream"))
+            .body(data);
     }
 
     /**
