@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: 代码深度清理与优化
 status: active
-last_updated: "2026-05-07T12:00:00.000Z"
+last_updated: "2026-05-07T14:00:00.000Z"
 last_activity: 2026-05-07
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 5
   total_plans: 5
-  completed_plans: 1
-  percent: 20
+  completed_plans: 5
+  percent: 100
 ---
 
 ## Project Reference
@@ -22,75 +22,58 @@ See: .planning/PROJECT.md (updated 2026-05-07)
 
 ## Current Position
 
-Phase: 23 of 26 (后端结构体优化)
+Phase: All phases completed (v1.6 里程碑已完成)
 Plan: —
-Status: Ready to start
-Last activity: 2026-05-07 — Phase 22 completed (cleanup: MonitorController dead var, AuditAspect fix)
+Status: ✅ Done
+Last activity: 2026-05-07 — Phase 25+26 completed (依赖清理+配置清理)
 
-Progress: [████░░░░░░] 20%
+Progress: [████████████] 100%
 
-## Milestone: v1.5 ✅ COMPLETED
+## Completed Phases
 
-**前后端代码重构与目录整理** — 所有 5 个阶段（17-21）均已完成：
+### Phase 22: 后端死代码清理 ✅
+- 删除未使用的私有方法、字段、局部变量、import 语句
+- 删除注释掉的代码块
+- 修复 MonitorController 死变量
 
-### 成果总结
+### Phase 23: 后端结构体优化 ✅
+- Wave 1: 删除未用 DTO/VO/Service 方法，精简 Mapper XML
+- Wave 2: RocketMQAdminServiceImpl 1099行→98行 Facade，拆为 4 个子服务
+- Wave 3: type-first 目录重构，10 个域 121 个文件迁移
+- Wave 4: BAC-04 工具类已验证无需处理
 
-- **Phase 17**: 工具链搭建 — EditorConfig/ESLint 10.x/Stylelint/Checkstyle/ArchUnit
-- **Phase 18**: 后端包结构重组 — 71 个文件迁移到 10 个业务域包
-- **Phase 19**: 配置文件整理 — application.yaml 拆分为 5 个关注点文件
-- **Phase 20**: 前端目录重组 — components/api/router 按域组织
-- **Phase 21**: 代码规范统一 — 前后端 lint 清理，Checkstyle 治理
+### Phase 24: 前端代码清理 ✅
+- 删除 5 个未用脚手架图标组件
+- 删除未用 api/index.ts/activity.ts 等文件
+- 删除 7 个未用 API 函数、11 个未用类型
+- 删除重复 CSS 样式和未引用 CSS 文件
+- lint 零 warning
 
 ## Performance Metrics
 
 **Velocity:**
-
-- Total plans completed: 41 (across v1.0-v1.5)
+- Total plans completed: 44 (across v1.0-v1.6)
 - Average duration: N/A
-- Total execution time: N/A
 
 **By Phase:**
+| Phase | Status |
+|-------|--------|
+| 1-16 (v1.0-v1.4) | ✅ completed |
+| 17-21 (v1.5) | ✅ completed |
+| 22 (v1.6) | ✅ completed |
+| 23 (v1.6) | ✅ completed |
+| 24 (v1.6) | ✅ completed |
+| 25 (v1.6) | ✅ completed |
+| 26 (v1.6) | ✅ completed |
 
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 1-16 (v1.0-v1.4) | 36 | completed | N/A |
-| 17-21 (v1.5) | 5 | completed | N/A |
-| 22-26 (v1.6) | 0 | pending | - |
-
-*Updated after each plan completion*
-
-## Accumulated Context
-
-### Decisions
-
-Recent decisions affecting current work:
-
-- **v1.6 scoping:** 仅做代码清理，不新增业务功能，不修改数据库 schema，不重构核心架构
-- **v1.6 phase design:** 后端死代码清理先行（Phase 22），前后端代码清理并行（Phase 23 + 24），依赖和配置清理在后（Phase 25 + 26）
-- **v1.6 safety:** 每阶段以编译通过 + lint/check 零新增告警 + 功能回归验证为完成标准
-
-Full decision log: .planning/PROJECT.md Key Decisions
-
-### Pending Todos
+## Pending Todos
 
 无。
 
-### Blockers/Concerns
+## Blockers/Concerns
 
-无。v1.5 里程碑全部完成，代码基线稳定，v1.6 可立即启动。
-
-## Deferred Items
-
-| Category | Item | Status | Deferred At |
-|----------|------|--------|-------------|
-| v1.4 carryover | 敏感信息环境变量加固（JWT secret、DB 密码） | Deferred | 2026-05-06 |
-
-## Session Continuity
-
-Last session: 2026-05-07
-Stopped at: v1.6 roadmap created, awaiting first plan-phase
-Resume file: None
+无。
 
 ---
 
-*STATE.md updated: 2026-05-07 — v1.6 roadmap created*
+*STATE.md updated: 2026-05-07 — Phase 23+24 completed*

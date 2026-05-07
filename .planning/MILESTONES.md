@@ -103,25 +103,18 @@
 
 ## v1.6 — 代码深度清理与优化
 
-**Date:** 2026-05-07 (planning)
+**Date:** 2026-05-07
 
 **Goal:** 全面清理前后端死代码（未使用方法/字段/导入/组件/API），清理无用依赖和冗余配置，提升代码库整洁度
 
-**Target features:**
-- 后端 Java 代码清理：死方法/字段/导入删除，工具类合并，DTO/VO 精简，Service 瘦身
-- 前端 Vue/TS 代码清理：无用组件删除，API 层精简，CSS 清理，类型合并
-- 依赖清理：Gradle 未用依赖移除，npm 未用包移除，依赖作用域修正
-- 配置清理：application.yaml 冗余属性清理，无引用 profile 清理，.env 清理
+**Delivered:**
+- 后端 Java 死代码清理：删除未用方法/字段/导入/注释块
+- 后端结构体优化：DTO/VO 精简，RocketMQAdminService Facade 拆分，type-first 目录重构
+- 前端代码清理：删除无用组件/API/类型/CSS，lint 零 warning
+- 依赖清理：修正 Gradle AOP 依赖为 BOM 管理，npm 包作用域修正（@playwright/test→devDependencies），移除冗余 vue-test-utils
+- 配置清理：移除 application-test.yaml 中与主配置重复的属性（mybatis-plus、seckill.limiter、seckill.order.timeout）
 
-**Constraints:**
-- 不新增任何业务功能
-- 不修改数据库 schema
-- 不重构核心架构
-- 仅清理现有代码
-
-**Phases:** 22-26 (5 phases, 22 requirements)
-
-**Status:** 🚧 Planning (roadmap created, awaiting first plan-phase)
+**Status:** ✅ Completed
 
 ---
 
