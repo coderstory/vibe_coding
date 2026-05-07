@@ -25,7 +25,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-aop:4.0.0-M2")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
-    implementation("org.springframework.boot:spring-boot-starter-flyway")
+    //implementation("org.springframework.boot:spring-boot-starter-flyway")
     implementation("org.springframework:spring-messaging")
 
     // Database
@@ -86,3 +86,4 @@ flyway {
     locations = arrayOf("classpath:db/migration")
     baselineOnMigrate = true
 }
+
