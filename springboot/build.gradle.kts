@@ -1,3 +1,12 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.flywaydb:flyway-mysql:12.4.0")
+    }
+}
+
 plugins {
     java
     id("org.springframework.boot") version "4.1.0-RC1"
@@ -81,7 +90,7 @@ springBoot {
 flyway {
     url = "jdbc:mysql://localhost:3306/admin_system?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false"
     user = System.getenv("DB_USER") ?: "root"
-    password = System.getenv("DB_PASSWORD") ?: ""
+    password = System.getenv("DB_PASSWORD") ?: "123456"
     driver = "com.mysql.cj.jdbc.Driver"
     locations = arrayOf("classpath:db/migration")
     baselineOnMigrate = true
