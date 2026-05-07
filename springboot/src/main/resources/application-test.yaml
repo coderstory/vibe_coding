@@ -69,33 +69,11 @@ spring:
 # 秒杀业务配置
 # ===========================================
 seckill:
-  limiter:
-    qps: 1000
-    concurrency: 500
-    ip-rate: 100
   lock:
     wait-time: 5
     lease-time: 10
-  order:
-    timeout: 900
   sse:
     timeout: 60000
-
-# ===========================================
-# MyBatis Plus 配置
-# ===========================================
-mybatis-plus:
-  configuration:
-    map-underscore-to-camel-case: true
-  global-config:
-    db-config:
-      logic-delete-field: deleted
-      logic-delete-value: 1
-      logic-not-delete-value: 0
-
-# ===========================================
-# 日志配置
-# ===========================================
 logging:
   level:
     cn.coderstory: DEBUG
