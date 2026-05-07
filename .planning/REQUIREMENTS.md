@@ -3,92 +3,91 @@
 **Defined:** 2026-05-07
 **Core Value:** 提供清晰、高效的企业级管理后台界面，通过夏日海滩风主题营造清爽专业的视觉体验。
 
-## v1.6 Requirements
+## v1.7 Requirements
 
-### 后端代码清理 (BAC)
+### 注释标准定义
 
-- [ ] **BAC-01**: 删除后端 Java 代码中所有未使用的私有方法
-- [ ] **BAC-02**: 删除后端 Java 代码中所有未使用的字段和局部变量
-- [ ] **BAC-03**: 删除所有未使用的 import 语句
-- [ ] **BAC-04**: 合并过于零散的辅助工具类（Util/Helper 类精简）
-- [ ] **BAC-05**: 删除未使用的 DTO/VO 类及冗余的实体字段
-- [ ] **BAC-06**: 删除注释掉的代码块
-- [ ] **BAC-07**: 精简冗余的 Mapper XML 映射配置
-- [ ] **BAC-08**: 检查并删除未被任何 Controller 引用的 Service 方法
-- [ ] **BAC-09**: 拆分过于臃肿的大类（上帝类），按职责拆分为多个小类
-- [ ] **BAC-10**: 将后端目录从 domain-first（`seckill/controller/`）重构为 type-first（`controller/seckill/`），统一 `package` 声明和 import 引用
+- [ ] **STD-01**: 确定注释语言策略（中文注释 + 英文技术术语保留）
+- [ ] **STD-02**: 定义 L0-L3 注释层级规则（什么必须/禁止/可选注释）
+- [ ] **STD-03**: 制定 TODO 管理规则（必须关联 Issue 编号）
+- [ ] **STD-04**: 明确 Javadoc/TSDoc 模板规范（禁止空骨架、禁止`@author`/`@since`）
+- [ ] **STD-05**: 制定 PR Review 注释检查清单
 
-### 前端代码清理 (FEC)
+### 配置文件注释
 
-- [ ] **FEC-01**: 删除未使用的 .vue 组件（脚手架残留组件）
-- [ ] **FEC-02**: 删除 Vue/TS 中未使用的变量、导入和类型定义
-- [ ] **FEC-03**: 精简 API 层（删除未被任何页面引用的 API 函数）
-- [ ] **FEC-04**: 删除未使用的 CSS 样式和重复的样式定义
-- [ ] **FEC-05**: 删除注释掉的代码块
-- [ ] **FEC-06**: 合并冗余的 TypeScript 类型定义
+- [ ] **CFG-01**: datasource.yaml 补充段头注释和关键属性行内说明
+- [ ] **CFG-02**: cache.yaml 补充段头注释和关键属性行内说明
+- [ ] **CFG-03**: mq.yaml 补充段头注释和关键属性行内说明
+- [ ] **CFG-04**: security.yaml 补充段头注释和关键属性行内说明
+- [ ] **CFG-05**: business.yaml 补充段头注释和关键属性行内说明
+- [ ] **CFG-06**: application.yaml 补充整体描述和各 Profile 说明
+- [ ] **CFG-07**: build.gradle.kts 和 libs.versions.toml 补充构建块注释
+- [ ] **CFG-08**: ESLint flat config 和 Stylelint 配置补充注释
 
-### 依赖清理 (DEC)
+### 后端 Java 代码注释
 
-- [ ] **DEC-01**: 删除 build.gradle.kts 中未使用的依赖项
-- [ ] **DEC-02**: 修正 Gradle 依赖作用域（implementation vs api vs compileOnly）
-- [ ] **DEC-03**: 删除 package.json 中未使用的 npm 包
-- [ ] **DEC-04**: 将 devDependencies 中纯类型包移至 @types 规范
-- [ ] **DEC-05**: 执行 npm prune 清理 node_modules 中多余的包
+- [ ] **BKND-01**: 所有 Controller 类补充类级 Javadoc（职责说明）和方法级 `@param`/`@return`
+- [ ] **BKND-02**: 配置类（`@ConfigurationProperties`）补充类 Javadoc 和字段说明
+- [ ] **BKND-03**: `SecurityConfig`、`CorsConfig`、`WebConfig` 等安全/Web 配置类补充注释
+- [ ] **BKND-04**: `BusinessException` 异常体系补充类级和枚举值注释
+- [ ] **BKND-05**: `JwtTokenProvider`、`JwtAuthenticationFilter` 补充类级 + 方法级 Javadoc
+- [ ] **BKND-06**: `AuditAspect` AOP 切面补充注释
+- [ ] **BKND-07**: `PasswordEncoder` 等工具类补充类级 Javadoc
+- [ ] **BKND-08**: ~15 个 Service 接口补充完整 Javadoc（职责 + 方法说明）
 
-### 配置清理 (COC)
+### 前端 Vue/TS 代码注释
 
-- [ ] **COC-01**: 删除 application.yaml 中无 `@Value` 或 `@ConfigurationProperties` 绑定的冗余属性
-- [ ] **COC-02**: 清理无引用的 profile 配置
-- [ ] **COC-03**: 检查并清理 .env 文件中过期的环境变量
+- [ ] **FRNT-01**: 所有 Vue 组件补充组件职责注释和 `defineProps`/`defineEmits` JSDoc
+- [ ] **FRNT-02**: API 模块函数补充 `@param` 参数说明
+- [ ] **FRNT-03**: Pinia Store 文件补充 Store 职责和 action 说明
+- [ ] **FRNT-04**: Router 模块补充路由说明和 guard 策略注释
 
-## v2 待定
+### 注释维护机制
 
-暂未定义。
+- [ ] **MAINT-01**: 在 PR Review 流程中加入注释同步检查条目
+- [ ] **MAINT-02**: 建立 TODO 注释定期清理机制
+- [ ] **MAINT-03**: 季度注释漂移抽查
+
+## v2 Requirements
+
+### API 文档站点
+
+- **DOC-01**: 评估 Smart-Doc 或 SpringDoc 集成
+- **DOC-02**: 生成 API 文档站点
+
+### 自动化校验
+
+- **DOC-03**: 启用 Checkstyle Javadoc 格式校验规则
+- **DOC-04**: 集成 eslint-plugin-tsdoc 格式校验
 
 ## Out of Scope
 
 | 功能 | 原因 |
 |------|------|
-| 不新增任何业务功能 | 本里程碑仅做清理不做新功能 |
-| 不修改数据库 schema | 仅清理代码，不涉及数据层 |
-| 不进行框架升级或替换 | 当前框架版本已稳定 |
-| 不重构核心架构 | 仅在现有结构内清理 |
+| Swagger/Knife4j 运行时注解 | v1.7 聚焦纯注释，不引入运行时依赖 |
+| `@author`/`@since` 标签 | Git blame/log 是更准确的作者/日期信息来源 |
+| 代码内 PlantUML/Mermaid 图表 | 图表放入 `docs/` 目录管理 |
+| 自动生成文档站点 | 等注释完成后在 v2+ 中评估 |
+| 注释覆盖率工具引入 | 超出 v1.7 范围，且现有工具链已足够 |
+| 不新增任何业务功能 | 本里程碑仅做注释不做新功能 |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BAC-01 | Phase 22 | Pending |
-| BAC-02 | Phase 22 | Pending |
-| BAC-03 | Phase 22 | Pending |
-| BAC-04 | Phase 23 | Pending |
-| BAC-05 | Phase 23 | Pending |
-| BAC-06 | Phase 22 | Pending |
-| BAC-07 | Phase 23 | Pending |
-| BAC-08 | Phase 23 | Pending |
-| BAC-09 | Phase 23 | Pending |
-| BAC-10 | Phase 23 | Pending |
-| FEC-01 | Phase 24 | Pending |
-| FEC-02 | Phase 24 | Pending |
-| FEC-03 | Phase 24 | Pending |
-| FEC-04 | Phase 24 | Pending |
-| FEC-05 | Phase 24 | Pending |
-| FEC-06 | Phase 24 | Pending |
-| DEC-01 | Phase 25 | Pending |
-| DEC-02 | Phase 25 | Pending |
-| DEC-03 | Phase 25 | Pending |
-| DEC-04 | Phase 25 | Pending |
-| DEC-05 | Phase 25 | Pending |
-| COC-01 | Phase 26 | Pending |
-| COC-02 | Phase 26 | Pending |
-| COC-03 | Phase 26 | Pending |
+| STD-01 ~ STD-05 | Phase 0 | Pending |
+| CFG-01 ~ CFG-08 | Phase 1 | Pending |
+| BKND-01 ~ BKND-07 | Phase 1 | Pending |
+| BKND-08 | Phase 2 | Pending |
+| FRNT-01 ~ FRNT-02 | Phase 2 | Pending |
+| FRNT-03 ~ FRNT-04 | Phase 2 | Pending |
+| MAINT-01 ~ MAINT-03 | Phase 4 | Pending |
 
 **Coverage:**
-- v1.6 requirements: 24 total
-- Mapped to phases: 24
-- Unmapped: 0
+- v1.7 requirements: 26 total
+- Mapped to phases: 26
+- Unmapped: 0 ✓
 
 ---
-
 *Requirements defined: 2026-05-07*
-*Last updated: 2026-05-07 — v1.6 requirements created*
+*Last updated: 2026-05-07 after initial definition*
