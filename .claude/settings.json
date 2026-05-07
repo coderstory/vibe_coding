@@ -1,3 +1,9 @@
 {
-
+  "permissions": {
+    "allow": [
+      "Bash(cmd /c *)",
+      "Bash(pwsh -Command Get-*)",
+      "Bash(pwsh -Command netstat *)"
+    ]
+  }
 }
