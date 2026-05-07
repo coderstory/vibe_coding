@@ -54,11 +54,12 @@ Progress: [                    ] 0%
 
 ## Session Continuity
 
-**Session:** 2026-05-07 — v1.7 Roadmap 创建
-**Context:** 注释与文档工程里程碑，基于 28 个 v1.7 需求定义 4 个阶段。
-Phase 27 定义标准，Phase 28 覆盖配置+Controller 注释，Phase 29 覆盖 Service+Vue 注释，
-Phase 30 建立维护机制。等待用户审批后进入 Phase 27 规划。
+**Session:** 2026-05-07 — Phase 27 上下文讨论
+**Context:** Phase 27（注释标准定义）上下文讨论完成。L0-L3 层级映射、语言策略、模板格式、TODO 管理、检查清单均已确定决策。标准将写入 CLAUDE.md 约束后续开发。
+**Next:** 执行 `/gsd-plan-phase 27` 进入规划阶段。
+
+**Resume from:** `.planning/phases/27-注释标准定义/27-CONTEXT.md`
 
 ---
 
-*STATE.md updated: 2026-05-07 — v1.7 Roadmap 创建*
+*STATE.md updated: 2026-05-07 — Phase 27 上下文已捕获，准备规划*
