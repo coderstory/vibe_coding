@@ -58,7 +58,9 @@
       "Bash(rm -v assets/themes/macos-26.css)",
       "Bash(rm -v assets/themes/animations/_utilities.css)",
       "Bash(sed -i '/^export interface SendMessageResult {/,/^}/d' api/modules/rocketmq.ts)",
-      "Bash(sed -i '/^export interface BrokerMetricsVO {/,/^}/d' api/modules/rocketmq.ts)"
+      "Bash(sed -i '/^export interface BrokerMetricsVO {/,/^}/d' api/modules/rocketmq.ts)",
+      "Bash(cmd //c \"netstat -an | findstr 3306\")",
+      "Bash(echo \"exit: $?\")"
     ],
     "deny": [
       "Bash(rm -rf:*)",
