@@ -3,15 +3,16 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.flywaydb:flyway-mysql:12.4.0")
+        // buildscript 无法访问 libs.versions.toml，此处直接写版本号
+        classpath("org.flywaydb:flyway-mysql:12.5.0")
     }
 }
 
 plugins {
     java
-    id("org.springframework.boot") version "4.1.0-RC1"
-    id("io.spring.dependency-management") version "1.1.7"
-    id("org.flywaydb.flyway") version "12.4.0"
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dm)
+    alias(libs.plugins.flyway)
     checkstyle
 }
 
@@ -28,46 +29,46 @@ repositories {
 }
 
 dependencies {
-    implementation(platform("org.springframework.boot:spring-boot-dependencies:4.1.0-RC1"))
+    implementation(platform(libs.spring.boot.bom))
     // Spring Boot Starters
-    implementation("org.springframework.boot:spring-boot-starter-webmvc")
-    implementation("org.springframework.boot:spring-boot-starter-aop:4.0.0-M2")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-data-redis")
-    //implementation("org.springframework.boot:spring-boot-starter-flyway")
-    implementation("org.springframework:spring-messaging")
+    implementation(libs.spring.boot.web)
+    implementation(libs.spring.boot.aop)
+    implementation(libs.spring.boot.security)
+    implementation(libs.spring.boot.redis)
+    implementation(libs.spring.boot.flyway)
+    implementation(libs.spring.messaging)
 
     // Database
-    implementation("com.mysql:mysql-connector-j:9.7.0")
-    implementation("com.baomidou:mybatis-plus-spring-boot4-starter:3.5.16")
-    implementation("org.flywaydb:flyway-core:12.4.0")
-    implementation("org.flywaydb:flyway-mysql:12.4.0")
+    implementation(libs.mysql.connector)
+    implementation(libs.mybatis.plus)
+    implementation(libs.flyway.core)
+    implementation(libs.flyway.mysql)
 
     // Messaging
-    implementation("org.apache.rocketmq:rocketmq-client:5.3.2")
-    implementation("org.apache.rocketmq:rocketmq-spring-boot-starter:2.3.5")
-    implementation("org.apache.rocketmq:rocketmq-tools:5.3.2")
+    implementation(libs.rocketmq.client)
+    implementation(libs.rocketmq.spring)
+    implementation(libs.rocketmq.tools)
 
     // Security & Cache
-    implementation("org.redisson:redisson-spring-boot-starter:4.3.1")
+    implementation(libs.redisson)
 
     // JWT
-    implementation("io.jsonwebtoken:jjwt-api:0.13.0")
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.13.0")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0")
+    implementation(libs.jjwt.api)
+    runtimeOnly(libs.jjwt.impl)
+    runtimeOnly(libs.jjwt.jackson)
 
     // Utils
-    runtimeOnly("com.github.luben:zstd-jni:1.5.7-7")
+    runtimeOnly(libs.zstd.jni)
 
     // Annotation Processors
-    compileOnly("org.projectlombok:lombok:1.18.44")
-    annotationProcessor("org.projectlombok:lombok:1.18.44")
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    compileOnly(libs.lombok)
+    annotationProcessor(libs.lombok)
+    annotationProcessor(libs.spring.boot.config.processor)
 
     // Test
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.security:spring-security-test")
-    testImplementation("com.tngtech.archunit:archunit-junit5:1.4.0")
+    testImplementation(libs.spring.boot.test)
+    testImplementation(libs.spring.security.test)
+    testImplementation(libs.archunit)
 }
 
 tasks.withType<JavaCompile>().configureEach {
@@ -79,7 +80,7 @@ tasks.withType<Test> {
 }
 
 checkstyle {
-    toolVersion = "10.21.4"
+    toolVersion = libs.versions.checkstyle.get()
     isIgnoreFailures = true
 }
 
@@ -95,4 +96,3 @@ flyway {
     locations = arrayOf("classpath:db/migration")
     baselineOnMigrate = true
 }
-
