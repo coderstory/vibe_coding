@@ -1,181 +1,163 @@
-# 项目调研摘要
+# Project Research Summary
 
-**项目:** Vue + Spring Boot 管理后台
-**域:** 代码重构与目录整理
-**调研日期:** 2026-05-06
-**置信度:** HIGH
+**Project:** Vue 3 + Spring Boot 管理后台 — v1.7 注释与文档工程
+**Domain:** 代码注释与文档规范工程（对已有项目追加注释）
+**Researched:** 2026-05-07
+**Confidence:** HIGH
 
----
+## Executive Summary
 
-## 执行摘要
+v1.7 注释工程的目标是降低新人上手门槛，核心手段是对全项目（后端 Java、前端 TypeScript/Vue、YAML 配置、Gradle 构建脚本）补充结构化注释。四项研究报告一致确认：**本项目无需引入新工具**，现有技术栈（Javadoc/TSDoc/KDoc/YAML 注释）已完全覆盖需求。关键的工作量估算约为 **15 人时（P0 范围）**，覆盖 90+ 个文件。
 
-本次 v1.5 里程碑是一次**代码架构卫生工程**。核心问题是后端包结构混用按层/按域两种风格、前端目录扁平化严重、配置文件缺少关注点分离且敏感信息存在硬编码。推荐策略是**按业务领域统一垂直切分 + 增量迁移**。
+**研究得出的核心建议是：必须先做 Phase 0（注释规范定义），再进入 Phase 1（批量注释编写）。** 四项研究独立得出了同一结论——跳过标准定义直接写注释，将导致风格混乱（中英混用、过度注释/空骨架、团队摩擦）和长期维护成本失控。
 
-后端建立 `shared/` 通用层和 `user/`、`auth/`、`menu/`、`role/`、`knowledge/`、`audit/`、`rocketmq/`、`seckill/`、`order/`、`monitor/` 等业务域包，合并零散 `mq/`/`stock/`/`sse/` 到 `seckill/` 域。前端同步按域拆分 `api/modules/`、`router/modules/`、`types/`。
+**最大风险是"注释漂移"——注释和代码逐渐不一致。** 预防方案是 PR Review Checklist 中增加"注释同步检查"条目，以及合理控制注释量。
 
-关键风险是 Vue Router 懒加载路径断裂（27 条动态 import）、MyBatis Mapper XML namespace 断裂、以及 Spring Component Scan 失效。所有风险可通过**先移动后修改的两步 commit 策略**和**每次移动后立即构建验证**来规避。
+## Key Findings
 
-## 关键发现
+### Recommended Stack
 
-### 1. 推荐工具链
+v1.7 不引入新的运行时工具，所有注释格式由现有技术栈原生确定。
 
-**前端工具（需新增/升级）：**
-- ESLint 10.x flat config 升级（当前 9.x）
-- `@stylistic/eslint-plugin` 替代已废弃的 ESLint 核心风格规则
-- Stylelint 17.x + stylelint-config-standard（CSS 质量检查）
-- `vue-tsc` CI 集成（Vue SFC 类型检查）
+**Core technologies (all already in the project):**
+- **Javadoc** (`/** */`): Java 后端标准 — JDK 原生，Checkstyle/IDE 均支持
+- **TSDoc** (`/** */` + TSDoc tags): TypeScript 前端标准 — Vue 3 + TS 项目首选
+- **KDoc** (`/** */` + Markdown): Kotlin DSL 标准 — `build.gradle.kts` 中原生使用
+- **YAML `#` comments**: 配置文件 — 需保持段头 + 行内说明的格式
+- **Checkstyle Javadoc module** (10.21.4, already configured): 可选开启格式校验规则
 
-**后端工具（需新增）：**
-- ArchUnit 1.4.0 — 重构核心工具，定义"controller 不能直接调用 mapper"等架构规则
-- Checkstyle (Gradle 内置) — 代码风格检查
-- PMD (Gradle 内置) — 源码异味检测
-- SpotBugs 4.9.3 — 字节码 bug 检测
-- JaCoCo — 测试覆盖率
-- Error Prone 2.37.0 — 编译时错误检测
+**Optional add-ons (not mandatory for v1.7):**
+- **eslint-plugin-tsdoc** (0.5.2): 校验 TSDoc 格式，仅校验不强制
+- **markdownlint-cli2**: Markdown 文档格式检查
+- **Smart-Doc** (3.1.2, downstream): 从 Javadoc 零注解生成 API 文档
 
-### 2. 代码组织规范
+**Confirmed excluded:**
+- Springfox/Swagger 注解 — 不引入运行时注解
+- Knife4j — 对 Spring Boot 4.x 支持不明确
+- `@author`/`@since` 标签 — Git blame 提供更准确信息
+- PMD CommentRequired — Checkstyle 已有此功能
+- 代码内 PlantUML/Mermaid — 放入 `docs/` 目录管理
 
-**后端问题（已确认）：**
-- Controller 直接注入 Mapper（UserController、SeckillController 等）
-- `MenuServiceImpl.java` 和 `RoleServiceImpl.java` 在 `service/` 根目录而非 `service/impl/`
-- DTO 层仅在 seckill 域存在，其他域使用 `Map<String, Object>` 作为请求体
-- 秒杀相关 `mq/`、`stock/`、`sse/` 模块松散分散
+### Expected Features
 
-**前端问题（已确认）：**
-- `components/` 扁平化含 10 个 `.vue` 文件
-- `api/` 扁平化含 15 个文件
-- `router/index.ts` 为 7KB 单一文件
-- 存在无用脚手架模板组件（`HelloWorld.vue`、`AboutView.vue` 等）
-- `vite.config.js` 应为 `vite.config.ts`
+**Must have (P0 — v1.7 必须完成，预估 ~15 人时):**
 
-### 3. 架构建议
+| 任务 | 文件数 | 预估时间 | 复杂度 |
+|------|--------|---------|--------|
+| YAML 配置注释补全（5 个文件） | 5 | 75min | 低 |
+| Controller 补充 `@param`/`@return`（18 个） | 18 | 180min | 低 |
+| Service 接口完整 Javadoc（~15 个） | 15 | 225min | 中 |
+| Vue 组件 `defineProps`/`defineEmits` JSDoc（40+） | 40 | 320min | 低 |
+| API 模块函数补充 `@param`（12 个） | 12 | 60min | 低 |
+| Gradle 构建脚本注释 | 2 | 15min | 低 |
+| ESLint 配置注释 | 1 | 10min | 低 |
 
-**后端架构** — 按业务域垂直切分：
-```
-cn.coderstory.springboot/
-├── shared/              # 跨业务通用组件
-│   ├── config/          # Security/Web/Cors/Redis 等配置
-│   ├── security/        # JWT 认证/授权
-│   ├── aspect/          # AOP 切面
-│   ├── exception/       # 全局异常处理
-│   ├── util/            # 工具类
-│   └── limiter/         # 限流组件
-├── user/                # 用户管理域
-│   ├── controller/      # UserController
-│   ├── service/         # UserService 接口
-│   ├── service/impl/    # UserServiceImpl
-│   ├── mapper/          # UserMapper
-│   ├── entity/          # User
-│   └── dto/             # UserRequest/UserResponse
-├── role/                # 角色管理域
-├── menu/                # 菜单管理域
-├── auth/                # 认证域
-├── audit/               # 审计日志域
-├── knowledge/           # 知识库域
-├── seckill/             # 秒杀域（含 mq/stock/sse）
-├── rocketmq/            # RocketMQ 监控域
-├── order/               # 订单域
-└── monitor/             # 系统监控域
-```
+**Should have (P1 — 可选):**
+- 测试类方法注释
+- 枚举/常量类 `@since` 标签
+- `eslint-disable` 理由注释
 
-**前端架构** — 按域组织：
-```
-src/
-├── api/
-│   ├── modules/         # 按域: auth/user/role/menu/seckill/rocketmq...
-│   └── index.ts         # 统一导出
-├── components/
-│   ├── common/          # 通用组件 (BaseTable/BaseForm)
-│   ├── layout/          # 布局组件
-│   └── business/        # 业务组件
-├── composables/         # 按域拆分或单文件
-├── router/
-│   ├── modules/         # 按域拆分
-│   └── guards.ts        # 路由守卫
-├── store/               # 按域拆分
-├── types/               # 按域拆分
-└── views/               # 按域（已基本完成）
-```
+**Defer to v2+ (P2):**
+- 复杂业务逻辑行内注释
+- Util 类方法注释
+- SpringDoc OpenAPI Swagger 注解整合
+- 文档站点生成（Dokka/Typedoc）
 
-### 4. 关键重构陷阱
+### Architecture Approach
 
-| 陷阱 | 风险 | 预防策略 |
-|------|------|---------|
-| Vue Router 懒加载路径断裂 | 移动 .vue 文件后运行时白屏 | 每次移动后 `npm run build`（非 `npm run dev`）|
-| MyBatis XML 三重绑定断裂 | XML 路径/namespace/@MapperScan 三处需同步 | 每次移动后 `./gradlew.bat test` |
-| 秒杀 Redis Key 不可修改 | 运行时 Redis 数据和 MQ 消息丢失 | 只提取常量引用，不改变 `seckill:stock:` 等值 |
-| JWT secret 硬编码 | 安全风险 | 重构时迁移到环境变量 |
-| 配置文件拆分级联失效 | spring.config.import 加载顺序导致配置缺失 | 双 profile 启动验证 |
+注释体系采用 **L0-L3 深度分级 + 四层实施策略**：
 
-## 路线图建议
+**注释价值金字塔（自上而下优先级递减）：**
+- **L3 详细文档**: 配置属性类、YAML 配置、公共 API（强制）
+- **L2 方法级文档**: Controller 方法、Service 接口、AOP 切面、Vue 组件逻辑（强制/鼓励）
+- **L1 关键点文档**: Service 实现复杂逻辑、Gradle 构建、DTO/VO 类级（鼓励）
+- **L0 最小文档**: Entity 特殊字段、Mapper 自定义 SQL（按需）
 
-基于调研，推荐 **5 个阶段**：
+**实施优先级：** Config 层 > Controller 层 > Service 接口层 > Vue 组件层 > Service 实现层 > Entity/DTO/VO 层 > Mapper 层
 
-### Phase 1: 基础设施搭建
-**先决条件：** 无（零依赖）
-**内容：** EditorConfig、ESLint flat config 升级、Prettier/Stylelint 配置、ArchUnit/Checkstyle/PMD/SpotBugs/JaCoCo 集成
-**验证：** `./gradlew.bat check` + `npm run lint` + `npx vue-tsc --noEmit`
+**核心规则：**
+- Service 接口注释优先于实现类注释（调用方只看接口）
+- 配置注释独立于代码注释，可最先完成
+- 不在注释中写文件名/行号/Git 信息
+- 合理复用现有标杆文件模式（`SeckillProperties.java`、`AuthController.java`、`datasource.yaml`、`rocketmq.ts`）
 
-### Phase 2: 后端包结构重组
-**先决条件：** Phase 1（工具链就绪）
-**内容：** 建 shared/ 通用层 → 逐个业务域迁移 → 合并零散模块 → 修复分层违规 → 统一 Service 接口+impl
-**验证：** `./gradlew.bat test`（每个域迁移后）
-**关键风险：** `@MapperScan` 通配符覆盖、Component Scan 路径
+### Critical Pitfalls
 
-### Phase 3: 配置文件拆分与安全加固
-**先决条件：** Phase 2（包结构确定后配置归属才明确）
-**内容：** 拆分 application.yaml → 消除 test.yaml 冗余 → JWT secret 强制环境变量 → 双 profile 验证
-**验证：** `./gradlew.bat bootRun` + `--spring.profiles.active=test`
+1. **注释漂移（Comment Drift）** — 注释与代码不一致。预防: 同 PR 原则 + PR Review 注释同步检查。
+2. **过度注释与空 Javadoc 骨架** — IDE 自动生成空 `@param`/`@return` 后不填充。预防: Phase 0 明确"不注释清单"。
+3. **注释掩盖烂代码（Deodorant Comments）** — 用长篇注释解释本应重构的代码。预防: 先尝试重构，再考虑加注释。
+4. **团队摩擦（Bike-shedding）** — 对注释风格无休止争论。预防: Phase 0 定标准，Review 只 check 合规不讨论标准。
+5. **TODO 注释泛滥** — 无 Issue 跟踪的 TODO 成为永久噪声。预防: TODO 必须关联 Issue 编号，禁止裸写。
 
-### Phase 4: 前端目录重组
-**先决条件：** 技术上独立，建议在 Phase 2-3 后（保持命名一致）
-**内容：** components/ 分区 → api/modules/ → router/modules/ → types/ 拆分 → 清理脚手架残留
-**验证：** `npm run build` + 手动登录全流程
+## Implications for Roadmap
 
-### Phase 5: 命名规范与质量收敛
-**先决条件：** Phase 2 + Phase 4（目录重组完成）
-**内容：** Page 后缀统一、DTO/VO 规范、TypeScript interface 规范、`@ConfigurationProperties` 类型安全配置、工具规则收紧
-**验证：** `./gradlew.bat check`（maxWarnings=0） + `npm run lint` + JaCoCo 覆盖率门槛
+### Phase 0: 注释标准定义（必须，预计 30 分钟会议）
+**Rationale:** 四项研究独立指出——跳过标准定义会导致风格混乱和团队摩擦。
+**Delivers:** 注释语言策略、层级决策、TODO 规则、空骨架禁令、PR Review 检查清单
+**Avoids:** Pitfall 4 (团队摩擦), Pitfall 7 (中英混用)
 
-## 置信度评估
+### Phase 1: 配置 + Controller 层注释（预估 4.5 人时）
+**Rationale:** 配置注释独立于业务理解，Controller 已有 Javadoc 只需补充标签。
+**Delivers:** 5 个 YAML 配置补全、18 个 Controller `@param`/`@return`、Gradle 脚本注释、ESLint 配置注释
 
-| 领域 | 置信度 | 原因 |
-|------|--------|------|
-| 工具链 | HIGH | npm registry 实时版本 + Gradle 生态确认 |
-| 目录规范 | HIGH | Vue 官方风格指南 + 阿里巴巴 P3C + 逐文件审查 |
-| 架构 | HIGH | 82+ Java 文件 + 50+ Vue/TS 文件逐行分析 |
-| 陷阱 | HIGH | 基于实际代码路径检查（具体文件+行号） |
-| **总体** | **HIGH** | 所有维度基于实际代码库分析 |
+### Phase 2: Service 接口 + Vue 组件层注释（预估 9 人时）
+**Rationale:** 需要中度业务理解，投入产出比最高。
+**Delivers:** ~15 个 Service 接口完整 Javadoc、40+ Vue 组件 `defineProps`/`defineEmits` JSDoc、12 个 API 模块 `@param` 补充
 
-### 待解决
+### Phase 3: Service 实现 + Entity/DTO/VO 层注释（预估 3-5 人时，P1 可选）
+**Rationale:** 需要深入实现逻辑理解，建议结合日常开发逐步完成。
+**Delivers:** 实现类复杂逻辑行内注释、Entity/DTO/VO 非自解释字段注释、枚举 `@since`
 
-- `@MapperScan` 通配符 `**` 在包重组后的覆盖验证（Phase 2 首个域迁移后立即验证）
-- RocketMQ Consumer 组件扫描路径验证（StockConsumer 当前已注释）
-- Flyway 迁移文件 checksum 保护（6 个已执行脚本不可修改）
+### Phase 4: 维护机制建立（持续，非一次性）
+**Rationale:** 注释的长期价值取决于维护，而非初次覆盖率。
+**Delivers:** PR Review 注释检查清单、TODO 扫描清理、季度注释漂移抽查
 
----
----
+### Phase Ordering Rationale
+- Phase 0 先于一切 — 标准定义是执行的前提
+- 配置 + Controller 先于 Service — 前者无需业务理解，快速建立节奏
+- Service 接口优先于实现 — 调用方依赖接口
+- Vue 组件与 API 模块并行 — 无数据依赖
+- Entity/Mapper 最后 — 自解释度高，注释价值有限
+- 维护机制持续 — 嵌入开发流程，非一次性
 
-## v1.6 补充调研：代码深度清理
+### Research Flags
+**Needs deeper research:** 无。
+**Standard patterns (skip research):** Phase 0-4 全部使用成熟标准。
 
-**调研日期:** 2026-05-07
+## Confidence Assessment
 
-**清理工具推荐：**
+| Area | Confidence | Notes |
+|------|------------|-------|
+| Stack | HIGH | Javadoc/TSDoc/KDoc 均为原生标准 |
+| Features | HIGH | P0/P1/P2 优先级基于 200+ 文件代码审查 |
+| Architecture | HIGH | L0-L3 层级策略基于项目代码审查 + 行业最佳实践 |
+| Pitfalls | HIGH | 10 个陷阱均有学术论文或经典著作支撑 |
 
-| 场景 | 工具 | 用途 |
-|------|------|------|
-| 后端死代码检测 | IntelliJ inspections + OpenRewrite | 未用字段/方法/类 |
-| 后端未用依赖 | dependency-analysis-gradle-plugin | Gradle 依赖冗余分析 |
-| 前端死代码 | knip + vue-sweep | 未用组件/导出/文件 |
-| 前端未用依赖 | depcheck | package.json 冗余分析 |
-| 测试覆盖率保护 | 现有 JaCoCo + 测试套件 | 清理后验证无回归 |
+**Overall confidence:** HIGH
 
-**核心风险：**
-1. Spring AOP/MyBatis XML 映射的方法被误判为"未使用"
-2. 测试代码依赖的内部方法需同步清理
-3. 删除依赖需逐个删除并验证构建
+### Gaps to Address
+1. **注释实际工时 vs 估算偏差** — Phase 1 完成后复盘实际耗时
+2. **Checkstyle Javadoc 强制规则启用决策** — 建议 Phase 0 讨论
+3. **Smart-Doc 格式兼容性** — Controller Javadoc 编写时注意格式
+4. **注释维护成本具体预算** — Phase 4 建立季度统计
+
+## Sources
+
+### Primary (HIGH confidence)
+- Oracle Javadoc Specification
+- TSDoc Official Documentation
+- Checkstyle 10.x Javadoc Module Documentation
+- ESLint flat config documentation
+- Spring Boot 4.1 Configuration Documentation
+
+### Secondary (MEDIUM confidence)
+- Wang et al., "Characterizing and Detecting Comment-Update Inconsistencies", ACM TOSEM 2023
+- Fowler, "Refactoring", Chapter on Comments
+- Conventional Comments specification
+
+### Tertiary (LOW confidence)
+- eslint-plugin-tsdoc compatibility with Vue SFC
 
 ---
-
-*调研完成: 2026-05-07*
-*可用于路线图: 是*
+*Research completed: 2026-05-07*
+*Ready for roadmap: yes*

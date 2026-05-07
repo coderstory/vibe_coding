@@ -1,662 +1,276 @@
-# Stack Research: Code Refactoring & Quality Enforcement Tools
+# Stack Research
 
-**Domain:** Vue 3 + Spring Boot 管理后台代码质量工具链
-**Researched:** 2026-05-06
-**Confidence:** HIGH (前端工具 npm 验证) / MEDIUM (后端工具基于已知生态)
+**Domain:** 代码注释与文档工具 (Code Comments & Documentation Tools)
+**Project:** Vue 3 + Spring Boot 管理后台 (v1.7 注释与文档工程)
+**Researched:** 2026-05-07
+**Confidence:** HIGH
 
----
+## 推荐工具链
 
-## Recommended Stack
+### 核心注释标准
 
-### 前端: Linting, 格式化, 类型检查
+| 标准 | 适用范围 | 说明 | 为什么选择 |
+|---|---|---|---|
+| **Javadoc** (`/** */`) | Java 后端 | JDK 原生标准，所有 Java 开发者熟悉。Checkstyle、IDE、Smart-Doc 均原生支持 | 项目存量为 Java，无需引入额外库，生态最成熟 |
+| **TSDoc** (`/** */` 含 TSDoc 标签) | TypeScript 前端 | 微软维护的 TS 生态现代标准。与 JSDoc 不同：类型由 TS 类型系统提供，`@param` 只写名称和描述 | Vue 3 + TS 项目首选，与 eslint-plugin-tsdoc 配合最佳 |
+| **KDoc** (`/** */` + Markdown) | Kotlin DSL (Gradle) | Kotlin 标准注释格式，支持 Markdown 内联标记 | `build.gradle.kts` 使用 Kotlin DSL，KDoc 是原生标准 |
+| **YAML `#` 注释** | 配置文件 | YAML 仅支持单行 `#` 注释，无多行语法 | 配置文件标准，搭配 yamllint 校验格式 |
+| **Markdown** | 文档文件 | README、文档页面 | 通用文档格式，搭配 markdownlint 校验 |
 
-| Tool | Version | Purpose | Why Recommended |
-|------|---------|---------|-----------------|
-| ESLint | 10.3.0 | JavaScript/TypeScript/Vue 静态分析 | 行业标准; 10.x 是 flat config 稳定版本; 项目已用 9.x, 升级路径清晰 |
-| typescript-eslint | 8.59.2 | TS 类型感知 linting (新统一入口包) | 替代旧 `@typescript-eslint/parser` + `@typescript-eslint/eslint-plugin` 分开安装的方式; 提供 `tseslint.config()` 辅助函数简化 flat config |
-| eslint-plugin-vue | 10.9.1 | Vue SFC 专用规则 | Vue 官方推荐; 10.x 兼容 ESLint 9+ flat config; 提供 `plugin.configs['flat/recommended']` 预设 |
-| @stylistic/eslint-plugin | 5.10.0 | 代码风格规则 (替代已废弃的 ESLint 核心风格规则) | ESLint 核心自 10.x 起移除了所有风格规则; 该插件是社区标准替代品 |
-| Prettier | 3.8.3 | 代码格式化 (无争议格式) | 行业标准; 与 ESLint 分工明确 (ESLint 管逻辑, Prettier 管格式) |
-| eslint-config-prettier | 10.1.5 | 关闭 ESLint 中与 Prettier 冲突的规则 | 必装; 确保 ESLint + Prettier 和平共存 |
-| vue-tsc | 3.2.8 | Vue SFC 类型检查 | 替代 `tsc --noEmit` 处理 `.vue` 文件; CI 中必须运行 |
-| @vitejs/plugin-vue | 6.0.5 | Vite 中编译 Vue SFC | 已安装, 当前版本正确 |
+### 注释格式校验工具
 
-### 前端: CSS 质量
+| 工具 | 版本 | 用途 | 配置建议 |
+|---|---|---|---|
+| **Checkstyle Javadoc 模块** | 10.21.4 (已在项目中) | 校验 Java Javadoc 的完整性和格式 | 当前关闭了所有 Javadoc 检查。建议按需启用轻量检查（见下方配置策略） |
+| **eslint-plugin-tsdoc** | 0.5.2 | 校验 TypeScript 文件中的 TSDoc 注释格式 | 当已有注释时校验格式正确性，不强制要求添加注释。兼容 ESLint 10 flat config |
+| **markdownlint-cli2** | 最新 | 校验 Markdown 文件格式 | 检查文档目录下的 `.md` 文件格式一致性 |
 
-| Tool | Version | Purpose | Why Recommended |
-|------|---------|---------|-----------------|
-| Stylelint | 17.11.0 | CSS/SCSS 静态分析 | 项目 CSS 文件量较大 (主题系统、动画等); Stylelint 可避免重复定义和不一致 |
-| stylelint-config-standard | 40.0.0 | Stylelint 预设规则 | 官方推荐的标准规则集 |
+### API 文档生成工具（下游阶段，非 v1.7 范围）
 
-### 后端: Java 静态分析 (Gradle 集成)
+| 工具 | 版本 | 用途 | 使用场景 |
+|---|---|---|---|
+| **Smart-Doc Gradle Plugin** | 3.1.2 | 从 Javadoc 零注解生成 API 文档 | 构建器生成 HTML/Markdown/OpenAPI 3.0/Postman。无需运行时注解，适合"先写注释再出文档"策略 |
+| **SpringDoc OpenAPI** | 3.0.2 | 运行时注解驱动的 Swagger UI | 如需在线调试 (Try-it-out)，需在 Controller 添加 `@Operation` 注解 |
+| **vue-component-meta** | vuejs/language-tools 3.x | 从 Vue SFC 提取组件元数据 | 提取 Props/Slots/Events 文档，可配合自定义站点 |
 
-| Tool | Version | Purpose | Why Recommended |
-|------|---------|---------|-----------------|
-| Checkstyle | 10.21.4 | 代码风格检查 (命名、格式、import排序) | 最成熟的 Java 风格检查器; Gradle 内置 `checkstyle` 插件, 零额外依赖 |
-| SpotBugs | 4.9.3 | 字节码层 bug 检测 (NPE、资源泄露等) | FindBugs 继任者; 比 PMD 更擅长字节码级别的错误检测 |
-| PMD | 7.11.0 | 源码层代码异味检测 (未使用变量、重复代码等) | 与 SpotBugs 互补 (PMD 看源码, SpotBugs 看字节码); 支持重复代码检测 (CPD) |
-| JaCoCo | 0.8.12 | 测试覆盖率 | Gradle 内置 `jacoco` 插件; 与 `check` 生命周期自然集成 |
-| ArchUnit | 1.4.0 | 包结构/依赖规则强制执行 | 代码重构阶段的核心工具; 可定义规则如 "controller 不能直接调用 mapper" |
-| Error Prone | 2.37.0 | 编译时错误检测 (Google 开发) | 在 `javac` 编译阶段拦截常见错误; 比 SpotBugs/PMD 更早发现问题 |
+### Javadoc 检查配置策略
 
-### 后端: Gradle 插件配置
+Checkstyle 的 Javadoc 模块分为 **"格式校验"** 和 **"强制存在"** 两类：
 
-| Gradle Plugin | Plugin ID | 说明 |
-|---------------|-----------|------|
-| Checkstyle | `checkstyle` | Gradle 内置, 无需额外插件声明 |
-| PMD | `pmd` | Gradle 内置, 无需额外插件声明 |
-| JaCoCo | `jacoco` | Gradle 内置, 但需要在 `plugins {}` 中声明 `id("jacoco")` |
-| SpotBugs | `com.github.spotbugs` | 第三方插件, version 6.1.3 |
-| Error Prone | `net.ltgt.errorprone` | 第三方插件, version 4.1.0 |
-
-### 跨项目: 编辑器无关配置
-
-| Tool | Purpose | Why Recommended |
-|------|---------|-----------------|
-| EditorConfig | 基础格式统一 (缩进、换行、编码) | 零依赖; 所有 IDE 原生支持; 项目当前缺失此文件 |
-
-### 可选: 快速 Linter (适合 CI 加速)
-
-| Tool | Version | Purpose | When to Use |
-|------|---------|---------|-------------|
-| oxlint | 1.63.0 | Rust 写的极速 JS/TS/Vue linter | CI 中使用 (比 ESLint 快 50-100 倍); 不替代 ESLint, 仅作为第一道快速检查 |
-
----
-
-## Installation
-
-### 前端
-
-```bash
-cd app-vue
-
-# 更新已有依赖到最新版本
-npm install -D eslint@^10.3.0 \
-  typescript-eslint@^8.59.2 \
-  eslint-plugin-vue@^10.9.1 \
-  prettier@^3.8.3 \
-  vue-tsc@^3.2.8
-
-# 新增依赖
-npm install -D @stylistic/eslint-plugin@^5.10.0 \
-  eslint-config-prettier@^10.1.5 \
-  stylelint@^17.11.0 \
-  stylelint-config-standard@^40.0.0
-
-# 可选: CI 加速
-npm install -D oxlint@^1.63.0
-```
-
-### 后端 (Gradle)
-
-在 `springboot/build.gradle.kts` 的 `plugins {}` 中添加:
-
-```kotlin
-plugins {
-    // ... 已有插件 ...
-    id("checkstyle")  // 内置, 无需版本
-    id("pmd")         // 内置, 无需版本
-    id("jacoco")      // 内置, 需显式声明
-    id("com.github.spotbugs") version "6.1.3"
-    id("net.ltgt.errorprone") version "4.1.0"
-}
-```
-
-ArchUnit 作为 test dependency 添加:
-
-```kotlin
-testImplementation("com.tngtech.archunit:archunit-junit5:1.4.0")
-```
-
----
-
-## Configuration Guides
-
-### 1. ESLint Flat Config (应用程序/eslint.config.js)
-
-ESLint 10.x 使用 flat config。推荐使用 `typescript-eslint` 统一入口包来简化配置:
-
-```javascript
-// eslint.config.js
-import tseslint from 'typescript-eslint'
-import vuePlugin from 'eslint-plugin-vue'
-import stylistic from '@stylistic/eslint-plugin'
-import prettierConfig from 'eslint-config-prettier'
-
-export default tseslint.config(
-  // 全局忽略
-  {
-    ignores: ['node_modules/**', 'dist/**', '*.d.ts']
-  },
-
-  // 所有 TS/JS 文件
-  ...tseslint.configs.recommended,
-
-  // Vue 文件
-  ...vuePlugin.configs['flat/recommended'],
-
-  // 风格规则 (替代已废弃的 ESLint 核心风格规则)
-  stylistic.configs.customize({
-    indent: 2,
-    quotes: 'single',
-    semi: false,
-    jsx: false,
-    commaDangle: 'never',
-    braceStyle: '1tbs'
-  }),
-
-  // Prettier 冲突处理 (必须放在最后)
-  prettierConfig,
-
-  // 项目自定义规则
-  {
-    rules: {
-      'vue/component-name-in-template-casing': ['error', 'PascalCase'],
-      'vue/multi-word-component-names': 'off',
-      'vue/no-v-html': 'warn',
-      '@typescript-eslint/no-unused-vars': ['error', {
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_'
-      }],
-      'no-console': ['warn', { allow: ['warn', 'error'] }]
-    }
-  }
-)
-```
-
-**重要提示:**
-- 移除旧的 `@typescript-eslint/parser` 和 `@typescript-eslint/eslint-plugin` 直接依赖; `typescript-eslint` 包已包含它们。
-- 移除旧的 `globals` 和 `vue-eslint-parser` 直接引用; `typescript-eslint` + `eslint-plugin-vue` 10.x 已内部处理。
-- `eslint-config-prettier` 必须放在配置数组的**最后**, 以确保它能覆盖所有前面的规则。
-
-### 2. Prettier (应用程序/.prettierrc.json)
-
-当前已有配置, 保持即可。增加 `overrides` 处理不同文件类型:
-
-```json
-{
-  "semi": false,
-  "singleQuote": true,
-  "tabWidth": 2,
-  "trailingComma": "none",
-  "printWidth": 100,
-  "bracketSpacing": true,
-  "arrowParens": "avoid",
-  "vueIndentScriptAndStyle": false,
-  "overrides": [
-    {
-      "files": "*.json",
-      "options": { "tabWidth": 2 }
-    },
-    {
-      "files": "*.md",
-      "options": { "proseWrap": "preserve" }
-    }
-  ]
-}
-```
-
-### 3. Stylelint (应用程序/stylelint.config.js)
-
-```javascript
-export default {
-  extends: ['stylelint-config-standard'],
-  rules: {
-    'selector-class-pattern': null,         // Element Plus 的 BEM 命名会触发此规则
-    'no-descending-specificity': null,      // CSS 覆盖有时需要降序特异性
-    'custom-property-pattern': null,        // Element Plus CSS 变量格式不同
-    'import-notation': null                 // 允许 @import url()
-  }
-}
-```
-
-### 4. EditorConfig (根目录/.editorconfig)
-
-放置在项目根目录, 覆盖前后端:
-
-```ini
-root = true
-
-[*]
-charset = utf-8
-end_of_line = lf
-indent_style = space
-insert_final_newline = true
-trim_trailing_whitespace = true
-
-[*.{java,kt,kts}]
-indent_size = 4
-
-[*.{js,ts,vue,css,scss,json,yml,yaml,md}]
-indent_size = 2
-
-[*.{xml,html}]
-indent_size = 2
-
-[*.md]
-trim_trailing_whitespace = false
-
-[*.bat]
-end_of_line = crlf
-```
-
-### 5. Checkstyle (springboot/config/checkstyle/checkstyle.xml)
-
-Gradle 内置 checkstyle 插件默认找 `config/checkstyle/checkstyle.xml`。推荐使用 Google Java Style 的 Checkstyle 配置作为起点:
+**推荐启用（格式校验，无强制）：**
 
 ```xml
-<?xml version="1.0"?>
-<!DOCTYPE module PUBLIC
-  "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
-  "https://checkstyle.org/dtds/configuration_1_3.dtd">
+<!-- Javadoc 块标签顺序 -->
+<module name="AtclauseOrder">
+    <property name="tagOrder" value="@param, @return, @throws, @see, @since"/>
+</module>
 
-<module name="Checker">
-  <property name="charset" value="UTF-8"/>
-  <property name="severity" value="warning"/>
+<!-- 块标签必须有描述内容 -->
+<module name="NonEmptyAtclauseDescription"/>
 
-  <!-- 文件级检查 -->
-  <module name="FileTabCharacter"/>
-  <module name="NewlineAtEndOfFile"/>
-  <module name="LineLength">
-    <property name="max" value="120"/>
-    <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
-  </module>
+<!-- Javadoc 段落结构 -->
+<module name="JavadocParagraph">
+    <property name="allowNewlineParagraph" value="false"/>
+</module>
 
-  <module name="TreeWalker">
-    <!-- 命名规范 -->
-    <module name="PackageName">
-      <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$"/>
-    </module>
-    <module name="TypeName"/>
-    <module name="MethodName"/>
-    <module name="LocalVariableName"/>
-    <module name="ParameterName"/>
+<!-- 单行 Javadoc 检查（没有块标签时要使用简洁格式） -->
+<module name="SingleLineJavadoc"/>
 
-    <!-- Import 规范 -->
-    <module name="AvoidStarImport"/>
-    <module name="UnusedImports"/>
-    <module name="RedundantImport"/>
+<!-- Summary 首句质量 -->
+<module name="SummaryJavadoc"/>
 
-    <!-- 代码块 -->
-    <module name="NeedBraces"/>
-    <module name="LeftCurly"/>
+<!-- Javadoc 内容位置 -->
+<module name="JavadocContentLocation"/>
 
-    <!-- 编码规范 -->
-    <module name="EmptyBlock"/>
-    <module name="EqualsHashCode"/>
-    <module name="IllegalInstantiation"/>
-    <module name="InnerAssignment"/>
-    <module name="MissingSwitchDefault"/>
-    <module name="SimplifyBooleanExpression"/>
-    <module name="SimplifyBooleanReturn"/>
-    <module name="StringLiteralEquality"/>
-    <module name="DefaultComesLast"/>
-    <module name="FallThrough"/>
-    <module name="MultipleVariableDeclarations"/>
+<!-- 函数名和注释首句重复检查 (v10.15.0+) -->
+<module name="SummaryJavadoc"/>
+```
 
-    <!-- 注解 -->
-    <module name="MissingOverride"/>
+**审慎启用（强制存在，需额外配置豁免）：**
 
-    <!-- 杂项 -->
-    <module name="ArrayTypeStyle"/>
-    <module name="UpperEll"/>
-    <module name="ModifierOrder"/>
-    <module name="OneStatementPerLine"/>
-    <module name="CommentsIndentation"/>
-  </module>
+```xml
+<!-- 对 public 方法要求 Javadoc，但豁免 Override 和 Controller 注解 -->
+<module name="MissingJavadocMethod">
+    <property name="scope" value="public"/>
+    <property name="allowMissingPropertyJavadoc" value="true"/>
+    <property name="allowedAnnotations" value="Override,GetMapping,PostMapping,PutMapping,DeleteMapping,PatchMapping,RequestMapping"/>
+    <property name="minLineCount" value="4"/>  <!-- 少于4行的方法不强制 -->
+</module>
 
-  <!-- 排除自动生成的代码 -->
-  <module name="SuppressionSingleFilter">
-    <property name="checks" value=".*"/>
-    <property name="files" value=".*[/\\]generated[/\\].*"/>
-  </module>
+<!-- public 类要求 Javadoc -->
+<module name="MissingJavadocType">
+    <property name="scope" value="public"/>
 </module>
 ```
 
-Gradle 配置 (在 `build.gradle.kts` 中):
+**核心原则：** Javadoc 检查的目的是发现"明显遗漏"而非强制每行都写。合理的豁免配置（allowedAnnotations/minLineCount）是消除误报的关键。Spring Boot 官方自身的 Checkstyle 配置也采用类似的实用主义策略。
 
-```kotlin
-checkstyle {
-    toolVersion = "10.21.4"
-    configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
-    maxWarnings = 0
-    isIgnoreFailures = false  // 违反规则则构建失败
-}
-```
+## 不使用
 
-### 6. SpotBugs (springboot/config/spotbugs/spotbugs-exclude.xml)
+| 工具 | 为什么不 | 替代方案 |
+|---|---|---|
+| **Springfox** (io.springfox) | 项目已停止维护，不支持 Spring Boot 4.x Jakarta 命名空间 | SpringDoc OpenAPI 3.0.2 |
+| **Swagger 3.x 注解** (`@ApiOperation`/`@ApiParam`) | v1.7 专注注释本身，注解引入运行时依赖和代码侵入。如需 API 文档，Smart-Doc 可从 Javadoc 生成 | Smart-Doc 3.1.2 |
+| **Knife4j** | 强绑定 Swagger 注解，对 Spring Boot 4.x 支持不明确 | Smart-Doc 或 SpringDoc |
+| **eslint-plugin-jsdoc** (v62.x) | 主要用于 JS 项目。本项目是 TypeScript + Vue 3，应使用 TSDoc 规范 | eslint-plugin-tsdoc 0.5.2 |
+| **vuese** | 使用私有注释语法，非标准 JSDoc/TSDoc | vue-component-meta |
+| **`@author` / `@since` 标签** | Git blame 和 Changelog 是更准确的作者和日期信息来源。手动维护易过时 | Git 原生工具 |
+| **代码注释中的 PlantUML/Mermaid 图** | 维护困难，在 IDE 中预览体验不佳 | 放在 `docs/` 目录以独立文件管理 |
+| **PMD CommentRequired** | 规则不如 Checkstyle 全面，且已有 Checkstyle | Checkstyle Javadoc 模块 |
+| **Prettier 的 Markdown 格式化** | Prettier 对 Markdown 的规则支持有限 | markdownlint-cli2 |
 
-```kotlin
-// build.gradle.kts
-spotbugs {
-    toolVersion = "4.9.3"
-    excludeFilter = file("${rootDir}/config/spotbugs/spotbugs-exclude.xml")
-    ignoreFailures = false
-    effort = com.github.spotbugs.snom.Effort.MAX
-    reportLevel = com.github.spotbugs.snom.Confidence.LOW
-}
-```
+## Javadoc vs Swagger 注解的互补关系
 
-排除过滤器 `spotbugs-exclude.xml` 用于屏蔽误报 (如 Lombok 生成的代码):
+根据 2025-2026 行业共识，两者应互补而非对立：
 
-```xml
-<FindBugsFilter>
-  <Match>
-    <!-- Lombok @Data 等注解生成的方法无需检查 -->
-    <Or>
-      <Annotation name="lombok.Data"/>
-      <Annotation name="lombok.Getter"/>
-      <Annotation name="lombok.Setter"/>
-    </Or>
-  </Match>
-</FindBugsFilter>
-```
+| 层次 | 使用 | 描述内容 | 目标读者 |
+|---|---|---|---|
+| **Controller 层** (端点) | Javadoc | 业务含义：端点做什么、何时调用、前置条件 | 后端开发者 |
+| **Controller 层** (API 合同) | `@Operation`/`@Parameter`/`@Schema` | 请求/响应结构、状态码、数据约束 | 前端/第三方调用者 |
+| **Service 层** | Javadoc | 业务逻辑意图、算法说明、设计决策 | 后端维护者 |
+| **DTO/Entity 层** | Javadoc + `@Schema` | 字段含义 (Javadoc) + 数据约束描述 (Schema) | 两端开发者 |
+| **Config/Utils 层** | Javadoc | 配置项作用、工具方法前置条件和行为 | 后端维护者 |
 
-### 7. PMD (springboot/config/pmd/ruleset.xml)
+**核心原则：不要重复。** Javadoc 描述"为什么"（实现层），`@Operation` 描述"是什么"（API 合同层）。
 
-```kotlin
-// build.gradle.kts
-pmd {
-    toolVersion = "7.11.0"
-    ruleSets = []  // 清空默认规则集
-    ruleSetFiles = files("${rootDir}/config/pmd/ruleset.xml")
-    isConsoleOutput = true
-    isIgnoreFailures = false
-}
-```
+## Smart-Doc vs SpringDoc 对比
 
-```xml
-<!-- config/pmd/ruleset.xml -->
-<?xml version="1.0"?>
-<ruleset name="Spring Boot Rules"
-  xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
-  xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+| 维度 | Smart-Doc 3.1.2 | SpringDoc 3.0.2 |
+|---|---|---|
+| **工作方式** | 构建时静态分析源码 | 运行时反射扫描注解 |
+| **代码侵入** | 零注解，完全基于 Javadoc | 需要添加 `@Operation` 等注解 |
+| **输出** | HTML/Markdown/OpenAPI JSON/Word/Postman | Swagger UI (在线) + OpenAPI JSON |
+| **在线调试** | 生成 HTML 调试页面（`createDebugPage: true`） | 原生 Swagger UI 调试支持 |
+| **Gradle 集成** | 专用插件 `com.ly.smart-doc` | 标准依赖 + 自动配置 |
+| **多模块** | 支持 subprojects 统一配置 | 支持，需额外配置 GroupedOpenApi |
+| **适合场景** | 注释优先、不想要注解侵入的团队 | 需要交互式 API 调试、前端频繁调用 |
 
-  <description>Spring Boot 项目 PMD 规则集</description>
+## 注释约定速查
 
-  <!-- 最佳实践 -->
-  <rule ref="category/java/bestpractices.xml">
-    <exclude name="JUnitAssertionsShouldIncludeMessage"/>  <!-- 项目中用断言消息较少 -->
-  </rule>
-
-  <!-- 代码风格 -->
-  <rule ref="category/java/codestyle.xml">
-    <exclude name="OnlyOneReturn"/>                 <!-- 提前 return 是合理模式 -->
-    <exclude name="AtLeastOneConstructor"/>         <!-- Lombok @RequiredArgsConstructor 已处理 -->
-    <exclude name="CommentDefaultAccessModifier"/>  <!-- 明确写 package-private 不必要 -->
-    <exclude name="ShortClassName"/>               <!-- DTO/VO 短名称合理 -->
-  </rule>
-
-  <!-- 设计 -->
-  <rule ref="category/java/design.xml">
-    <exclude name="LoosePackageCoupling"/>  <!-- Spring Boot 项目跨包调用正常 -->
-  </rule>
-
-  <!-- 错误倾向 -->
-  <rule ref="category/java/errorprone.xml"/>
-
-  <!-- 性能 -->
-  <rule ref="category/java/performance.xml"/>
-
-  <!-- 安全 -->
-  <rule ref="category/java/security.xml"/>
-</ruleset>
-```
-
-### 8. ArchUnit (springboot/src/test/java/ArchitectureTest.java)
-
-代码重构阶段的核心工具。确保包结构符合约定:
+### Java Javadoc 示例
 
 ```java
-package cn.coderstory.springboot;
-
-import com.tngtech.archunit.core.domain.JavaClasses;
-import com.tngtech.archunit.core.importer.ClassFileImporter;
-import com.tngtech.archunit.lang.ArchRule;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
-
-class ArchitectureTest {
-
-    static JavaClasses importedClasses;
-
-    @BeforeAll
-    static void setup() {
-        importedClasses = new ClassFileImporter()
-            .importPackages("cn.coderstory.springboot");
-    }
-
-    @Test
-    void controllerShouldOnlyDependOnService() {
-        classes().that().resideInAPackage("..controller..")
-            .should().onlyDependOnClassesThat()
-            .resideInAnyPackage(
-                "..service..", "..dto..", "..vo..",
-                "java..", "org.springframework..",
-                "jakarta..", "lombok.."
-            )
-            .check(importedClasses);
-    }
-
-    @Test
-    void serviceInterfacesShouldBeInServicePackage() {
-        classes().that().areInterfaces()
-            .and().resideInAPackage("..service..")
-            .should().haveSimpleNameEndingWith("Service")
-            .check(importedClasses);
-    }
-
-    @Test
-    void serviceImplementationsShouldBeInImplPackage() {
-        classes().that().haveSimpleNameEndingWith("ServiceImpl")
-            .should().resideInAPackage("..service.impl..")
-            .check(importedClasses);
-    }
-
-    @Test
-    void mapperShouldOnlyBeInMapperPackage() {
-        classes().that().haveSimpleNameEndingWith("Mapper")
-            .should().resideInAPackage("..mapper..")
-            .check(importedClasses);
-    }
-
-    @Test
-    void entityShouldNotDependOnServiceOrController() {
-        noClasses().that().resideInAPackage("..entity..")
-            .should().dependOnClassesThat()
-            .resideInAnyPackage("..service..", "..controller..")
-            .check(importedClasses);
-    }
-
-    @Test
-    void noCyclicDependenciesBetweenModules() {
-        slices().matching("cn.coderstory.springboot.(*)..")
-            .should().beFreeOfCycles()
-            .check(importedClasses);
-    }
+/**
+ * 根据用户 ID 获取用户信息及其关联角色
+ *
+ * <p>查询用户基本信息，同时加载用户角色和权限列表。
+ * 返回的用户对象包含完整的角色树。</p>
+ *
+ * @param userId 用户唯一标识，不能为空
+ * @return 带角色信息的用户对象，不存在则返回 null
+ * @throws IllegalArgumentException 如果 userId 为空
+ * @see UserRoleService#getUserRoles
+ */
+public UserVO getUserWithRoles(Long userId) {
+    // ...
 }
 ```
 
-### 9. Error Prone (集成到 compile 阶段)
+### TypeScript TSDoc 示例
+
+```typescript
+/**
+ * 用户登录服务
+ *
+ * 处理用户认证流程，包括密码验证和令牌生成。
+ * 支持记住我功能延长 token 有效期。
+ *
+ * @param credentials - 登录凭据（用户名 + 密码）
+ * @param rememberMe - 是否记住登录状态
+ * @returns 认证结果，包含 token 和用户信息
+ * @throws AuthenticationError 用户名或密码错误时
+ */
+async function login(credentials: LoginDto, rememberMe?: boolean): Promise<LoginResult>
+```
+
+### Vue 3 组件注释
+
+```vue
+<script lang="ts">
+/**
+ * 用户表单组件
+ *
+ * 支持用户信息的创建和编辑，包含表单验证和异步提交。
+ * 通过 `mode` prop 切换新建/编辑模式。
+ *
+ * @example
+ * <UserForm mode="create" @submit="handleSubmit" />
+ */
+</script>
+
+<script setup lang="ts">
+interface Props {
+  /** 表单模式：create 新建 / edit 编辑 */
+  mode: 'create' | 'edit'
+  /** 编辑模式下的用户 ID（create 模式下忽略） */
+  userId?: number
+  /** 表单初始数据（可选，用于预填充） */
+  initialData?: Partial<UserInfo>
+}
+const props = defineProps<Props>()
+
+/**
+ * 提交表单时触发
+ * @param formData - 表单数据对象
+ */
+const emit = defineEmits<{
+  submit: [formData: UserInfo]
+}>()
+</script>
+```
+
+### Gradle KDoc 示例
 
 ```kotlin
-// build.gradle.kts
-dependencies {
-    errorprone("com.google.errorprone:error_prone_core:2.37.0")
-}
-
-tasks.withType<JavaCompile>().configureEach {
-    options.errorprone {
-        // 针对重构阶段的关键检查
-        check("MissingOverride", CheckSeverity.ERROR)
-        check("UnusedVariable", CheckSeverity.WARNING)
-        check("BadImport", CheckSeverity.ERROR)     // 禁止 java.security.* import
-        check("ImmutableEnumChecker", CheckSeverity.ERROR)
-        check("EqualsIncompatibleType", CheckSeverity.ERROR)
-    }
+/**
+ * 生产环境构建配置
+ *
+ * 启用所有优化选项，禁用调试信息。
+ * 此配置文件应用于 CI/CD 生产部署流程。
+ *
+ * @since 1.4.0
+ */
+plugins {
+    id("org.springframework.boot") version "4.1.0-RC1"
 }
 ```
 
-### 10. JaCoCo (覆盖率门槛)
+### YAML 注释示例
 
-```kotlin
-// build.gradle.kts
-tasks.test {
-    useJUnitPlatform()
-    finalizedBy(tasks.jacocoTestReport)  // 测试后自动生成报告
-}
-
-jacoco {
-    toolVersion = "0.8.12"
-}
-
-tasks.jacocoTestReport {
-    reports {
-        xml.required = true    // CI 集成用
-        html.required = true   // 本地查看用
-    }
-}
-
-tasks.jacocoTestCoverageVerification {
-    violationRules {
-        rule {
-            limit {
-                minimum = BigDecimal(0.50)  // 重构初期目标 50%
-            }
-        }
-    }
-}
+```yaml
+# ---------------------------------------------------------------------------
+# 数据源配置
+# ---------------------------------------------------------------------------
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/admin_system
+    # 连接池初始大小（根据服务启动时的并发量调整）
+    hikari:
+      initial-size: 5
 ```
 
-### 11. 统一 Gradle 任务 (扩展 build.gradle.kts)
+## 安装
 
-利用 Gradle 9.5 的 `check` 生命周期统一执行所有质量检查:
-
-```kotlin
-// build.gradle.kts
-// 所有质量插件 (checkstyle/pmd/spotbugs/jacoco) 
-// 自动绑定到 check 生命周期
-
-// 添加质量报告汇总任务
-tasks.register("qualityCheck") {
-    group = "verification"
-    description = "运行所有代码质量检查"
-    dependsOn(tasks.check)
-}
-```
-
-运行方式:
 ```bash
-cd springboot
-./gradlew.bat qualityCheck   # 运行所有质量检查
-./gradlew.bat check          # 等效, Gradle 内置
+# eslint-plugin-tsdoc（前端 TSDoc 格式校验）
+cd app-vue
+npm install -D eslint-plugin-tsdoc@^0.5.2
+
+# markdownlint-cli2（Markdown 格式校验）
+npm install -D markdownlint-cli2@latest
+
+# Smart-Doc（下游阶段，API 文档生成）
+# 在 springboot/build.gradle.kts 添加：
+# plugins { id("com.ly.smart-doc") version "3.1.2" }
+
+# SpringDoc OpenAPI（下游阶段，交互式 API 文档）
+# 在 springboot/build.gradle.kts 添加依赖：
+# implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
 ```
 
----
+## 版本兼容
 
-## package.json Scripts 更新
+| 包 | 兼容环境 | 注意事项 |
+|---|---|---|
+| `eslint-plugin-tsdoc@0.5.2` | ESLint 9.x / 10.x flat config | v0.5.0+ 支持 flat config。v0.5.2 修复了 ESLint 10 的 API 变更 |
+| `springdoc-openapi-starter-webmvc-ui:3.0.2` | Spring Boot 4.1.x | v3.x 专为 Spring Boot 4.x / Spring Framework 7.x 设计。Spring Boot 3.x 用户使用 v2.8.x |
+| `com.ly.smart-doc:smart-doc-gradle-plugin:3.1.2` | JDK 17+, Gradle 8.4+ | 本项目 JDK 26 + Gradle 9.5 完全兼容 |
+| `Checkstyle 10.21.4` | JDK 23+ | 如 JDK 26 遇到兼容性问题，升级到 Checkstyle 13.x |
 
-```json
-{
-  "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview",
-    "lint": "eslint . --ext .vue,.ts,.js --cache",
-    "lint:fix": "eslint . --ext .vue,.ts,.js --cache --fix",
-    "format": "prettier --write \"src/**/*.{vue,ts,js,css,json}\"",
-    "format:check": "prettier --check \"src/**/*.{vue,ts,js,css,json}\"",
-    "type-check": "vue-tsc --noEmit",
-    "stylelint": "stylelint \"src/**/*.{css,vue}\" --cache",
-    "stylelint:fix": "stylelint \"src/**/*.{css,vue}\" --cache --fix",
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "coverage": "vitest coverage",
-    "check": "npm run type-check && npm run lint && npm run format:check && npm run stylelint && npm run test",
-    "check:fast": "oxlint --fix && npm run type-check",
-    "pre-commit": "npm run check:fast"
-  }
-}
-```
+## 来源
+
+- [Smart-Doc 官方文档](https://smart-doc-group.github.io/#/zh-cn/) — Gradle 插件配置、3.x 版本变更
+- [Smart-Doc Gradle Plugin GitHub](https://github.com/TongchengOpenSource/smart-doc-gradle-plugin) — 3.1.2 版本信息
+- [SpringDoc OpenAPI Releases](https://github.com/springdoc/springdoc-openapi/releases) — v3.0.2 兼容性
+- [Checkstyle Javadoc Checks 官方文档](https://checkstyle.org/checks/javadoc/index.html) — 所有 Javadoc 检查模块说明
+- [Checkstyle Release Notes](https://checkstyle.org/releasenotes.html) — 10.21.4 最新发布说明
+- [eslint-plugin-tsdoc npm](https://www.npmjs.com/package/eslint-plugin-tsdoc) — v0.5.2 ESLint 10 兼容性
+- [tsdoc.org](https://tsdoc.org/) — TypeScript 注释标准规范
+- [KDoc 官方文档](https://kotlinlang.org/docs/kotlin-doc.html) — Kotlin 文档注释语法
+- [YAML 注释最佳实践](https://devgex.com/en/article/00001216) — YAML 注释约定
+- [Vue.js 3 组件中 JSDoc 注释最佳实践](https://blog.gitcode.com/76e939cf67d58be05074740c174da061.html) — Vue 3 组件注释方案
+- [Spring Boot 官方 Checkstyle 配置](https://gitee.com/mirrors/spring-boot/blob/main/buildSrc/config/checkstyle/checkstyle.xml) — Spring Boot 项目自身的 Checkstyle 参考
 
 ---
-
-## Alternatives Considered
-
-| Recommended | Alternative | When to Use Alternative |
-|-------------|-------------|-------------------------|
-| ESLint 10.x flat config | Biome (Rust-based) | 新建项目且不需要插件的场景; 当前项目依赖 eslint-plugin-vue, Biome 不兼容 |
-| `typescript-eslint` 统一包 | 分开装 `@typescript-eslint/parser` + `@typescript-eslint/eslint-plugin` | 不再推荐; 统一包更简洁, 是官方推荐方式 |
-| Checkstyle | SonarLint (IDE 插件) | IDE 本地实时反馈; 但不能替代 CI 中的 Checkstyle (不同开发者 IDE 配置不同) |
-| PMD + SpotBugs | SonarQube Server | 多项目集中管理; 单项目开销过大, 不适合此阶段 |
-| ArchUnit | ModuleDoc (Spring Modulith) | Spring Modulith 项目; 当前项目未采用 Modulith 架构 |
-| JaCoCo | 不设置覆盖率 | 默认不强制; 但重构阶段需要覆盖率保护网防止回归 |
-| oxlint (CI 补充) | 只用 ESLint | 小项目 ESLint 速度足够; 本项目 60+ Vue/TS 文件, oxlint 加速有价值 |
-
-## What NOT to Use
-
-| Avoid | Why | Use Instead |
-|-------|-----|-------------|
-| SonarQube Server | 需要 Docker/服务器部署; 项目中只有 ~100 个 Java 文件, 重型方案过度设计 | 直接在 Gradle 中集成 Checkstyle + PMD + SpotBugs + JaCoCo |
-| Biome | 不支持 Vue SFC; 无法替代 eslint-plugin-vue 的规则 | ESLint 10.x + Prettier |
-| ESLint Stylistic rules (已废弃) | ESLint 10.x 移除了所有风格规则; 继续使用会报错 | @stylistic/eslint-plugin |
-| ktlint / detekt | 项目后端是 Java, 非 Kotlin (Gradle 构建脚本除外) | Checkstyle 处理 Java; kts 构建脚本遵循 EditorConfig |
-| Husky + lint-staged (git hooks) | 可配置但非必需; 当前阶段重点在 CI 流程 | package.json `pre-commit` script + CI pipeline |
-| TSLint | 已废弃 5 年以上 | typescript-eslint |
-| @typescript-eslint/parser v7 | ESLint 10.x 需要 v8.x 版本 | @typescript-eslint/parser@^8.59.2 |
-| findbugs | 已停止维护 (2016) | SpotBugs (FindBugs 继任者) |
-
----
-
-## Version Compatibility
-
-| Package A | Compatible With | Notes |
-|-----------|-----------------|-------|
-| ESLint 10.3.0 | typescript-eslint 8.59.2, eslint-plugin-vue 10.9.1 | ESLint 10 要求插件升级到支持 flat config 的版本 |
-| typescript-eslint 8.59.2 | TypeScript 6.0.x | 当前项目使用 TS 6.0.3, 完全兼容 |
-| eslint-plugin-vue 10.9.1 | ESLint 9+ flat config | 10.x 原生支持 flat config, 无需 `eslint-plugin-vue/lib/configs/flat` |
-| vue-tsc 3.2.8 | TypeScript 6.0.3, Vue 3.5.31 | 版本匹配当前项目 |
-| Checkstyle 10.21.4 | Gradle 9.5 | 内置 checkstyle 插件自动兼容 |
-| SpotBugs Gradle Plugin 6.1.3 | Gradle 9.5, JDK 26 | SpotBugs 本身支持 JDK 26 class files |
-| ArchUnit 1.4.0 | JUnit 5, JDK 26 | 以 test 依赖形式集成, 无版本冲突 |
-| Error Prone 2.37.0 | JDK 26 | Error Prone 作为 javac 插件运行, 对 JDK 版本敏感; 2.37.0 已支持 JDK 26 |
-
----
-
-## 重构阶段发现的现有问题 (Additional Context)
-
-基于代码库审查, 以下问题需要工具链来解决:
-
-| 问题 | 严重程度 | 工具覆盖 |
-|------|---------|---------|
-| `service/MenuServiceImpl.java` 和 `service/RoleServiceImpl.java` 在 `service/` 目录, 不在 `service/impl/` | 中 | **ArchUnit** — `serviceImplementationsShouldBeInImplPackage` 规则直接检查 |
-| 根目录缺少 `.editorconfig` | 低 | **EditorConfig** — 新增文件 |
-| `eslint.config.js` rules 部分为空, 只有少数几条规则 | 中 | **ESLint** — 完整配置覆盖 (本 STACK 第1节) |
-| `tsconfig.node.json` 引用 `vite.config.ts` 但实际文件是 `vite.config.js` | 低 | **vue-tsc** — 类型检查会发现; 重构时修复 |
-| 无 Java 静态分析工具 | 高 | **Checkstyle + PMD + SpotBugs** — 全部新增 |
-| 无测试覆盖率度量 | 中 | **JaCoCo** — 新增 |
-| 无包结构强制执行 | 中 | **ArchUnit** — 新增测试 |
-| 前端存在无用模板组件 (HelloWorld, TheWelcome, WelcomeItem, Icon* 系列) | 低 | 手动清理; **oxlint** 可检测未使用导出 |
-| `vite.config.js` 应为 `vite.config.ts` 以保持 TS-first 项目风格 | 低 | 重构时手动重命名 |
-
----
-
-## Sources
-
-| Source | Type | Confidence |
-|--------|------|------------|
-| npm registry (`npm view <package> version`) | 官方注册表查询 | HIGH — 实时版本号 |
-| ESLint 10.x flat config (training data, 2025-Q1) | 产品知识 | MEDIUM — 非最新官方文档 |
-| typescript-eslint unified package (training data, 2025-Q1) | 产品知识 | MEDIUM |
-| eslint-plugin-vue 10.x (training data, 2025-Q1) | 产品知识 | MEDIUM |
-| Gradle built-in plugins (training data, 2025-Q1) | 产品知识 | MEDIUM |
-| SpotBugs/Checkstyle/PMD Gradle integration (training data, 2025-Q1) | 产品知识 | MEDIUM |
-| ArchUnit 1.4.0 (training data, 2025-Q1) | 产品知识 | MEDIUM |
-| Error Prone (training data, 2025-Q1) | 产品知识 | MEDIUM |
-| 项目代码审查 (Glob + Read 实查) | 直接审查 | HIGH |
-
----
-
-*Stack research for: Vue 3 + Spring Boot 管理后台代码质量工具链*
-*Researched: 2026-05-06*
+*Stack research for: 代码注释与文档工具*
+*Researched: 2026-05-07*
