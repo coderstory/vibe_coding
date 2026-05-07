@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import {onMounted, reactive, ref} from 'vue'
-import {ElMessage, ElMessageBox} from 'element-plus'
-import {createTopic, type CreateTopicParams, deleteTopic, getTopicList, type TopicVO} from '@/api/modules/rocketmq'
+import { onMounted, reactive, ref } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { createTopic, type CreateTopicParams, deleteTopic, getTopicList, type TopicVO } from '@/api/modules/rocketmq'
 
 // 状态
 const loading = ref(false)
@@ -46,9 +46,11 @@ async function loadData() {
     const res = await getTopicList(searchForm.keyword || undefined)
     topicList.value = res.data.records
     total.value = res.data.total
-  } catch {
+  }
+  catch {
     // 错误已在 request.ts 的响应拦截器中处理
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -94,9 +96,11 @@ async function handleCreate() {
     ElMessage.success('Topic 创建成功')
     createDialogVisible.value = false
     loadData()
-  } catch {
+  }
+  catch {
     // 错误已在 request.ts 的响应拦截器中处理
-  } finally {
+  }
+  finally {
     createLoading.value = false
   }
 }
@@ -124,7 +128,8 @@ async function handleDelete(row: TopicVO) {
     await deleteTopic(row.topicName)
     ElMessage.success('删除成功')
     loadData()
-  } catch {
+  }
+  catch {
     // 如果用户取消，ElMessageBox 会抛出 'cancel' 字符串
     // 如果是其他错误，错误消息已在 request.ts 中处理
   }

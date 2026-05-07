@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import {ref, watch} from 'vue'
-import {ElMessage} from 'element-plus'
-import {type ConsumerGroupDetailVO, getConsumerGroupDetail} from '@/api/modules/rocketmq'
+import { ref, watch } from 'vue'
+import { ElMessage } from 'element-plus'
+import { type ConsumerGroupDetailVO, getConsumerGroupDetail } from '@/api/modules/rocketmq'
 import ResetOffsetDialog from './ResetOffsetDialog.vue'
 
 const props = defineProps<{
@@ -33,9 +33,11 @@ async function loadDetail() {
   try {
     const res = await getConsumerGroupDetail(props.groupName)
     detailData.value = res.data
-  } catch (error: any) {
+  }
+  catch (error: any) {
     ElMessage.error(error.message || '获取详情失败')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -44,7 +46,7 @@ watch(() => props.groupName, () => {
   if (dialogVisible.value) {
     loadDetail()
   }
-}, {immediate: true})
+}, { immediate: true })
 
 // 重置位点弹窗
 const resetDialogVisible = ref(false)

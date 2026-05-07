@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue'
-import type {Order} from '@/api/modules/order'
-import {orderApi} from '@/api/modules/order'
+import { onMounted, ref } from 'vue'
+import type { Order } from '@/api/modules/order'
+import { orderApi } from '@/api/modules/order'
 
 const orders = ref<Order[]>([])
 const loading = ref(false)
@@ -11,7 +11,8 @@ onMounted(async () => {
   try {
     const res = await orderApi.getMyOrders()
     orders.value = res.data || []
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 })
@@ -21,7 +22,7 @@ function formatTime(time: string) {
 }
 
 function getStatusText(status: number) {
-  const map = {0: '待支付', 1: '已支付', 2: '已取消', 3: '超时取消'}
+  const map = { 0: '待支付', 1: '已支付', 2: '已取消', 3: '超时取消' }
   return map[status as keyof typeof map] || '未知'
 }
 </script>

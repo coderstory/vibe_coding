@@ -1,7 +1,7 @@
-import axios, {AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig} from 'axios'
-import {ElMessage} from 'element-plus'
-import type {ApiResponse} from './types'
-import {refreshToken as apiRefreshToken} from '@/api/modules/auth'
+import axios, { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import { ElMessage } from 'element-plus'
+import type { ApiResponse } from './types'
+import { refreshToken as apiRefreshToken } from '@/api/modules/auth'
 
 /**
  * 统一的 Axios 请求实例
@@ -48,7 +48,8 @@ request.interceptors.request.use(
         if (user.id) {
           config.headers['X-User-Id'] = String(user.id)
         }
-      } catch {
+      }
+      catch {
         // 忽略解析错误
       }
     }
@@ -145,7 +146,8 @@ async function tryRefreshToken(): Promise<string | null> {
     onTokenRefreshed(newToken)
     isRefreshing = false
     return newToken
-  } catch {
+  }
+  catch {
     // 刷新失败，清除 token 并跳转到登录页
     localStorage.removeItem('token')
     localStorage.removeItem('refreshToken')
@@ -164,7 +166,8 @@ request.interceptors.response.use(
     const res = response.data
     if (res.code === 200) {
       return res
-    } else {
+    }
+    else {
       ElMessage.error(res.message || '请求失败')
       return Promise.reject(new Error(res.message || '请求失败'))
     }
@@ -191,4 +194,4 @@ request.interceptors.response.use(
 export default request
 
 // 重新导出类型供外部使用
-export type {ApiResponse}
+export type { ApiResponse }

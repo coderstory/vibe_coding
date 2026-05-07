@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import {ref} from 'vue'
-import {useRouter} from 'vue-router'
-import {ElMessage} from 'element-plus'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 
 const router = useRouter()
 const loading = ref(false)

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue'
-import {ElTable, ElTableColumn} from 'element-plus'
-import {getTopicBacklogList, type TopicBacklogVO} from '@/api/modules/rocketmq'
+import { onMounted, ref } from 'vue'
+import { ElTable, ElTableColumn } from 'element-plus'
+import { getTopicBacklogList, type TopicBacklogVO } from '@/api/modules/rocketmq'
 
 const loading = ref(false)
 const topics = ref<TopicBacklogVO[]>([])
@@ -13,9 +13,11 @@ async function loadTopics() {
     if (res.code === 200) {
       topics.value = res.data.records || []
     }
-  } catch (e) {
+  }
+  catch (e) {
     console.error('加载 Topic 堆积量失败', e)
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }

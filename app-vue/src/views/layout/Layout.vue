@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {ref} from 'vue'
+import { ref } from 'vue'
 import AppMenu from '@/components/layout/AppMenu.vue'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import AppTabs from '@/components/layout/AppTabs.vue'

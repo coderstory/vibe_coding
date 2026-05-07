@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue'
-import type {Cart} from '@/api/modules/cart'
-import {cartApi} from '@/api/modules/cart'
-import {ElMessage} from 'element-plus'
+import { onMounted, ref } from 'vue'
+import type { Cart } from '@/api/modules/cart'
+import { cartApi } from '@/api/modules/cart'
+import { ElMessage } from 'element-plus'
 
 const carts = ref<Cart[]>([])
 const loading = ref(false)
@@ -16,7 +16,8 @@ async function loadCart() {
   try {
     const res = await cartApi.getMyCart()
     carts.value = res.data || []
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }

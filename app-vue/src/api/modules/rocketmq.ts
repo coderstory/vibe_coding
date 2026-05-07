@@ -3,7 +3,7 @@
  * 提供 Topic 的列表查询、详情查看、创建、删除等操作
  */
 import request from '../request'
-import type {ApiResponse} from '../types'
+import type { ApiResponse } from '../types'
 
 /**
 
@@ -17,14 +17,6 @@ export interface TopicVO {
   createTime: string;
   readQueueNums?: number;
   perm?: string;
-}
-
-/**
- * Topic 详情视图对象
- */
-export interface TopicDetailVO extends TopicVO {
-  routeInfo?: any;
-  subscriptions?: string[];
 }
 
 /**
@@ -42,16 +34,8 @@ export interface CreateTopicParams {
  */
 export function getTopicList(keyword?: string) {
   return request.get<ApiResponse<{ records: TopicVO[]; total: number }>>('/rocketmq/topics', {
-    params: {keyword}
+    params: { keyword }
   })
-}
-
-/**
- * 获取 Topic 详情
- * @param topicName Topic 名称
- */
-export function getTopicDetail(topicName: string) {
-  return request.get<ApiResponse<TopicDetailVO>>(`/rocketmq/topics/${encodeURIComponent(topicName)}`)
 }
 
 /**
@@ -106,7 +90,7 @@ export interface ResetOffsetParams {
  */
 export function getConsumerGroupList(keyword?: string) {
   return request.get<ApiResponse<{ records: ConsumerGroupVO[]; total: number }>>('/rocketmq/consumer-groups', {
-    params: {keyword}
+    params: { keyword }
   })
 }
 
@@ -186,9 +170,9 @@ export interface MessageTraceVO {
 export function getMessageList(topic: string, startTime?: number, endTime?: number, maxMsg?: number, keyword?: string) {
   return request.get<ApiResponse<{
     records: MessageVO[];
-    total: number
+    total: number;
   }>>(`/rocketmq/messages/${encodeURIComponent(topic)}`, {
-    params: {startTime, endTime, maxMsg, keyword}
+    params: { startTime, endTime, maxMsg, keyword }
   })
 }
 
@@ -213,16 +197,6 @@ export function getMessageTrace(topic: string, msgId: string) {
 /**
  * 发送消息结果
  */
-export interface SendMessageResult {
-  msgId: string;
-  topic: string;
-  tags: string;
-  keys: string;
-  sendStatus: string;
-  queueId: number;
-  queueOffset: number;
-  timestamp: number;
-}
 
 /**
  * 发送消息
@@ -232,7 +206,7 @@ export interface SendMessageResult {
  * @param body 消息内容
  */
 export function sendMessage(topic: string, body: string, tags?: string, keys?: string) {
-  return request.post<ApiResponse<SendMessageResult>>('/rocketmq/messages', {topic, tags, keys, body})
+  return request.post<ApiResponse<{ msgId: string; sendStatus: string }>>('/rocketmq/messages', { topic, tags, keys, body })
 }
 
 // ==================== Dashboard 监控面板 ====================

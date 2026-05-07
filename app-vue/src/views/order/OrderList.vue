@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue'
-import type {Order} from '@/api/modules/order'
-import {orderApi} from '@/api/modules/order'
-import {ElMessage} from 'element-plus'
+import { onMounted, ref } from 'vue'
+import type { Order } from '@/api/modules/order'
+import { orderApi } from '@/api/modules/order'
+import { ElMessage } from 'element-plus'
 
 const orders = ref<Order[]>([])
 const loading = ref(false)
@@ -12,7 +12,8 @@ onMounted(async () => {
   try {
     const res = await orderApi.getMyOrders()
     orders.value = res.data || []
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 })
@@ -23,7 +24,8 @@ async function handlePay(orderNo: string) {
     ElMessage.success('支付成功')
     const res = await orderApi.getMyOrders()
     orders.value = res.data || []
-  } catch {
+  }
+  catch {
     ElMessage.error('支付失败')
   }
 }
@@ -34,13 +36,14 @@ async function handleCancel(orderNo: string) {
     ElMessage.success('取消成功')
     const res = await orderApi.getMyOrders()
     orders.value = res.data || []
-  } catch {
+  }
+  catch {
     ElMessage.error('取消失败')
   }
 }
 
 function getStatusText(status: number) {
-  const map = {0: '待支付', 1: '已支付', 2: '已取消', 3: '超时取消'}
+  const map = { 0: '待支付', 1: '已支付', 2: '已取消', 3: '超时取消' }
   return map[status as keyof typeof map] || '未知'
 }
 </script>

@@ -3,10 +3,10 @@
  * 侧边栏菜单组件
  * 从后端加载菜单树，支持折叠和动态路由
  */
-import {computed, onMounted, ref} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import {getMenuTree} from '@/api/modules/menu'
-import type {Menu} from '@/api/types'
+import { computed, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { getMenuTree } from '@/api/modules/menu'
+import type { Menu } from '@/api/types'
 
 interface MenuItem {
   path: string;
@@ -38,7 +38,8 @@ async function loadMenus() {
     const res = await getMenuTree()
     const menus: Menu[] = res.data || []
     menuItems.value = convertToMenuItems(menus)
-  } catch (error) {
+  }
+  catch (error) {
     console.error('获取菜单失败', error)
     menuItems.value = []
   }
@@ -55,9 +56,11 @@ function convertToMenuItems(menus: Menu[]): MenuItem[] {
       // 后端返回 /dashboard 作为首页，实际路由是 /index
       if (menu.path === '/dashboard') {
         fullPath = '/index'
-      } else if (menu.path.startsWith('/')) {
+      }
+      else if (menu.path.startsWith('/')) {
         fullPath = menu.path
-      } else {
+      }
+      else {
         fullPath = `/${menu.path}`
       }
     }

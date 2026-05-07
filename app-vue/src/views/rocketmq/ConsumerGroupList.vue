@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import {onMounted, reactive, ref} from 'vue'
-import {ElMessage, ElMessageBox} from 'element-plus'
-import {type ConsumerGroupVO, deleteConsumerGroup, getConsumerGroupList} from '@/api/modules/rocketmq'
+import { onMounted, reactive, ref } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { type ConsumerGroupVO, deleteConsumerGroup, getConsumerGroupList } from '@/api/modules/rocketmq'
 import ConsumerGroupDetail from './ConsumerGroupDetail.vue'
 
 // 状态
@@ -17,17 +17,6 @@ const searchForm = reactive({
 // 详情弹窗
 const detailDialogVisible = ref(false)
 const currentGroup = ref('')
-
-// 表格列定义
-const columns = [
-  {prop: 'index', label: '序号', width: 80, align: 'center' as const},
-  {prop: 'group', label: 'Group 名称', minWidth: 120},
-  {prop: 'groupType', label: '类型', width: 100, align: 'center' as const},
-  {prop: 'status', label: '状态', width: 100, align: 'center' as const},
-  {prop: 'consumerCount', label: '消费者数', width: 100, align: 'center' as const},
-  {prop: 'accumulatedDiff', label: '堆积量', width: 120, align: 'center' as const},
-  {prop: 'actions', label: '操作', width: 120, fixed: 'right' as const}
-]
 
 // 类型标签
 const groupTypeTagType = (type: string): '' | 'primary' | 'warning' | 'danger' | 'info' => {
@@ -93,9 +82,11 @@ async function loadData() {
     const res = await getConsumerGroupList(searchForm.keyword || undefined)
     consumerGroupList.value = res.data.records
     total.value = res.data.total
-  } catch {
+  }
+  catch {
     // 错误已在 request.ts 的响应拦截器中处理
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -132,7 +123,8 @@ async function handleDelete(row: ConsumerGroupVO) {
     await deleteConsumerGroup(row.group)
     ElMessage.success('删除成功')
     loadData()
-  } catch {
+  }
+  catch {
     // 取消或错误已在 request.ts 拦截
   }
 }

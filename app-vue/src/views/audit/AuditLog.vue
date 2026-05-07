@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import {onMounted, reactive, ref} from 'vue'
-import {getAuditLogs} from '@/api/modules/audit'
-import type {AuditLog, AuditLogQueryParams} from '@/api/types'
+import { onMounted, reactive, ref } from 'vue'
+import { getAuditLogs } from '@/api/modules/audit'
+import type { AuditLog, AuditLogQueryParams } from '@/api/types'
 
 // 查询表单
 const searchForm = reactive({
@@ -24,12 +24,12 @@ const pagination = reactive({
 
 // 操作类型选项
 const operationTypeOptions = [
-  {value: null, label: '全部'},
-  {value: 'LOGIN', label: '登录'},
-  {value: 'LOGOUT', label: '登出'},
-  {value: '新增', label: '新增'},
-  {value: '编辑', label: '编辑'},
-  {value: '删除', label: '删除'}
+  { value: null, label: '全部' },
+  { value: 'LOGIN', label: '登录' },
+  { value: 'LOGOUT', label: '登出' },
+  { value: '新增', label: '新增' },
+  { value: '编辑', label: '编辑' },
+  { value: '删除', label: '删除' }
 ]
 
 // 加载审计日志列表
@@ -48,9 +48,11 @@ async function loadAuditLogs() {
     const res = await getAuditLogs(params)
     auditList.value = res.data.records
     total.value = res.data.total
-  } catch (error) {
+  }
+  catch (error) {
     console.error('加载审计日志失败', error)
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }

@@ -9,8 +9,8 @@
  *
  * @description 秒杀活动入口页面
  */
-import {onMounted, ref} from 'vue'
-import {type Activity, activityApi} from '@/api/modules/seckill'
+import { onMounted, ref } from 'vue'
+import { type Activity, activityApi } from '@/api/modules/seckill'
 
 /** 活动列表数据 */
 const activities = ref<Activity[]>([])
@@ -25,9 +25,11 @@ onMounted(async () => {
   try {
     const res = await activityApi.list()
     activities.value = res.data?.records || []
-  } catch {
+  }
+  catch {
     activities.value = []
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 })
@@ -47,7 +49,7 @@ function formatTime(time: string) {
  * @returns 状态描述文本
  */
 function getStatusText(status: number) {
-  const map = {0: '未开始', 1: '进行中', 2: '已结束'}
+  const map = { 0: '未开始', 1: '进行中', 2: '已结束' }
   return map[status as keyof typeof map] || '未知'
 }
 </script>

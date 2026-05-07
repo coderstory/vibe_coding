@@ -2,8 +2,8 @@
  * 用户状态管理
  * 管理登录状态、Token、用户信息等全局状态
  */
-import {computed, ref} from 'vue'
-import {defineStore} from 'pinia'
+import { computed, ref } from 'vue'
+import { defineStore } from 'pinia'
 import {
   getCurrentUser,
   login as apiLogin,
@@ -39,7 +39,7 @@ export const useUserStore = defineStore('user', () => {
    * 保存 Token 和用户信息到 localStorage
    */
   async function login(username: string, password: string) {
-    const res = await apiLogin({username, password})
+    const res = await apiLogin({ username, password })
     token.value = res.data.token
     storedRefreshToken.value = res.data.refreshToken
     user.value = res.data.user
@@ -61,7 +61,8 @@ export const useUserStore = defineStore('user', () => {
       localStorage.setItem('token', token.value)
       localStorage.setItem('refreshToken', storedRefreshToken.value)
       return true
-    } catch {
+    }
+    catch {
       return false
     }
   }
@@ -73,7 +74,8 @@ export const useUserStore = defineStore('user', () => {
   async function logout() {
     try {
       await apiLogout()
-    } catch {
+    }
+    catch {
       // 忽略登出错误，确保本地状态被清除
     }
     token.value = ''
@@ -95,7 +97,8 @@ export const useUserStore = defineStore('user', () => {
       user.value = res.data
       localStorage.setItem('user', JSON.stringify(user.value))
       return user.value
-    } catch {
+    }
+    catch {
       logout()
       return null
     }
@@ -109,7 +112,8 @@ export const useUserStore = defineStore('user', () => {
     if (savedUser) {
       try {
         user.value = JSON.parse(savedUser)
-      } catch {
+      }
+      catch {
         user.value = null
       }
     }
@@ -117,7 +121,6 @@ export const useUserStore = defineStore('user', () => {
 
   return {
     token,
-    refreshToken,
     user,
     isLoggedIn,
     login,

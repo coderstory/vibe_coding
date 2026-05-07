@@ -1,9 +1,5 @@
 import request from '../request'
-import type {ApiResponse, Menu, MenuTree} from '../types'
-
-export function getUserMenus(userId: number) {
-  return request.get<ApiResponse<MenuTree[]>>(`/menus/user/${userId}`)
-}
+import type { ApiResponse, Menu, MenuTree } from '../types'
 
 export function getMenuTree() {
   return request.get<ApiResponse<MenuTree[]>>('/menus/tree')

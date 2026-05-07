@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import {onMounted, reactive, ref} from 'vue'
-import type {ElTree} from 'element-plus'
-import {ElMessage, ElMessageBox, type FormInstance, type FormRules} from 'element-plus'
+import { onMounted, reactive, ref } from 'vue'
+import type { ElTree } from 'element-plus'
+import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import {
   assignRoleMenus,
   createRole,
@@ -11,7 +11,7 @@ import {
   getRoleMenus,
   updateRole
 } from '@/api/modules/role'
-import type {CreateRoleParams, MenuTree, Role, UpdateRoleParams} from '@/api/types'
+import type { CreateRoleParams, MenuTree, Role, UpdateRoleParams } from '@/api/types'
 
 // 搜索表单
 const searchForm = reactive({
@@ -40,8 +40,8 @@ const roleForm = reactive({
 })
 const roleFormRef = ref<FormInstance | null>(null)
 const roleFormRules: FormRules = {
-  roleName: [{required: true, message: '请输入角色名称', trigger: 'blur'}],
-  roleCode: [{required: true, message: '请输入角色编码', trigger: 'blur'}]
+  roleName: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
+  roleCode: [{ required: true, message: '请输入角色编码', trigger: 'blur' }]
 }
 const isEdit = ref(false)
 
@@ -73,9 +73,11 @@ async function loadRoleList() {
     const res = await getRoleList(params)
     roleList.value = res.data.records
     total.value = res.data.total
-  } catch {
+  }
+  catch {
     ElMessage.error('加载角色列表失败')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -139,7 +141,8 @@ function handleDelete(row: Role) {
       await deleteRole(row.id)
       ElMessage.success('角色删除成功')
       loadRoleList()
-    } catch {
+    }
+    catch {
       ElMessage.error('角色删除失败')
     }
   }).catch(() => {
@@ -162,7 +165,8 @@ async function handleAssignPermission(row: Role) {
     checkedMenuIds.value = roleMenuRes.data || []
 
     permissionDialogVisible.value = true
-  } catch {
+  }
+  catch {
     ElMessage.error('加载权限数据失败')
   }
 }
@@ -182,7 +186,8 @@ async function handleSaveRole() {
         }
         await updateRole(roleForm.id as number, params)
         ElMessage.success('角色更新成功')
-      } else {
+      }
+      else {
         const params: CreateRoleParams = {
           roleName: roleForm.roleName,
           roleCode: roleForm.roleCode,
@@ -193,7 +198,8 @@ async function handleSaveRole() {
       }
       dialogVisible.value = false
       loadRoleList()
-    } catch {
+    }
+    catch {
       ElMessage.error(isEdit.value ? '角色更新失败' : '角色创建失败')
     }
   })
@@ -212,7 +218,8 @@ async function handleSavePermission() {
     await assignRoleMenus(currentRoleId.value as number, allSelected)
     ElMessage.success('权限保存成功')
     permissionDialogVisible.value = false
-  } catch {
+  }
+  catch {
     ElMessage.error('权限保存失败')
   }
 }

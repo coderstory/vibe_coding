@@ -20,11 +20,11 @@
  * - status=1 (进行中): 显示"立即抢购"按钮
  * - status=2 (已结束): 按钮禁用，显示"活动已结束"
  */
-import {computed, onMounted, onUnmounted, ref} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import {ElMessage} from 'element-plus'
-import {Loading} from '@element-plus/icons-vue'
-import {activityApi, type ActivityDetail, seckillApi, type SeckillResponse} from '@/api/modules/seckill'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import { Loading } from '@element-plus/icons-vue'
+import { activityApi, type ActivityDetail, seckillApi, type SeckillResponse } from '@/api/modules/seckill'
 
 const route = useRoute()
 const router = useRouter()
@@ -57,7 +57,7 @@ const queueing = ref(false)
  */
 const statusText = computed(() => {
   if (!activity.value) return '加载中'
-  const map: Record<number, string> = {0: '未开始', 1: '进行中', 2: '已结束'}
+  const map: Record<number, string> = { 0: '未开始', 1: '进行中', 2: '已结束' }
   return map[activity.value.status] || '未知'
 })
 
@@ -70,7 +70,7 @@ const statusText = computed(() => {
  */
 const statusType = computed(() => {
   if (!activity.value) return 'info'
-  const map: Record<number, string> = {0: 'warning', 1: 'success', 2: 'info'}
+  const map: Record<number, string> = { 0: 'warning', 1: 'success', 2: 'info' }
   return map[activity.value.status] || 'info'
 })
 
@@ -106,13 +106,16 @@ async function loadActivity() {
       activity.value = res.data
       // 活动信息加载成功后，获取库存
       await loadStock()
-    } else {
+    }
+    else {
       ElMessage.error(res.message || '加载活动详情失败')
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('加载活动详情失败', error)
     ElMessage.error('加载活动详情失败，请重试')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -133,7 +136,8 @@ async function loadStock() {
   try {
     const res = await seckillApi.getStock(activity.value.id)
     stock.value = res.data
-  } catch (error) {
+  }
+  catch (error) {
     console.error('加载库存失败', error)
     ElMessage.error('加载库存失败，请重试')
   }
@@ -185,7 +189,8 @@ async function handleSeckill() {
       const signRes = await seckillApi.getSign(activity.value.goods.id)
       sign = signRes.data.sign
       timestamp = signRes.data.timestamp
-    } catch (e) {
+    }
+    catch (e) {
       console.error('获取签名失败', e)
       ElMessage.error('获取签名失败，请刷新页面重试')
       eventSource?.close()
@@ -211,13 +216,15 @@ async function handleSeckill() {
       eventSource = null
       queueing.value = false
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('抢购失败', error)
     ElMessage.error('抢购失败，请稍后重试')
     eventSource?.close()
     eventSource = null
     queueing.value = false
-  } finally {
+  }
+  finally {
     seckilling.value = false
   }
 }
@@ -256,10 +263,12 @@ function subscribeSeckillResult(queueId: string) {
         ElMessage.success('恭喜！抢购成功！')
         // 跳转到订单确认页面
         router.push('/order/confirm')
-      } else if (data.status === 2) {
+      }
+      else if (data.status === 2) {
         // status=2: 抢购失败
         ElMessage.error(data.message || '抢购失败')
-      } else {
+      }
+      else {
         // status=0: 排队中或其他状态
         ElMessage.info(data.message || '处理中...')
       }
@@ -289,7 +298,8 @@ async function handleReserve() {
   try {
     await activityApi.reserve(activity.value.id)
     ElMessage.success('预约成功，活动开始前会通知您')
-  } catch (error) {
+  }
+  catch (error) {
     console.error('预约失败', error)
     ElMessage.error('预约失败，请重试')
   }

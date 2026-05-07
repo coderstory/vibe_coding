@@ -7,11 +7,11 @@
  * - 表单验证
  * - 保存后返回列表
  */
-import {onMounted, ref} from 'vue'
-import {goodsApi, type SeckillGoods} from '@/api/modules/goods'
-import {activityApi} from '@/api/modules/seckill'
-import {ElMessage} from 'element-plus'
-import {useRoute, useRouter} from 'vue-router'
+import { onMounted, ref } from 'vue'
+import { goodsApi, type SeckillGoods } from '@/api/modules/goods'
+import { activityApi } from '@/api/modules/seckill'
+import { ElMessage } from 'element-plus'
+import { useRoute, useRouter } from 'vue-router'
 
 const router = useRouter()
 const route = useRoute()
@@ -33,7 +33,8 @@ async function loadActivities() {
   try {
     const res = await activityApi.list()
     activityList.value = res.data?.records || []
-  } catch (e) {
+  }
+  catch (e) {
     console.error('加载活动列表失败', e)
   }
 }
@@ -50,10 +51,12 @@ async function loadGoods(id: number) {
         ElMessage.warning('该商品关联的活动已不存在或已下架')
       }
     }
-  } catch (e) {
+  }
+  catch (e) {
     ElMessage.error('加载商品失败，但您仍可以编辑表单')
     // 不关闭页面，让用户可以继续编辑
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -81,14 +84,17 @@ async function handleSubmit() {
     if (isEdit.value) {
       await goodsApi.updateGoods(form.value.id!, form.value)
       ElMessage.success('更新成功')
-    } else {
+    }
+    else {
       await goodsApi.createGoods(form.value)
       ElMessage.success('创建成功')
     }
     router.push('/seckill/goods')
-  } catch (e) {
+  }
+  catch (e) {
     ElMessage.error(isEdit.value ? '更新失败' : '创建失败')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }

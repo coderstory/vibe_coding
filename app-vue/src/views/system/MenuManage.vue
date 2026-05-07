@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import {onMounted, reactive, ref} from 'vue'
-import type {ElTree} from 'element-plus'
-import {ElMessage, ElMessageBox, type FormInstance, type FormRules} from 'element-plus'
-import {createMenu, deleteMenu, getMenuTree, updateMenu} from '@/api/modules/menu'
-import type {Menu, MenuTree} from '@/api/types'
+import { onMounted, reactive, ref } from 'vue'
+import type { ElTree } from 'element-plus'
+import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
+import { createMenu, deleteMenu, getMenuTree, updateMenu } from '@/api/modules/menu'
+import type { Menu, MenuTree } from '@/api/types'
 
 // 菜单树数据
 const menuTreeData = ref<MenuTree[]>([])
@@ -32,8 +32,8 @@ const isEdit = ref(false)
 
 // 表单验证
 const menuFormRules: FormRules = {
-  name: [{required: true, message: '请输入菜单名称', trigger: 'blur'}],
-  path: [{required: true, message: '请输入菜单路径', trigger: 'blur'}]
+  name: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }],
+  path: [{ required: true, message: '请输入菜单路径', trigger: 'blur' }]
 }
 
 // 加载菜单树
@@ -42,9 +42,11 @@ async function loadMenuTree() {
   try {
     const res = await getMenuTree()
     menuTreeData.value = res.data || []
-  } catch {
+  }
+  catch {
     ElMessage.error('加载菜单列表失败')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -113,7 +115,8 @@ function handleDelete(row: Menu) {
       await deleteMenu(row.id)
       ElMessage.success('菜单删除成功')
       loadMenuTree()
-    } catch {
+    }
+    catch {
       ElMessage.error('菜单删除失败')
     }
   }).catch(() => {
@@ -131,13 +134,15 @@ async function handleSaveMenu() {
       if (isEdit.value) {
         await updateMenu(menuForm.id as number, menuForm)
         ElMessage.success('菜单更新成功')
-      } else {
+      }
+      else {
         await createMenu(menuForm)
         ElMessage.success('菜单创建成功')
       }
       dialogVisible.value = false
       loadMenuTree()
-    } catch {
+    }
+    catch {
       ElMessage.error(isEdit.value ? '菜单更新失败' : '菜单创建失败')
     }
   })

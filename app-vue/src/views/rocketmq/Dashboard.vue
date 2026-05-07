@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import {onMounted, onUnmounted} from 'vue'
-import {ElCard, ElCol, ElRow} from 'element-plus'
+import { onMounted, onUnmounted } from 'vue'
+import { ElCard, ElCol, ElRow } from 'element-plus'
 import OverviewCard from './OverviewCard.vue'
 import BrokerStatusTable from './BrokerStatusTable.vue'
 import TopicBacklogTable from './TopicBacklogTable.vue'

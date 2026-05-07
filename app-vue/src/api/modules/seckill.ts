@@ -5,7 +5,6 @@
  *
  * 接口列表：
  * - seckillApi.buy()           - 执行秒杀抢购
- * - seckillApi.getResult()     - 查询秒杀结果
  * - seckillApi.getSign()       - 获取秒杀签名
  * - seckillApi.subscribeSeckillResult() - SSE 订阅秒杀结果
  * - seckillApi.getStock()      - 获取活动库存
@@ -128,30 +127,6 @@ export const seckillApi = {
   },
 
   /**
-   * 查询秒杀结果（轮询方式）
-   *
-   * 适用场景：
-   * - SSE 连接不可用时（如某些不支持 SSE 的环境）
-   * - 作为 SSE 的降级方案
-   *
-   * 注意：推荐使用 subscribeSeckillResult() 实时性更好
-   *
-   * @param queueId 队列ID（从 buy 接口返回）
-   * @returns 秒杀处理结果
-   *
-   * @example
-   * ```typescript
-   * const res = await seckillApi.getResult('queue-123')
-   * if (res.data.status === 1) {
-   *   console.log('抢购成功，订单号：', res.data.orderId)
-   * }
-   * ```
-   */
-  getResult(queueId: string) {
-    return request.get<SeckillResponse>(`/seckill/result/${queueId}`)
-  },
-
-  /**
    * 获取秒杀签名
    *
    * 签名机制：
@@ -244,7 +219,8 @@ export const seckillApi = {
         const data = JSON.parse(event.data) as SeckillResponse
         console.log('收到秒杀结果:', data)
         onMessage?.(data)
-      } catch (error) {
+      }
+      catch (error) {
         console.error('解析秒杀结果失败', error)
       }
     })
@@ -255,7 +231,8 @@ export const seckillApi = {
         const data = JSON.parse(event.data)
         console.log('状态更新:', data)
         // 可以在这里更新页面上的状态显示
-      } catch (error) {
+      }
+      catch (error) {
         console.error('解析状态更新失败', error)
       }
     })
@@ -430,7 +407,7 @@ export const activityApi = {
    * ```
    */
   list(page: number = 1, size: number = 20) {
-    return request.get<{ records: Activity[]; total: number }>('/seckill/activity', {params: {page, size}})
+    return request.get<{ records: Activity[]; total: number }>('/seckill/activity', { params: { page, size } })
   },
 
   /**

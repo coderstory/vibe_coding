@@ -87,49 +87,6 @@ export interface RefreshTokenResult {
 }
 
 /**
- * 用户查询参数
- */
-export interface UserQueryParams extends PageParams {
-  username?: string;
-  name?: string;
-  department?: string;
-  enabled?: number;
-  phone?: string;
-}
-
-/**
- * 创建用户参数
- */
-export interface CreateUserParams {
-  username: string;
-  name: string;
-  password?: string;
-  gender?: number;
-  email?: string;
-  department?: string;
-  position?: string;
-  roleId?: number;
-  enabled?: number;
-  avatar?: string;
-  phone?: string;
-}
-
-/**
- * 更新用户参数
- */
-export interface UpdateUserParams {
-  name?: string;
-  gender?: number;
-  email?: string;
-  department?: string;
-  position?: string;
-  roleId?: number;
-  enabled?: number;
-  avatar?: string;
-  phone?: string;
-}
-
-/**
  * 角色信息
  */
 export interface Role {
@@ -177,19 +134,6 @@ export interface AuditLog {
   url: string;
   ip: string;
   createTime: string;
-}
-
-/**
- * 知识库条目
- */
-export interface Knowledge {
-  id: number;
-  title: string;
-  content: string;
-  category?: string;
-  tags?: string[];
-  createTime: string;
-  updateTime: string;
 }
 
 /**
@@ -242,24 +186,6 @@ export interface KnowledgeCategory {
 }
 
 /**
- * 创建分类参数
- */
-export interface CreateCategoryParams {
-  name: string;
-  parentId?: number;
-  sortOrder?: number;
-}
-
-/**
- * 更新分类参数
- */
-export interface UpdateCategoryParams {
-  name?: string;
-  parentId?: number;
-  sortOrder?: number;
-}
-
-/**
  * 知识库文章
  */
 export interface KnowledgeArticle {
@@ -271,35 +197,6 @@ export interface KnowledgeArticle {
   tags?: number[];
   createTime: string;
   updateTime: string;
-}
-
-/**
- * 文章查询参数
- */
-export interface ArticleQueryParams extends PageParams {
-  title?: string;
-  categoryId?: number;
-  tag?: string;
-}
-
-/**
- * 创建文章参数
- */
-export interface CreateArticleParams {
-  title: string;
-  content: string;
-  categoryId?: number;
-  tags?: number[];
-}
-
-/**
- * 更新文章参数
- */
-export interface UpdateArticleParams {
-  title?: string;
-  content?: string;
-  categoryId?: number;
-  tags?: number[];
 }
 
 /**

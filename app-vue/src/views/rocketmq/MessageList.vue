@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import {onMounted, reactive, ref} from 'vue'
-import {ElMessage} from 'element-plus'
+import { onMounted, reactive, ref } from 'vue'
+import { ElMessage } from 'element-plus'
 import {
   getMessageDetail,
   getMessageList,
@@ -45,11 +45,11 @@ const searchForm = reactive({
 
 // 快捷时间选择
 const timeShortcuts = [
-  {text: '最近 1 小时', value: () => Date.now() - 60 * 60 * 1000},
-  {text: '最近 6 小时', value: () => Date.now() - 6 * 60 * 60 * 1000},
-  {text: '最近 12 小时', value: () => Date.now() - 12 * 60 * 60 * 1000},
-  {text: '最近 24 小时', value: () => Date.now() - 24 * 60 * 60 * 1000},
-  {text: '最近 7 天', value: () => Date.now() - 7 * 24 * 60 * 60 * 1000}
+  { text: '最近 1 小时', value: () => Date.now() - 60 * 60 * 1000 },
+  { text: '最近 6 小时', value: () => Date.now() - 6 * 60 * 60 * 1000 },
+  { text: '最近 12 小时', value: () => Date.now() - 12 * 60 * 60 * 1000 },
+  { text: '最近 24 小时', value: () => Date.now() - 24 * 60 * 60 * 1000 },
+  { text: '最近 7 天', value: () => Date.now() - 7 * 24 * 60 * 60 * 1000 }
 ]
 
 // 详情对话框
@@ -80,7 +80,8 @@ async function loadTopics() {
   try {
     const res = await getTopicList()
     topicList.value = res.data.records || []
-  } catch {
+  }
+  catch {
     // 错误已在 request.ts 的响应拦截器中处理
   }
 }
@@ -106,9 +107,11 @@ async function loadMessages() {
     )
     messageList.value = res.data.records || []
     total.value = res.data.total
-  } catch {
+  }
+  catch {
     // 错误已在 request.ts 的响应拦截器中处理
-  } finally {
+  }
+  finally {
     messageLoading.value = false
   }
 }
@@ -119,7 +122,8 @@ async function handleViewDetail(row: MessageVO) {
     const res = await getMessageDetail(selectedTopic.value, row.msgId)
     detailData.value = res.data
     detailDialogVisible.value = true
-  } catch {
+  }
+  catch {
     // 错误已在 request.ts 的响应拦截器中处理
   }
 }
@@ -131,9 +135,11 @@ async function handleViewTrace(row: MessageVO) {
   try {
     const res = await getMessageTrace(selectedTopic.value, row.msgId)
     traceList.value = res.data?.consumeTraceList || []
-  } catch {
+  }
+  catch {
     // 错误已在 request.ts 的响应拦截器中处理
-  } finally {
+  }
+  finally {
     traceLoading.value = false
   }
 }
@@ -178,9 +184,11 @@ async function handleSend() {
     ElMessage.success(`消息发送成功，MsgId: ${res.data.msgId}`)
     sendDialogVisible.value = false
     // 发送成功后不自动刷新列表，让用户自己决定是否刷新
-  } catch {
+  }
+  catch {
     // 错误已在 request.ts 的响应拦截器中处理
-  } finally {
+  }
+  finally {
     sendLoading.value = false
   }
 }

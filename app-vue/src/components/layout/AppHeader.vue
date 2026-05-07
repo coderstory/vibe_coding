@@ -3,15 +3,15 @@
  * 应用顶部导航栏组件
  * 显示用户信息和动画切换控制
  */
-import {computed} from 'vue'
-import {useRouter} from 'vue-router'
-import {ElMessageBox} from 'element-plus'
-import {useUserStore} from '@/store/user'
-import {useAnimationToggle} from '@/composables/useAnimationToggle'
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { ElMessageBox } from 'element-plus'
+import { useUserStore } from '@/store/user'
+import { useAnimationToggle } from '@/composables/useAnimationToggle'
 
 const router = useRouter()
 const userStore = useUserStore()
-const {animationsEnabled, toggleAnimations} = useAnimationToggle()
+const { animationsEnabled, toggleAnimations } = useAnimationToggle()
 
 // 显示用户名，取 name 或 username
 const username = computed(() => userStore.user?.name || userStore.user?.username || '未登录')
@@ -32,10 +32,12 @@ async function handleCommand(command: string) {
 
       await userStore.logout()
       router.push('/login')
-    } catch {
+    }
+    catch {
       // 用户取消操作
     }
-  } else if (command === 'profile') {
+  }
+  else if (command === 'profile') {
     // TODO: 跳转到个人中心
   }
 }

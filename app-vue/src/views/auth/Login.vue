@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import {h, onMounted, onUnmounted, reactive, ref} from 'vue'
-import {useRouter} from 'vue-router'
-import {ElMessage, type FormInstance, type FormRules} from 'element-plus'
-import {useUserStore} from '@/store/user'
+import { h, onMounted, onUnmounted, reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { useUserStore } from '@/store/user'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -17,10 +17,10 @@ const loginFormRef = ref<FormInstance | null>(null)
 
 const rules: FormRules = {
   username: [
-    {required: true, message: '请输入用户名', trigger: 'blur'}
+    { required: true, message: '请输入用户名', trigger: 'blur' }
   ],
   password: [
-    {required: true, message: '请输入密码', trigger: 'blur'}
+    { required: true, message: '请输入密码', trigger: 'blur' }
   ]
 }
 
@@ -35,10 +35,12 @@ async function handleLogin() {
       await userStore.login(loginForm.username, loginForm.password)
       ElMessage.success('登录成功')
       router.push('/index')
-    } catch (error: unknown) {
+    }
+    catch (error: unknown) {
       const err = error as Error
       ElMessage.error(err.message || '用户名或密码错误')
-    } finally {
+    }
+    finally {
       loading.value = false
     }
   })
@@ -161,8 +163,8 @@ const UserIcon = {
       'width': '18',
       'height': '18'
     }, [
-      h('path', {d: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'}),
-      h('circle', {cx: '12', cy: '7', r: '4'})
+      h('path', { d: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2' }),
+      h('circle', { cx: '12', cy: '7', r: '4' })
     ])
   }
 }
@@ -178,8 +180,8 @@ const LockIcon = {
       'width': '18',
       'height': '18'
     }, [
-      h('rect', {x: '3', y: '11', width: '18', height: '11', rx: '2', ry: '2'}),
-      h('path', {d: 'M7 11V7a5 5 0 0 1 10 0v4'})
+      h('rect', { x: '3', y: '11', width: '18', height: '11', rx: '2', ry: '2' }),
+      h('path', { d: 'M7 11V7a5 5 0 0 1 10 0v4' })
     ])
   }
 }

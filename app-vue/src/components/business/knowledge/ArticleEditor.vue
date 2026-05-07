@@ -10,8 +10,8 @@
  *
  * @module components/knowledge/ArticleEditor
  */
-import {computed, onBeforeUnmount, ref, shallowRef, watch} from 'vue'
-import {Editor, Toolbar} from '@wangeditor/editor-for-vue'
+import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
+import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import '@wangeditor/editor/dist/css/style.css'
 import {
   createArticle,
@@ -21,8 +21,8 @@ import {
   updateArticle,
   uploadFile
 } from '@/api/modules/knowledge'
-import {ElMessage} from 'element-plus'
-import type {CreateArticleParams, KnowledgeTag, UpdateArticleParams} from '@/api/types'
+import { ElMessage } from 'element-plus'
+import type { CreateArticleParams, KnowledgeTag, UpdateArticleParams } from '@/api/types'
 
 /** 文章表单数据结构 */
 interface ArticleForm {
@@ -108,7 +108,7 @@ const customUpload = (file: File, insertFn: (url: string, alt: string, href: str
  */
 const getAuthHeaders = (): Record<string, string> => {
   const token = localStorage.getItem('token')
-  return token ? {Authorization: `Bearer ${token}`} : {}
+  return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
 /** 富文本编辑器配置 */
@@ -137,7 +137,8 @@ watch(visible, async (val) => {
     await loadTags()
     if (props.articleId) {
       await loadArticle()
-    } else {
+    }
+    else {
       resetForm()
     }
   }
@@ -150,7 +151,8 @@ async function loadTags() {
   try {
     const res = await getAllTags()
     allTags.value = res.data || []
-  } catch (e) {
+  }
+  catch (e) {
     console.error('加载标签失败', e)
   }
 }
@@ -173,7 +175,8 @@ async function loadArticle() {
       status: article.status
     }
     editorData.value = article.content || ''
-  } catch {
+  }
+  catch {
     ElMessage.error('加载文章失败')
   }
 }
@@ -209,7 +212,7 @@ async function handleSave() {
     let tagIds = [...form.value.tagIds]
     const newTagNames = tagIds.filter(id => typeof id === 'string') as string[]
     for (const name of newTagNames) {
-      const res = await createTag({name, color: '#409EFF'})
+      const res = await createTag({ name, color: '#409EFF' })
       tagIds = tagIds.map(id => id === name ? res.data.id : id)
       allTags.value.push(res.data)
     }
@@ -228,13 +231,15 @@ async function handleSave() {
     if (isEdit.value) {
       await updateArticle(props.articleId as number, data as UpdateArticleParams)
       ElMessage.success('更新成功')
-    } else {
+    }
+    else {
       await createArticle(data as CreateArticleParams)
       ElMessage.success('创建成功')
     }
     emit('success')
     visible.value = false
-  } catch {
+  }
+  catch {
     ElMessage.error(isEdit.value ? '更新失败' : '创建失败')
   }
 }

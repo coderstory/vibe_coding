@@ -1,4 +1,4 @@
-import {beforeEach, describe, expect, it, vi} from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock Element Plus message
 vi.mock('element-plus', async () => {
@@ -49,7 +49,7 @@ describe('User API Error Handling', () => {
         return '操作失败'
       }
 
-      expect(extractErrorMessage({response: {status: 401}})).toBe('登录已过期，请重新登录')
+      expect(extractErrorMessage({ response: { status: 401 } })).toBe('登录已过期，请重新登录')
     })
 
     it('should return 404 message for not found', async () => {
@@ -60,7 +60,7 @@ describe('User API Error Handling', () => {
         return '操作失败'
       }
 
-      expect(extractErrorMessage({response: {status: 404}})).toBe('请求的资源不存在')
+      expect(extractErrorMessage({ response: { status: 404 } })).toBe('请求的资源不存在')
     })
 
     it('should return 500 message for server error', async () => {
@@ -71,7 +71,7 @@ describe('User API Error Handling', () => {
         return '操作失败'
       }
 
-      expect(extractErrorMessage({response: {status: 500}})).toBe('服务器内部错误，请稍后重试')
+      expect(extractErrorMessage({ response: { status: 500 } })).toBe('服务器内部错误，请稍后重试')
     })
 
     it('should handle network error', async () => {
@@ -82,7 +82,7 @@ describe('User API Error Handling', () => {
         return '操作失败'
       }
 
-      expect(extractErrorMessage({code: 'ERR_NETWORK'})).toBe('网络连接失败，请检查网络设置')
+      expect(extractErrorMessage({ code: 'ERR_NETWORK' })).toBe('网络连接失败，请检查网络设置')
     })
 
     it('should handle timeout error', async () => {
@@ -93,7 +93,7 @@ describe('User API Error Handling', () => {
         return '操作失败'
       }
 
-      expect(extractErrorMessage({code: 'ECONNABORTED'})).toBe('请求超时，请检查网络或稍后重试')
+      expect(extractErrorMessage({ code: 'ECONNABORTED' })).toBe('请求超时，请检查网络或稍后重试')
     })
 
     it('should return default message for unknown errors', async () => {
@@ -101,7 +101,7 @@ describe('User API Error Handling', () => {
         return error.message || '操作失败，请稍后重试'
       }
 
-      expect(extractErrorMessage({message: 'Unknown error'})).toBe('Unknown error')
+      expect(extractErrorMessage({ message: 'Unknown error' })).toBe('Unknown error')
     })
   })
 
@@ -128,7 +128,7 @@ describe('User API Error Handling', () => {
           return '操作失败'
         }
 
-        expect(extractErrorMessage({response: {status: Number(status)}})).toBe(expectedMessage)
+        expect(extractErrorMessage({ response: { status: Number(status) } })).toBe(expectedMessage)
       })
     })
   })

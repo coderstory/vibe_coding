@@ -10,9 +10,9 @@
  * 数据来源：
  * - GET /api/reservation/my - 获取当前用户的预约列表
  */
-import {onMounted, ref} from 'vue'
-import {ElMessage} from 'element-plus'
-import {activityApi, type Reservation} from '@/api/modules/seckill'
+import { onMounted, ref } from 'vue'
+import { ElMessage } from 'element-plus'
+import { activityApi, type Reservation } from '@/api/modules/seckill'
 
 /** 预约记录（包含活动详情） */
 interface ReservationWithActivity extends Reservation {
@@ -42,10 +42,12 @@ onMounted(async () => {
 
     // 补充活动详情（需要分别调用活动详情接口）
     await enrichActivityDetails()
-  } catch (error) {
+  }
+  catch (error) {
     console.error('加载预约列表失败', error)
     ElMessage.error('加载预约列表失败，请重试')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 })
@@ -66,7 +68,8 @@ async function enrichActivityDetails() {
         reservation.activityEndTime = res.data.endTime
         reservation.activityStatus = res.data.status
       }
-    } catch (error) {
+    }
+    catch (error) {
       console.error('加载活动详情失败', error)
     }
   }

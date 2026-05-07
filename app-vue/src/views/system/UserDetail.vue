@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import {onMounted, reactive, ref} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import {ElMessage, type FormInstance, type FormRules} from 'element-plus'
-import {getAllRoles, getUserDetail, updateUser} from '@/api/modules/user'
-import type {Role, UpdateUserParams, UserVO} from '@/api/types'
+import { onMounted, reactive, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { getAllRoles, getUserDetail, updateUser } from '@/api/modules/user'
+import type { Role, UpdateUserParams, UserVO } from '@/api/types'
 
 const route = useRoute()
 const router = useRouter()
@@ -30,8 +30,8 @@ const userForm = reactive({
 })
 
 const userFormRules: FormRules = {
-  name: [{required: true, message: '请输入姓名', trigger: 'blur'}],
-  roleId: [{required: true, message: '请选择角色', trigger: 'change'}]
+  name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+  roleId: [{ required: true, message: '请选择角色', trigger: 'change' }]
 }
 
 async function loadUser() {
@@ -39,9 +39,11 @@ async function loadUser() {
   try {
     const res = await getUserDetail(Number(route.params.id))
     user.value = res.data
-  } catch {
+  }
+  catch {
     ElMessage.error('加载用户详情失败')
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -50,7 +52,8 @@ async function loadRoles() {
   try {
     const res = await getAllRoles()
     roles.value = res.data || []
-  } catch {
+  }
+  catch {
     ElMessage.error('加载角色列表失败')
   }
 }
@@ -95,9 +98,11 @@ async function handleSave() {
       ElMessage.success('用户更新成功')
       dialogVisible.value = false
       loadUser()
-    } catch {
+    }
+    catch {
       ElMessage.error('用户更新失败')
-    } finally {
+    }
+    finally {
       saving.value = false
     }
   })

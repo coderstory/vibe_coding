@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue'
+import { onMounted, ref } from 'vue'
 import CategoryTree from '@/components/business/knowledge/CategoryTree.vue'
 import ArticleEditor from '@/components/business/knowledge/ArticleEditor.vue'
-import {deleteArticle, getArticlePage, searchArticles} from '@/api/modules/knowledge'
-import {ElMessage, ElMessageBox} from 'element-plus'
-import type {ArticleQueryParams, KnowledgeArticle, KnowledgeCategory} from '@/api/types'
+import { deleteArticle, getArticlePage, searchArticles } from '@/api/modules/knowledge'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import type { ArticleQueryParams, KnowledgeArticle, KnowledgeCategory } from '@/api/types'
 
 const categoryTreeRef = ref<InstanceType<typeof CategoryTree> | null>(null)
 const showMobileTree = ref(false)
@@ -26,7 +26,8 @@ async function loadArticles() {
       res = await searchArticles(searchKeyword.value)
       articleList.value = res.data || []
       pagination.value.total = articleList.value.length
-    } else {
+    }
+    else {
       const params: ArticleQueryParams = {
         page: pagination.value.page,
         size: pagination.value.size
@@ -39,7 +40,8 @@ async function loadArticles() {
       articleList.value = data.records || []
       pagination.value.total = data.total || 0
     }
-  } catch {
+  }
+  catch {
     ElMessage.error('加载知识列表失败')
   }
 }
@@ -72,11 +74,12 @@ function handleEdit(row: KnowledgeArticle) {
 
 async function handleDelete(row: KnowledgeArticle) {
   try {
-    await ElMessageBox.confirm('确定删除该知识吗？', '警告', {type: 'warning'})
+    await ElMessageBox.confirm('确定删除该知识吗？', '警告', { type: 'warning' })
     await deleteArticle(row.id)
     ElMessage.success('删除成功')
     loadArticles()
-  } catch {
+  }
+  catch {
     // user cancelled
   }
 }
