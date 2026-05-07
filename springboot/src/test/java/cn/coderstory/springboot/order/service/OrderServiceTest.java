@@ -1,7 +1,7 @@
-package cn.coderstory.springboot.order.service;
+package cn.coderstory.springboot.service.order;
 
 import cn.coderstory.springboot.SpringbootApplication;
-import cn.coderstory.springboot.order.mapper.OrderMapper;
+import cn.coderstory.springboot.mapper.order.OrderMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,8 +48,8 @@ class OrderServiceTest {
 
         testOrderNos.forEach(orderNo -> {
             try {
-                orderMapper.delete(new LambdaQueryWrapper<cn.coderstory.springboot.order.entity.Order>()
-                    .eq(cn.coderstory.springboot.order.entity.Order::getOrderNo, orderNo));
+                orderMapper.delete(new LambdaQueryWrapper<cn.coderstory.springboot.entity.order.Order>()
+                    .eq(cn.coderstory.springboot.entity.order.Order::getOrderNo, orderNo));
             } catch (Exception ignored) {
             }
         });
@@ -62,7 +62,7 @@ class OrderServiceTest {
     void shouldCreateSeckillOrder() {
         String queueId = "test-queue-" + System.currentTimeMillis();
 
-        cn.coderstory.springboot.order.entity.Order result = orderService.createSeckillOrder(1L, 100L, 1L, queueId);
+        cn.coderstory.springboot.entity.order.Order result = orderService.createSeckillOrder(1L, 100L, 1L, queueId);
 
         assertNotNull(result);
         assertNotNull(result.getId());
@@ -78,7 +78,7 @@ class OrderServiceTest {
     void shouldPayOrder() {
         String queueId = "test-pay-" + System.currentTimeMillis();
 
-        cn.coderstory.springboot.order.entity.Order created = orderService.createSeckillOrder(1L, 100L, 1L, queueId);
+        cn.coderstory.springboot.entity.order.Order created = orderService.createSeckillOrder(1L, 100L, 1L, queueId);
         testOrderIds.add(created.getId());
         testOrderNos.add(created.getOrderNo());
 
@@ -93,7 +93,7 @@ class OrderServiceTest {
     void shouldCancelOrder() {
         String queueId = "test-cancel-" + System.currentTimeMillis();
 
-        cn.coderstory.springboot.order.entity.Order created = orderService.createSeckillOrder(1L, 100L, 1L, queueId);
+        cn.coderstory.springboot.entity.order.Order created = orderService.createSeckillOrder(1L, 100L, 1L, queueId);
         testOrderIds.add(created.getId());
         testOrderNos.add(created.getOrderNo());
 
@@ -108,11 +108,11 @@ class OrderServiceTest {
     void shouldGetUserOrders() {
         String queueId = "test-list-" + System.currentTimeMillis();
 
-        cn.coderstory.springboot.order.entity.Order created = orderService.createSeckillOrder(1L, 100L, 1L, queueId);
+        cn.coderstory.springboot.entity.order.Order created = orderService.createSeckillOrder(1L, 100L, 1L, queueId);
         testOrderIds.add(created.getId());
         testOrderNos.add(created.getOrderNo());
 
-        List<cn.coderstory.springboot.order.entity.Order> orders = orderService.getUserOrders(1L);
+        List<cn.coderstory.springboot.entity.order.Order> orders = orderService.getUserOrders(1L);
 
         assertNotNull(orders);
     }

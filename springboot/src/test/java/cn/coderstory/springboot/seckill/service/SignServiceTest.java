@@ -1,4 +1,4 @@
-package cn.coderstory.springboot.seckill.service;
+package cn.coderstory.springboot.service.seckill;
 
 import cn.coderstory.springboot.SpringbootApplication;
 import org.junit.jupiter.api.*;

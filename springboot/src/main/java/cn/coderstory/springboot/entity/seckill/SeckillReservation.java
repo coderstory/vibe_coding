@@ -1,0 +1,21 @@
+package cn.coderstory.springboot.entity.seckill;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+
+@Data
+@TableName("seckill_reservation")
+public class SeckillReservation {
+    @TableId(type = IdType.AUTO)
+    private Long id;
+    private Long userId;
+    private Long activityId;
+    private LocalDateTime reserveTime;
+    private Integer status;
+    private Boolean notified;
+    private LocalDateTime notifyTime;
+}

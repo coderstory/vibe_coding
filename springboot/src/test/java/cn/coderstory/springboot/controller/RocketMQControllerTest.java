@@ -1,8 +1,8 @@
 package cn.coderstory.springboot.controller;
 
-import cn.coderstory.springboot.rocketmq.controller.RocketMQController;
-import cn.coderstory.springboot.rocketmq.service.RocketMQAdminService;
-import cn.coderstory.springboot.shared.exception.BusinessException;
+import cn.coderstory.springboot.controller.rocketmq.RocketMQController;
+import cn.coderstory.springboot.service.rocketmq.RocketMQAdminService;
+import cn.coderstory.springboot.exception.BusinessException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -136,7 +136,7 @@ class RocketMQControllerTest {
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(rocketMQController)
-            .setControllerAdvice(new cn.coderstory.springboot.shared.exception.GlobalExceptionHandler())
+            .setControllerAdvice(new cn.coderstory.springboot.exception.GlobalExceptionHandler())
             .build();
     }
 

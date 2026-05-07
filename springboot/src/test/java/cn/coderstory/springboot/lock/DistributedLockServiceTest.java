@@ -1,7 +1,7 @@
 package cn.coderstory.springboot.lock;
 
 import cn.coderstory.springboot.SpringbootApplication;
-import cn.coderstory.springboot.shared.lock.DistributedLockService;
+import cn.coderstory.springboot.lock.DistributedLockService;
 import org.junit.jupiter.api.*;
 import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;

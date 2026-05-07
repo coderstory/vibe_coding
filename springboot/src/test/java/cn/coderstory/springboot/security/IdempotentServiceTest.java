@@ -1,7 +1,7 @@
 package cn.coderstory.springboot.security;
 
 import cn.coderstory.springboot.SpringbootApplication;
-import cn.coderstory.springboot.shared.security.IdempotentService;
+import cn.coderstory.springboot.config.IdempotentService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,8 +1,8 @@
 package cn.coderstory.springboot.exception;
 
-import cn.coderstory.springboot.shared.exception.BusinessException;
-import cn.coderstory.springboot.shared.exception.GlobalExceptionHandler;
-import cn.coderstory.springboot.shared.vo.ApiResponse;
+import cn.coderstory.springboot.exception.BusinessException;
+import cn.coderstory.springboot.exception.GlobalExceptionHandler;
+import cn.coderstory.springboot.dto.ApiResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

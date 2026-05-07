@@ -1,7 +1,7 @@
 package cn.coderstory.springboot.limiter;
 
 import cn.coderstory.springboot.SpringbootApplication;
-import cn.coderstory.springboot.shared.limiter.QpsLimiter;
+import cn.coderstory.springboot.limiter.QpsLimiter;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
