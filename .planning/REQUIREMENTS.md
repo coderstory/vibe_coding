@@ -75,19 +75,18 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| STD-01 ~ STD-05 | Phase 0 | Pending |
-| CFG-01 ~ CFG-08 | Phase 1 | Pending |
-| BKND-01 ~ BKND-07 | Phase 1 | Pending |
-| BKND-08 | Phase 2 | Pending |
-| FRNT-01 ~ FRNT-02 | Phase 2 | Pending |
-| FRNT-03 ~ FRNT-04 | Phase 2 | Pending |
-| MAINT-01 ~ MAINT-03 | Phase 4 | Pending |
+| STD-01, STD-02, STD-03, STD-04, STD-05 | Phase 27 | Pending |
+| CFG-01, CFG-02, CFG-03, CFG-04, CFG-05, CFG-06, CFG-07, CFG-08 | Phase 28 | Pending |
+| BKND-01, BKND-02, BKND-03, BKND-04, BKND-05, BKND-06, BKND-07 | Phase 28 | Pending |
+| BKND-08 | Phase 29 | Pending |
+| FRNT-01, FRNT-02, FRNT-03, FRNT-04 | Phase 29 | Pending |
+| MAINT-01, MAINT-02, MAINT-03 | Phase 30 | Pending |
 
 **Coverage:**
-- v1.7 requirements: 26 total
-- Mapped to phases: 26
+- v1.7 requirements: 28 total
+- Mapped to phases: 28
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-05-07*
-*Last updated: 2026-05-07 after initial definition*
+*Last updated: 2026-05-07 — traceability updated for Phase 27-30*

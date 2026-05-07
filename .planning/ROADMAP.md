@@ -2,8 +2,8 @@
 
 > **创建日期:** 2026-04-03
 > **更新日期:** 2026-05-07
-> **当前里程碑:** v1.6 代码深度清理与优化 (已完成)
-> **目标:** 全面清理前后端死代码、无用依赖和冗余配置，提升代码库整洁度
+> **当前里程碑:** v1.7 注释与文档工程 (Planning)
+> **目标:** 全项目配置文件和前后端代码添加必要注释，降低新人上手门槛
 
 ---
 
@@ -16,6 +16,7 @@
 - ✅ **v1.4 Maven→Gradle + Spring Boot 4.1 升级** — Phases 13-16 (shipped 2026-05-06)
 - ✅ **v1.5 前后端代码重构与目录整理** — Phases 17-21 (shipped 2026-05-07)
 - ✅ **v1.6 代码深度清理与优化** — Phases 22-26 (shipped 2026-05-07)
+- 🚧 **v1.7 注释与文档工程** — Phases 27-30 (planning)
 
 ---
 
@@ -184,7 +185,7 @@
 
 ---
 
-## 🚧 v1.6 代码深度清理与优化 (Planning)
+## 🚧 v1.6 代码深度清理与优化 (Completed)
 
 **Milestone Goal:** 全面清理前后端死代码（未使用方法/字段/导入/组件/API），清理无用依赖和冗余配置，提升代码库整洁度。不新增业务功能，不修改数据库 schema，不重构核心架构。
 
@@ -233,11 +234,11 @@
 **Depends on**: Phase 23 + Phase 24
 **Requirements**: DEC-01, DEC-02, DEC-03, DEC-04, DEC-05
 **Success Criteria** (what must be TRUE):
-  1. `./gradlew.bat build` 编译通过 ✓
-  2. Gradle 依赖作用域修正后编译通过 ✓（spring-boot-starter-aop 保留显式版本 4.0.0-M2）
-  3. `npm run build` 成功 ✓
-  4. `@types/*` 包均位于 devDependencies ✓（无 @types 包待处理）
-  5. `npm prune` 后 node_modules 体积减小 ✓（移除 vue-test-utils）
+  1. `./gradlew.bat build` 编译通过
+  2. Gradle 依赖作用域修正后编译通过（spring-boot-starter-aop 保留显式版本 4.0.0-M2）
+  3. `npm run build` 成功
+  4. `@types/*` 包均位于 devDependencies（无 @types 包待处理）
+  5. `npm prune` 后 node_modules 体积减小（移除 vue-test-utils）
 **Plans**: 1 plan
 **Status**: ✅ Completed 2026-05-07
 
@@ -246,32 +247,90 @@
 **Depends on**: Phase 23
 **Requirements**: COC-01, COC-02, COC-03
 **Success Criteria** (what must be TRUE):
-  1. 删除 application*.yaml 中无引用的属性后 bootRun 启动正常 ✓
-  2. 无引用 profile 清理后 bootRun 多 profile 正常启动 ✓
-  3. `.env` 清理后环境变量加载完整 ✓（项目无 .env 文件，跳过）
-  4. 配置变更后 dev 和 test 环境启动验证全部通过 ✓
+  1. 删除 application*.yaml 中无引用的属性后 bootRun 启动正常
+  2. 无引用 profile 清理后 bootRun 多 profile 正常启动
+  3. `.env` 清理后环境变量加载完整（项目无 .env 文件，跳过）
+  4. 配置变更后 dev 和 test 环境启动验证全部通过
 **Plans**: 1 plan
 **Status**: ✅ Completed 2026-05-07
 
 ---
 
-## Progress
+## 🚧 v1.7 注释与文档工程 (Planning)
 
-**Execution Order:** Phases execute in numeric order: 22 → 23 → 24 → 25 → 26
+**Milestone Goal:** 全项目配置文件和前后端代码添加必要注释，降低新人上手门槛。不引入新工具，不新增业务功能。
 
-| Phase | Milestone | Plans Complete | Status | Completed |
-|-------|-----------|----------------|--------|-----------|
-| 17. 基础设施搭建 | v1.5 | 1/1 | ✅ Completed | 2026-05-07 |
-| 18. 后端包结构重组 | v1.5 | 1/1 | ✅ Completed | 2026-05-07 |
-| 19. 配置文件整理 | v1.5 | 1/1 | ✅ Completed | 2026-05-07 |
-| 20. 前端目录重组 | v1.5 | 1/1 | ✅ Completed | 2026-05-07 |
-| 21. 代码规范统一 | v1.5 | 1/1 | ✅ Completed | 2026-05-07 |
-| 22. 后端死代码清理 | v1.6 | 1/1 | ✅ Completed | 2026-05-07 |
-| 23. 后端结构体优化 | v1.6 | 1/1 | ✅ Completed | 2026-05-07 |
-| 24. 前端代码清理 | v1.6 | 1/1 | ✅ Completed | 2026-05-07 |
-| 25. 依赖清理 | v1.6 | 1/1 | ✅ Completed | 2026-05-07 |
-| 26. 配置清理 | v1.6 | 1/1 | ✅ Completed | 2026-05-07 |
+### Phase 27: 注释标准定义
+**Goal**: 全项目注释规范和标准确立，所有注释编写有据可依
+**Depends on**: v1.6 产物（Phase 26 配置清理完成后代码基线稳定）
+**Requirements**: STD-01, STD-02, STD-03, STD-04, STD-05
+**Success Criteria** (what must be TRUE):
+  1. 注释语言策略确定：中文注释 + 英文技术术语保留，无中英混用
+  2. L0-L3 注释层级规则建立：L0 按需/L1 鼓励/L2 鼓励/L3 强制，明确禁止注释清单和必须注释清单
+  3. TODO 必须关联 Issue 编号，禁止裸写 TODO
+  4. Javadoc/TSDoc 模板规范确定：禁止空骨架、禁止 `@author`/`@since`
+  5. PR Review 注释检查清单完成，在后续 Phase 28-30 评审中实际执行
+**Plans**: TBD
+
+### Phase 28: 配置层 + Controller 层注释
+**Goal**: 所有配置文件和后端 Controller/配置类/工具类方法级注释补全完成
+**Depends on**: Phase 27（注释标准定义完成后编写风格有据可依）
+**Requirements**: CFG-01, CFG-02, CFG-03, CFG-04, CFG-05, CFG-06, CFG-07, CFG-08, BKND-01, BKND-02, BKND-03, BKND-04, BKND-05, BKND-06, BKND-07
+**Success Criteria** (what must be TRUE):
+  1. 5 个 YAML 配置文件（datasource/cache/mq/security/business）每份包含段头注释和关键属性行内说明
+  2. application.yaml 包含整体描述和各 Profile 说明
+  3. build.gradle.kts 和 libs.versions.toml 有构建块注释
+  4. ESLint flat config 和 Stylelint 配置有必要的配置项注释
+  5. 所有 18+ 个 Controller 包含类级 Javadoc（职责说明）和方法级 `@param`/`@return`
+  6. 所有配置类（@ConfigurationProperties）、安全/Web 配置类、JWT 相关类、AOP 切面、异常体系类包含类级 Javadoc 和关键字段/方法说明
+**Plans**: TBD
+
+### Phase 29: Service 接口 + Vue/TS 注释
+**Goal**: 后端 Service 接口完整 Javadoc、前端 Vue/TS 组件级和 API 级注释全部补全
+**Depends on**: Phase 28（可并行开始，但工具类注释完成后再梳理 Service 接口签名更清晰）
+**Requirements**: BKND-08, FRNT-01, FRNT-02, FRNT-03, FRNT-04
+**Success Criteria** (what must be TRUE):
+  1. ~15 个 Service 接口包含完整 Javadoc（接口职责 + 每个方法参数/返回值/异常说明）
+  2. 所有 Vue 组件包含组件职责注释，`defineProps`/`defineEmits` 包含 JSDoc 类型说明
+  3. API 模块函数包含 `@param` 参数说明
+  4. Pinia Store 文件包含 Store 职责和 action 说明
+  5. Router 模块包含路由说明和 guard 策略注释
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 30: 注释维护机制建立
+**Goal**: 注释长期维护机制建立，确保注释与代码同步
+**Depends on**: Phase 27（标准是维护机制的基础）
+**Requirements**: MAINT-01, MAINT-02, MAINT-03
+**Success Criteria** (what must be TRUE):
+  1. PR Review 模板中包含注释同步检查条目，每个 PR 评审时自动检查
+  2. TODO 注释定期清理流程建立，每轮清理后无过期 TODO 残留
+  3. 季度注释漂移抽查机制建立，首次抽查范围和时间已确定
+**Plans**: TBD
 
 ---
 
-*路线图更新: 2026-05-07 — v1.6 里程碑完成*
+## Progress
+
+**Execution Order:** Phases execute in numeric order: 27 -> 28 -> 29 -> 30
+
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 17. 基础设施搭建 | v1.5 | 1/1 | Completed | 2026-05-07 |
+| 18. 后端包结构重组 | v1.5 | 1/1 | Completed | 2026-05-07 |
+| 19. 配置文件整理 | v1.5 | 1/1 | Completed | 2026-05-07 |
+| 20. 前端目录重组 | v1.5 | 1/1 | Completed | 2026-05-07 |
+| 21. 代码规范统一 | v1.5 | 1/1 | Completed | 2026-05-07 |
+| 22. 后端死代码清理 | v1.6 | 1/1 | Completed | 2026-05-07 |
+| 23. 后端结构体优化 | v1.6 | 1/1 | Completed | 2026-05-07 |
+| 24. 前端代码清理 | v1.6 | 1/1 | Completed | 2026-05-07 |
+| 25. 依赖清理 | v1.6 | 1/1 | Completed | 2026-05-07 |
+| 26. 配置清理 | v1.6 | 1/1 | Completed | 2026-05-07 |
+| 27. 注释标准定义 | v1.7 | 0/0 | Not started | - |
+| 28. 配置层+Controller层注释 | v1.7 | 0/0 | Not started | - |
+| 29. Service接口+Vue/TS注释 | v1.7 | 0/0 | Not started | - |
+| 30. 注释维护机制建立 | v1.7 | 0/0 | Not started | - |
+
+---
+
+*路线图更新: 2026-05-07 — v1.7 里程碑初始化，Phase 27-30 规划完成*
