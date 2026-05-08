@@ -14,8 +14,7 @@ package cn.coderstory.springboot.service.seckill.stock;
  * 3. 库存查询 - 支持 Redis 缓存
  * 4. 库存初始化 - 初始化商品库存
  *
- * @author system
- * @version 1.1.0
+ * @since 1.7.0
  */
 public interface StockService {
 

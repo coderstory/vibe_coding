@@ -4,8 +4,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * RocketMQ Admin 服务接口
- * 提供 Topic 的查看、创建、删除等管理功能
+ * RocketMQ Admin 服务接口。
+ * <p>
+ * 提供 Topic、Consumer Group 的 CRUD 管理、消息查询和集群监控功能。
+ *
+ * @since 1.7.0
  */
 public interface RocketMQAdminService {
 

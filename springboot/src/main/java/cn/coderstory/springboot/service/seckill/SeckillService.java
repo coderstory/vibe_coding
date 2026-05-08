@@ -41,8 +41,7 @@ import cn.coderstory.springboot.dto.seckill.SeckillResponse;
  * - 限时抢购场景
  * - 任何需要流量控制的商品销售场景
  *
- * @author system
- * @version 1.1.0
+ * @since 1.7.0
  */
 public interface SeckillService {
 

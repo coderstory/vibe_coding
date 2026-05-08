@@ -17,6 +17,8 @@ import java.util.function.Supplier;
  * - 秒杀活动锁: seckill:lock:activity:{activityId}
  * - 商品库存锁: seckill:lock:stock:{goodsId}
  * - 用户订单锁: seckill:order:{userId}:{goodsId}
+ *
+ * @since 1.7.0
  */
 public interface DistributedLockService {
 

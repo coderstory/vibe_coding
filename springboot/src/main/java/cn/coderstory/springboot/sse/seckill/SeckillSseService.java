@@ -30,9 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 4. 处理完成后，通过 SSE 推送结果给前端
  * 5. 前端收到结果后展示给用户
  *
- * @author system
- * @version 1.0
- * @since 2026-04-20
+ * @since 1.7.0
  */
 @Slf4j
 @Service
