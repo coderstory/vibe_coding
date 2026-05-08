@@ -12,6 +12,7 @@ spring:
     name: admin-system                    # 应用名称
 
   config:
+    # 按关注点拆分的子配置文件，通过 classpath:config/ 加载
     import:
       - classpath:config/datasource.yaml
       - classpath:config/cache.yaml

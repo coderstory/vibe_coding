@@ -1,3 +1,5 @@
+# ===== 版本号定义 =====
+# 集中管理所有依赖的版本号，通过 ${…} 引用
 [versions]
 spring-boot = "4.1.0-RC1"
 spring-dm = "1.1.7"                # dependency-management plugin
@@ -14,8 +16,9 @@ lombok = "1.18.44"
 archunit = "1.4.2"
 checkstyle = "10.21.4"
 
+# ===== 依赖库声明 =====
 [libraries]
-# BOM
+# BOM（Spring Boot 依赖管理）
 spring-boot-bom = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
 
 # Spring Boot Starters (BOM managed — no version)
@@ -61,6 +64,7 @@ lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 # Test
 archunit = { module = "com.tngtech.archunit:archunit-junit5", version.ref = "archunit" }
 
+# ===== Gradle 插件声明 =====
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dm = { id = "io.spring.dependency-management", version.ref = "spring-dm" }

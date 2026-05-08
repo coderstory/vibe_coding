@@ -2,13 +2,13 @@
 # 安全配置
 # ===========================================
 security:
+  # 安全白名单路径（无需认证即可访问的 API 端点，多个路径用逗号分隔）
   whitelist: /api/auth/**,/api/knowledge/files/**,/api/seckill/subscribe/**,/api/seckill/unsubscribe/**
-  # 无需认证的接口路径（多个用逗号分隔）
 
 # ===========================================
 # JWT 认证配置
 # ===========================================
 jwt:
-  secret: mySecretKeyForJwtTokenGeneration123456789  # JWT 签名密钥（生产环境应使用更复杂的密钥）
+  secret: mySecretKeyForJwtTokenGeneration123456789  # Access Token 签名密钥（生产环境通过环境变量注入，禁止硬编码）
   expiration: 86400000              # Access Token 过期时间（毫秒），24 小时
   refresh-expiration: 604800000      # Refresh Token 过期时间（毫秒），7 天

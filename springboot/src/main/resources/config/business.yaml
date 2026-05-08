@@ -33,5 +33,5 @@ seckill:
 # ===========================================
 logging:
   level:
-    cn.coderstory: DEBUG              # 应用日志级别
+    cn.coderstory: DEBUG              # 应用包日志级别（包含所有业务模块的调试输出）
     org.flywaydb: DEBUG               # Flyway 数据库迁移日志级别

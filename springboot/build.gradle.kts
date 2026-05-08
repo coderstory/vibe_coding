@@ -1,3 +1,5 @@
+// ===== 构建脚本配置 =====
+// buildscript 块在 plugins 块之前执行，用于配置 build 过程自身的依赖
 buildscript {
     repositories {
         mavenCentral()
@@ -8,6 +10,7 @@ buildscript {
     }
 }
 
+// ===== 项目插件 =====
 plugins {
     java
     alias(libs.plugins.spring.boot)
@@ -16,6 +19,7 @@ plugins {
     checkstyle
 }
 
+// ===== Java 工具链配置 =====
 val javaVersion = JavaLanguageVersion.of(26)
 
 java {
@@ -28,6 +32,7 @@ repositories {
     mavenCentral()
 }
 
+// ===== 依赖管理 =====
 dependencies {
     implementation(platform(libs.spring.boot.bom))
     // Spring Boot Starters
@@ -79,15 +84,18 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
+// ===== Checkstyle 代码风格检查 =====
 checkstyle {
     toolVersion = libs.versions.checkstyle.get()
     isIgnoreFailures = true
 }
 
+// ===== Spring Boot 构建信息 =====
 springBoot {
     buildInfo()
 }
 
+// ===== Flyway 数据库迁移配置 =====
 flyway {
     url = "jdbc:mysql://localhost:3306/admin_system?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false"
     user = System.getenv("DB_USER") ?: "root"
