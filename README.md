@@ -223,9 +223,9 @@ vibe_coding/
 2. **Superpower**：汉化版本 `npx superpowers-zh`
 3. **浏览器访问**：动态渲染页面使用 `.opencode/skills/browser-msedge/fetch-page.js`
 4. **claude安装**: `npm install -g @anthropic-ai/claude-code@latest`
-
+5. **caveman**: `claude plugin marketplace add JuliusBrussee/caveman && claude plugin install caveman@caveman`
 ## 🔧 配置说明
-
+ 
 - **npm镜像**：`npm config set registry https://registry.npmmirror.com`
 - **数据库配置**：`springboot/src/main/resources/application.yaml`
 - **浏览器自动化**：`docs/browser-automation-guide.md` 或 `.opencode/skills/browser-msedge/`

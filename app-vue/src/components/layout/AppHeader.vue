@@ -38,7 +38,7 @@ async function handleCommand(command: string) {
     }
   }
   else if (command === 'profile') {
-    // TODO: 跳转到个人中心
+    // TODO(#TODO-2): 跳转到个人中心
   }
 }
 </script>

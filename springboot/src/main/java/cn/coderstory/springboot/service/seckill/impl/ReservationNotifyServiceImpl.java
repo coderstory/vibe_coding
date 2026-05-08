@@ -108,7 +108,7 @@ public class ReservationNotifyServiceImpl {
      * @param activity    活动信息
      */
     private void sendNotification(SeckillReservation reservation, SeckillActivity activity) {
-        // TODO: 实现实际的提醒通知逻辑
+        // TODO(#TODO-1): 实现实际的提醒通知逻辑
         // 例如：发送邮件、短信、站内信、消息队列等
 
         log.info("发送预约提醒：用户 {}，活动《{}》，开始时间 {}",
