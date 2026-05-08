@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 角色管理页面组件。展示角色列表，支持创建、编辑、删除和权限分配。
+ */
+</script>
+
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue'
 import type { ElTree } from 'element-plus'

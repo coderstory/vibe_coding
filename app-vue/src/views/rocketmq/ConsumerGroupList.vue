@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * Consumer Group 列表组件。展示 RocketMQ 消费组列表和消费进度。
+ */
+</script>
+
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'

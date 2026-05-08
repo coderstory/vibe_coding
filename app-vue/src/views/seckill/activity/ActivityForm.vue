@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 秒杀活动表单组件。支持新增和编辑两种模式。
+ */
+</script>
+
 <script lang="ts" setup>
 /**
  * 活动表单页面

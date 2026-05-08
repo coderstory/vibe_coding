@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 订单列表组件。展示用户订单信息，支持查看详情和取消订单操作。
+ */
+</script>
+
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import type { Order } from '@/api/modules/order'

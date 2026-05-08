@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 知识库文章编辑器组件。提供富文本编辑、Markdown 编辑和文章元信息管理功能。
+ */
+</script>
+
 <script lang="ts" setup>
 /**
  * 文章编辑器组件

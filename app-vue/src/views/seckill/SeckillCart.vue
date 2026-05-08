@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 秒杀购物车组件。管理用户在秒杀活动中添加的商品，支持数量调整和下单。
+ */
+</script>
+
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import type { Cart } from '@/api/modules/cart'

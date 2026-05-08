@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 业务数据页面组件。展示和管理核心业务数据。
+ */
+</script>
+
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import CategoryTree from '@/components/business/knowledge/CategoryTree.vue'

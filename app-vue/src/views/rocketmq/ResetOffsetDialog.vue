@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 重置消费位点弹窗组件。提供按时间或指定位点重置消费进度的功能。
+ */
+</script>
+
 <script lang="ts" setup>
 import { reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
@@ -9,7 +15,9 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
+  /** 弹窗可见状态变化时触发。 */
   'update:modelValue': [value: boolean];
+  /** 位点重置成功后触发。 */
   'success': [];
 }>()
 

@@ -37,6 +37,8 @@ export const useUserStore = defineStore('user', () => {
   /**
    * 用户登录
    * 保存 Token 和用户信息到 localStorage
+   * @param username 用户名
+   * @param password 密码
    */
   async function login(username: string, password: string) {
     const res = await apiLogin({ username, password })
@@ -51,6 +53,7 @@ export const useUserStore = defineStore('user', () => {
   /**
    * 刷新 Token
    * 使用 refreshToken 获取新的访问令牌
+   * @return 是否刷新成功
    */
   async function refreshToken(): Promise<boolean> {
     if (!storedRefreshToken.value) return false
@@ -89,6 +92,7 @@ export const useUserStore = defineStore('user', () => {
   /**
    * 获取当前用户信息
    * 失败时自动登出
+   * @return 当前用户信息（获取失败返回 null）
    */
   async function fetchCurrentUser(): Promise<UserInfo | null> {
     if (!token.value) return null

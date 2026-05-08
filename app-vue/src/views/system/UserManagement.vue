@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 用户管理页面组件。展示用户列表，支持筛选、分页、新增、编辑、删除和状态切换。
+ */
+</script>
+
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'

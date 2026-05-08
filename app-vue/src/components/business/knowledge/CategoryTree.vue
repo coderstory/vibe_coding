@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 知识库分类树组件。以树形结构展示和管理知识库分类。
+ */
+</script>
+
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import { createCategory, deleteCategory, getCategoryTree } from '@/api/modules/knowledge'
@@ -5,6 +11,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import type { KnowledgeCategory } from '@/api/types'
 
 const emit = defineEmits<{
+  /** 选择分类时触发 */
   select: [category: KnowledgeCategory];
 }>()
 

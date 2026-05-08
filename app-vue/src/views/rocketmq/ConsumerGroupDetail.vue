@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * Consumer Group 详情组件。展示消费组的详细消费进度、堆积量和连接状态。
+ */
+</script>
+
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'

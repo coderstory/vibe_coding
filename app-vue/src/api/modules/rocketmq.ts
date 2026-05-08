@@ -29,8 +29,10 @@ export interface CreateTopicParams {
 }
 
 /**
- * 获取 Topic 列表
+ * 获取 Topic 列表。
+ *
  * @param keyword 关键字筛选（可选）
+ * @return Topic 分页列表
  */
 export function getTopicList(keyword?: string) {
   return request.get<ApiResponse<{ records: TopicVO[]; total: number }>>('/rocketmq/topics', {
@@ -39,16 +41,20 @@ export function getTopicList(keyword?: string) {
 }
 
 /**
- * 创建 Topic
+ * 创建 Topic。
+ *
  * @param data 创建参数
+ * @return 创建结果
  */
 export function createTopic(data: CreateTopicParams) {
   return request.post<ApiResponse<void>>('/rocketmq/topics', data)
 }
 
 /**
- * 删除 Topic
+ * 删除 Topic。
+ *
  * @param topicName Topic 名称
+ * @return 删除结果
  */
 export function deleteTopic(topicName: string) {
   return request.delete<ApiResponse<void>>(`/rocketmq/topics/${encodeURIComponent(topicName)}`)
@@ -85,8 +91,10 @@ export interface ResetOffsetParams {
 }
 
 /**
- * 获取 Consumer Group 列表
+ * 获取 Consumer Group 列表。
+ *
  * @param keyword 关键字筛选（可选）
+ * @return Consumer Group 分页列表
  */
 export function getConsumerGroupList(keyword?: string) {
   return request.get<ApiResponse<{ records: ConsumerGroupVO[]; total: number }>>('/rocketmq/consumer-groups', {
@@ -95,25 +103,31 @@ export function getConsumerGroupList(keyword?: string) {
 }
 
 /**
- * 获取 Consumer Group 详情
+ * 获取 Consumer Group 详情。
+ *
  * @param group Group 名称
+ * @return Consumer Group 详情
  */
 export function getConsumerGroupDetail(group: string) {
   return request.get<ApiResponse<ConsumerGroupDetailVO>>(`/rocketmq/consumer-groups/${encodeURIComponent(group)}`)
 }
 
 /**
- * 重置消费位点
+ * 重置消费位点。
+ *
  * @param group Group 名称
- * @param params 重置参数
+ * @param params 重置参数（包含 topic 和时间戳）
+ * @return 重置结果
  */
 export function resetConsumerOffset(group: string, params: ResetOffsetParams) {
   return request.post<ApiResponse<void>>(`/rocketmq/consumer-groups/${encodeURIComponent(group)}/reset-offset`, params)
 }
 
 /**
- * 删除 Consumer Group
+ * 删除 Consumer Group。
+ *
  * @param group Group 名称
+ * @return 删除结果
  */
 export function deleteConsumerGroup(group: string) {
   return request.delete<ApiResponse<void>>(`/rocketmq/consumer-groups/${encodeURIComponent(group)}`)
@@ -160,12 +174,14 @@ export interface MessageTraceVO {
 }
 
 /**
- * 获取 Message 列表
+ * 获取 Message 列表。
+ *
  * @param topic Topic 名称
+ * @param startTime 开始时间戳（可选）
+ * @param endTime 结束时间戳（可选）
+ * @param maxMsg 最大消息数（可选）
  * @param keyword 关键字筛选（可选）
- * @param startTime 开始时间戳
- * @param endTime 结束时间戳
- * @param maxMsg 最大消息数
+ * @return Message 分页列表
  */
 export function getMessageList(topic: string, startTime?: number, endTime?: number, maxMsg?: number, keyword?: string) {
   return request.get<ApiResponse<{
@@ -177,18 +193,22 @@ export function getMessageList(topic: string, startTime?: number, endTime?: numb
 }
 
 /**
- * 获取 Message 详情
+ * 获取 Message 详情。
+ *
  * @param topic Topic 名称
  * @param msgId Message ID
+ * @return Message 详情
  */
 export function getMessageDetail(topic: string, msgId: string) {
   return request.get<ApiResponse<MessageDetailVO>>(`/rocketmq/messages/${encodeURIComponent(topic)}/${encodeURIComponent(msgId)}`)
 }
 
 /**
- * 获取 Message 轨迹
+ * 获取 Message 轨迹。
+ *
  * @param topic Topic 名称
  * @param msgId Message ID
+ * @return Message 轨迹列表
  */
 export function getMessageTrace(topic: string, msgId: string) {
   return request.get<ApiResponse<MessageTraceVO[]>>(`/rocketmq/messages/${encodeURIComponent(topic)}/${encodeURIComponent(msgId)}/trace`)
@@ -199,11 +219,13 @@ export function getMessageTrace(topic: string, msgId: string) {
  */
 
 /**
- * 发送消息
+ * 发送消息。
+ *
  * @param topic Topic 名称
+ * @param body 消息内容
  * @param tags Tags（可选）
  * @param keys Keys（可选）
- * @param body 消息内容
+ * @return 发送结果（包含消息 ID 和发送状态）
  */
 export function sendMessage(topic: string, body: string, tags?: string, keys?: string) {
   return request.post<ApiResponse<{ msgId: string; sendStatus: string }>>('/rocketmq/messages', { topic, tags, keys, body })
@@ -222,6 +244,11 @@ export interface ClusterOverviewVO {
   totalDiff: number;
 }
 
+/**
+ * 获取集群概览。
+ *
+ * @return 集群概览信息
+ */
 export function getClusterOverview() {
   return request.get<ApiResponse<ClusterOverviewVO>>('/rocketmq/dashboard/overview')
 }
@@ -237,6 +264,11 @@ export interface BrokerStatusVO {
   inBrokerHouseDate: string;
 }
 
+/**
+ * 获取 Broker 状态列表。
+ *
+ * @return Broker 状态分页列表
+ */
 export function getBrokerStatusList() {
   return request.get<ApiResponse<{ records: BrokerStatusVO[]; total: number }>>('/rocketmq/dashboard/brokers')
 }
@@ -250,12 +282,23 @@ export interface TopicBacklogVO {
   lastUpdateTime: number;
 }
 
+/**
+ * 获取 Topic 堆积量列表。
+ *
+ * @return Topic 堆积量分页列表
+ */
 export function getTopicBacklogList() {
   return request.get<ApiResponse<{ records: TopicBacklogVO[]; total: number }>>('/rocketmq/dashboard/topics')
 }
 
 /**
  * Broker 指标
+ */
+/**
+ * 获取 Broker 指标。
+ *
+ * @param brokerName Broker 名称
+ * @return Broker 指标数据
  */
 export function getBrokerMetrics(brokerName: string) {
   return request.get<ApiResponse<any>>(`/rocketmq/dashboard/broker/${encodeURIComponent(brokerName)}/metrics`)

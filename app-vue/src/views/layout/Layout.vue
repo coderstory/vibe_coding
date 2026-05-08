@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 主布局容器组件。包含侧边栏菜单、顶部导航栏、标签页和主内容区。
+ */
+</script>
+
 <script lang="ts" setup>
 import { ref } from 'vue'
 import AppMenu from '@/components/layout/AppMenu.vue'

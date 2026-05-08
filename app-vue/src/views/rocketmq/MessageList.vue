@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 消息管理页面组件。提供消息查询、详情查看、轨迹追踪和消息重发功能。
+ */
+</script>
+
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'

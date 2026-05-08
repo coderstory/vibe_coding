@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 登录页面组件。提供用户名/密码登录表单，包含粒子动画背景和安全白名单跳转。
+ */
+</script>
+
 <script lang="ts" setup>
 import { h, onMounted, onUnmounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'

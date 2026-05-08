@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 秒杀首页组件。展示秒杀活动列表和商品信息，提供用户参与秒杀的入口。
+ */
+</script>
+
 <script lang="ts" setup>
 /**
  * 秒杀首页组件

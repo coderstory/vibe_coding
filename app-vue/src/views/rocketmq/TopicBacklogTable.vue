@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * Topic 消息堆积量表格组件。展示各 Topic 的消息堆积数量和消费延迟情况。
+ */
+</script>
+
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import { ElTable, ElTableColumn } from 'element-plus'

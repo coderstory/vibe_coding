@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 用户抢购记录组件。展示当前用户的秒杀参与记录和状态。
+ */
+</script>
+
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import type { Order } from '@/api/modules/order'

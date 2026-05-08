@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 仪表盘首页组件。展示系统概览统计信息和核心业务指标。
+ */
+</script>
+
 <template>
   <div class="page-content">
     <canvas ref="canvasRef" class="wave-canvas"></canvas>

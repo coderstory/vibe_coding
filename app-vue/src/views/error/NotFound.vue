@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 404 错误页面组件。路由不匹配时展示的友好提示页面。
+ */
+</script>
+
 <script lang="ts" setup>
 import { onBeforeUnmount, ref } from 'vue'
 import { useRouter } from 'vue-router'

@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 订单确认页面组件。展示订单确认信息，确认后创建正式订单。
+ */
+</script>
+
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'

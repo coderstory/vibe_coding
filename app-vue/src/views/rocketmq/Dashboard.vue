@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * RocketMQ 监控面板组件。聚合展示 RocketMQ 集群概览、Broker 状态和消息堆积量。
+ */
+</script>
+
 <script lang="ts" setup>
 import { onMounted, onUnmounted } from 'vue'
 import { ElCard, ElCol, ElRow } from 'element-plus'

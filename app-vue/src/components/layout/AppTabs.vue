@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 多标签页导航组件。管理已打开页面的标签页，支持标签切换、关闭和刷新。
+ */
+</script>
+
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'

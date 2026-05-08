@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 集群概览卡片组件。展示 RocketMQ 集群的关键指标摘要信息。
+ */
+</script>
+
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import { ElCard, ElStatistic } from 'element-plus'

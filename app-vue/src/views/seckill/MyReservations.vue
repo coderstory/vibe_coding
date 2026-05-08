@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 我的预约列表组件。展示用户已预约的秒杀活动，支持取消预约操作。
+ */
+</script>
+
 <script lang="ts" setup>
 /**
  * 我的预约页面

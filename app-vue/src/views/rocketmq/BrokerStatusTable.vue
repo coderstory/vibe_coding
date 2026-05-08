@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * Broker 状态表格组件。展示 RocketMQ Broker 的运行状态、角色和负载信息。
+ */
+</script>
+
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import { ElTable, ElTableColumn, ElTag } from 'element-plus'

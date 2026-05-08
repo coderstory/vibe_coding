@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 菜单管理页面组件。以树形结构展示和管理系统菜单，支持拖拽排序和权限绑定。
+ */
+</script>
+
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue'
 import type { ElTree } from 'element-plus'

@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * Topic 管理页面组件。展示 RocketMQ Topic 列表，支持创建、删除和配置更新。
+ */
+</script>
+
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'

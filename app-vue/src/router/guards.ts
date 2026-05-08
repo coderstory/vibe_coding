@@ -4,6 +4,7 @@ import { useUserStore } from '@/store/user'
 /**
  * 导航守卫
  * 实现登录拦截和页面访问控制
+ * @param router Vue Router 实例
  */
 export function setupGuards(router: Router) {
   router.beforeEach((to, from, next) => {

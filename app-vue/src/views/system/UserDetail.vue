@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 用户详情页面组件。展示单个用户的详细信息，包含基本资料、角色信息和操作日志。
+ */
+</script>
+
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'

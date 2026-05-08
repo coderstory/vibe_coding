@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * QPS 图表组件。展示 RocketMQ 集群的每秒消息吞吐量趋势图。
+ */
+</script>
+
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref } from 'vue'
 import VChart from 'vue-echarts'

@@ -1,8 +1,10 @@
-<script lang="ts" setup>
+<script lang="ts">
 /**
- * 侧边栏菜单组件
- * 从后端加载菜单树，支持折叠和动态路由
+ * 侧边栏导航菜单组件。根据路由配置自动生成菜单树，支持多级展开和路由跳转。
  */
+</script>
+
+<script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getMenuTree } from '@/api/modules/menu'
@@ -18,6 +20,7 @@ interface MenuItem {
 }
 
 const props = defineProps<{
+  /** 菜单折叠状态 */
   collapsed: boolean;
 }>()
 

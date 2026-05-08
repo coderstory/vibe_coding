@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 审计日志页面组件。展示系统操作审计日志，支持按用户、操作类型和时间范围筛选。
+ */
+</script>
+
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue'
 import { getAuditLogs } from '@/api/modules/audit'

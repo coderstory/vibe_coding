@@ -18,6 +18,7 @@ let refreshSubscribers: Array<(token: string) => void> = []
 
 /**
  * 将 token 添加到重试队列
+ * @param callback 接收新 token 的回调函数
  */
 function subscribeTokenRefresh(callback: (token: string) => void) {
   refreshSubscribers.push(callback)
@@ -25,6 +26,7 @@ function subscribeTokenRefresh(callback: (token: string) => void) {
 
 /**
  * 通知所有订阅者 token 已刷新
+ * @param token 刷新后的新 token
  */
 function onTokenRefreshed(token: string) {
   refreshSubscribers.forEach(callback => callback(token))
@@ -62,6 +64,8 @@ request.interceptors.request.use(
 
 /**
  * 提取错误消息
+ * @param error Axios 错误对象
+ * @return 可读的错误消息
  */
 function extractErrorMessage(error: AxiosError): string {
   // 情况1: 后端返回的 JSON 格式错误
@@ -118,6 +122,7 @@ function extractErrorMessage(error: AxiosError): string {
 
 /**
  * 尝试刷新 token
+ * @return 刷新后的 token，刷新失败返回 null
  */
 async function tryRefreshToken(): Promise<string | null> {
   if (isRefreshing) {

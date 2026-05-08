@@ -1,3 +1,9 @@
+<script lang="ts">
+/**
+ * 监控大盘页面组件。展示系统运行状态、性能指标和资源使用情况的实时监控面板。
+ */
+</script>
+
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref } from 'vue'
 import type { MonitorMetrics } from '@/api/modules/monitor'

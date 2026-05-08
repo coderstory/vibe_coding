@@ -521,30 +521,33 @@ export const activityApi = {
   },
 
   /**
-   * 开启活动（手动开始）
+   * 开启活动（手动开始）。
    *
    * @param id 活动ID
+   * @return 操作结果
    */
   start(id: number) {
     return request.post<boolean>(`/activity/${id}/start`)
   },
 
   /**
-   * 结束活动（手动结束）
+   * 结束活动（手动结束）。
    *
    * @param id 活动ID
+   * @return 操作结果
    */
   end(id: number) {
     return request.post<boolean>(`/activity/${id}/end`)
   },
 
   /**
-   * 预约活动
+   * 预约活动。
    *
    * 用户预约后，活动开始前会收到通知
    * 预约信息存储在 Redis Set 中
    *
    * @param activityId 活动ID
+   * @return 预约结果
    */
   reserve(activityId: number) {
     return request.post<void>(`/reservation/${activityId}`)
@@ -560,12 +563,13 @@ export const activityApi = {
   },
 
   /**
-   * 预热活动数据（手动触发）
+   * 预热活动数据（手动触发）。
    *
    * 通常不需要手动调用，发布时会自动预热
    * 用于管理后台手动刷新缓存
    *
    * @param activityId 活动ID
+   * @return 预热结果
    */
   preheat(activityId: number) {
     return request.post<any>(`/seckill/preheat/${activityId}`)
