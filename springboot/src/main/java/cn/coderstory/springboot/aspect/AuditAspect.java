@@ -17,6 +17,16 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * 审计日志 AOP 切面。
+ * <p>
+ * 拦截 cn.coderstory.springboot.service 包下的方法调用，
+ * 根据方法名前缀推断操作类型（新增/编辑/删除等），
+ * 异步记录操作日志到数据库。
+ * 使用 ThreadLocal 防止同一线程内重复记录。
+ *
+ * @since 1.7.0
+ */
 @Slf4j
 @Aspect
 @Component
@@ -51,6 +61,16 @@ public class AuditAspect {
     public void servicePointcut() {
     }
 
+    /**
+     * 环绕通知，拦截 Service 方法调用并记录审计日志。
+     * <p>
+     * 通过方法名前缀推断操作类型，仅记录数据变更操作。
+     * 使用 ThreadLocal 防止同一线程内重复记录。
+     *
+     * @param joinPoint 连接点
+     * @return 原方法执行结果
+     * @throws Throwable 原方法抛出的异常
+     */
     @Around("servicePointcut()")
     public Object auditAround(ProceedingJoinPoint joinPoint) throws Throwable {
         String methodName = joinPoint.getSignature().getName();
@@ -221,6 +241,7 @@ public class AuditAspect {
         return ip;
     }
 
+    // 操作类型枚举，每个枚举值对应一种审计操作行为
     private enum OperationType {
         CREATE("新增"),
         UPDATE("编辑"),

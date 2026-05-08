@@ -18,9 +18,7 @@ import org.springframework.stereotype.Component;
  * - order: 订单相关配置（超时时间）
  * - sse: SSE实时通知相关配置（超时时间）
  *
- * @author system
- * @version 1.0
- * @since 2026-04-20
+ * @since 1.7.0
  */
 @Data
 @Component

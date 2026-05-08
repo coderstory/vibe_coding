@@ -31,9 +31,7 @@ import org.springframework.context.annotation.Configuration;
  *     }
  * </pre>
  *
- * @author system
- * @version 1.1
- * @since 2026-04-20
+ * @since 1.7.0
  */
 @Data
 @Configuration

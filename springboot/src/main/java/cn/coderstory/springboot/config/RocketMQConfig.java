@@ -8,8 +8,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * RocketMQ Admin 配置
- * 用于管理 Topic、Consumer Group 等集群管理操作
+ * RocketMQ Admin 配置。
+ * <p>
+ * 提供 RocketMQ Admin 实例和消息发送专用生产者，
+ * 用于管理 Topic、Consumer Group 等集群管理操作。
+ *
+ * @since 1.7.0
  */
 @Slf4j
 @Configuration
@@ -19,8 +23,11 @@ public class RocketMQConfig {
     private String nameServer;
 
     /**
-     * 创建 RocketMQ Admin 扩展实例
-     * 用于执行 Topic 管理、Consumer Group 管理等运维操作
+     * 创建 RocketMQ Admin 扩展实例。
+     * <p>
+     * 用于执行 Topic 管理、Consumer Group 管理等运维操作。
+     *
+     * @return DefaultMQAdminExt 实例
      */
     @Bean
     public DefaultMQAdminExt defaultMQAdminExt() {
@@ -37,8 +44,11 @@ public class RocketMQConfig {
     }
 
     /**
-     * 创建消息发送专用生产者
-     * 使用独立的生产者组，避免与秒杀系统生产者冲突
+     * 创建消息发送专用生产者。
+     * <p>
+     * 使用独立的生产者组，避免与秒杀系统生产者冲突。
+     *
+     * @return DefaultMQProducer 实例
      */
     @Bean
     public DefaultMQProducer messageProducer() {
