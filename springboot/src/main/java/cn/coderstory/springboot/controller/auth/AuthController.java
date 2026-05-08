@@ -14,8 +14,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 认证控制器
- * 处理用户登录、登出、Token刷新等认证相关操作
+ * 认证控制器。
+ * <p>
+ * 处理用户登录、登出、Token 刷新等认证相关操作，管理用户会话和 JWT 令牌生命周期。
+ *
+ * @since 1.7.0
  */
 @Slf4j
 @RestController
@@ -27,8 +30,13 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * 用户登录
-     * 验证用户名密码后返回 JWT Token，支持 Token 自动刷新机制
+     * 用户登录。
+     * <p>
+     * 验证用户名和密码，登录成功后返回 JWT Token 和刷新令牌。
+     *
+     * @param request     登录请求，包含用户名和密码
+     * @param httpRequest HTTP 请求，用于获取客户端 IP
+     * @return 登录结果，包含 Token、刷新令牌和用户信息
      */
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<Map<String, Object>>> login(
@@ -43,8 +51,12 @@ public class AuthController {
     }
 
     /**
-     * 刷新 Token
-     * 使用 RefreshToken 获取新的 AccessToken，延长会话有效期
+     * 刷新 Token。
+     * <p>
+     * 使用刷新令牌获取新的访问令牌，延长用户会话有效期。
+     *
+     * @param request 包含刷新令牌的请求
+     * @return 新的 Token 和刷新令牌
      */
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<Map<String, Object>>> refresh(@RequestBody Map<String, String> request) {
@@ -54,8 +66,12 @@ public class AuthController {
     }
 
     /**
-     * 用户登出
-     * 记录登出日志，客户端应清除本地存储的 Token
+     * 用户登出。
+     * <p>
+     * 记录登出日志并清除服务端会话状态，客户端应同时清除本地存储的 Token。
+     *
+     * @param request HTTP 请求，用于提取 Token 和客户端 IP
+     * @return 登出结果
      */
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request) {
@@ -73,8 +89,12 @@ public class AuthController {
     }
 
     /**
-     * 获取当前用户信息
-     * 从 Token 中解析用户 ID，查询完整用户信息
+     * 获取当前用户信息。
+     * <p>
+     * 从请求中解析 JWT Token，查询当前登录用户的详细信息。
+     *
+     * @param request HTTP 请求，用于提取 Token
+     * @return 当前用户的基本信息
      */
     @GetMapping("/current")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getCurrentUser(HttpServletRequest request) {
@@ -100,9 +120,7 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success(data));
     }
 
-    /**
-     * 从请求头提取 Bearer Token
-     */
+    // 从请求头提取 Bearer Token
     private String getTokenFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
@@ -111,10 +129,7 @@ public class AuthController {
         return null;
     }
 
-    /**
-     * 获取客户端真实 IP
-     * 优先从 X-Forwarded-For 头获取，兼容代理和负载均衡场景
-     */
+    // 获取客户端真实 IP，优先从 X-Forwarded-For 头获取，兼容代理和负载均衡场景
     private String getClientIp(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");
         if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {

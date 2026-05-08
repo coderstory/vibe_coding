@@ -16,8 +16,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 角色管理控制器
- * 提供角色 CRUD 及权限分配操作
+ * 角色管理控制器。
+ * <p>
+ * 提供角色的 CRUD 操作和菜单权限分配功能。
+ *
+ * @since 1.7.0
  */
 @Slf4j
 @RestController
@@ -28,7 +31,12 @@ public class RoleController {
     private final RoleService roleService;
 
     /**
-     * 分页查询角色列表
+     * 分页查询角色列表。
+     *
+     * @param roleName 角色名称（可选筛选条件）
+     * @param page     页码
+     * @param size     每页条数
+     * @return 角色分页结果，包含记录列表和分页信息
      */
     @GetMapping
     public ResponseEntity<ApiResponse<Map<String, Object>>> getRolePage(
@@ -50,7 +58,10 @@ public class RoleController {
     }
 
     /**
-     * 获取角色详情
+     * 根据角色 ID 获取角色详情。
+     *
+     * @param id 角色 ID
+     * @return 角色信息
      */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Role>> getRoleById(@PathVariable Long id) {
@@ -59,7 +70,10 @@ public class RoleController {
     }
 
     /**
-     * 创建角色
+     * 创建角色。
+     *
+     * @param role 角色信息
+     * @return 创建结果
      */
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> createRole(@RequestBody Role role) {
@@ -72,7 +86,11 @@ public class RoleController {
     }
 
     /**
-     * 更新角色
+     * 更新角色信息。
+     *
+     * @param id   角色 ID
+     * @param role 角色信息
+     * @return 更新结果
      */
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> updateRole(@PathVariable Long id, @RequestBody Role role) {
@@ -86,7 +104,10 @@ public class RoleController {
     }
 
     /**
-     * 删除角色
+     * 删除角色。
+     *
+     * @param id 角色 ID
+     * @return 删除结果
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteRole(@PathVariable Long id) {
@@ -99,8 +120,12 @@ public class RoleController {
     }
 
     /**
-     * 获取角色的菜单权限
-     * 返回该角色被授权的所有菜单 ID 列表
+     * 获取角色的菜单权限列表。
+     * <p>
+     * 返回该角色被授权的所有菜单。
+     *
+     * @param id 角色 ID
+     * @return 角色的菜单列表
      */
     @GetMapping("/{id}/menus")
     public ResponseEntity<ApiResponse<List<Menu>>> getRoleMenus(@PathVariable Long id) {
@@ -109,8 +134,13 @@ public class RoleController {
     }
 
     /**
-     * 分配菜单权限
-     * 全量替换：该角色的所有菜单权限将被新列表覆盖
+     * 分配菜单权限。
+     * <p>
+     * 全量替换：该角色的所有菜单权限将被新列表覆盖。
+     *
+     * @param id      角色 ID
+     * @param request 包含菜单 ID 列表的请求
+     * @return 分配结果
      */
     @PutMapping("/{id}/menus")
     public ResponseEntity<ApiResponse<Void>> assignMenus(

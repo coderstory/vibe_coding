@@ -27,7 +27,7 @@ import java.util.List;
  * Redis Key 设计：
  * - seckill:reservation:{activityId} - 预约用户ID集合（Set 类型）
  *
- * @author seckill-team
+ * @since 1.7.0
  */
 @Slf4j
 @RestController

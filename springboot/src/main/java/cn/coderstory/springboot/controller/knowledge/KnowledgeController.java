@@ -30,9 +30,7 @@ import java.util.List;
  * - 标签管理：列表、创建、删除
  * - 文件管理：上传、下载、删除
  *
- * @author system
- * @version 1.0
- * @since 2026-04-20
+ * @since 1.7.0
  */
 @RestController
 @RequestMapping("/api/knowledge")

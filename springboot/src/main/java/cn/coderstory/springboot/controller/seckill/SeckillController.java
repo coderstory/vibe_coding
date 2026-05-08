@@ -30,9 +30,7 @@ import java.util.UUID;
  * 2. 系统校验请求，生成排队号
  * 3. 用户通过排队号查询秒杀结果
  *
- * @author system
- * @version 1.0
- * @since 2026-04-20
+ * @since 1.7.0
  */
 @RestController
 @RequestMapping("/api/seckill")
@@ -117,15 +115,7 @@ public class SeckillController {
         return ApiResponse.success(result);
     }
 
-    /**
-     * 获取客户端真实 IP
-     * <p>
-     * 优先级：X-Forwarded-For > X-Real-IP > getRemoteAddr()
-     * 支持代理和负载均衡场景下的 IP 获取
-     *
-     * @param request HTTP 请求
-     * @return 客户端 IP 地址
-     */
+    // 获取客户端真实 IP，优先级：X-Forwarded-For > X-Real-IP > getRemoteAddr()
     private String getClientIp(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");
         if (ip == null || ip.isEmpty()) {

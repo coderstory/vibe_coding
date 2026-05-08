@@ -12,8 +12,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * RocketMQ 管理控制器
- * 提供 Topic 和 Consumer Group 的 RESTful API
+ * RocketMQ 管理控制器。
+ * <p>
+ * 提供 Topic 和 Consumer Group 的 RESTful API，包括消息查询、消息轨迹和消息发送功能。
+ *
+ * @since 1.7.0
  */
 @Slf4j
 @RestController
@@ -26,8 +29,10 @@ public class RocketMQController {
     // ==================== Topic 管理 ====================
 
     /**
-     * 获取 Topic 列表
-     * GET /api/rocketmq/topics?keyword=xxx
+     * 获取 Topic 列表。
+     *
+     * @param keyword 搜索关键字（可选，按名称模糊匹配）
+     * @return Topic 列表及总数
      */
     @GetMapping("/topics")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getTopicList(
@@ -42,8 +47,10 @@ public class RocketMQController {
     }
 
     /**
-     * 获取 Topic 详情
-     * GET /api/rocketmq/topics/{topicName}
+     * 根据 Topic 名称获取详细信息。
+     *
+     * @param topicName Topic 名称
+     * @return Topic 详情数据
      */
     @GetMapping("/topics/{topicName}")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getTopicDetail(
@@ -53,9 +60,12 @@ public class RocketMQController {
     }
 
     /**
-     * 创建 Topic
-     * POST /api/rocketmq/topics
-     * Body: { "topicName": "xxx", "queueCount": 8, "perm": "READ" }
+     * 创建新的 Topic。
+     * <p>
+     * 支持指定队列数量和读写权限。默认队列数为 8，默认权限为 READ。
+     *
+     * @param request 包含 topicName、queueCount、perm 的请求体
+     * @return 创建成功提示
      */
     @PostMapping("/topics")
     public ResponseEntity<ApiResponse<Void>> createTopic(@RequestBody Map<String, Object> request) {
@@ -75,8 +85,10 @@ public class RocketMQController {
     }
 
     /**
-     * 删除 Topic
-     * DELETE /api/rocketmq/topics/{topicName}
+     * 根据 Topic 名称删除指定 Topic。
+     *
+     * @param topicName 要删除的 Topic 名称
+     * @return 删除成功提示
      */
     @DeleteMapping("/topics/{topicName}")
     public ResponseEntity<ApiResponse<Void>> deleteTopic(@PathVariable String topicName) {
@@ -87,8 +99,10 @@ public class RocketMQController {
     // ==================== Consumer Group 管理 ====================
 
     /**
-     * 获取 Consumer Group 列表
-     * GET /api/rocketmq/consumer-groups?keyword=xxx
+     * 获取 Consumer Group 列表。
+     *
+     * @param keyword 搜索关键字（可选，按名称模糊匹配）
+     * @return Consumer Group 列表及总数
      */
     @GetMapping("/consumer-groups")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getConsumerGroupList(
@@ -103,8 +117,10 @@ public class RocketMQController {
     }
 
     /**
-     * 获取 Consumer Group 详情
-     * GET /api/rocketmq/consumer-groups/{group}
+     * 根据消费组名称获取详细信息。
+     *
+     * @param group 消费组名称
+     * @return Consumer Group 详情数据
      */
     @GetMapping("/consumer-groups/{group}")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getConsumerGroupDetail(
@@ -114,9 +130,13 @@ public class RocketMQController {
     }
 
     /**
-     * 重置消费位点
-     * POST /api/rocketmq/consumer-groups/{group}/reset-offset
-     * Body: { "topic": "xxx", "timestamp": 1715000000000 }
+     * 重置 Consumer Group 在指定 Topic 上的消费位点。
+     * <p>
+     * 根据时间戳将消费位点回退到指定时间位置，用于重新消费历史消息。
+     *
+     * @param group   消费组名称
+     * @param request 包含 topic 和 timestamp 的请求体
+     * @return 位点重置成功提示
      */
     @PostMapping("/consumer-groups/{group}/reset-offset")
     public ResponseEntity<ApiResponse<Void>> resetConsumerOffset(
@@ -131,8 +151,10 @@ public class RocketMQController {
     }
 
     /**
-     * 删除 Consumer Group
-     * DELETE /api/rocketmq/consumer-groups/{group}
+     * 删除指定 Consumer Group。
+     *
+     * @param group 要删除的消费组名称
+     * @return 删除成功提示
      */
     @DeleteMapping("/consumer-groups/{group}")
     public ResponseEntity<ApiResponse<Void>> deleteConsumerGroup(@PathVariable String group) {
@@ -143,8 +165,16 @@ public class RocketMQController {
     // ==================== 消息管理 ====================
 
     /**
-     * 查询消息列表
-     * GET /api/rocketmq/messages/{topic}?startTime=xxx&endTime=xxx&maxMsg=100&keyword=xxx
+     * 查询指定 Topic 的消息列表。
+     * <p>
+     * 支持按时间范围和关键字筛选，默认最多返回 100 条消息。
+     *
+     * @param topic    Topic 名称
+     * @param startTime 起始时间戳（可选，毫秒）
+     * @param endTime   结束时间戳（可选，毫秒）
+     * @param maxMsg    最大返回消息数，默认 100
+     * @param keyword   搜索关键字（可选）
+     * @return 消息列表及总数
      */
     @GetMapping("/messages/{topic}")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getMessageList(
@@ -161,8 +191,11 @@ public class RocketMQController {
     }
 
     /**
-     * 查询消息详情
-     * GET /api/rocketmq/messages/{topic}/{msgId}
+     * 根据消息 ID 查询消息详情。
+     *
+     * @param topic Topic 名称
+     * @param msgId 消息 ID
+     * @return 消息详细信息
      */
     @GetMapping("/messages/{topic}/{msgId}")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getMessageDetail(
@@ -173,8 +206,11 @@ public class RocketMQController {
     }
 
     /**
-     * 查询消息轨迹
-     * GET /api/rocketmq/messages/{topic}/{msgId}/trace
+     * 查询消息轨迹信息。
+     *
+     * @param topic Topic 名称
+     * @param msgId 消息 ID
+     * @return 消息轨迹数据
      */
     @GetMapping("/messages/{topic}/{msgId}/trace")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getMessageTrace(
@@ -185,8 +221,10 @@ public class RocketMQController {
     }
 
     /**
-     * 发送消息
-     * POST /api/rocketmq/messages
+     * 发送消息到指定 Topic。
+     *
+     * @param body 包含 topic、tags、keys、body 的消息体
+     * @return 发送结果（包含消息 ID 和发送状态）
      */
     @PostMapping("/messages")
     public ResponseEntity<ApiResponse<Map<String, Object>>> sendMessage(@RequestBody Map<String, Object> body) {

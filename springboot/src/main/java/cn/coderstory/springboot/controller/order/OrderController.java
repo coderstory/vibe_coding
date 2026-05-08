@@ -9,20 +9,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 订单控制器
+ * 订单管理控制器。
  * <p>
- * 功能描述：
- * - 提供订单查询、支付、取消等操作接口
- * - 支持用户查看自己的订单列表
- * <p>
- * 接口列表：
- * - GET /api/order/my: 获取当前用户的订单列表
- * - POST /api/order/{orderNo}/pay: 支付订单
- * - POST /api/order/{orderNo}/cancel: 取消订单
+ * 提供订单查询、支付和取消等操作接口，支持用户查看自己的订单列表。
  *
- * @author system
- * @version 1.0
- * @since 2026-04-20
+ * @since 1.7.0
  */
 @RestController
 @RequestMapping("/api/order")
