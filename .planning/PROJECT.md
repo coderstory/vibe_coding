@@ -32,18 +32,26 @@ Vue 3 + Element Plus 管理后台系统，前端使用夏日海滩风主题（�
 - ✓ 修复 Gradle 测试中文路径 ClassNotFoundException — v1.4
 - ✓ 修复 pom.xml 中硬编码的数据库凭证 — v1.4
 
-## Current Milestone: v1.6 代码深度清理与优化
+## Current Milestone: v1.7 注释与文档工程
 
-**Goal:** 全面清理前后端代码，删除无用方法、无用依赖、无用组件，合并拆分代码类，优化代码结构
+**Goal:** 全项目配置文件和前后端代码添加必要注释，降低新人上手门槛
 
 **Target features:**
-- 后端 Java 代码清理（无用方法/类删除、类合并拆分、代码精简）
-- 后端依赖清理（pom/gradle 无用依赖移除）
-- 前端 Vue/TS 代码清理（冗余组件删除、API 层瘦身）
-- 前端依赖清理（npm 无用包移除）
-- 配置文件与环境变量清理
+- 后端 Java 代码注释（Controller/Config/Utils 重点层优先）
+- 前端 Vue/TS 代码注释（组件/API/Store/路由）
+- 配置文件注释（YAML/Gradle/ESLint/npm 等）
+- 适中型注释风格：配置按块注释、代码按类/方法/复杂逻辑注释
 
 ### Previous Milestones
+
+**v1.6 代码深度清理与优化 — ✅ 已完成 (2026-05-07)**
+
+**Delivered:**
+- 后端死代码清理（未用方法/字段/导入/注释块）
+- 后端结构体优化（DTO/VO 精简，RocketMQAdminService 拆分为 4 个子服务）
+- 前端代码清理（无用组件/API/类型/CSS 删除，lint 零 warning）
+- 依赖清理（Gradle AOP BOM、npm 作用域修正）
+- 配置清理（移除 test.yaml 与主配置重复属性）
 
 **v1.5 前后端代码重构与目录整理 — ✅ 已完成 (2026-05-07)**
 
@@ -53,16 +61,6 @@ Vue 3 + Element Plus 管理后台系统，前端使用夏日海滩风主题（�
 - 配置文件拆分为 5 个关注点（datasource/cache/mq/security/business）
 - 前端 components/api/router 按域拆分
 - 代码规范统一（命名/PascalCase/import 清理）
-
-**v1.4 Maven→Gradle + Spring Boot 4.1 升级 — ✅ 已完成 (2026-05-06)**
-
-**Delivered:**
-- Maven → Gradle 完整迁移（Gradle 9.5 + JDK 26）
-- Spring Boot 4.0.5 → 4.1.0-RC1 升级
-- 所有依赖升级到最新兼容版本
-- 修复 Gradle 测试中文路径 ClassNotFoundException（file.encoding=GBK）
-- 修复 pom.xml 中硬编码的数据库凭证
-- 保持现有功能完全正常工作
 
 ### Out of Scope
 

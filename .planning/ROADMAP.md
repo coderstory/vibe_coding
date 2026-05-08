@@ -1,7 +1,7 @@
 # Roadmap: Vue + Spring Boot 管理后台
 
 > **创建日期:** 2026-04-03
-> **更新日期:** 2026-05-07
+> **更新日期:** 2026-05-08
 > **当前里程碑:** v1.7 注释与文档工程 (Planning)
 > **目标:** 全项目配置文件和前后端代码添加必要注释，降低新人上手门槛
 
@@ -270,7 +270,12 @@
   3. TODO 必须关联 Issue 编号，禁止裸写 TODO
   4. Javadoc/TSDoc 模板规范确定：禁止空骨架、禁止 `@author`/`@since`
   5. PR Review 注释检查清单完成，在后续 Phase 28-30 评审中实际执行
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [x] 27-01-PLAN.md — 注释规范写入 CLAUDE.md（语言策略、L0-L3 层级、Javadoc/TSDoc 模板、YAML 注释、TODO 管理、PR 检查清单）
+- [x] 27-02-PLAN.md — TODO 回溯处理（全局搜索并分类、更新格式或清理）
+- [x] 27-03-PLAN.md — PR 检查清单细化（判定标准、抽样验证）
+**Status**: ✅ Completed 2026-05-08
 
 ### Phase 28: 配置层 + Controller 层注释
 **Goal**: 所有配置文件和后端 Controller/配置类/工具类方法级注释补全完成
@@ -283,7 +288,10 @@
   4. ESLint flat config 和 Stylelint 配置有必要的配置项注释
   5. 所有 18+ 个 Controller 包含类级 Javadoc（职责说明）和方法级 `@param`/`@return`
   6. 所有配置类（@ConfigurationProperties）、安全/Web 配置类、JWT 相关类、AOP 切面、异常体系类包含类级 Javadoc 和关键字段/方法说明
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 28-01-PLAN.md — 配置文件注释（YAML/Gradle/Lint 配置，Wave 1）
+- [ ] 28-02-PLAN.md — 后端 Java L3 层注释（Controller/Config/Security/Exception/AOP，Wave 2）
 
 ### Phase 29: Service 接口 + Vue/TS 注释
 **Goal**: 后端 Service 接口完整 Javadoc、前端 Vue/TS 组件级和 API 级注释全部补全
@@ -326,11 +334,11 @@
 | 24. 前端代码清理 | v1.6 | 1/1 | Completed | 2026-05-07 |
 | 25. 依赖清理 | v1.6 | 1/1 | Completed | 2026-05-07 |
 | 26. 配置清理 | v1.6 | 1/1 | Completed | 2026-05-07 |
-| 27. 注释标准定义 | v1.7 | 0/0 | Not started | - |
-| 28. 配置层+Controller层注释 | v1.7 | 0/0 | Not started | - |
+| 27. 注释标准定义 | v1.7 | 3/3 | Completed | 2026-05-08 |
+| 28. 配置层+Controller层注释 | v1.7 | 0/2 | Planning | - |
 | 29. Service接口+Vue/TS注释 | v1.7 | 0/0 | Not started | - |
 | 30. 注释维护机制建立 | v1.7 | 0/0 | Not started | - |
 
 ---
 
-*路线图更新: 2026-05-07 — v1.7 里程碑初始化，Phase 27-30 规划完成*
+*路线图更新: 2026-05-08 — Phase 27 完成，Phase 28 规划完成 (2 plans, 2 waves)*
