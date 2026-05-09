@@ -60,7 +60,9 @@
       "Bash(sed -i '/^export interface SendMessageResult {/,/^}/d' api/modules/rocketmq.ts)",
       "Bash(sed -i '/^export interface BrokerMetricsVO {/,/^}/d' api/modules/rocketmq.ts)",
       "Bash(cmd //c \"netstat -an | findstr 3306\")",
-      "Bash(echo \"exit: $?\")"
+      "Bash(echo \"exit: $?\")",
+      "Bash(gsd-sdk --help)",
+      "Bash(gsd-sdk query *)"
     ],
     "deny": [
       "Bash(rm -rf:*)",

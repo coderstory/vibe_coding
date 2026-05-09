@@ -118,4 +118,22 @@
 
 ---
 
-*Last updated: 2026-05-07*
+## v1.7 — 注释与文档工程
+
+**Date:** 2026-05-07 → 2026-05-09
+
+**Goal:** 全项目配置文件和前后端代码添加必要注释，降低新人上手门槛
+
+**Delivered:**
+- 注释标准制定（L0-L3 层级、Javadoc/TSDoc 模板、TODO 管理规则）
+- 后端 L3 层注释补全（Controller/Config/Exception/JWT/AOP 共 40+ 文件）
+- Service 接口注释补全（23 个 Service 接口 + 实现类）
+- Vue 组件注释（38 个组件职责 + Props/Emits 说明）
+- API/Store/Router 注释（12 个 API 模块 + types + store + router）
+- 注释维护机制建立（PR 检查清单 + TODO 月清理 + 季度抽查）
+
+**Status:** ✅ Completed
+
+---
+
+*Last updated: 2026-05-09*
