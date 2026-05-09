@@ -342,7 +342,11 @@ Plans:
   3. `GET /api/monitor/hardware/trend?metric=cpu&range=360` 返回近 1h 环形缓冲区趋势数据
   4. `GET /api/monitor/hardware/system` 返回系统基本信息（OS 版本、运行时间、进程数）
   5. 采集服务通过接口抽象，OSHI 依赖可 mock，核心采集/计算/缓存逻辑有单元测试覆盖
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 31-01-PLAN.md — 基础层: OSHI 依赖、DTO 定义、RingBuffer、Service 接口、配置类 (Wave 1)
+- [ ] 31-02-PLAN.md — 采集实现: HardwareMetricsServiceImpl + 单元测试 (Wave 2)
+- [ ] 31-03-PLAN.md — REST API: 3 个端点 + Controller 测试 + 集成测试 (Wave 2)
 
 ### Phase 32: SSE 实时推送 + 前端基础页面
 **Goal**: 后端通过 SSE 实时推送硬件指标，前端展示 CPU/内存仪表盘、磁盘容量和系统信息
@@ -407,11 +411,11 @@ Plans:
 | 28. 配置层+Controller层注释 | v1.7 | 2/2 | Completed | 2026-05-09 |
 | 29. Service接口+Vue/TS注释 | v1.7 | 2/2 | Completed | 2026-05-09 |
 | 30. 注释维护机制建立 | v1.7 | 2/2 | Completed | 2026-05-09 |
-| 31. 后端采集服务+REST API | v1.8 | 0/0 | Not started | - |
+| 31. 后端采集服务+REST API | v1.8 | 3/0 | Planning | - |
 | 32. SSE实时推送+前端基础页面 | v1.8 | 0/0 | Not started | - |
 | 33. 完整图表+趋势 | v1.8 | 0/0 | Not started | - |
 | 34. 安全加固+打磨 | v1.8 | 0/0 | Not started | - |
 
 ---
 
-*路线图更新: 2026-05-09 — v1.7 全部完成 (Phases 27-30) ，v1.8 初始化 (Phases 31-34)*
+*路线图更新: 2026-05-09 — Phase 31 规划完成 (3 plans)*
