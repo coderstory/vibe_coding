@@ -1,9 +1,9 @@
 # Roadmap: Vue + Spring Boot 管理后台
 
 > **创建日期:** 2026-04-03
-> **更新日期:** 2026-05-08
-> **当前里程碑:** v1.7 注释与文档工程 (Planning)
-> **目标:** 全项目配置文件和前后端代码添加必要注释，降低新人上手门槛
+> **更新日期:** 2026-05-09
+> **当前里程碑:** v1.8 Windows 硬件负载监控 (Planning)
+> **目标:** Windows 系统硬件负载监控页面，实时展示 CPU/内存/磁盘/网络指标
 
 ---
 
@@ -16,7 +16,8 @@
 - ✅ **v1.4 Maven→Gradle + Spring Boot 4.1 升级** — Phases 13-16 (shipped 2026-05-06)
 - ✅ **v1.5 前后端代码重构与目录整理** — Phases 17-21 (shipped 2026-05-07)
 - ✅ **v1.6 代码深度清理与优化** — Phases 22-26 (shipped 2026-05-07)
-- 🚧 **v1.7 注释与文档工程** — Phases 27-30 (planning)
+- ✅ **v1.7 注释与文档工程** — Phases 27-30 (shipped 2026-05-09)
+- 🚧 **v1.8 Windows 硬件负载监控** — Phases 31-34 (planning)
 
 ---
 
@@ -185,7 +186,7 @@
 
 ---
 
-## 🚧 v1.6 代码深度清理与优化 (Completed)
+## ✅ v1.6 代码深度清理与优化 (Completed)
 
 **Milestone Goal:** 全面清理前后端死代码（未使用方法/字段/导入/组件/API），清理无用依赖和冗余配置，提升代码库整洁度。不新增业务功能，不修改数据库 schema，不重构核心架构。
 
@@ -256,7 +257,7 @@
 
 ---
 
-## 🚧 v1.7 注释与文档工程 (Planning)
+## ✅ v1.7 注释与文档工程 (Completed)
 
 **Milestone Goal:** 全项目配置文件和前后端代码添加必要注释，降低新人上手门槛。不引入新工具，不新增业务功能。
 
@@ -290,8 +291,9 @@ Plans:
   6. 所有配置类（@ConfigurationProperties）、安全/Web 配置类、JWT 相关类、AOP 切面、异常体系类包含类级 Javadoc 和关键字段/方法说明
 **Plans**: 2 plans
 Plans:
-- [ ] 28-01-PLAN.md — 配置文件注释（YAML/Gradle/Lint 配置，Wave 1）
-- [ ] 28-02-PLAN.md — 后端 Java L3 层注释（Controller/Config/Security/Exception/AOP，Wave 2）
+- [x] 28-01-PLAN.md — 配置文件注释（YAML/Gradle/Lint 配置，Wave 1）
+- [x] 28-02-PLAN.md — 后端 Java L3 层注释（Controller/Config/Security/Exception/AOP，Wave 2）
+**Status**: ✅ Completed 2026-05-09
 
 ### Phase 29: Service 接口 + Vue/TS 注释
 **Goal**: 后端 Service 接口完整 Javadoc、前端 Vue/TS 组件级和 API 级注释全部补全
@@ -303,7 +305,11 @@ Plans:
   3. API 模块函数包含 `@param` 参数说明
   4. Pinia Store 文件包含 Store 职责和 action 说明
   5. Router 模块包含路由说明和 guard 策略注释
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [x] 29-01-PLAN.md — 后端 Service 接口 Javadoc 补全
+- [x] 29-02-PLAN.md — Vue 组件 + TS/API/Store/Router 注释补全
+**Status**: ✅ Completed 2026-05-09
 **UI hint**: yes
 
 ### Phase 30: 注释维护机制建立
@@ -314,13 +320,76 @@ Plans:
   1. PR Review 模板中包含注释同步检查条目，每个 PR 评审时自动检查
   2. TODO 注释定期清理流程建立，每轮清理后无过期 TODO 残留
   3. 季度注释漂移抽查机制建立，首次抽查范围和时间已确定
+**Plans**: 2 plans
+Plans:
+- [x] 30-01-PLAN.md — PR 检查清单 + TODO 管理流程文档
+- [x] 30-02-PLAN.md — CLAUDE.md 注释维护章节更新
+**Status**: ✅ Completed 2026-05-09
+
+---
+
+## 🚧 v1.8 Windows 硬件负载监控 (Planning)
+
+**Milestone Goal:** Windows 系统硬件负载监控页面，实时展示 CPU/内存/磁盘/网络指标。通过 OSHI 7.x FFM 库采集硬件数据，REST API + SSE 推送至前端，ECharts 实时可视化。
+
+### Phase 31: 后端采集服务 + REST API
+**Goal**: 后端集成 OSHI 7.x FFM 库，实现 CPU/内存/磁盘/网络指标的定时采集，提供 REST API 和环形缓冲区趋势查询
+**Depends on**: v1.7 产物（Phase 30 注释维护机制建立完成后代码基线稳定）
+**Requirements**: HWM-01, HWM-02, HWM-03, HWM-04, HWM-05, HWM-06, HWM-07, HWM-08, HWM-09, TDD-01, TDD-03
+**Success Criteria** (what must be TRUE):
+  1. 后端启动后自动以 2s 间隔采集 CPU 使用率（总体和各核）、内存指标（总量/已用/可用）、磁盘容量和分区信息、磁盘 IOPS/读写速度、网络接口吞吐量
+  2. `GET /api/monitor/hardware/current` 返回当前所有硬件指标的快照 JSON
+  3. `GET /api/monitor/hardware/trend?metric=cpu&range=360` 返回近 1h 环形缓冲区趋势数据
+  4. `GET /api/monitor/hardware/system` 返回系统基本信息（OS 版本、运行时间、进程数）
+  5. 采集服务通过接口抽象，OSHI 依赖可 mock，核心采集/计算/缓存逻辑有单元测试覆盖
 **Plans**: TBD
+
+### Phase 32: SSE 实时推送 + 前端基础页面
+**Goal**: 后端通过 SSE 实时推送硬件指标，前端展示 CPU/内存仪表盘、磁盘容量和系统信息
+**Depends on**: Phase 31（SSE 推送需要采集服务提供数据）
+**Requirements**: HWM-10, HWM-11, HWM-12, HWM-13, HWM-14, HWM-15, HWM-17, HWM-19, TDD-02, TDD-05
+**Success Criteria** (what must be TRUE):
+  1. 用户打开硬件监控页面后，页面通过 SSE 实时接收硬件指标（每 2s 推送一次）
+  2. SSE 连接包含心跳机制，过期连接自动清理，断线自动重连
+  3. CPU 使用率以环形图展示，显示核数/型号信息卡片
+  4. 内存使用率以环形图展示，显示总量/已用/可用信息
+  5. 磁盘分区以进度条列表展示容量使用情况
+  6. 系统基本信息卡片展示 OS 版本、运行时间、进程数
+  7. SSE 推送服务和前端 SSE composable 设计为可测试的接口抽象
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 33: 完整图表 + 趋势
+**Goal**: 磁盘 IO/网络吞吐量实时折线图、近 1 小时趋势图，图表组件适配海滩风主题
+**Depends on**: Phase 32（图表数据来自 SSE 推送）
+**Requirements**: HWM-16, HWM-18, HWM-20, HWM-22, TDD-04
+**Success Criteria** (what must be TRUE):
+  1. 用户可以看到磁盘 IOPS 和读写速度实时折线图
+  2. 用户可以看到网络接口上下行速率实时折线图
+  3. 用户可以看到 CPU/内存的近 1 小时趋势折线图（ECharts 滑动窗口，300 点上限）
+  4. 所有图表组件适配夏日海滩风主题配色（海洋蓝主调 + 琥珀色强调）
+  5. ECharts 实例在组件卸载时正确 dispose，通过 markRaw 避免响应式代理，无内存泄漏
+  6. Vue 组件逻辑（composable、图表数据处理）有单元测试覆盖
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 34: 安全加固 + 打磨
+**Goal**: 硬件监控 API 权限控制、页面加载/异常/断连状态处理
+**Depends on**: Phase 32（状态处理在页面基础上打磨）
+**Requirements**: HWM-21, HWM-23, HWM-24
+**Success Criteria** (what must be TRUE):
+  1. 非 ADMIN 角色用户无法访问硬件监控 API 端点，返回 403 错误
+  2. 页面加载时显示加载骨架态，数据为空时显示空状态提示，请求/连接失败时显示错误信息
+  3. SSE 断线重连时页面顶部显示连接状态提示（"正在重连..."），恢复连接后自动消失
+  4. 用户离开监控页面时 SSE 连接正确关闭，无资源泄漏
+**Plans**: TBD
+**UI hint**: yes
 
 ---
 
 ## Progress
 
-**Execution Order:** Phases execute in numeric order: 27 -> 28 -> 29 -> 30
+**Execution Order:** Phases execute in numeric order: 31 -> 32 -> 33 -> 34
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -335,10 +404,14 @@ Plans:
 | 25. 依赖清理 | v1.6 | 1/1 | Completed | 2026-05-07 |
 | 26. 配置清理 | v1.6 | 1/1 | Completed | 2026-05-07 |
 | 27. 注释标准定义 | v1.7 | 3/3 | Completed | 2026-05-08 |
-| 28. 配置层+Controller层注释 | v1.7 | 0/2 | Planning | - |
-| 29. Service接口+Vue/TS注释 | v1.7 | 0/0 | Not started | - |
-| 30. 注释维护机制建立 | v1.7 | 0/0 | Not started | - |
+| 28. 配置层+Controller层注释 | v1.7 | 2/2 | Completed | 2026-05-09 |
+| 29. Service接口+Vue/TS注释 | v1.7 | 2/2 | Completed | 2026-05-09 |
+| 30. 注释维护机制建立 | v1.7 | 2/2 | Completed | 2026-05-09 |
+| 31. 后端采集服务+REST API | v1.8 | 0/0 | Not started | - |
+| 32. SSE实时推送+前端基础页面 | v1.8 | 0/0 | Not started | - |
+| 33. 完整图表+趋势 | v1.8 | 0/0 | Not started | - |
+| 34. 安全加固+打磨 | v1.8 | 0/0 | Not started | - |
 
 ---
 
-*路线图更新: 2026-05-08 — Phase 27 完成，Phase 28 规划完成 (2 plans, 2 waves)*
+*路线图更新: 2026-05-09 — v1.7 全部完成 (Phases 27-30) ，v1.8 初始化 (Phases 31-34)*

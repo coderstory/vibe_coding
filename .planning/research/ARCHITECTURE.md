@@ -1,573 +1,681 @@
-# 注释体系结构
+# Architecture Patterns: Windows Hardware Load Monitoring
 
-**项目：** Vue + Spring Boot 管理后台
-**研究日期：** 2026-05-07
-**模式：** 生态系统研究（注释体系结构）
-**整体置信度：** 高
+**Project:** Vue + Spring Boot Admin System
+**Domain:** Windows server hardware resource monitoring (CPU, memory, disk, network)
+**Researched:** 2026-05-09
+**Mode:** Ecosystem + Feasibility
 
-## 推荐注释架构
+## Recommended Architecture
 
-### 核心原则
+### Overview
+
+The Windows hardware monitoring feature follows the existing domain-package pattern and SSE real-time push pattern already established in the seckill system. A new `monitor/hardware` sub-domain is added on the backend. A new `views/monitor/hardware/` page set goes on the frontend.
 
 ```
-注释价值金字塔（从高到低）：
-┌─────────────────────────────────────────┐
-│  公共 API / 对外接口    ← 强制性注释     │  ← 最高价值
-├─────────────────────────────────────────┤
-│  配置属性 / 配置类       ← 强制性注释     │
-├─────────────────────────────────────────┤
-│  复杂业务逻辑            ← 必须注释      │
-├─────────────────────────────────────────┤
-│  非显而易见的设计决策     ← 必须注释      │
-├─────────────────────────────────────────┤
-│  类/组件职责             ← 鼓励注释      │
-├─────────────────────────────────────────┤
-│  简单方法的用途           ← 可选          │
-├─────────────────────────────────────────┤
-│  Getter/Setter / 自解释代码 ← 不注释    │  ← 最低价值
-└─────────────────────────────────────────┘
+Browser (Vue 3)
+    |
+    |-- GET /api/monitor/hardware/metrics          (polling fallback)
+    |-- GET /api/monitor/hardware/subscribe        (SSE real-time stream)
+    |
+    v
+Spring Boot Backend
+    |
+    |-- controller/monitor/hardware/HardwareMonitorController
+    |       |
+    |       |-- service/monitor/hardware/HardwareMetricsService
+    |       |       |-- OSHI SystemInfo (singleton, JNA-based)
+    |       |       |-- @Scheduled sampling loop (2s interval)
+    |       |       |-- in-memory ring buffer for trend history
+    |       |
+    |       |-- sse/monitor/HardwareSseService
+    |               |-- ConcurrentHashMap<String, SseEmitter>
+    |               |-- Broadcast to all connected clients
+    |
+    |-- OSHI 6.13.x (or 7.1.x) Library
+            |-- CentralProcessor  (CPU load, ticks, frequency, per-core)
+            |-- GlobalMemory      (physical/virtual memory, swap)
+            |-- HWDiskStore       (disk read/write bytes, queue length)
+            |-- NetworkIF         (network throughput, packets, errors)
 ```
 
-**两条铁律：**
-1. **"为什么"优先于"是什么"** —— 代码本身说明"是什么"，注释说明"为什么这么写"
-2. **不注释自解释代码** —— `String name` 不需要注释"用户姓名"，但需要注释为什么为 null 时回退到默认值
+### Why SSE over WebSocket
 
----
+| Criteria | SSE | WebSocket | Verdict |
+|----------|-----|-----------|---------|
+| Direction | Server -> Client only | Full-duplex | SSE sufficient (monitoring is server push only) |
+| Existing pattern | Already used in seckill (`SeckillSseService`) | Not used anywhere in project | SSE reuses proven pattern |
+| Auto-reconnect | Native browser support | Manual implementation | SSE wins |
+| Protocol complexity | HTTP (standard, no upgrade) | WS (separate protocol, upgrade handshake) | SSE simpler to proxy/firewall |
+| Binary data | Text only | Binary supported | Not needed for JSON metrics |
+| Concurrent connections | Browser limit ~6 per domain | No browser limit | Not a concern at our scale (<10 users) |
 
-### 层注释定义
+**Conclusion:** SSE is the right choice. The existing `SeckillSseService` is a direct template for `HardwareSseService`.
 
-#### 第 1 层：配置类与配置文件（强制性注释）
+### Component Boundaries
 
-| 文件类型 | 注释深度 | 示例 |
-|----------|----------|------|
-| YAML 配置 | 按块注释 | 已有良好模式：`# =====` 分区 + 行内说明 |
-| `@ConfigurationProperties` | 类 Javadoc + 每个字段 Javadoc | `SeckillProperties` 是标杆（含 `<p>` 说明 + 默认值 + 用途） |
-| `@Configuration` Bean 方法 | 方法 Javadoc（用途、返回值含义） | `RocketMQConfig` 是标杆 |
-| Gradle build 文件 | 按注释块分组依赖 | `build.gradle.kts` 已有良好模式 |
+| Component | Responsibility | Communicates With |
+|-----------|---------------|-------------------|
+| `HardwareMonitorController` | REST + SSE endpoints for hardware metrics | `HardwareMetricsService`, `HardwareSseService` |
+| `HardwareMetricsService` | OSHI data collection, metrics aggregation, history buffer | OSHI `SystemInfo` singleton |
+| `HardwareSseService` | SSE connection management, broadcast push to all clients | `HardwareMetricsService` (gets metrics), `SseEmitter` (sends to clients) |
+| `MonitoringScheduler` | `@Scheduled(fixedRate=2000)` sampling loop | `HardwareMetricsService`, `HardwareSseService` |
+| `HardwareMonitorPage.vue` | Main monitoring page with layout | Child gauge/chart components |
+| `CpuGauge.vue` | CPU usage gauge + per-core breakdown | ECharts gauge + bar chart |
+| `MemoryGauge.vue` | Memory usage gauge (physical + virtual) | ECharts gauge |
+| `DiskGauge.vue` | Disk I/O read/write rates | ECharts gauge + line chart |
+| `NetworkChart.vue` | Network throughput (in/out) | ECharts line chart |
+| `MetricTrendChart.vue` | Time-series chart for historical trends | ECharts line chart (reuses QpsChart pattern) |
 
-**YAML 配置注释标准（现有模式保留）：**
+### Data Flow
+
+#### Polling Mode (fallback — initial page load)
+
 ```
-# ===========================================
-# [配置区块名称]
-# [一句话说明该区块的用途]
-# ===========================================
-配置键: 值               # [行内说明：解释该值的作用、取值范围、是否可用环境变量覆盖]
+Frontend                          Backend
+   |                                 |
+   |-- GET /api/monitor/hardware     |
+   |   /metrics                      |
+   |                               HardwareMetricsService
+   |                                  |-- OSHI snapshot (reads cached metrics)
+   |<-- { cpu, mem, disk, network }  |
 ```
 
-**配置属性类注释标准（以 SeckillProperties 为蓝本）：**
+#### SSE Streaming Mode (primary — real-time updates)
+
+```
+Frontend                          Backend                         OSHI
+   |                                 |                              |
+   |-- GET /api/monitor/hardware     |                              |
+   |   /subscribe                    |                              |
+   |   (SSE connection)              | HardwareSseService           |
+   |                                 |   |-- create SseEmitter      |
+   |                                 |   |-- store in ConcurrentHashMap
+   |                                 |                              |
+   |                                 | MonitoringScheduler          |
+   |                                 |   |-- @Scheduled(2000ms)     |
+   |                                 |   |-- snapMetrics():         |
+   |                                 |       call OSHI              |
+   |                                 |       update cache          |
+   |                                 |       push to history buf   |
+   |                                 |   |-- broadcast():           |
+   |<-- event: "metric-update"       |       forEach emitter:      |
+   |    data: { cpu, mem, disk,      |         emitter.send(event) |
+   |           network, timestamp }  |                              |
+   |                                 |                              |
+```
+
+#### SSE Reconnection (browser built-in)
+
+```
+Browser                                   Backend
+   |                                         |
+   |-- EventSource connects ----------------->| (creates new SseEmitter)
+   |                                         |
+   |<-- event: "metric-update" (immediate) --|
+   |                                         |
+   (network drops)                           |
+   |                                         |
+   |-- Browser auto-reconnects (3s default)  |
+   |   (sends Last-Event-ID header)          |
+   |                                         | (creates new SseEmitter)
+   |<-- event: "metric-update" --------------|
+   |                                         |
+```
+
+**Key point:** SSE auto-reconnection happens at the browser level without any frontend code. The `Last-Event-ID` header can be used to resume from the last received event, but for monitoring (where stale data is acceptable), simply reconnecting and receiving the latest snapshot is sufficient.
+
+### Directory Structure Changes
+
+#### Backend (new files)
+
+```
+springboot/src/main/java/cn/coderstory/springboot/
++-- controller/monitor/hardware/
+|   +-- HardwareMonitorController.java
++-- service/monitor/hardware/
+|   +-- HardwareMetricsService.java
++-- sse/monitor/
+|   +-- HardwareSseService.java
++-- dto/monitor/hardware/
+|   +-- HardwareMetricsDTO.java
+|   +-- CpuMetricsDTO.java
+|   +-- MemoryMetricsDTO.java
+|   +-- DiskMetricsDTO.java
+|   +-- NetworkMetricsDTO.java
+```
+
+#### Frontend (new files)
+
+```
+app-vue/src/
++-- views/monitor/hardware/
+|   +-- HardwareMonitorPage.vue       # Main dashboard layout
+|   +-- CpuGauge.vue                  # CPU utilization gauge
+|   +-- MemoryGauge.vue               # Memory utilization gauge
+|   +-- DiskGauge.vue                 # Disk I/O gauge
+|   +-- NetworkChart.vue              # Network throughput chart
++-- api/modules/
+|   +-- hardware.ts                   # Hardware monitoring API module
++-- composables/
+|   +-- useHardwareSse.ts             # SSE connection composable
+```
+
+#### Modified files
+
+```
+springboot/gradle/libs.versions.toml              # + oshi-version, oshi-core library entry
+springboot/build.gradle.kts                       # + implementation(libs.oshi.core)
+springboot/src/main/resources/application.yaml     # + monitor.hardware config section
+app-vue/src/router/modules/routes.ts               # + /monitor/hardware route entry
+```
+
+## Patterns to Follow
+
+### Pattern 1: Domain Package Isolation
+
+**What:** Hardware monitoring gets its own sub-package under `monitor/`, separate from existing seckill metrics monitoring.
+
+**Where:** `controller/monitor/hardware/`, `service/monitor/hardware/`, `dto/monitor/hardware/`
+
+**Why:** The existing `MonitorController` and `MonitorService` handle Redis-based seckill metrics (concurrent count, QPS keys). Hardware monitoring is a separate concern (OS-level CPU/memory/disk via OSHI). The project's existing domain structure (e.g., `seckill`, `rocketmq`, `order`) confirms this pattern.
+
+**Example:**
 ```java
-/**
- * [配置类作用的一句话说明]
- * <p>
- * 功能说明：
- * - [功能点 1]
- * - [功能点 2]
- * <p>
- * 配置项：
- * - [子配置项 1]: [说明]
- * - [子配置项 2]: [说明]
- */
-@ConfigurationProperties(prefix = "xxx")
-public class XxxProperties {
-    /** [字段作用]，默认值: [值]，[额外说明] */
-    private int field = defaultValue;
-}
-```
+package cn.coderstory.springboot.controller.monitor.hardware;
 
-#### 第 2 层：公共 API / Controller 层（强制性注释）
-
-**Controller 层注释标准（以 AuthController 为蓝本）：**
-```java
-/**
- * [控制器名称]
- * 提供 [资源] 的 CRUD 和 [额外操作] RESTful API
- */
 @RestController
-@RequestMapping("/api/xxx")
-public class XxxController {
+@RequestMapping("/api/monitor/hardware")
+@RequiredArgsConstructor
+public class HardwareMonitorController {
+    private final HardwareMetricsService metricsService;
+    private final HardwareSseService sseService;
 
-    // ==================== [子资源 1] 管理 ====================
+    @GetMapping("/metrics")
+    public ApiResponse<HardwareMetricsDTO> getMetrics() {
+        return ApiResponse.success(metricsService.getCurrentMetrics());
+    }
 
-    /**
-     * [HTTP 动作] [资源]
-     * [一句话说明做了什么]
-     * [特殊说明：分页、筛选、排序等]
-     * HTTP: [METHOD /api/xxx/yyy?params]
-     */
-    @GetMapping("/yyy")
-    public ResponseEntity<ApiResponse<...>> method(...) { ... }
+    @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter subscribe() {
+        return sseService.createEmitter();
+    }
 }
 ```
 
-**要点：**
-- 类注释：说明该控制器管理的资源和职责边界
-- 方法注释：必须标注 HTTP 方法和路径，说明输入参数和返回数据
-- 区块分隔符：`// =====` 用于区分不同子资源的管理接口
-- **不注释**：显而易见的 Mapper 代理方法、自解释的 `return ResponseEntity.ok(...)`
+### Pattern 2: SSE Broadcast (Reuse Seckill Pattern)
 
-#### 第 3 层：Service 接口/实现层（鼓励注释）
+**What:** The seckill system already has `SeckillSseService` with `ConcurrentHashMap<String, SseEmitter>`. The hardware monitoring SSE follows the same implementation pattern but broadcasts to ALL connected clients instead of per-queue.
 
-**Service 层注释策略：**
+**Key differences from SeckillSseService:**
 
+| Aspect | SeckillSseService | HardwareSseService |
+|--------|-------------------|-------------------|
+| Connection key | `queueId` (per-request) | `UUID` (per-client) |
+| Message routing | `sendToQueue(queueId, event, data)` | `broadcast(event, data)` to all |
+| Timeout | 300s (bounded) | `0L` (never expire — monitoring stays open) |
+| Heartbeat | Per-queue heartbeats | Broadcast heartbeat to all |
+| Lifecycle | Ephemeral (seconds) | Persistent (hours/days) |
+
+**Example:**
 ```java
-/**
- * [接口职责的一句话说明]
- */
-public interface XxxService {
-    /**
-     * [做什么] — 鼓励说明参数约束和返回值约定
-     * @param param [参数说明，包括 null 安全性]
-     * @return [返回值说明，包括 null 可能性]
-     */
-    ResultType method(ParamType param);
-}
-```
-
-**Service 实现类注释要点：**
-- **类注释**：可选（如果接口注释足够清晰）
-- **公共方法**：复杂业务逻辑方法必须注释，标注关键步骤
-- **私有方法**：非显而易见时注释
-- **不需要注释**：简单的委托调用、参数透传
-
-**示例（对现有 AuthService 的补全建议）：**
-```java
-/**
- * 认证服务
- * 处理用户登录验证、Token 生成和刷新
- */
-@Slf4j
 @Service
-public class AuthService {
-    
-    /**
-     * 用户密码登录
-     * 验证流程：查用户 -> 校验密码 -> 检查禁用 -> 生成双 Token -> 记录审计
-     * 注意：用户名不存在和密码错误返回相同消息（防用户枚举）
-     */
-    public Map<String, Object> login(String username, String password, String ipAddress) { ... }
+@Slf4j
+public class HardwareSseService {
+    private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
+
+    public SseEmitter createEmitter() {
+        String clientId = UUID.randomUUID().toString();
+        SseEmitter emitter = new SseEmitter(0L); // Never timeout
+
+        emitter.onCompletion(() -> emitters.remove(clientId));
+        emitter.onTimeout(() -> emitters.remove(clientId));
+        emitter.onError(e -> {
+            log.warn("Hardware SSE client {} error: {}", clientId, e.getMessage());
+            emitters.remove(clientId);
+        });
+
+        emitters.put(clientId, emitter);
+
+        // Send connected event immediately so client isn't pending
+        try {
+            emitter.send(SseEmitter.event().name("connected").data("Hardware monitoring connected"));
+        } catch (IOException e) {
+            emitter.complete();
+        }
+
+        log.debug("Hardware SSE connected: {} (total: {})", clientId, emitters.size());
+        return emitter;
+    }
+
+    public void broadcast(String eventName, Object data) {
+        if (emitters.isEmpty()) return;
+        emitters.forEach((id, emitter) -> {
+            try {
+                emitter.send(SseEmitter.event()
+                    .name(eventName)
+                    .data(data, MediaType.APPLICATION_JSON));
+            } catch (IOException e) {
+                log.debug("Hardware SSE broadcast failed for {}: {}", id, e.getMessage());
+                emitters.remove(id);
+            }
+        });
+    }
+
+    public int getActiveConnectionCount() {
+        return emitters.size();
+    }
 }
 ```
 
-#### 第 4 层：Entity / DTO / VO 层（选择性注释）
+### Pattern 3: OSHI Singleton + @Scheduled Sampling
 
-**注释策略：**
+**What:** `SystemInfo` is instantiated exactly once per application lifetime. A `@Scheduled(fixedRate=2000)` method runs the sampling loop and updates a cached `HardwareMetricsDTO`.
+
+**Why:**
+1. OSHI documentation explicitly warns against creating `SystemInfo` per-request — JNA class loading and native library discovery is expensive (100-500ms).
+2. CPU load requires two tick samples with a delay between them — periodic sampling is the natural fit.
+3. Separate data collection from data serving (single writer, multiple readers pattern).
+
+**Example:**
 ```java
+@Service
+@Slf4j
+public class HardwareMetricsService {
+
+    // OSHI singleton — instantiated once
+    private final SystemInfo systemInfo = new SystemInfo();
+    private final HardwareAbstractionLayer hal = systemInfo.getHardware();
+    private final CentralProcessor cpu = hal.getProcessor();
+    private final GlobalMemory memory = hal.getMemory();
+
+    // Thread-safe cached metrics — volatile for visibility
+    private volatile HardwareMetricsDTO currentMetrics;
+
+    // CPU tick history array — needed for delta calculation
+    private long[] previousCpuTicks;
+
+    // Network history — needed for throughput calculation
+    private final Map<String, NetworkMetricsSnapshot> previousNetworkStats = new ConcurrentHashMap<>();
+
+    // In-memory ring buffer for trend history (last 60 samples = 2 minutes at 2s interval)
+    private final RingBuffer<HardwareMetricsDTO> historyBuffer = new RingBuffer<>(60);
+
+    @PostConstruct
+    public void init() {
+        // Warm up: first call to getSystemCpuLoadTicks() may return -1
+        this.previousCpuTicks = cpu.getSystemCpuLoadTicks();
+    }
+
+    @Scheduled(fixedRateString = "${monitor.hardware.sampling-interval:2000}")
+    public void sample() {
+        HardwareMetricsDTO metrics = new HardwareMetricsDTO();
+        metrics.setTimestamp(System.currentTimeMillis());
+        metrics.setCpu(sampleCpu());
+        metrics.setMemory(sampleMemory());
+        metrics.setDisks(sampleDisks());
+        metrics.setNetwork(sampleNetwork());
+
+        this.currentMetrics = metrics;
+        historyBuffer.add(metrics);
+    }
+
+    private CpuMetricsDTO sampleCpu() {
+        long[] currentTicks = cpu.getSystemCpuLoadTicks();
+        double systemLoad = cpu.getSystemCpuLoadBetweenTicks(previousCpuTicks) * 100;
+        double[] perCoreLoad = cpu.getProcessorCpuLoadBetweenTicks(previousCpuTicks);
+
+        this.previousCpuTicks = currentTicks;
+
+        CpuMetricsDTO dto = new CpuMetricsDTO();
+        dto.setSystemLoad(Math.round(systemLoad * 10.0) / 10.0);
+        dto.setPerCoreLoad(ArrayUtils.toList(perCoreLoad));
+        dto.setPhysicalCores(cpu.getPhysicalProcessorCount());
+        dto.setLogicalCores(cpu.getLogicalProcessorCount());
+        return dto;
+    }
+
+    // ... similar for memory, disks, network
+
+    public HardwareMetricsDTO getCurrentMetrics() {
+        return currentMetrics;
+    }
+
+    public List<HardwareMetricsDTO> getHistory() {
+        return historyBuffer.snapshot();
+    }
+}
+```
+
+### Pattern 4: Frontend SSE Composable
+
+**What:** A `useHardwareSse` composable encapsulates SSE connection lifecycle, event parsing, and cleanup.
+
+**Why:** Follows the project's Composition API conventions. Keeps SSE logic reusable. Auto-cleans on component unmount via `onUnmounted`.
+
+**Example:**
+```typescript
+// composables/useHardwareSse.ts
+import { onUnmounted, ref } from 'vue'
+import type { HardwareMetricsDTO } from '@/api/modules/hardware'
+
+export function useHardwareSse() {
+  const connected = ref(false)
+  const metrics = ref<HardwareMetricsDTO | null>(null)
+  const error = ref<string | null>(null)
+  let eventSource: EventSource | null = null
+
+  function connect(url: string = '/api/monitor/hardware/subscribe') {
+    if (eventSource) disconnect()
+
+    eventSource = new EventSource(url)
+
+    eventSource.addEventListener('metric-update', (event: MessageEvent) => {
+      try {
+        metrics.value = JSON.parse(event.data)
+        error.value = null
+      } catch (e) {
+        error.value = '解析监控数据失败'
+      }
+    })
+
+    eventSource.addEventListener('connected', () => {
+      connected.value = true
+      error.value = null
+    })
+
+    eventSource.onerror = () => {
+      connected.value = false
+      error.value = 'SSE 连接断开，正在重连...'
+      // EventSource auto-reconnects — no manual code needed
+    }
+  }
+
+  function disconnect() {
+    eventSource?.close()
+    eventSource = null
+    connected.value = false
+    error.value = null
+  }
+
+  onUnmounted(disconnect)
+
+  return { connect, disconnect, connected, metrics, error }
+}
+```
+
+### Pattern 5: ECharts Gauge + Line Chart (Reuse QpsChart Pattern)
+
+**What:** The project already uses ECharts 6.x + vue-echarts 8.x in the RocketMQ dashboard (`QpsChart.vue`). Hardware monitoring adds gauge charts for current utilization and line charts for trends.
+
+**Example (CpuGauge.vue):**
+```vue
+<script lang="ts">
 /**
- * [实体类说明：对应的数据库表、业务含义]
- * 在数据库字段命名清晰时，可以省略大部分字段注释
- * 仅在以下情况必须添加字段注释：
- *   1. 字段含义与命名不一致（如 deleted 表示逻辑删除）
- *   2. 字段有特殊约束（如 status 的可选值）
- *   3. 数值字段需要说明单位/范围
+ * CPU 利用率仪表盘组件。以仪表盘形式展示当前 CPU 使用率，附带每个逻辑核心的负载柱状图。
  */
-@Data
-@TableName("sys_xxx")
-public class XxxEntity {
-    @TableId(type = IdType.AUTO)
-    private Long id;               // 不注释 — 自解释
+</script>
 
-    private String name;           // 不注释 — 自解释
+<script lang="ts" setup>
+import VChart from 'vue-echarts'
+import { use } from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import { GaugeChart, BarChart } from 'echarts/charts'
+import { computed } from 'vue'
 
-    private Integer status;        // 必须注释 — 需要说明可选值：0=启用, 1=禁用
+use([CanvasRenderer, GaugeChart, BarChart])
 
-    private Integer deleted;       // 必须注释 — 与命名不一致，表示逻辑删除
-}
-```
+const props = defineProps<{
+  /** CPU 整体利用率 0-100 */
+  systemLoad: number
+  /** 每个逻辑核心的利用率数组 */
+  perCoreLoad: number[]
+}>()
 
-**DTO/VO 注释规则：**
-- 类注释必须有（说明 DTO/VO 的用途和与实体的关系）
-- 字段注释仅在有特殊含义时添加
-- `ApiResponse` 现有注释是标杆
-
-#### 第 5 层：Mapper / DAO 层（最低注释优先级）
-
-**注释策略：**
-- 接口方法签名即文档，通常不需要额外注释
-- 仅在以下情况添加注释：
-  - 自定义复杂 SQL 的方法（非 MyBatis Plus 自动生成）
-  - 多表关联查询
-  - 有特殊参数的查询
-
-```java
-@Mapper
-public interface XxxMapper extends BaseMapper<XxxEntity> {
-
-    /** 注意：返回 null 时上层应处理空值 */
-    XxxVO selectUserWithRoleName(@Param("id") Long id);
-
-    /** 仅查询未删除用户（deleted=0 已在 SQL 中过滤） */
-    XxxEntity findByUsername(@Param("username") String username);
-}
-```
-
-#### 第 6 层：前端组件（Vue SFC 注释策略）
-
-```
-Vue SFC 注释分布：
-<script setup> 
-  ├── 组件级别：顶部注释说明组件职责（必要）
-  ├── Props / Emits 定义：可选（类型定义即文档，特殊行为需注释）
-  ├── 响应式状态：按块注释分组（现有模式好）
-  ├── 方法：仅复杂方法需 JSDoc
-  └── 生命周期钩子：简单钩子不注释
+const gaugeOption = computed(() => ({
+  series: [{
+    type: 'gauge',
+    startAngle: 90,
+    endAngle: -270,
+    max: 100,
+    pointer: { show: true },
+    progress: {
+      show: true,
+      width: 8
+    },
+    axisLine: {
+      lineStyle: { width: 8 }
+    },
+    axisLabel: { show: false },
+    detail: {
+      formatter: '{value}%',
+      fontSize: 24
+    },
+    data: [{ value: props.systemLoad }]
+  }]
+}))
+</script>
 
 <template>
-  ├── 大区块模板：HTML 注释分隔（必须）
-  └── 单行模板：不注释
-
-<style scoped>
-  — 不注释（CSS 类名应自解释）
-</style>
+  <v-chart :option="gaugeOption" autoresize style="height: 250px" />
+</template>
 ```
 
-**示例（对 TopicList.vue 的补全建议）：**
-```vue
-<script lang="ts" setup>
-/**
- * Topic 列表管理组件
- * 提供 Topic 的查询、创建、删除操作
- * 依赖：getTopicList / createTopic / deleteTopic API
- */
-import { ... }
+### Pattern 6: In-Memory Ring Buffer for Trend History
 
-// ===== 状态管理 =====
-const loading = ref(false)
-const topicList = ref<TopicVO[]>([])
+**What:** A fixed-size circular buffer storing the last N metric samples for trend display.
 
-// ===== 搜索表单 =====
-const searchForm = reactive({ keyword: '' })
+**Why:** No database needed for short-term history (2 minutes at 2s intervals = 60 samples). The ring buffer is lock-free for the single writer, or uses `ReentrantReadWriteLock` for the snapshot method.
 
-// ===== 创建对话框 =====
-const createDialogVisible = ref(false)
-const createForm = reactive<CreateTopicParams>({ ... })
-
-/**
- * 加载 Topic 列表
- * 调用 /api/rocketmq/topics 接口
- */
-async function loadData() { ... }
-
-/**
- * 创建新 Topic
- * 先验证名称合法性，再调用创建接口
- * 成功后刷新列表
- */
-async function handleCreate() { ... }
-</script>
-```
-
-#### 第 7 层：前端 API 和 Store（现状保持）
-
-**现有模式已经很好，只需统一：**
-- 每个 API 模块文件顶部必须有注释说明该模块管理的资源
-- 每个接口函数必须有 `@param` 和功能说明（现有 rocketmq.ts 是标杆）
-- Store 的每个 action 必须有用途说明（现有 user.ts 是标杆）
-- Router guards 需要有注释说明守卫策略（现有 guards.ts 是标杆）
-
----
-
-### 文件头约定
-
-**Java 文件头：**
+**Example:**
 ```java
-/*
- * 文件名: Xxx.java
- * 描述: [TODO - 只在首次创建时填写，不做长期维护]
- * 
- * 本文件属于 admin-system 项目
- */
-package cn.coderstory.springboot.xxx;
+@Component
+public class RingBuffer<T> {
+    private final T[] buffer;
+    private final int capacity;
+    private int head = 0;
+    private int count = 0;
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
+    @SuppressWarnings("unchecked")
+    public RingBuffer(@Value("${monitor.hardware.history-size:60}") int capacity) {
+        this.capacity = capacity;
+        this.buffer = (T[]) new Object[capacity];
+    }
+
+    public void add(T item) {
+        lock.writeLock().lock();
+        try {
+            buffer[head] = item;
+            head = (head + 1) % capacity;
+            if (count < capacity) count++;
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    public List<T> snapshot() {
+        lock.readLock().lock();
+        try {
+            List<T> result = new ArrayList<>(count);
+            for (int i = 0; i < count; i++) {
+                int idx = (head - count + i + capacity) % capacity;
+                result.add(buffer[idx]);
+            }
+            return result;
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+}
 ```
 
-**Vue/TS 文件头：**
-```typescript
-/**
- * 文件名: Xxx.vue
- * 描述: [TODO - 只在首次创建时填写]
- */
+## Anti-Patterns to Avoid
 
-/**
- * 文件名: Xxx.ts
- * 描述: [TODO - 只在首次创建时填写]
- */
-```
+### Anti-Pattern 1: Creating SystemInfo Per-Request
 
-**注意：** 文件头注释不做长期维护。文件名和路径本身已经说明了大部分信息。文件头只在首次创建时填写"描述"字段，之后不做要求。
+**What:** Instantiating `new SystemInfo()` on every REST API call or in every controller method.
 
-**不作要求的原因是：**
-1. 文件名+包路径已经提供了足够的上下文
-2. 文件头注释极易过时且无人维护
-3. Git log 比文件头注释更能准确说明文件目的
+**Why bad:** OSHI initialization performs JNA class loading, native library discovery, and Windows COM initialization. This takes 100-500ms per call and can cause resource leaks.
 
----
+**Instead:** Create `SystemInfo` once as a `private final` field in `HardwareMetricsService`. This follows the "initialize once, reuse forever" pattern from OSHI's own documentation.
 
-### 配置文件的注释组织
+**Detection:** Look for `new SystemInfo()` outside of `@PostConstruct` or constructor.
 
-**YAML 配置注释层级：**
+### Anti-Pattern 2: Running wmic/typeperf via Runtime.exec()
 
-```
-# ===========================================
-# [区块标题] — 一级标题（全等号包围）
-# [区块说明]
-# ===========================================
-键:
-  子键: 值               # 行内注释
+**What:** Running `Runtime.getRuntime().exec("wmic cpu get loadpercentage")` or `typeperf` commands.
 
-  # ========== [子区块标题] ==========
-  # [子区块说明]
-  子键2:
-    属性: 值             # 行内注释（说明作用、默认值、可选值）
-```
+**Why bad:** Each shell exec spawns a new process (800ms+ per call at 2s intervals). Output parsing is fragile (locale-dependent formatting). Error handling is poor (what if wmic is not in PATH?). This puts unnecessary load on the WMI provider.
 
-**现有 YAML 注释已经很好，需补充的：**
-1. 每个配置项注释说明是否需要环境变量覆盖（已有示例：`datasource.yaml` 的 `DB_USER` / `DB_PASSWORD`）
-2. 数值配置项标注默认值和单位（已有示例：`expiration: 86400000 # Access Token 过期时间（毫秒），24 小时`）
-3. 布尔配置项说明开放/关闭的效果
+**Instead:** Use OSHI, which calls PDH (Performance Data Helper) API directly via JNA (~10ms per call) with proper error handling.
 
-**Gradle 构建文件注释：**
-```kotlin
-// ==== 数据库 ====
-implementation(libs.mysql.connector)  // MySQL JDBC 驱动
-implementation(libs.mybatis.plus)      // MyBatis Plus ORM
+**Detection:** Search for `Runtime.exec`, `ProcessBuilder`, `wmic`, or `typeperf` in code.
 
-// ==== 消息队列 ====
-implementation(libs.rocketmq.client)   // RocketMQ 客户端核心库
-```
+### Anti-Pattern 3: Mixing Seckill Metrics and Hardware Metrics
 
-**ESLint 配置注释：**
-```javascript
-// 仅启用基本规则，代码风格统一放在后续 Phase
-```
+**What:** Adding hardware monitoring methods to the existing `MonitorService` or the existing `/api/monitor/metrics` endpoint.
 
----
+**Why bad:** The existing `MonitorService` fetches **Redis-based seckill metrics** (concurrent count, QPS keys). Hardware monitoring manages **OS-level metrics** (CPU, memory, disk) via OSHI. These are completely different:
+- Different data sources (Redis vs native JNA)
+- Different refresh rates (event-driven vs 2s fixed-rate)
+- Different consumers (seckill operators vs infrastructure admins)
 
-### 跨引用策略
+**Instead:** Create `HardwareMetricsService` under `service/monitor/hardware/` and expose via `/api/monitor/hardware/metrics`.
 
-**什么时候需要跨文件/跨类引用注释：**
+### Anti-Pattern 4: Per-User SSE Routing for Broadcast Data
 
-| 场景 | 引用方式 | 示例 |
-|------|----------|------|
-| Controller 引用 Service | `@see` 或不引用 | Controller 注释应自己说明职责 |
-| Service 调用 Mapper | 不引用 | 依赖注入已说明 |
-| 配置类引用 YAML | 在类注释中说明配置前缀 | `@ConfigurationProperties(prefix = "seckill")` |
-| 各层 DTO 使用关系 | 在类注释中说明 | `用于 XxxController 的 Yyy 接口返回值` |
-| 跨模块调用 | 在方法注释中说明 | `调用 authService.login() 完成认证` |
-| AOP 切面 | 注释说明切点和逻辑 | `@Pointcut 表达式` + 类注释说明拦截策略 |
+**What:** Mapping SSE connections to specific users and only sending events addressed to that user.
 
-**关键规则：**
-1. **不在注释中写文件名/行号** —— 重构时立即过时
-2. **不在注释中写 Git 信息** —— Git blame 才是正确的做法
-3. **可以写包名和类名** —— IDE 可点击跳转，但不需要 `@see` 标签（除非是外部库）
-4. **不要在 Entity 注释中引用 Mapper** —— MyBatis Plus 框架约束已足够
+**Why bad:** Hardware metrics are system-wide and identical for all viewers. Per-user routing adds needless complexity (user-to-emitter map, auth check on every broadcast).
 
-**负示例（不要这样写）：**
-```java
-// BAD: 文件名会过时
-// 参见 XxxController.java 第 42 行的 login() 方法
+**Instead:** Use a simple broadcast pattern — all SSE connections receive identical `metric-update` events. Authenticate at connection time (the JWT filter already handles this).
 
-// BAD: Git 信息不属于注释
-// Modified by Zhang San on 2026-01-01
-```
+### Anti-Pattern 5: Polling as Primary Data Channel
 
-**正示例（推荐这样写）：**
-```java
-// GOOD: 类引用比文件名稳定
-// 返回数据格式见 AuthController.login() 的 ApiResponse 约定
-```
+**What:** Frontend polls `GET /api/monitor/hardware/metrics` every 2 seconds instead of using SSE.
 
----
+**Why bad:** Each poll is a full HTTP request/response with headers, authentication filter chain, serialization, and deserialization. At 2s intervals with 10 clients, that is 5 requests/second just for no-op overhead.
 
-### 注释维护策略
+**Instead:** Use SSE for real-time streaming. Keep the REST endpoint only for:
+1. Initial page load (set initial state before SSE connects)
+2. Clients that do not support SSE (rare, but possible in restricted browsers)
+3. Diagnostic/debugging via curl
 
-#### 自动化检查
+### Anti-Pattern 6: Storing History in Database
 
-**后端维护机制：**
+**What:** Writing every metric sample (every 2 seconds) to a MySQL table via MyBatis Plus.
 
-| 工具 | 可以检查什么 | 是否适合本需求 |
-|------|-------------|--------------|
-| Checkstyle JavadocMethod | 公共方法缺少 Javadoc | 太严格，会报大量误报 |
-| Checkstyle JavadocType | 公共类缺少 Javadoc | 太严格 |
-| SpotBugs | 不检查注释 | 不适用 |
-| PMD CommentRequired | 可配置哪些元素需要注释 | **建议启用（宽松模式）** |
-| ArchUnit | 架构规则 | 不检查注释 |
+**Why bad:** At 2s intervals, that is 43,200 rows/day per metric. MySQL is not optimized for time-series writes at this frequency. The existing schema would need a new migration, and the database is already serving the admin system's transactional data.
 
-**推荐方案：不强制自动化注释检查**
+**Instead:** Use an in-memory ring buffer for short-term history (2 minutes). If long-term history is needed later, add a dedicated time-series store (InfluxDB, Prometheus, or a separate metrics table with downsampling).
 
-理由：
-1. 该项目已启用 Checkstyle、PMD、SpotBugs，目前均未配置注释规则，说明团队选择不强制执行
-2. 注释的"质量"无法用自动化工具衡量（写了不等于写好）
-3. 强行启用会大量误报，降低团队对 lint 工具的信任
+## Scalability Considerations
 
-**可行的轻量方案：**
-```xml
-<!-- checkstyle.xml 可选添加，但设为忽略 -->
-<!-- <module name="JavadocMethod">
-  <property name="severity" value="ignore"/>
-</module> -->
-```
+| Concern | At 1-10 users | At 100 users | At 1000+ users |
+|---------|--------------|--------------|----------------|
+| **SSE connections** | Direct SseEmitter per connection (trivial) | Tomcat thread pool needs tuning (`server.tomcat.max-threads=200`) | Need WebFlux for reactive SSE or separate push server |
+| **OSHI sampling overhead** | Single `@Scheduled` thread, ~10-50ms per call at 2s interval | Same — sampling cost is independent of user count. 0.5-2.5% CPU overhead | Consider dedicated monitoring agent (decoupled from admin server) |
+| **History storage** | In-memory ring buffer (60 entries, ~100KB) | Same — buffer is fixed-size regardless of users | Export to InfluxDB or Prometheus for long-term queries |
+| **SSE broadcast cost** | Iterating ~10 emitters, negligible | Iterating ~100 emitters, sub-millisecond | Need event bus (Redis pub/sub) for multi-instance fan-out |
 
-**前端维护机制：**
+### Recommendations by Scale
 
-ESLint 的 `require-jsdoc` 规则：**不启用**，理由同上。
+**Current scale (single instance, <10 concurrent users):**
+- Direct `ConcurrentHashMap<String, SseEmitter>`
+- In-memory ring buffer (60 samples = 2 minutes history)
+- OSHI sampling in the same JVM
+- No changes to infrastructure
 
-#### 人工维护机制
+**Future scale (2+ instances, load-balanced):**
+- Redis pub/sub for SSE fan-out (so any instance can push to any client)
+- Dedicated `@Async` event publisher to avoid blocking the sampling thread
+- Refactor sampling to a separate thread pool
 
-| 场景 | 维护方式 | 责任方 |
-|------|----------|--------|
-| 新增配置属性 | 必须同时写 Javadoc | 开发者 |
-| 新增 Controller 接口 | 必须写方法注释 | 开发者 |
-| 修改 API 行为 | 更新相关注释 | 开发者 |
-| 新增复杂业务逻辑 | 添加关键步骤注释 | 开发者 |
-| 清理过时注释 | Code Review 发现 | Reviewer |
-| 重构后更新注释 | 重构完成前检查 | 开发者 |
+**Future scale (1000+ concurrent connections):**
+- Separate monitoring agent service (decouples OSHI from admin server)
+- WebFlux-based SSE for non-blocking I/O
+- Prometheus + Grafana for long-term dashboards (the admin page becomes a thin viewer)
 
-#### PR Review 清单条目
+## Integration Points
 
-在 `.github/PULL_REQUEST_TEMPLATE.md` 或 Review 清单中添加：
+### Backend
 
-```
-注释检查清单：
-- [ ] 新增的 `@ConfigurationProperties` 字段是否有 Javadoc？
-- [ ] 新增的 Controller 方法是否有 HTTP 方法和路径说明？
-- [ ] 新增的复杂业务逻辑是否有关键步骤注释？
-- [ ] 删除/修改功能时，同步删除了关联的过时注释？
-- [ ] 没有对 Getter/Setter 或自解释代码写废话注释？
-```
+| Point | What Changes | Risk | Effort |
+|-------|-------------|------|--------|
+| `libs.versions.toml` | Add `oshi-core` version entry | Low | 1 line |
+| `build.gradle.kts` | Add `implementation(libs.oshi.core)` | Low | 1 line |
+| `application.yaml` (or `business.yaml`) | Add `monitor.hardware.sampling-interval` config | Low | 5 lines |
+| `build.gradle.kts` | Add `@EnableScheduling` to config or main class | Low | 1 annotation |
 
-#### 过时注释治理
+### Frontend
 
-**发现过时注释的处理流程：**
-1. 在对应代码旁添加 `// TODO(注释过期): [说明]` 
-2. 或者在重构时一并清理
-3. 不要在同一个 PR 中"只更新注释" —— 注释过时通常伴随着代码变更
+| Point | What Changes | Risk | Effort |
+|-------|-------------|------|--------|
+| `routes.ts` | Add route entry under `/monitor/hardware` | Low | 8 lines |
+| Sidebar/menu config | Add menu item linking to hardware page | Low | 5 lines |
+| `package.json` | ECharts already installed, no change needed | None | 0 lines |
 
----
+### No Changes Needed
 
-### 各层文档级别矩阵
+| What | Why |
+|------|-----|
+| **SecurityConfig** | New endpoints use existing JWT auth filter; no new permit rules needed |
+| **Database schema** | No new tables (metrics are transient, stored in-memory) |
+| **Flyway migration** | No schema changes |
+| **Existing MonitorController/MonitorService** | Left untouched — seckill metrics remain separate |
+| **MonitorDashboard.vue** | Left untouched — or optionally add a link to the new hardware page |
+| **CORS config** | Already configured for all `/api/**` paths |
 
-| 层 | 文档级别 | 必须注释 | 可选注释 | 不注释 |
-|----|----------|----------|----------|--------|
-| YAML 配置 | L3 — 详细文档 | 每个区块标题 + 关键属性行内说明 | 显而易见的属性 | — |
-| Gradle 构建 | L1 — 关键点 | 依赖分组 | 版本号说明 | 标准配置 |
-| `@ConfigurationProperties` | L3 — 详细文档 | 类 Javadoc, 每个字段 Javadoc | 内部静态类 Javadoc | 无 |
-| `@Configuration` 类 | L2 — 方法级 | Bean 方法 Javadoc | 类 Javadoc | 自解释方法 |
-| Controller | L2 — API 级 | 类+方法 Javadoc | 私有帮助方法 | 自解释小方法 |
-| Service Interface | L2 — 接口级 | 公共方法 Javadoc | 类 Javadoc | 参数/返回值自解释 |
-| Service Impl | L1 — 关键点 | 复杂逻辑注释 | 类 Javadoc | 简单委托方法 |
-| Entity | L0-L1 — 仅特殊字段 | 字段含义模糊时 | 字段有约束/单位时 | 自解释字段 |
-| DTO/VO | L1 — 类级 | 类 Javadoc | 特殊字段 | 自解释字段 |
-| Mapper | L0 — 最小 | 自定义 SQL 方法 | 参数说明 | 自动生成方法 |
-| AOP | L2 — 方法级 | 类 Javadoc + Pointcut 说明 | 通知方法 | — |
-| Exception | L0-L1 | 类 Javadoc（可选） | — | 自解释方法 |
-| Vue 组件 script | L2 — 逻辑级 | 组件职责 + 复杂方法 | 状态分组 | 自解释模板 |
-| Vue 组件 template | L1 — 区块级 | HTML 区块分隔 | 行内分组 | 单行模板 |
-| API 模块 | L2 — 接口级 | 函数 Javadoc + @param | 接口类型 | 自解释参数 |
-| Store | L2 — Action 级 | Action 用途 | 状态属性 | 计算属性 |
-| Router | L1 — 关键点 | Guard 策略 | 路由分组 | — |
-| Type/Interface | L1 — 类级 | Interface Javadoc | 字段注释 | 自解释字段 |
-| ESLint 配置 | L0-L1 | 非标准规则说明 | — | 标准配置 |
+## Suggested Implementation Order
 
----
+### Phase 1: Backend Service + REST API (2-3 hours)
 
-### 层注释示例对照
+1. Add `oshi-core` dependency to `libs.versions.toml`:
+   ```toml
+   [versions]
+   oshi = "6.13.0"
 
-**好的注释（保留或可采纳）：**
+   [libraries]
+   oshi-core = { module = "com.github.oshi:oshi-core", version.ref = "oshi" }
+   ```
+2. Create DTOs: `HardwareMetricsDTO`, `CpuMetricsDTO`, `MemoryMetricsDTO`, `DiskMetricsDTO`, `NetworkMetricsDTO`
+3. Create `HardwareMetricsService` with OSHI singleton, `@Scheduled` sampling, and in-memory cache
+4. Create `HardwareMonitorController` with `GET /api/monitor/hardware/metrics`
+5. Add `@EnableScheduling` to application main class
+6. Verify: `curl http://localhost:8080/api/monitor/hardware/metrics` returns JSON
 
-| 文件 | 示例位置 | 好的原因 |
-|------|----------|----------|
-| `SeckillProperties.java` | 类注释 + 每个字段 `/** ... */` | 完整的配置说明、默认值标记、功能列表 |
-| `RedissonConfig.java` | `RedissonClient` Bean 方法注释 | 说明了适用场景和集群建议 |
-| `AuthController.java` | `login()`, `refresh()`, `logout()` | 简短准确，说明了业务含义 |
-| `application.yaml` | 虚拟线程配置注释 | 说明了技术背景和效果 |
-| `datasource.yaml` | JDBC URL 连接参数 | 逐参数说明了意义 |
-| `rocketmq.ts` | 所有 API 函数 | 一致的 JSDoc 格式，`@param` 齐全 |
-| `user.ts` (store) | `login()`, `fetchCurrentUser()` | 方法用途 + 边际情况说明 |
-| `request.ts` | `extractErrorMessage()` | 复杂逻辑的分情况说明 |
+### Phase 2: SSE Streaming (1-2 hours)
 
-**差的注释（应避免）：**
+1. Create `HardwareSseService` modeled on existing `SeckillSseService`
+2. Add SSE endpoint to `HardwareMonitorController`
+3. Modify `HardwareMetricsService` (or a dedicated scheduler bean) to call `sseService.broadcast()` after each sample
+4. Verify: `curl -N http://localhost:8080/api/monitor/hardware/subscribe` streams events
 
-| 示例 | 为什么差 | 改进 |
-|------|----------|------|
-| `// 获取用户列表` 在 `getUserList()` 上 | 方法名已说明 | 删除，或改成说明分页逻辑 |
-| `// 用户 ID` 在 `private Long userId` 字段上 | 字段名自解释 | 删除 |
-| `// 创建时间` 在 `createTime` 字段上 | 字段名自解释 | 删除，除非说明自动填充策略 |
-| `@param username 用户名` | 参数名自解释 | 删除，或改成 `不允许为空` |
-| `// 循环遍历列表` 在 for 循环上 | 循环代码自解释 | 删除 |
+### Phase 3: Frontend Page (3-4 hours)
 
----
+1. Create `useHardwareSse` composable
+2. Create `api/modules/hardware.ts`
+3. Create gauge components: `CpuGauge.vue`, `MemoryGauge.vue`, `DiskGauge.vue`
+4. Create `NetworkChart.vue`
+5. Create `HardwareMonitorPage.vue` with 2x2 grid layout (CPU, Memory, Disk, Network)
+6. Add route in `routes.ts`
+7. Add sidebar menu entry
 
-### 当前已有注释状态（用于 Roadmap Phase 编排）
+### Phase 4: Polish (1-2 hours)
 
-**已有注释的文件（无需增加注释，只需检查一致性）：**
+1. Add loading state while SSE connects
+2. Add reconnection status indicator
+3. Add trend history chart (past 2 minutes of data)
+4. Add per-core CPU breakdown to CpuGauge
+5. Handle SSE disconnection gracefully (show stale data indicator)
 
-| 文件 | 当前状态 | 需要动作 |
-|------|----------|----------|
-| `AuthController.java` | 好 | 无 |
-| `RocketMQController.java` | 好 | 无 |
-| `SeckillProperties.java` | 好（标杆） | 无 |
-| `RedissonConfig.java` | 好（标杆） | 无 |
-| `RocketMQConfig.java` | 好 | 无 |
-| `ApiResponse.java` | 好 | 无 |
-| `application.yaml` | 好 | 无 |
-| 所有 config YAML | 好 | 无 |
-| `build.gradle.kts` | 好 | 无 |
-| `auth.ts` (API) | 好 | 无 |
-| `rocketmq.ts` (API) | 好（标杆） | 无 |
-| `user.ts` (store) | 好（标杆） | 无 |
-| `router/*.ts` | 好 | 无 |
-| `guards.ts` | 好 | 无 |
-| `request.ts` | 好 | 无 |
-| `types.ts` | 好 | 无 |
+## Sources
 
-**需要补全注释的文件（按 Phase 优先级）：**
-
-| 优先级 | 文件 | 当前状态 | 需要补充的内容 |
-|--------|------|----------|---------------|
-| P0 | `BusinessException.java` | 无注释 | 类 Javadoc：说明异常体系和使用方式 |
-| P0 | `SecurityConfig.java` | 无注释 | 类注释 + 过滤链策略说明 |
-| P0 | `CorsConfig.java` | 无注释 | 类注释 + CORS 策略说明 |
-| P0 | `WebConfig.java` | 无注释 | 类注释 + 配置内容说明 |
-| P0 | `PasswordEncoder.java` | 无注释 | 类注释：说明加密策略和强度 |
-| P1 | `JwtTokenProvider.java` | 无类注释 | 类 Javadoc：说明 Token 结构和验证流程 |
-| P1 | `JwtAuthenticationFilter.java` | 无类注释 | 类 Javadoc：说明过滤逻辑和豁免路径 |
-| P1 | `AuditAspect.java` | 无类注释 | 类 Javadoc：说明 AOP 审计策略和排除规则 |
-| P2 | `AuthService.java` | 有零星注释 | 类注释 + 核心方法注释 |
-| P2 | `RocketMQTopicServiceImpl.java` | 无注释 | 类注释 + 复杂逻辑方法注释 |
-| P3 | `User.java` (Entity) | 无注释 | 仅 `deleted`/`status` 等特殊字段注释 |
-| P3 | `UserMapper.java` | 无注释 | 自定义方法注释 |
-| P3 | `RocketMQController.java` | 已有注释 | 检查一致性即可 |
-
-**备注：** P0 为当前 Phase 必须完成，P1 为紧接 Phase，P2 为后续 Phase，P3 为低优先级。
-
----
-
-### 注释写作规则总结
-
-```
-DO:
-  1. 写"为什么"——为什么用这种算法？为什么返回 null 而不是空集合？
-  2. 写"约束"——参数不能为 null，返回值可能为 null
-  3. 写"对比"——为什么选 A 方案不选 B
-  4. 写"注意事项"——复杂线程安全、性能影响、API 兼容性
-  5. 用中文写注释（项目规范要求）
-  6. Controller 方法注释包含 HTTP 方法和路径
-  7. 配置属性注释包含默认值和单位
-
-DON'T:
-  1. 写重复代码的注释（"i++ 将 i 加 1"）
-  2. 写过时的文件头（"作者：张三 最后修改：2024"）
-  3. 写显而易见的注释（"// 获取用户信息" 在 getUserInfo() 上）
-  4. 写 TODO 留到永远（有 TODO 必须在同 Phase 解决）
-  5. 写归档性注释（"这段代码已废弃"——应该直接删代码）
-  6. 在 Entity 字段上写和字段名完全一样的注释
-  7. 在 Getter/Setter 上写任何注释
-```
-
----
-
-### 来源
-
-- 项目实际代码审查（springboot/ 和 app-vue/ 目录全部文件的注释模式分析）
-- Checkstyle 配置分析（`config/checkstyle/checkstyle.xml` —— 未启用注释规则）
-- ESLint 配置分析（`eslint.config.js` —— 未启用注释规则）
-- 行业最佳实践：Google Java Style Guide 注释部分, Vue Style Guide 文档建议
+- OSHI 7.1.0 GitHub Releases: https://github.com/oshi/oshi/releases (HIGH confidence, official releases page, accessed 2026-05-09)
+- OSHI Official Site: https://www.oshi.ooo/ (HIGH confidence, official project site)
+- OSHI Windows Implementation DeepWiki: https://deepwiki.com/oshi/oshi/4.1-windows-implementation (MEDIUM confidence, community analysis of OSHI internals)
+- Maven Central OSHI versions (libraries.io): https://libraries.io/maven/com.github.oshi:oshi-core (MEDIUM confidence, package registry data)
+- OSHI FFM module plans (Issue #3123): https://github.com/oshi/oshi/issues/3123 (MEDIUM confidence, GitHub issue with plans)
+- Spring SSE best practices (dev.to): https://dev.to/sadiul_hakim/server-sent-event-133o (MEDIUM confidence, community article)
+- vue-echarts: https://github.com/ecomfe/vue-echarts (HIGH confidence, official GitHub repo)
+- Existing project code: `SeckillSseService.java`, `MonitorController.java`, `QpsChart.vue` (HIGH confidence, verified in codebase)

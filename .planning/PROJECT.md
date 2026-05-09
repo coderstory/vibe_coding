@@ -32,19 +32,27 @@ Vue 3 + Element Plus 管理后台系统，前端使用夏日海滩风主题（�
 - ✓ 修复 Gradle 测试中文路径 ClassNotFoundException — v1.4
 - ✓ 修复 pom.xml 中硬编码的数据库凭证 — v1.4
 
-## Current Milestone: v1.7 注释与文档工程
+## Current Milestone: v1.8 Windows 硬件负载监控
 
-**Goal:** 全项目配置文件和前后端代码添加必要注释，降低新人上手门槛
+**Goal:** 开发 Windows 系统硬件负载监控页面，实时展示 CPU/内存/磁盘/网络等系统指标
 
 **Target features:**
-- 后端 Java 代码注释（Controller/Config/Utils 重点层优先）
-- 前端 Vue/TS 代码注释（组件/API/Store/路由）
-- 配置文件注释（YAML/Gradle/ESLint/npm 等）
-- 适中型注释风格：配置按块注释、代码按类/方法/复杂逻辑注释
+- 后端 OSHI 采集服务 + REST API + SSE 实时推送
+- 前端 CPU/内存仪表盘、磁盘列表、IO/网络图表、1h 趋势图
+- 夏日海滩风主题适配、ADMIN 权限控制
+- TDD 驱动开发，接口可 mock 设计
 
 ### Previous Milestones
 
-**v1.6 代码深度清理与优化 — ✅ 已完成 (2026-05-07)**
+**v1.7 注释与文档工程 — ✅ 已完成 (2026-05-09)**
+
+**Delivered:**
+- 注释标准制定（L0-L3 层级、Javadoc/TSDoc 模板、TODO 管理规则）
+- 后端 L3 层注释补全（Controller/Config/Exception/JWT/AOP 共 40+ 文件）
+- Service 接口注释补全（23 个 Service 接口 + 实现类）
+- Vue 组件注释（38 个组件职责 + Props/Emits 说明）
+- API/Store/Router 注释（12 个 API 模块 + types + store + router）
+- 注释维护机制建立（PR 检查清单 + TODO 月清理 + 季度抽查）
 
 **Delivered:**
 - 后端死代码清理（未用方法/字段/导入/注释块）

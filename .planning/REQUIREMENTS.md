@@ -1,92 +1,115 @@
 # Requirements: Vue + Spring Boot 管理后台
 
-**Defined:** 2026-05-07
+**Defined:** 2026-05-09
 **Core Value:** 提供清晰、高效的企业级管理后台界面，通过夏日海滩风主题营造清爽专业的视觉体验。
 
-## v1.7 Requirements
+## v1.8 Requirements
 
-### 注释标准定义
+Windows 系统硬件负载监控页面，实时展示 CPU/内存/磁盘/网络指标。
 
-- [ ] **STD-01**: 确定注释语言策略（中文注释 + 英文技术术语保留）
-- [ ] **STD-02**: 定义 L0-L3 注释层级规则（什么必须/禁止/可选注释）
-- [ ] **STD-03**: 制定 TODO 管理规则（必须关联 Issue 编号）
-- [ ] **STD-04**: 明确 Javadoc/TSDoc 模板规范（禁止空骨架、禁止`@author`/`@since`）
-- [ ] **STD-05**: 制定 PR Review 注释检查清单
+### 后端服务
 
-### 配置文件注释
+- [ ] **HWM-01**: 系统集成 OSHI 7.x FFM 库，在 JDK 26 上正常采集硬件指标
+- [ ] **HWM-02**: 后端定时采集 CPU 使用率（2s 间隔），支持总体使用率和各核使用率
+- [ ] **HWM-03**: 后端定时采集内存指标（总量、已用、可用
+- 、使用率）
+- [ ] **HWM-04**: 后端定时采集磁盘容量和分区信息
+- [ ] **HWM-05**: 后端定时采集磁盘 IOPS 和读写速度
+- [ ] **HWM-06**: 后端定时采集网络接口吞吐量（上下行速率）
+- [ ] **HWM-07**: 后端提供 REST API 返回当前硬件指标快照
+- [ ] **HWM-08**: 后端维护内存环形缓冲区（360 点 = 1h），支持趋势数据查询
+- [ ] **HWM-09**: 后端采集系统基本信息（OS 版本、运行时间、进程数）
 
-- [ ] **CFG-01**: datasource.yaml 补充段头注释和关键属性行内说明
-- [ ] **CFG-02**: cache.yaml 补充段头注释和关键属性行内说明
-- [ ] **CFG-03**: mq.yaml 补充段头注释和关键属性行内说明
-- [ ] **CFG-04**: security.yaml 补充段头注释和关键属性行内说明
-- [ ] **CFG-05**: business.yaml 补充段头注释和关键属性行内说明
-- [ ] **CFG-06**: application.yaml 补充整体描述和各 Profile 说明
-- [ ] **CFG-07**: build.gradle.kts 和 libs.versions.toml 补充构建块注释
-- [ ] **CFG-08**: ESLint flat config 和 Stylelint 配置补充注释
+### 实时推送
 
-### 后端 Java 代码注释
+- [ ] **HWM-10**: 后端通过 SSE 端点实时推送硬件指标数据
+- [ ] **HWM-11**: SSE 连接实现心跳检测和过期连接自动清理
 
-- [ ] **BKND-01**: 所有 Controller 类补充类级 Javadoc（职责说明）和方法级 `@param`/`@return`
-- [ ] **BKND-02**: 配置类（`@ConfigurationProperties`）补充类 Javadoc 和字段说明
-- [ ] **BKND-03**: `SecurityConfig`、`CorsConfig`、`WebConfig` 等安全/Web 配置类补充注释
-- [ ] **BKND-04**: `BusinessException` 异常体系补充类级和枚举值注释
-- [ ] **BKND-05**: `JwtTokenProvider`、`JwtAuthenticationFilter` 补充类级 + 方法级 Javadoc
-- [ ] **BKND-06**: `AuditAspect` AOP 切面补充注释
-- [ ] **BKND-07**: `PasswordEncoder` 等工具类补充类级 Javadoc
-- [ ] **BKND-08**: ~15 个 Service 接口补充完整 Javadoc（职责 + 方法说明）
+### 前端页面
 
-### 前端 Vue/TS 代码注释
+- [ ] **HWM-12**: 前端硬件监控页面路由和菜单接入
+- [ ] **HWM-13**: CPU 使用率仪表盘环形图 + 核数/型号信息卡片
+- [ ] **HWM-14**: 内存使用率仪表盘环形图 + 总量/已用/可用信息
+- [ ] **HWM-15**: 磁盘分区容量进度条列表
+- [ ] **HWM-16**: 磁盘 IO / 网络吞吐量实时折线图
+- [ ] **HWM-17**: 系统基本信息卡片（OS 版本、运行时间、进程数）
+- [ ] **HWM-18**: 近 1 小时趋势折线图（ECharts 滑动窗口）
+- [ ] **HWM-19**: 前端 SSE 连接管理（自动重连、加载态、错误处理）
+- [ ] **HWM-20**: 夏日海滩风主题适配（配色与现有主题一致）
 
-- [ ] **FRNT-01**: 所有 Vue 组件补充组件职责注释和 `defineProps`/`defineEmits` JSDoc
-- [ ] **FRNT-02**: API 模块函数补充 `@param` 参数说明
-- [ ] **FRNT-03**: Pinia Store 文件补充 Store 职责和 action 说明
-- [ ] **FRNT-04**: Router 模块补充路由说明和 guard 策略注释
+### 安全与打磨
 
-### 注释维护机制
+- [ ] **HWM-21**: 硬件监控 API 需要 ADMIN 角色权限
+- [ ] **HWM-22**: ECharts 实例生命周期管理（dispose、markRaw、300 点上限）
+- [ ] **HWM-23**: 页面加载态、空状态、异常状态处理
+- [ ] **HWM-24**: SSE 断线重连时 UI 状态提示
 
-- [ ] **MAINT-01**: 在 PR Review 流程中加入注释同步检查条目
-- [ ] **MAINT-02**: 建立 TODO 注释定期清理机制
-- [ ] **MAINT-03**: 季度注释漂移抽查
+### TDD 质量保障
 
-## v2 Requirements
+- [ ] **TDD-01**: 后端采集服务设计为接口模式，OSHI 依赖可 mock，便于单元测试
+- [ ] **TDD-02**: SSE 推送服务设计为可测试的接口抽象，支持 mock 客户端验证
+- [ ] **TDD-03**: 后端核心逻辑（采集、计算、缓存）有单元测试覆盖，先写测试后实现
+- [ ] **TDD-04**: 前端 Vue 组件逻辑（composable、图表数据处理）有单元测试覆盖
+- [ ] **TDD-05**: SSE 连接管理 composable 设计为可测试的接口，支持模拟事件源
 
-### API 文档站点
+## 未来需求
 
-- **DOC-01**: 评估 Smart-Doc 或 SpringDoc 集成
-- **DOC-02**: 生成 API 文档站点
+- **HWM-F01**: CPU 温度监控（需 jLibreHardwareMonitor）
+- **HWM-F02**: GPU 指标监控（需额外依赖）
+- **HWM-F03**: 历史数据持久化（MySQL 分区表或 InfluxDB）
+- **HWM-F04**: 阈值告警配置
+- **HWM-F05**: 进程 Top N 列表
 
-### 自动化校验
-
-- **DOC-03**: 启用 Checkstyle Javadoc 格式校验规则
-- **DOC-04**: 集成 eslint-plugin-tsdoc 格式校验
-
-## Out of Scope
+## 排除范围
 
 | 功能 | 原因 |
 |------|------|
-| Swagger/Knife4j 运行时注解 | v1.7 聚焦纯注释，不引入运行时依赖 |
-| `@author`/`@since` 标签 | Git blame/log 是更准确的作者/日期信息来源 |
-| 代码内 PlantUML/Mermaid 图表 | 图表放入 `docs/` 目录管理 |
-| 自动生成文档站点 | 等注释完成后在 v2+ 中评估 |
-| 注释覆盖率工具引入 | 超出 v1.7 范围，且现有工具链已足够 |
-| 不新增任何业务功能 | 本里程碑仅做注释不做新功能 |
+| CPU 温度监控 | 需额外 jLibreHardwareMonitor DLL，稳定性待验证 |
+| GPU 指标 | OSHI 核心模块不直接支持 |
+| 阈值告警 | V1 聚焦展示，告警放入后续迭代 |
+| 历史数据持久化 | 初期环形缓冲区足够，运行后评估再决定 |
+| 跨平台（Linux） | 本里程碑定位为 Windows 专用 |
+| 移动端适配 | 监控页为桌面端使用场景 |
 
-## Traceability
+## 追踪
 
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| STD-01, STD-02, STD-03, STD-04, STD-05 | Phase 27 | Pending |
-| CFG-01, CFG-02, CFG-03, CFG-04, CFG-05, CFG-06, CFG-07, CFG-08 | Phase 28 | Pending |
-| BKND-01, BKND-02, BKND-03, BKND-04, BKND-05, BKND-06, BKND-07 | Phase 28 | Pending |
-| BKND-08 | Phase 29 | Pending |
-| FRNT-01, FRNT-02, FRNT-03, FRNT-04 | Phase 29 | Pending |
-| MAINT-01, MAINT-02, MAINT-03 | Phase 30 | Pending |
+| 需求 | 阶段 | 状态 |
+|------|------|------|
+| HWM-01 | Phase 31 | Pending |
+| HWM-02 | Phase 31 | Pending |
+| HWM-03 | Phase 31 | Pending |
+| HWM-04 | Phase 31 | Pending |
+| HWM-05 | Phase 31 | Pending |
+| HWM-06 | Phase 31 | Pending |
+| HWM-07 | Phase 31 | Pending |
+| HWM-08 | Phase 31 | Pending |
+| HWM-09 | Phase 31 | Pending |
+| HWM-10 | Phase 32 | Pending |
+| HWM-11 | Phase 32 | Pending |
+| HWM-12 | Phase 32 | Pending |
+| HWM-13 | Phase 32 | Pending |
+| HWM-14 | Phase 32 | Pending |
+| HWM-15 | Phase 32 | Pending |
+| HWM-16 | Phase 33 | Pending |
+| HWM-17 | Phase 32 | Pending |
+| HWM-18 | Phase 33 | Pending |
+| HWM-19 | Phase 32 | Pending |
+| HWM-20 | Phase 33 | Pending |
+| HWM-21 | Phase 34 | Pending |
+| HWM-22 | Phase 33 | Pending |
+| HWM-23 | Phase 34 | Pending |
+| HWM-24 | Phase 34 | Pending |
+| TDD-01 | Phase 31 | Pending |
+| TDD-02 | Phase 32 | Pending |
+| TDD-03 | Phase 31 | Pending |
+| TDD-04 | Phase 33 | Pending |
+| TDD-05 | Phase 32 | Pending |
 
-**Coverage:**
-- v1.7 requirements: 28 total
-- Mapped to phases: 28
-- Unmapped: 0 ✓
+**覆盖度：**
+- v1.8 需求：29 条
+- 已映射到阶段：29
+- 未映射：0
 
 ---
-*Requirements defined: 2026-05-07*
-*Last updated: 2026-05-07 — traceability updated for Phase 27-30*
+
+*需求定义: 2026-05-09*
