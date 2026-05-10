@@ -1,7 +1,7 @@
 # Roadmap: Vue + Spring Boot 管理后台
 
 > **创建日期:** 2026-04-03
-> **更新日期:** 2026-05-09
+> **更新日期:** 2026-05-10
 > **当前里程碑:** v1.8 Windows 硬件负载监控 (Planning)
 > **目标:** Windows 系统硬件负载监控页面，实时展示 CPU/内存/磁盘/网络指标
 
@@ -360,7 +360,11 @@ Plans:
   5. 磁盘分区以进度条列表展示容量使用情况
   6. 系统基本信息卡片展示 OS 版本、运行时间、进程数
   7. SSE 推送服务和前端 SSE composable 设计为可测试的接口抽象
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 32-01-PLAN.md — 后端 SSE 广播服务 + Controller 端点 + 测试 (Wave 1)
+- [ ] 32-02-PLAN.md — 前端类型定义 + SSE composable + 单元测试 (Wave 1)
+- [ ] 32-03-PLAN.md — 前端页面 (左导航/ECharts 环形图/磁盘进度条/系统信息) (Wave 2)
 **UI hint**: yes
 
 ### Phase 33: 完整图表 + 趋势
@@ -412,10 +416,10 @@ Plans:
 | 29. Service接口+Vue/TS注释 | v1.7 | 2/2 | Completed | 2026-05-09 |
 | 30. 注释维护机制建立 | v1.7 | 2/2 | Completed | 2026-05-09 |
 | 31. 后端采集服务+REST API | v1.8 | 3/1 | In progress | - |
-| 32. SSE实时推送+前端基础页面 | v1.8 | 0/0 | Not started | - |
+| 32. SSE实时推送+前端基础页面 | v1.8 | 3/0 | Not started | - |
 | 33. 完整图表+趋势 | v1.8 | 0/0 | Not started | - |
 | 34. 安全加固+打磨 | v1.8 | 0/0 | Not started | - |
 
 ---
 
-*路线图更新: 2026-05-09 — Phase 31 规划完成 (3 plans)*
+*路线图更新: 2026-05-10 — Phase 32 规划完成 (3 plans)*

@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Windows 硬件负载监控
 status: in_progress
-last_updated: "2026-05-10T10:00:00.000Z"
+last_updated: "2026-05-10T18:00:00.000Z"
 last_activity: 2026-05-10
 progress:
   total_phases: 4
   completed_phases: 0
-  total_plans: 3
+  total_plans: 6
   completed_plans: 2
   percent: 17
 ---
@@ -18,13 +18,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-07)
 
 **Core value:** 提供清晰、高效的企业级管理后台界面，通过夏日海滩风主题营造清爽专业的视觉体验。
-**Current focus:** v1.8 Windows 硬件负载监控 — 规划中
+**Current focus:** v1.8 Windows 硬件负载监控 — Phase 32 规划完成
 
 ## Current Position
 
-Phase: 31 - 后端采集服务 + REST API
-Plan: 03 — REST API（已完成）
-Status: In progress (Plan 2/3)
+Phase: 32 - SSE 实时推送 + 前端基础页面
+Plan: 01-03 — 全部规划完成（待执行）
+Status: Planning complete
 
 Progress: [###                 ] 17%
 
@@ -32,8 +32,8 @@ Progress: [###                 ] 17%
 
 | Phase | Goal | Requirements | Status |
 |-------|------|--------------|--------|
-| 31 | 后端采集服务 + REST API | HWM-01~09, TDD-01, TDD-03 | Not started |
-| 32 | SSE 实时推送 + 前端基础页面 | HWM-10~15, HWM-17, HWM-19, TDD-02, TDD-05 | Not started |
+| 31 | 后端采集服务 + REST API | HWM-01~09, TDD-01, TDD-03 | 执行中 |
+| 32 | SSE 实时推送 + 前端基础页面 | HWM-10~15, HWM-17, HWM-19, TDD-02, TDD-05 | 规划完成 (3 plans) |
 | 33 | 完整图表 + 趋势 | HWM-16, HWM-18, HWM-20, HWM-22, TDD-04 | Not started |
 | 34 | 安全加固 + 打磨 | HWM-21, HWM-23, HWM-24 | Not started |
 
@@ -43,9 +43,11 @@ Progress: [###                 ] 17%
 |------|------|------|
 | OSHI 7.x FFM（非 6.x JNA） | JDK 26 JEP 472 禁用 JNA | 已确认 |
 | monitor/hardware/ 新包 | 不与 RocketMQ 监控耦合 | 已确认 |
-| SSE 复用 SeckillSseService 模式 | 项目已有成熟 SSE 实现 | 待确认 |
-| ECharts 6.x 复用 | 项目已有，无需新增依赖 | 待确认 |
+| SSE 复用 SeckillSseService 模式 | 项目已有成熟 SSE 实现 | 已确认（广播模式变体） |
+| ECharts 6.x 复用 | 项目已有，无需新增依赖 | 已确认 |
 | 接口式采集服务设计 | TDD 要求，OSHI 可 mock | 已确认 |
+| SSE 广播模式 + HardwareSseService | Phase 32 context D-01 | 已锁定 |
+| 指数退避重连 1s->max 30s | Phase 32 context D-08 | 已锁定 |
 
 ## Performance Metrics
 
@@ -54,12 +56,20 @@ Progress: [###                 ] 17%
 | 31 | 01 | 15 | 2 | 15 | 2026-05-10 |
 | 31 | 03 | 35 | 2 | 4 | 2026-05-10 |
 
+## Phase 32 Plans
+
+| Plan | Objective | Tasks | Files | Wave |
+|------|-----------|-------|-------|------|
+| 01 | 后端 SSE 广播服务 + Controller 端点 + 测试 | 3 | HardwareSseService, Controller mod, ServiceImpl mod, Test | 1 |
+| 02 | 前端类型定义 + SSE composable + 单元测试 | 3 | hardware.ts, useHardwareMetrics.ts, test | 1 |
+| 03 | 前端页面 (导航/环形图/进度条/系统信息) | 3 | 5 Vue components + routes.ts | 2 |
+
 ## Last Session
 
 **Timestamp:** 2026-05-10
-**Stopped At:** Completed 31-03-PLAN.md
+**Stopped At:** Phase 32 planning complete
 **Resume File:** None
 
 ---
 
-*STATE.md updated: 2026-05-09 — v1.8 初始化，4 个阶段待规划*
+*STATE.md updated: 2026-05-10 — Phase 32 规划完成 (3 plans, 2 waves)*
