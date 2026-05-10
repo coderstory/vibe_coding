@@ -346,7 +346,7 @@ Plans:
 Plans:
 - [x] 31-01-PLAN.md — 基础层: OSHI 依赖、DTO 定义、RingBuffer、Service 接口、配置类 (Wave 1)
 - [ ] 31-02-PLAN.md — 采集实现: HardwareMetricsServiceImpl + 单元测试 (Wave 2)
-- [ ] 31-03-PLAN.md — REST API: 3 个端点 + Controller 测试 + 集成测试 (Wave 2)
+- [x] 31-03-PLAN.md — REST API: 3 个端点 + Controller 测试 + 集成测试 (Wave 2)
 
 ### Phase 32: SSE 实时推送 + 前端基础页面
 **Goal**: 后端通过 SSE 实时推送硬件指标，前端展示 CPU/内存仪表盘、磁盘容量和系统信息

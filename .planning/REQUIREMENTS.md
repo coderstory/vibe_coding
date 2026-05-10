@@ -16,9 +16,9 @@ Windows 系统硬件负载监控页面，实时展示 CPU/内存/磁盘/网络�
 - [ ] **HWM-04**: 后端定时采集磁盘容量和分区信息
 - [ ] **HWM-05**: 后端定时采集磁盘 IOPS 和读写速度
 - [ ] **HWM-06**: 后端定时采集网络接口吞吐量（上下行速率）
-- [ ] **HWM-07**: 后端提供 REST API 返回当前硬件指标快照
-- [ ] **HWM-08**: 后端维护内存环形缓冲区（360 点 = 1h），支持趋势数据查询
-- [ ] **HWM-09**: 后端采集系统基本信息（OS 版本、运行时间、进程数）
+- [x] **HWM-07**: 后端提供 REST API 返回当前硬件指标快照（31-03-PLAN）
+- [x] **HWM-08**: 后端维护内存环形缓冲区（360 点 = 1h），支持趋势数据查询（31-01/31-03-PLAN）
+- [x] **HWM-09**: 后端采集系统基本信息（OS 版本、运行时间、进程数）（31-03-PLAN）
 
 ### 实时推送
 
@@ -81,9 +81,9 @@ Windows 系统硬件负载监控页面，实时展示 CPU/内存/磁盘/网络�
 | HWM-04 | Phase 31 | Pending |
 | HWM-05 | Phase 31 | Pending |
 | HWM-06 | Phase 31 | Pending |
-| HWM-07 | Phase 31 | Pending |
-| HWM-08 | Phase 31 | Pending |
-| HWM-09 | Phase 31 | Pending |
+| HWM-07 | Phase 31 | Complete |
+| HWM-08 | Phase 31 | Complete |
+| HWM-09 | Phase 31 | Complete |
 | HWM-10 | Phase 32 | Pending |
 | HWM-11 | Phase 32 | Pending |
 | HWM-12 | Phase 32 | Pending |
