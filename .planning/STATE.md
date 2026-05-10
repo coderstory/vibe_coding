@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Windows 硬件负载监控
 status: in_progress
-last_updated: "2026-05-10T18:00:00.000Z"
+last_updated: "2026-05-10T22:30:00.000Z"
 last_activity: 2026-05-10
 progress:
   total_phases: 4
-  completed_phases: 0
-  total_plans: 6
-  completed_plans: 2
-  percent: 17
+  completed_phases: 2
+  total_plans: 9
+  completed_plans: 8
+  percent: 67
 ---
 
 ## Project Reference
@@ -22,19 +22,19 @@ See: .planning/PROJECT.md (updated 2026-05-07)
 
 ## Current Position
 
-Phase: 32 - SSE 实时推送 + 前端基础页面
-Plan: 01-03 — 全部规划完成（待执行）
-Status: Planning complete
+Phase: 33 - 完整图表 + 趋势
+Plan: 01 — 全部执行完成
+Status: Execution complete
 
-Progress: [###                 ] 17%
+Progress: [########            ] 67%
 
 ## v1.8 Phase Structure
 
 | Phase | Goal | Requirements | Status |
 |-------|------|--------------|--------|
 | 31 | 后端采集服务 + REST API | HWM-01~09, TDD-01, TDD-03 | 执行中 |
-| 32 | SSE 实时推送 + 前端基础页面 | HWM-10~15, HWM-17, HWM-19, TDD-02, TDD-05 | 规划完成 (3 plans) |
-| 33 | 完整图表 + 趋势 | HWM-16, HWM-18, HWM-20, HWM-22, TDD-04 | Not started |
+| 32 | SSE 实时推送 + 前端基础页面 | HWM-10~15, HWM-17, HWM-19, TDD-02, TDD-05 | 执行完成 (3 plans) |
+| 33 | 完整图表 + 趋势 | HWM-16, HWM-18, HWM-20, HWM-22, TDD-04 | 执行完成 |
 | 34 | 安全加固 + 打磨 | HWM-21, HWM-23, HWM-24 | Not started |
 
 ## 技术决策
@@ -55,6 +55,10 @@ Progress: [###                 ] 17%
 |-------|------|----------------|-------|-------|------|
 | 31 | 01 | 15 | 2 | 15 | 2026-05-10 |
 | 31 | 03 | 35 | 2 | 4 | 2026-05-10 |
+| 32 | 01 | 7 | 4 | 4 | 2026-05-10 |
+| 32 | 02 | 5 | 3 | 3 | 2026-05-10 |
+| 32 | 03 | 4 | 5 | 7 | 2026-05-10 |
+| 33 | 01 | 4 | 3 | 5 | 2026-05-10 |
 
 ## Phase 32 Plans
 
@@ -62,14 +66,14 @@ Progress: [###                 ] 17%
 |------|-----------|-------|-------|------|
 | 01 | 后端 SSE 广播服务 + Controller 端点 + 测试 | 3 | HardwareSseService, Controller mod, ServiceImpl mod, Test | 1 |
 | 02 | 前端类型定义 + SSE composable + 单元测试 | 3 | hardware.ts, useHardwareMetrics.ts, test | 1 |
-| 03 | 前端页面 (导航/环形图/进度条/系统信息) | 3 | 5 Vue components + routes.ts | 2 |
+| 03 | 前端页面 + Flyway 菜单迁移 | 4 | 5 Vue components + routes.ts + V25 migration | 2 |
 
 ## Last Session
 
 **Timestamp:** 2026-05-10
-**Stopped At:** Phase 32 planning complete
+**Stopped At:** Phase 33 execution complete
 **Resume File:** None
 
 ---
 
-*STATE.md updated: 2026-05-10 — Phase 32 规划完成 (3 plans, 2 waves)*
+*STATE.md updated: 2026-05-10 — Phase 33 执行完成 (4 chart components + composable + 6 tests)*

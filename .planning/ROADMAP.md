@@ -2,7 +2,7 @@
 
 > **创建日期:** 2026-04-03
 > **更新日期:** 2026-05-10
-> **当前里程碑:** v1.8 Windows 硬件负载监控 (Planning)
+> **当前里程碑:** v1.8 Windows 硬件负载监控 (Executing)
 > **目标:** Windows 系统硬件负载监控页面，实时展示 CPU/内存/磁盘/网络指标
 
 ---
@@ -378,7 +378,10 @@ Plans:
   4. 所有图表组件适配夏日海滩风主题配色（海洋蓝主调 + 琥珀色强调）
   5. ECharts 实例在组件卸载时正确 dispose，通过 markRaw 避免响应式代理，无内存泄漏
   6. Vue 组件逻辑（composable、图表数据处理）有单元测试覆盖
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [x] 33-01-PLAN.md — 完整图表组件（磁盘 IO/网络实时折线图 + CPU/内存趋势图）+ TDD + 页面集成
+**Status**: ✅ Completed 2026-05-10
 **UI hint**: yes
 
 ### Phase 34: 安全加固 + 打磨
@@ -415,9 +418,9 @@ Plans:
 | 28. 配置层+Controller层注释 | v1.7 | 2/2 | Completed | 2026-05-09 |
 | 29. Service接口+Vue/TS注释 | v1.7 | 2/2 | Completed | 2026-05-09 |
 | 30. 注释维护机制建立 | v1.7 | 2/2 | Completed | 2026-05-09 |
-| 31. 后端采集服务+REST API | v1.8 | 3/1 | In progress | - |
-| 32. SSE实时推送+前端基础页面 | v1.8 | 3/0 | Not started | - |
-| 33. 完整图表+趋势 | v1.8 | 0/0 | Not started | - |
+| 31. 后端采集服务+REST API | v1.8 | 3/3 | Completed | 2026-05-10 |
+| 32. SSE实时推送+前端基础页面 | v1.8 | 3/3 | Completed | 2026-05-10 |
+| 33. 完整图表+趋势 | v1.8 | 1/1 | Completed | 2026-05-10 |
 | 34. 安全加固+打磨 | v1.8 | 0/0 | Not started | - |
 
 ---
