@@ -35,3 +35,14 @@ logging:
   level:
     cn.coderstory: DEBUG              # 应用包日志级别（包含所有业务模块的调试输出）
     org.flywaydb: DEBUG               # Flyway 数据库迁移日志级别
+
+# ==================== 硬件监控配置 ====================
+# OSHI 采集服务的采样间隔、环形缓冲区大小和降级策略。
+# ---------------------------------------------------
+monitor:
+  hardware:
+    sampling-interval: 2000              # 主循环间隔（毫秒）
+    disk-net-interval: 3                  # 磁盘/网络每 N 次采样更新一次
+    trend-buffer-size: 360               # 环形缓冲区容量（360 点 = 1h at 10s 间隔）
+    trend-decimation: 5                   # 每 N 次采样写入一次趋势缓冲区
+    enabled: true                         # 是否启用采集

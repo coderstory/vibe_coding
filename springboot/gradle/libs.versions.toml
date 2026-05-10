@@ -15,6 +15,7 @@ zstd = "1.5.7-7"
 lombok = "1.18.44"
 archunit = "1.4.2"
 checkstyle = "10.21.4"
+oshi = "7.1.0"
 
 # ===== 依赖库声明 =====
 [libraries]
@@ -60,6 +61,9 @@ zstd-jni = { module = "com.github.luben:zstd-jni", version.ref = "zstd" }
 
 # Annotation Processors
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
+
+# OSHI (FFM)
+oshi-core-ffm = { module = "com.github.oshi:oshi-core-ffm", version.ref = "oshi" }
 
 # Test
 archunit = { module = "com.tngtech.archunit:archunit-junit5", version.ref = "archunit" }
