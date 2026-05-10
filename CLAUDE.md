@@ -17,14 +17,12 @@ Claude Code 辅助开发。项目规范、沟通规则、常见陷阱。
 4. **直接执行不问意见** — 确认目标后直接执行，不询问"是否要执行"。但 TDD 铁律（第 37-45 行）优先级高于本条，任何场景不得以"直接执行"为由跳过 RED 阶段
 5. **目录前置检查** — 执行命令和提交前确认当前目录正确
 6. **禁止主动使用 emoji**
-7. **禁止调用 gpt 系列模型**
 
 ## 工作规范
 
 ### Git
 - commit 描述中文 — 标题和正文均中文，仅技术专有名词可保留英文
 - 提交前清理多余/缓存文件
-- `.claude/projects/` memory 文件不提交
 
 ### 提交前自检（每批次提交前执行）
 1. **TDD 合规** — 本次提交包含新功能/修复？测试是否先于代码提交？
@@ -185,35 +183,8 @@ Flyway 脚本位于 `springboot/src/main/resources/db/migration/`，命名 `V{�
 ---
 
 ## 常见陷阱
-
-### 1. Windows 中文路径编码
-**症状**：Gradle 测试报 `ClassNotFoundException`
-**修复**：`build.gradle.kts` 添加 `-Dfile.encoding=GBK`
-
-### 2. localhost DNS 解析失败
-**症状**：`UnknownHostException: localhost`
-**修复**：所有配置用 `127.0.0.1` 替代 `localhost`
-
-### 3. RocketMQ 5.x API 包路径变更
-**症状**：`ClassNotFoundException`，类路径变更（如 `TopicList` 移到 `remoting.protocol.body`）
-**注意**：升级 RocketMQ 后检查 API 包路径
-
-### 4. Edit 工具跨段落匹配误删
+### 1. Edit 工具跨段落匹配误删
 **规避**：最小唯一字符串作 `old_string`，不跨段落匹配
-
-### 5. 依赖版本对齐
-**常见**：Lombok/Spring AOP 版本需与 Spring Boot 对齐；`webmvc` vs `web` 一致性
-**建议**：使用 `libs.versions.toml` 统一管理
-
-### 6. GSD 命令语法
-**注意**：使用冒号 `gsd:execute-phase`（不是 `gsd-execute-phase`）
-
-### 7. Gradle 构建缓存
-**修复**：`./gradlew.bat clean build` 或 `--no-build-cache`
-
-### 8. SSE 连接时序（秒杀系统）
-**问题**：SSE 连接与请求发送的时序竞争
-**修复**：前端先生成 `queueId`，再建立 SSE 连接
 
 ## 注释规范
 
@@ -230,18 +201,6 @@ L0-L3 注释层级速览：
 
 L3 层文件缺少 Javadoc 视为 PR 阻塞项。
 
-## 演变历史
-
-| 版本 | 内容 | 日期 |
-|------|------|------|
-| v1.0 | 基础框架（Vue 3 + Element Plus + Spring Boot） | 2026-04-02 |
-| v1.1 | 主题修复（海浪动画、弹窗修复、配色调整） | 2026-04-03 |
-| v1.2 | 用户管理模块 | 2026-04-18 |
-| v1.3 | RocketMQ 管理（Topic/Consumer Group/消息/监控） | 2026-04-29 |
-| v1.4 | Maven→Gradle + Spring Boot 4.1 + 依赖升级 | 2026-05-06 |
-| v1.5 | 代码重构（质量工具链/包结构重组/配置拆分/规范统一） | 2026-05-07 |
-
-**滞留项**：敏感信息环境变量加固（JWT secret、DB 密码）
 
 ---
 
@@ -252,15 +211,3 @@ L3 层文件缺少 Javadoc 视为 PR 阻塞项。
 - `docs/comment-standards.md` — 注释规范详细说明
 - `docs/superpowers-zh.md` — Superpowers-ZH 技能列表
 - `.planning/` — GSD 规划文件
-
-<!-- superpowers-zh:begin -->
-## Superpowers-ZH 中文增强版
-
-已安装 superpowers-zh 技能框架（20 skills）。详细列表见 `docs/superpowers-zh.md`。
-
-核心规则：
-1. 收到任务时先检查是否有匹配 skill
-2. 设计先于编码（brainstorming）
-3. 测试先于实现（TDD）
-4. 验证先于完成
-<!-- superpowers-zh:end -->
