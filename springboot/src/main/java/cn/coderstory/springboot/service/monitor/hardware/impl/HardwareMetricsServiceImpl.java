@@ -10,6 +10,7 @@ import cn.coderstory.springboot.dto.monitor.hardware.NetworkMetricsDTO;
 import cn.coderstory.springboot.dto.monitor.hardware.SystemInfoDTO;
 import cn.coderstory.springboot.service.monitor.hardware.HardwareMetricsService;
 import cn.coderstory.springboot.service.monitor.hardware.RingBuffer;
+import cn.coderstory.springboot.sse.monitor.HardwareSseService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,7 @@ public class HardwareMetricsServiceImpl implements HardwareMetricsService {
     private final SystemInfo systemInfo;
     private final ScheduledExecutorService scheduler;
     private final MonitorHardwareProperties properties;
+    private final HardwareSseService hardwareSseService;
 
     private final ReentrantReadWriteLock cacheLock = new ReentrantReadWriteLock();
     private volatile HardwareMetricsDTO currentMetrics;
@@ -142,6 +144,11 @@ public class HardwareMetricsServiceImpl implements HardwareMetricsService {
             }
         } finally {
             cacheLock.writeLock().unlock();
+        }
+
+        // SSE 广播：在写锁外部，避免阻塞采集线程
+        if (hardwareSseService != null) {
+            hardwareSseService.broadcast("metrics", snapshot);
         }
     }
 

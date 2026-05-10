@@ -7,12 +7,15 @@ import cn.coderstory.springboot.dto.monitor.hardware.NetworkMetricsDTO;
 import cn.coderstory.springboot.dto.monitor.hardware.SystemInfoDTO;
 import cn.coderstory.springboot.dto.monitor.hardware.TrendDataPoint;
 import cn.coderstory.springboot.service.monitor.hardware.HardwareMetricsService;
+import cn.coderstory.springboot.sse.monitor.HardwareSseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +36,7 @@ import java.util.Set;
 public class HardwareMonitorController {
 
     private final HardwareMetricsService metricsService;
+    private final HardwareSseService hardwareSseService;
 
     /** 支持的指标名称列表，用于趋势查询参数校验 */
     private static final Set<String> SUPPORTED_METRICS = Set.of(
@@ -85,6 +89,33 @@ public class HardwareMonitorController {
     @GetMapping("/system")
     public ApiResponse<SystemInfoDTO> getSystem() {
         return ApiResponse.success(metricsService.getSystemInfo());
+    }
+
+    /**
+     * 订阅硬件指标实时推送。
+     * <p>
+     * 建立 SSE 连接后，服务器每 2s 推送一次硬件指标数据。
+     * 浏览器 EventSource 自动处理重连。
+     *
+     * @return SSE 连接发射器
+     */
+    @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter subscribe() {
+        return hardwareSseService.createEmitter();
+    }
+
+    /**
+     * 取消订阅硬件指标推送。
+     * <p>
+     * 客户端关闭 EventSource 即自动完成，此端点为调试备用。
+     *
+     * @param clientId 客户端 ID
+     */
+    @GetMapping("/unsubscribe")
+    public void unsubscribe(@RequestParam(defaultValue = "") String clientId) {
+        if (!clientId.isEmpty()) {
+            hardwareSseService.unsubscribe(clientId);
+        }
     }
 
     /**
