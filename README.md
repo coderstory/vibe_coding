@@ -1,254 +1,219 @@
-# 后台管理系统
-
-
-
 <p align="center">
-  <a href="#">
-    <img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="版本">
-  </a>
-  <a href="#">
-    <img src="https://img.shields.io/badge/build-passing-green.svg" alt="构建状态">
-  </a>
-  <a href="#">
-    <img src="https://img.shields.io/badge/license-GPL--3.0-blue.svg" alt="许可证">
-  </a>
+  <h1 align="center">vibe_coding</h1>
+  <p align="center">
+    基于 Spring Boot 4 + Vue 3 的现代化后台管理系统
+    <br />
+    AI 辅助编程 · 全栈类型安全 · 高并发就绪
+  </p>
 </p>
 
-## 📸 页面预览
 <p align="center">
-  <img src="./docs/images/view-page-2.png" alt="后台管理系统" width="80%">
+  <a href="#"><img src="https://img.shields.io/badge/version-1.8.0--rc1-blue.svg?style=flat-square" alt="版本"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Spring%20Boot-4.1.0--RC1-6DB33F?style=flat-square&logo=springboot" alt="Spring Boot"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Java-26-ED8B00?style=flat-square&logo=openjdk" alt="Java"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Vue-3.5-4FC08D?style=flat-square&logo=vuedotjs" alt="Vue"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Gradle-9.5-02303A?style=flat-square&logo=gradle" alt="Gradle"></a>
+  <a href="#"><img src="https://img.shields.io/badge/license-GPL--3.0-blue.svg?style=flat-square" alt="许可证"></a>
 </p>
-<p align="center">
-  <img src="./docs/images/login-page.png" alt="登录页面" width="80%">
-</p>
-
-
-## 📋 项目简介
-
-这是一个基于 Spring Boot 4 和 Vue 3 的现代化后台管理系统，使用 AI 编程工具完成开发。
-
-- **前端**：Vue 3.5 + Vite 8 + TypeScript
-- **后端**：Spring Boot 4.0.5 + Java 26 + MyBatis Plus
-- **数据库**：MySQL + Flyway 数据库迁移
-- **认证**：JWT 令牌认证
-- **UI 组件**：Element Plus
-- **富文本编辑器**：WangEditor
-
-## 🚀 快速开始
-
-### 环境要求
-
-- **前端**：Node.js v20.19+ 或 v22.12+
-- **后端**：Java 26+
-- **数据库**：MySQL（数据库名 `admin_system`，本地默认 root/123456）
-- **缓存**：Redis 8.0+（秒杀系统必需）
-- **消息队列**：RocketMQ 5.3.2（秒杀系统必需）
-
-### 安装与运行
-
-#### 前端
-
-```powershell
-# 进入前端目录
-cd app-vue
-
-# 安装依赖
-npm install
-
-# 开发模式（热重载，端口 5173）
-npm run dev
-
-# 生产构建
-npm run build
-
-# 预览生产构建
-npm run preview
-```
-
-#### 后端
-
-```powershell
-# 进入后端目录
-cd springboot
-
-# 运行应用
-./mvnw.cmd spring-boot:run
-
-# 编译打包
-./mvnw.cmd package
-```
-
-## 📁 项目结构
-
-```
-vibe_coding/
-├── .opencode/          # AI 工具配置（skill、agent 等）
-│   └── skills/
-│       └── browser-msedge/  # 浏览器自动化脚本
-├── .planning/          # GSD 日志文件
-├── app-vue/            # 前端项目源码
-│   ├── src/
-│   │   ├── api/        # API 服务层
-│   │   ├── components/ # 公共组件
-│   │   ├── views/      # 页面视图
-│   │   ├── router/     # 路由配置
-│   │   └── store/      # 状态管理
-│   └── vite.config.js  # Vite 配置
-├── docs/               # 项目文档
-│   ├── seckill/        # 秒杀系统文档
-│   ├── browser-automation-guide.md  # 浏览器自动化指南
-│   └── images/         # 项目图片
-├── springboot/         # 后端源码目录
-│   ├── src/
-│   │   ├── main/java/  # Java 代码
-│   │   └── resources/  # 资源文件
-│   └── pom.xml         # Maven 配置
-├── AGENTS.md           # AI 开发说明文档
-└── README.md           # 项目说明文档
-```
-
-## ✨ 核心功能
-
-### 系统管理
-- **用户管理**：用户CRUD、角色分配
-- **角色管理**：角色CRUD、权限配置
-- **菜单管理**：菜单配置、权限控制
-
-### 知识库管理
-- **文章管理**：富文本编辑、标签管理
-- **分类管理**：树形分类结构
-- **标签管理**：标签创建与管理
-- **文件上传**：支持图片和附件上传
-
-### 审计日志
-- **操作日志**：自动记录用户操作
-- **登录日志**：记录用户登录信息
-
-### 秒杀系统
-完整的秒杀/高并发电商活动平台，支持海量并发抢购：
-
-**活动管理**
-- 秒杀活动创建、开启、结束
-- 活动时间线管理
-- 限购数量控制
-
-**商品管理**
-- 秒杀商品上架
-- 原价/秒杀价对比
-- 库存管理
-
-**抢购功能**
-- 签名验证（防请求篡改）
-- 多层限流保护（QPS限流、并发限流、IP限流）
-- 风控保护（黑名单、幂等性保证）
-- 异步订单处理（RocketMQ事务消息）
-- 排队机制（SSE实时推送）
-
-**订单管理**
-- 待支付订单支付
-- 订单取消（用户主动/超时自动）
-- 订单状态追踪
-
-**实时监控（管理员）**
-- 并发处理数监控
-- QPS统计
-- 活动时间线
-
-**技术架构**
-| 层次 | 技术 | 作用 |
-|------|------|------|
-| 第一层 | Redis原子操作 | 高性能库存预扣减 |
-| 第二层 | RocketMQ消息队列 | 削峰填谷，控制数据库写入并发 |
-| 第三层 | 数据库乐观锁 | 最终一致性保障，防止超卖 |
-
-详细文档：
-- 用户手册：`docs/seckill/user-guide.md`
-- 开发手册：`docs/seckill/developer-guide.md`
-- 运维指南：`docs/seckill/operation-guide.md`
-
-## 🔧 开发流程
-
-本项目使用基于 GSD（Get Shit Done）的开发流程：
-
-1. **提出问题**：初步分析 `/gsd:new-project`
-2. **技术分析**：发现标准技术栈、架构模式、常见陷阱。`/gsd:research-phase N`
-3. **拆解问题**：讨论技术方案，产出需求 `/gsd:discuss-phase N`
-4. **拆解问题**：讨论UI方案，产出需求 `/gsd:ui-phase N`
-5. **详细设计**：针对单个需求进行设计 `/gsd:plan-phase N`
-6. **执行编码**：实现功能 `/gsd:execute-phase N`
-7. **功能测试**：验证功能正确性 `/gsd:verify-work N`
-8. **完成里程碑**：结束本轮开发 `/gsd:complete-milestone`
-9. **开始新里程**：启动新一轮开发 `/gsd:new-milestone`
-
-## 🛠 技术栈
-
-| 类别 | 技术 | 版本 |
-|------|------|------|
-| **前端框架** | Vue | 3.5+ |
-| **构建工具** | Vite | 8+ |
-| **类型系统** | TypeScript | - |
-| **UI库** | Element Plus | - |
-| **状态管理** | Pinia | - |
-| **路由** | Vue Router | - |
-| **HTTP客户端** | Axios | - |
-| **后端框架** | Spring Boot | 4.0.5 |
-| **语言** | Java | 26 |
-| **ORM** | MyBatis Plus | - |
-| **缓存** | Redis | 8.0+ |
-| **消息队列** | RocketMQ | 5.3.2 |
-| **数据库迁移** | Flyway | - |
-| **认证** | JWT | - |
-
-## 🤖 AI 协作配置
-
-本项目已配置 AI 编程工具，默认使用中文沟通：
-
-- **AI 语言**：默认中文（简体中文）
-- **技能框架**：Superpowers-ZH 中文增强版
-- **交互规范**：见 `CLAUDE.md` 和 `AGENTS.md`
-
-## 📚 文档
-
-- **AI 开发指南**：`AGENTS.md` - AI 编程说明文档  
-- **AI 配置**：`CLAUDE.md` - Claude Code 工作指南
-- **项目文档**：`docs/` 目录下的相关文档
-
-## 🔍 问题分析
-
-对于复杂场景的分析，使用 `/brainstorming` 进行头脑风暴，帮助理清思路和解决方案。
-
-## 📦 技能依赖
-
-1. **GSD**：安装到 `npx get-shit-done-cc@latest`
-2. **Superpower**：汉化版本 `npx superpowers-zh`
-3. **浏览器访问**：动态渲染页面使用 `.opencode/skills/browser-msedge/fetch-page.js`
-4. **claude安装**: `npm install -g @anthropic-ai/claude-code@latest`
-5. **caveman**: `claude plugin marketplace add JuliusBrussee/caveman && claude plugin install caveman@caveman`
-## 🔧 配置说明
- 
-- **npm镜像**：`npm config set registry https://registry.npmmirror.com`
-- **数据库配置**：`springboot/src/main/resources/application.yaml`
-- **浏览器自动化**：`docs/browser-automation-guide.md` 或 `.opencode/skills/browser-msedge/`
-
-## 🤝 贡献
-
-欢迎提交 Issue 和 Pull Request 来改进这个项目！
-
-## 📄 许可证
-
-本项目采用 GPL-3.0 许可证 - 详情请参阅 [LICENSE](LICENSE) 文件
-
-## 🌟 鸣谢
-
-- [Vue.js](https://vuejs.org/)
-- [Spring Boot](https://spring.io/projects/spring-boot)
-- [Element Plus](https://element-plus.org/)
-- [MyBatis Plus](https://baomidou.com/)
-- [GSD](https://github.com/gsd:2/get-shit-done)
-- [Superpower](https://github.com/obra/superpowers)
 
 ---
 
+## 页面预览
+
 <p align="center">
-  Made with ❤️ by AI + Human Collaboration
+  <img src="./docs/images/view-page-2.png" alt="后台管理系统" width="80%">
+  <br />
+  <img src="./docs/images/login-page.png" alt="登录页面" width="45%">
+</p>
+
+---
+
+## 项目简介
+
+现代化企业级后台管理系统，覆盖系统管理、知识库、高并发秒杀、硬件监控四大业务域。前后端分离架构，全栈 TypeScript / Java 类型安全。
+
+### 技术栈
+
+| 类别 | 技术 | 版本 |
+|------|------|------|
+| 前端框架 | Vue (Composition API) | 3.5+ |
+| 构建工具 | Vite | 8+ |
+| UI 组件库 | Element Plus | — |
+| 状态管理 | Pinia | — |
+| 可视化 | ECharts | 6.x |
+| 后端框架 | Spring Boot | 4.1.0-RC1 |
+| 语言 | Java | 26 |
+| 构建工具 | Gradle (Kotlin DSL) | 9.5 |
+| ORM | MyBatis Plus | 3.5.x |
+| 缓存 | Redis | 8.0+ |
+| 消息队列 | RocketMQ | 5.3.2 |
+| 数据库迁移 | Flyway | — |
+| 认证 | JWT (jjwt 0.13) | — |
+| 代码质量 | ArchUnit / Checkstyle / PMD / SpotBugs / Error Prone / JaCoCo | — |
+| 前端 Lint | ESLint 10.x flat config + Stylelint 17.x | — |
+
+---
+
+## 核心功能
+
+### 系统管理
+
+用户、角色、菜单的完整 CRUD 与权限分配，支撑后台基础运营。
+
+- **用户管理** — 用户 CRUD、角色分配、状态管理
+- **角色管理** — 角色 CRUD、菜单权限配置
+- **菜单管理** — 树形菜单配置、权限标识绑定
+
+### 知识库管理
+
+企业级内容管理模块，支持富文本编辑、分类组织和标签体系。
+
+- **文章管理** — WangEditor 富文本编辑、标签绑定
+- **分类管理** — 无限级树形分类
+- **标签管理** — 标签创建、文章关联
+
+### 审计日志
+
+基于 AOP 切面的自动操作审计，零侵入记录用户行为。
+
+- **操作日志** — 方法级别自动记录（CRUD 前缀推断）
+- **登录日志** — 登录成功/失败记录与回溯
+
+### 秒杀系统
+
+完整的高并发秒杀/抢购平台，Redis 原子预扣减 + RocketMQ 事务消息 + 数据库乐观锁三层架构。
+
+| 层次 | 技术 | 作用 |
+|------|------|------|
+| 第一层 | Redis 原子操作 | 高性能库存预扣减 |
+| 第二层 | RocketMQ 事务消息 | 削峰填谷，异步落库 |
+| 第三层 | 数据库乐观锁 | 最终一致性，防超卖 |
+
+**关键能力：** 签名防篡改 · QPS/并发/IP 三层限流 · 黑名单风控 · SSE 实时排队推送 · 订单超时自动取消
+
+### 硬件监控（v1.8）
+
+Windows 服务器硬件负载实时监控面板，OSHI 7.x FFM 采集 + SSE 推送 + ECharts 可视化。
+
+- **实时仪表盘** — CPU/内存环形图，2s SSE 推送刷新
+- **磁盘监控** — 分区容量进度条 + IOPS/读写速率实时折线图
+- **网络监控** — 上下行带宽实时折线图，60 点滑动窗口
+- **趋势分析** — CPU/内存近 1 小时趋势线，30s 自动轮询
+- **系统信息** — OS 版本、运行时间、进程数一览
+
+---
+
+## 快速开始
+
+### 环境要求
+
+- **Node.js** v20.19+ 或 v22.12+
+- **Java** 26+
+- **MySQL**（数据库 `admin_system`，默认 root/123456）
+- **Redis** 8.0+（秒杀系统必需）
+- **RocketMQ** 5.3.2（秒杀系统必需）
+
+### 前端
+
+```bash
+cd app-vue
+npm install
+npm run dev      # 开发（端口 5173）
+npm run build    # 生产构建
+npm run test     # 单元测试
+npm run lint     # ESLint + Stylelint
+```
+
+### 后端
+
+```bash
+cd springboot
+./gradlew.bat bootRun              # 运行（端口 8080）
+./gradlew.bat build                # 编译打包
+./gradlew.bat test                 # 测试
+./gradlew.bat check                # 全量代码质量检查
+```
+
+---
+
+## 项目结构
+
+```
+vibe_coding/
+├── .planning/                     # GSD 规划与进度追踪
+├── app-vue/                       # Vue 3 前端
+│   └── src/
+│       ├── api/                   # API 层（按业务域拆分）
+│       ├── components/            # 通用/布局/业务组件
+│       ├── composables/           # 组合式函数
+│       ├── views/                 # 页面（auth/dashboard/system/
+│       │                          #       seckill/knowledge/monitor）
+│       ├── router/                # 路由（模块拆分 + 守卫）
+│       └── store/                 # Pinia 状态
+├── springboot/                    # Spring Boot 后端
+│   └── src/main/java/cn/coderstory/springboot/
+│       ├── shared/                # 通用层（config/security/aspect/
+│       │                          #       exception/util/limiter）
+│       └── {domain}/              # 业务域：user/role/menu/auth/
+│                                  #   audit/knowledge/seckill/
+│                                  #   rocketmq/order/monitor
+│           ├── controller/
+│           ├── service/
+│           ├── mapper/
+│           └── entity/
+├── docs/                          # 项目文档
+│   ├── seckill/                   # 秒杀系统文档
+│   └── ...                        # 开发指南/注释规范
+├── CLAUDE.md                      # AI 协作指南
+└── README.md
+```
+
+---
+
+## 项目历程
+
+| 版本 | 里程碑 | 状态 |
+|------|--------|------|
+| v1.0 | 基础框架（Vue 3 + Element Plus + Spring Boot） | 已发布 |
+| v1.1 | 夏日海滩风主题修复 | 已发布 |
+| v1.2 | 用户管理模块 | 已发布 |
+| v1.3 | RocketMQ 管理（Topic/Consumer/消息/监控） | 已发布 |
+| v1.4 | Maven → Gradle + Spring Boot 4.1 + 依赖升级 | 已发布 |
+| v1.5 | 代码重构（质量工具链/包结构/配置拆分） | 已发布 |
+| v1.6 | 代码深度清理（后端/前端/依赖/配置） | 已发布 |
+| v1.7 | 注释与文档工程（标准/配置/代码/维护） | 已发布 |
+| v1.8 | Windows 硬件负载监控（采集/SSE/图表） | 执行中 |
+
+---
+
+## AI 协作
+
+本项目以 AI 辅助编程为核心开发方式。
+
+- **AI 配置**：`CLAUDE.md` — Claude Code 工作指南
+- **开发流程**：GSD（Discuss → Plan → Execute → Verify）
+- **语言策略**：默认中文，技术术语保留英文
+- **质量门禁**：TDD 铁律 · 提交前自检 · 全量代码质量检查
+
+---
+
+## 文档索引
+
+| 文档 | 说明 |
+|------|------|
+| `CLAUDE.md` | AI 编程指南与项目规范 |
+| `docs/seckill/user-guide.md` | 秒杀系统用户手册 |
+| `docs/seckill/developer-guide.md` | 秒杀系统开发手册 |
+| `docs/seckill/operation-guide.md` | 秒杀系统运维指南 |
+| `docs/comment-standards.md` | 注释规范详细说明 |
+| `docs/browser-automation-guide.md` | 浏览器自动化指南 |
+
+---
+
+## 许可证
+
+本项目采用 [GPL-3.0](LICENSE) 许可证。
+
+<p align="center">
+  <sub>Made with AI + Human Collaboration</sub>
 </p>
