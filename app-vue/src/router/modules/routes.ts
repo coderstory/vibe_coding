@@ -199,6 +199,13 @@ const routes: RouteRecordRaw[] = [
         name: 'RocketMQDashboard',
         component: () => import('@/views/rocketmq/Dashboard.vue'),
         meta: { title: '监控面板', requiresAuth: true }
+      },
+      // 硬件监控（需要认证）
+      {
+        path: '/monitor/hardware',
+        name: 'HardwareMonitor',
+        component: () => import('@/views/monitor/hardware/HardwareMonitorPage.vue'),
+        meta: { title: '硬件监控', requiresAuth: true }
       }
     ]
   },
