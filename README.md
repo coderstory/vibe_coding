@@ -219,7 +219,7 @@ vibe_coding/
 
 ## 📦 技能依赖
 
-1. **GSD**：安装到 `.opencode` 目录 `npx gsd:opencode@latest`
+1. **GSD**：安装到 `npx get-shit-done-cc@latest`
 2. **Superpower**：汉化版本 `npx superpowers-zh`
 3. **浏览器访问**：动态渲染页面使用 `.opencode/skills/browser-msedge/fetch-page.js`
 4. **claude安装**: `npm install -g @anthropic-ai/claude-code@latest`
