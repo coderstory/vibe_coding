@@ -2,11 +2,12 @@
 /**
  * 硬件监控页面组件。左导航 + 右内容区布局，SSE 实时接收硬件数据。
  * 包含环形图（CPU/内存）、进度条（磁盘）、折线图（趋势/IO/网络）。
+ * 支持加载骨架态 / 空状态 / 错误状态 / SSE 断连提示。
  */
 </script>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useHardwareMetrics } from '@/composables/useHardwareMetrics'
 import { Cpu, DataBoard, Folder, InfoFilled, Monitor } from '@element-plus/icons-vue'
 import CpuGauge from './CpuGauge.vue'
@@ -18,8 +19,14 @@ import DiskIoChart from './DiskIoChart.vue'
 import NetworkChart from './NetworkChart.vue'
 import SystemInfo from './SystemInfo.vue'
 
-const { connect, connected, metrics } = useHardwareMetrics()
+const { connect, connected, metrics, error } = useHardwareMetrics()
 const activeSection = ref('cpu')
+const pageLoading = ref(true)
+
+// 首次数据到达后取消加载态
+watch(metrics, (val) => {
+  if (val !== null) pageLoading.value = false
+}, { once: true })
 
 const navItems = [
   { key: 'cpu', label: 'CPU', icon: Cpu },
@@ -49,32 +56,61 @@ onMounted(() => { connect() })
         </el-menu>
       </div>
       <div class="hw-content">
+        <!-- 连接指示器 -->
         <div class="hw-connection-indicator">
           <span class="hw-status-dot" :class="connected ? 'hw-status-dot--connected' : 'hw-status-dot--disconnected'" />
           <span class="hw-status-text">{{ connected ? '已连接' : '连接已断开' }}</span>
         </div>
 
-        <div v-show="activeSection === 'cpu'" class="hw-section">
-          <CpuGauge :cpu-data="metrics?.cpu ?? null" :connected="connected" />
-          <CpuTrendChart :connected="connected" />
+        <!-- SSE 断连重连提示 -->
+        <el-alert
+          v-if="!connected && !pageLoading"
+          title="连接已断开，正在重连..."
+          type="warning"
+          :closable="false"
+          show-icon
+          class="hw-reconnect-banner"
+        />
+
+        <!-- 错误提示 -->
+        <el-alert
+          v-if="error && connected"
+          :title="error"
+          type="error"
+          :closable="true"
+          show-icon
+          class="hw-error-banner"
+        />
+
+        <!-- 加载骨架态 -->
+        <div v-if="pageLoading" class="hw-skeleton">
+          <el-skeleton :rows="6" animated />
         </div>
 
-        <div v-show="activeSection === 'memory'" class="hw-section">
-          <MemoryGauge :memory-data="metrics?.memory ?? null" :connected="connected" />
-          <MemoryTrendChart :connected="connected" />
-        </div>
+        <!-- 主内容区 -->
+        <div v-else>
+          <div v-show="activeSection === 'cpu'" class="hw-section">
+            <CpuGauge :cpu-data="metrics?.cpu ?? null" :connected="connected" />
+            <CpuTrendChart :connected="connected" />
+          </div>
 
-        <div v-show="activeSection === 'disk'" class="hw-section">
-          <DiskPartitions :disks="metrics?.disks ?? null" :connected="connected" />
-          <DiskIoChart :metrics="metrics" :connected="connected" />
-        </div>
+          <div v-show="activeSection === 'memory'" class="hw-section">
+            <MemoryGauge :memory-data="metrics?.memory ?? null" :connected="connected" />
+            <MemoryTrendChart :connected="connected" />
+          </div>
 
-        <div v-show="activeSection === 'network'" class="hw-section">
-          <NetworkChart :metrics="metrics" :connected="connected" />
-        </div>
+          <div v-show="activeSection === 'disk'" class="hw-section">
+            <DiskPartitions :disks="metrics?.disks ?? null" :connected="connected" />
+            <DiskIoChart :metrics="metrics" :connected="connected" />
+          </div>
 
-        <div v-show="activeSection === 'system'" class="hw-section">
-          <SystemInfo :system-data="metrics?.system ?? null" />
+          <div v-show="activeSection === 'network'" class="hw-section">
+            <NetworkChart :metrics="metrics" :connected="connected" />
+          </div>
+
+          <div v-show="activeSection === 'system'" class="hw-section">
+            <SystemInfo :system-data="metrics?.system ?? null" />
+          </div>
         </div>
       </div>
     </div>
@@ -95,5 +131,8 @@ onMounted(() => { connect() })
 .hw-status-dot--disconnected { background-color: var(--el-color-warning, #d97706); }
 .hw-status-text { vertical-align: middle; }
 .hw-section { animation: hw-fade-in 0.3s ease; }
+.hw-reconnect-banner { margin-bottom: 12px; }
+.hw-error-banner { margin-bottom: 12px; }
+.hw-skeleton { padding: 24px; }
 @keyframes hw-fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 </style>

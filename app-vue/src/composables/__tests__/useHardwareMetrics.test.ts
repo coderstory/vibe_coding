@@ -106,4 +106,37 @@ describe('useHardwareMetrics', () => {
     disconnect()
     expect(connected.value).toBe(false)
   })
+
+  it('断连时 error 包含重连秒数', async () => {
+    const { connect, error } = useHardwareMetrics({
+      createEventSource: () => mockEs as unknown as EventSource
+    })
+
+    connect()
+    await vi.runAllTimersAsync()
+
+    mockEs.mockError()
+    expect(error.value).toContain('重连')
+    expect(error.value).toContain('秒')
+  })
+
+  it('重连成功后 error 清空', async () => {
+    const { connect, error, connected } = useHardwareMetrics({
+      createEventSource: () => mockEs as unknown as EventSource
+    })
+
+    connect()
+    await vi.runAllTimersAsync()
+    expect(connected.value).toBe(true)
+    expect(error.value).toBeNull()
+
+    mockEs.mockError()
+    expect(connected.value).toBe(false)
+    expect(error.value).toContain('重连')
+
+    // 模拟服务端重新连接成功
+    mockEs.mockReceiveEvent('connected', '{"status":"connected"}')
+    expect(connected.value).toBe(true)
+    expect(error.value).toBeNull()
+  })
 })
