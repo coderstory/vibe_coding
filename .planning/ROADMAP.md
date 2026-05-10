@@ -344,7 +344,7 @@ Plans:
   5. 采集服务通过接口抽象，OSHI 依赖可 mock，核心采集/计算/缓存逻辑有单元测试覆盖
 **Plans**: 3 plans
 Plans:
-- [ ] 31-01-PLAN.md — 基础层: OSHI 依赖、DTO 定义、RingBuffer、Service 接口、配置类 (Wave 1)
+- [x] 31-01-PLAN.md — 基础层: OSHI 依赖、DTO 定义、RingBuffer、Service 接口、配置类 (Wave 1)
 - [ ] 31-02-PLAN.md — 采集实现: HardwareMetricsServiceImpl + 单元测试 (Wave 2)
 - [ ] 31-03-PLAN.md — REST API: 3 个端点 + Controller 测试 + 集成测试 (Wave 2)
 
@@ -411,7 +411,7 @@ Plans:
 | 28. 配置层+Controller层注释 | v1.7 | 2/2 | Completed | 2026-05-09 |
 | 29. Service接口+Vue/TS注释 | v1.7 | 2/2 | Completed | 2026-05-09 |
 | 30. 注释维护机制建立 | v1.7 | 2/2 | Completed | 2026-05-09 |
-| 31. 后端采集服务+REST API | v1.8 | 3/0 | Planning | - |
+| 31. 后端采集服务+REST API | v1.8 | 3/1 | In progress | - |
 | 32. SSE实时推送+前端基础页面 | v1.8 | 0/0 | Not started | - |
 | 33. 完整图表+趋势 | v1.8 | 0/0 | Not started | - |
 | 34. 安全加固+打磨 | v1.8 | 0/0 | Not started | - |

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Windows 硬件负载监控
-status: planning
-last_updated: "2026-05-09T10:00:00.000Z"
-last_activity: 2026-05-09
+status: in_progress
+last_updated: "2026-05-10T10:00:00.000Z"
+last_activity: 2026-05-10
 progress:
   total_phases: 4
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 3
+  completed_plans: 1
+  percent: 8
 ---
 
 ## Project Reference
@@ -23,10 +23,10 @@ See: .planning/PROJECT.md (updated 2026-05-07)
 ## Current Position
 
 Phase: 31 - 后端采集服务 + REST API
-Plan: 待规划
-Status: Not started
+Plan: 01 — 基础层（已完成）
+Status: In progress (Plan 1/3)
 
-Progress: [                    ] 0%
+Progress: [##                  ] 8%
 
 ## v1.8 Phase Structure
 
@@ -41,11 +41,23 @@ Progress: [                    ] 0%
 
 | 决策 | 依据 | 状态 |
 |------|------|------|
-| OSHI 7.x FFM（非 6.x JNA） | JDK 26 JEP 472 禁用 JNA | 待确认 |
-| monitor/hardware/ 新包 | 不与 RocketMQ 监控耦合 | 待确认 |
+| OSHI 7.x FFM（非 6.x JNA） | JDK 26 JEP 472 禁用 JNA | 已确认 |
+| monitor/hardware/ 新包 | 不与 RocketMQ 监控耦合 | 已确认 |
 | SSE 复用 SeckillSseService 模式 | 项目已有成熟 SSE 实现 | 待确认 |
 | ECharts 6.x 复用 | 项目已有，无需新增依赖 | 待确认 |
-| 接口式采集服务设计 | TDD 要求，OSHI 可 mock | 待确认 |
+| 接口式采集服务设计 | TDD 要求，OSHI 可 mock | 已确认 |
+
+## Performance Metrics
+
+| Phase | Plan | Duration (min) | Tasks | Files | Date |
+|-------|------|----------------|-------|-------|------|
+| 31 | 01 | 15 | 2 | 15 | 2026-05-10 |
+
+## Last Session
+
+**Timestamp:** 2026-05-10
+**Stopped At:** Completed 31-01-PLAN.md
+**Resume File:** None
 
 ---
 
