@@ -62,7 +62,8 @@
       "Bash(cmd //c \"netstat -an | findstr 3306\")",
       "Bash(echo \"exit: $?\")",
       "Bash(gsd-sdk --help)",
-      "Bash(gsd-sdk query *)"
+      "Bash(gsd-sdk query *)",
+      "Bash(cmd.exe /c \"where python\")"
     ],
     "deny": [
       "Bash(rm -rf:*)",

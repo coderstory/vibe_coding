@@ -3,7 +3,23 @@
     "allow": [
       "Bash(cmd /c *)",
       "Bash(pwsh -Command Get-*)",
-      "Bash(pwsh -Command netstat *)"
+      "Bash(pwsh -Command netstat *)",
+      "Bash(gsd-sdk query *)",
+      "Bash(python3 -c *)",
+      "Bash(python3 -m json.tool *)",
+      "Bash(./gradlew.bat test *)",
+      "Bash(./gradlew.bat build *)",
+      "Bash(./gradlew.bat bootRun *)",
+      "Bash(./gradlew.bat check *)",
+      "Bash(./gradlew.bat clean *)",
+      "Bash(which *)",
+      "Bash(npm run dev *)",
+      "Bash(npm run build *)",
+      "Bash(npm run lint *)",
+      "Bash(npm run test *)",
+      "Bash(ls *)",
+      "Bash(lsof *)",
+      "Bash(ps *)"
     ]
   }
 }
