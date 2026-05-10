@@ -1,4 +1,4 @@
-# Architecture Patterns: Windows Hardware Load Monitoring
+/# Architecture Patterns: Windows Hardware Load Monitoring
 
 **Project:** Vue + Spring Boot Admin System
 **Domain:** Windows server hardware resource monitoring (CPU, memory, disk, network)
