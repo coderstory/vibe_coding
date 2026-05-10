@@ -31,16 +31,39 @@ Vue 3 + Element Plus 管理后台系统，前端使用夏日海滩风主题（�
 - ✓ 构建脚本优化（Kotlin DSL）— v1.4
 - ✓ 修复 Gradle 测试中文路径 ClassNotFoundException — v1.4
 - ✓ 修复 pom.xml 中硬编码的数据库凭证 — v1.4
+- ✓ 后端 OSHI FFM 硬件采集服务 + REST API — v1.8
+- ✓ SSE 实时推送 + 前端仪表盘（CPU/内存/磁盘/系统信息）— v1.8
+- ✓ ECharts 实时图表（磁盘 IO/网络吞吐量 + 趋势折线图）— v1.8
+- ✓ ADMIN JWT 角色权限控制 + 页面骨架/错误/断连状态 — v1.8
 
-## Current Milestone: v1.8 Windows 硬件负载监控
+## Current State
+
+**Shipped:** v1.8 Windows 硬件负载监控 (2026-05-10)
+
+**Codebase:** ~45 files changed, ~6070 LOC added for hardware monitoring
+- 后端 OSHI 7.x FFM 采集（CPU/内存/磁盘/网络/系统），SSE 广播推送，REST API
+- 前端 ECharts 仪表盘（环形图/折线图/进度条），SSE 自动重连，骨架/错误/断连状态
+- TDD 全覆盖：6 后端测试类 + 2 前端 composable 测试，13 前端 + 多后端测试通过
+
+**Next:** Planning v1.9 milestone
+
+## Active Requirements
+<details>
+<summary>✅ v1.8 Windows 硬件负载监控 — SHIPPED 2026-05-10</summary>
 
 **Goal:** 开发 Windows 系统硬件负载监控页面，实时展示 CPU/内存/磁盘/网络等系统指标
 
-**Target features:**
-- 后端 OSHI 采集服务 + REST API + SSE 实时推送
-- 前端 CPU/内存仪表盘、磁盘列表、IO/网络图表、1h 趋势图
-- 夏日海滩风主题适配、ADMIN 权限控制
-- TDD 驱动开发，接口可 mock 设计
+**Delivered:**
+- 后端 OSHI 7.x FFM 采集服务 + REST API（3 端点）
+- SSE 实时推送（广播 + 指数退避重连 1s→30s）
+- 前端仪表盘（CPU/内存环形图、磁盘进度条、系统信息）
+- ECharts 实时图表（磁盘 IO/网络吞吐量 + 1h 趋势折线图）
+- 夏日海滩风主题配色适配
+- ADMIN JWT 角色权限控制
+- 页面骨架/空状态/错误/断连状态全覆盖
+- TDD 全覆盖，13 前端测试 + 多后端测试通过
+
+</details>
 
 ### Previous Milestones
 
@@ -119,4 +142,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-07 after v1.5 completed, v1.6 initialized*
+*Last updated: 2026-05-10 after v1.8 milestone — 最新路线图见 .planning/ROADMAP.md*

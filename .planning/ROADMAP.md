@@ -17,7 +17,7 @@
 - ✅ **v1.5 前后端代码重构与目录整理** — Phases 17-21 (shipped 2026-05-07)
 - ✅ **v1.6 代码深度清理与优化** — Phases 22-26 (shipped 2026-05-07)
 - ✅ **v1.7 注释与文档工程** — Phases 27-30 (shipped 2026-05-09)
-- 🚧 **v1.8 Windows 硬件负载监控** — Phases 31-34 (planning)
+- ✅ **v1.8 Windows 硬件负载监控** — Phases 31-34 (shipped 2026-05-10)
 
 ---
 
@@ -328,76 +328,17 @@ Plans:
 
 ---
 
-## 🚧 v1.8 Windows 硬件负载监控 (Planning)
+<details>
+<summary>✅ v1.8 Windows 硬件负载监控 (Phases 31-34) — SHIPPED 2026-05-10</summary>
 
-**Milestone Goal:** Windows 系统硬件负载监控页面，实时展示 CPU/内存/磁盘/网络指标。通过 OSHI 7.x FFM 库采集硬件数据，REST API + SSE 推送至前端，ECharts 实时可视化。
+- [x] Phase 31: 后端采集服务 + REST API (3/3 plans) — Completed 2026-05-10
+- [x] Phase 32: SSE 实时推送 + 前端基础页面 (3/3 plans) — Completed 2026-05-10
+- [x] Phase 33: 完整图表 + 趋势 (1/1 plan) — Completed 2026-05-10
+- [x] Phase 34: 安全加固 + 打磨 (1/1 plan) — Completed 2026-05-10
 
-### Phase 31: 后端采集服务 + REST API
-**Goal**: 后端集成 OSHI 7.x FFM 库，实现 CPU/内存/磁盘/网络指标的定时采集，提供 REST API 和环形缓冲区趋势查询
-**Depends on**: v1.7 产物（Phase 30 注释维护机制建立完成后代码基线稳定）
-**Requirements**: HWM-01, HWM-02, HWM-03, HWM-04, HWM-05, HWM-06, HWM-07, HWM-08, HWM-09, TDD-01, TDD-03
-**Success Criteria** (what must be TRUE):
-  1. 后端启动后自动以 2s 间隔采集 CPU 使用率（总体和各核）、内存指标（总量/已用/可用）、磁盘容量和分区信息、磁盘 IOPS/读写速度、网络接口吞吐量
-  2. `GET /api/monitor/hardware/current` 返回当前所有硬件指标的快照 JSON
-  3. `GET /api/monitor/hardware/trend?metric=cpu&range=360` 返回近 1h 环形缓冲区趋势数据
-  4. `GET /api/monitor/hardware/system` 返回系统基本信息（OS 版本、运行时间、进程数）
-  5. 采集服务通过接口抽象，OSHI 依赖可 mock，核心采集/计算/缓存逻辑有单元测试覆盖
-**Plans**: 3 plans
-Plans:
-- [x] 31-01-PLAN.md — 基础层: OSHI 依赖、DTO 定义、RingBuffer、Service 接口、配置类 (Wave 1)
-- [ ] 31-02-PLAN.md — 采集实现: HardwareMetricsServiceImpl + 单元测试 (Wave 2)
-- [x] 31-03-PLAN.md — REST API: 3 个端点 + Controller 测试 + 集成测试 (Wave 2)
+Details: .planning/milestones/v1.8-ROADMAP.md
 
-### Phase 32: SSE 实时推送 + 前端基础页面
-**Goal**: 后端通过 SSE 实时推送硬件指标，前端展示 CPU/内存仪表盘、磁盘容量和系统信息
-**Depends on**: Phase 31（SSE 推送需要采集服务提供数据）
-**Requirements**: HWM-10, HWM-11, HWM-12, HWM-13, HWM-14, HWM-15, HWM-17, HWM-19, TDD-02, TDD-05
-**Success Criteria** (what must be TRUE):
-  1. 用户打开硬件监控页面后，页面通过 SSE 实时接收硬件指标（每 2s 推送一次）
-  2. SSE 连接包含心跳机制，过期连接自动清理，断线自动重连
-  3. CPU 使用率以环形图展示，显示核数/型号信息卡片
-  4. 内存使用率以环形图展示，显示总量/已用/可用信息
-  5. 磁盘分区以进度条列表展示容量使用情况
-  6. 系统基本信息卡片展示 OS 版本、运行时间、进程数
-  7. SSE 推送服务和前端 SSE composable 设计为可测试的接口抽象
-**Plans**: 3 plans
-Plans:
-- [ ] 32-01-PLAN.md — 后端 SSE 广播服务 + Controller 端点 + 测试 (Wave 1)
-- [ ] 32-02-PLAN.md — 前端类型定义 + SSE composable + 单元测试 (Wave 1)
-- [ ] 32-03-PLAN.md — 前端页面 (左导航/ECharts 环形图/磁盘进度条/系统信息) (Wave 2)
-**UI hint**: yes
-
-### Phase 33: 完整图表 + 趋势
-**Goal**: 磁盘 IO/网络吞吐量实时折线图、近 1 小时趋势图，图表组件适配海滩风主题
-**Depends on**: Phase 32（图表数据来自 SSE 推送）
-**Requirements**: HWM-16, HWM-18, HWM-20, HWM-22, TDD-04
-**Success Criteria** (what must be TRUE):
-  1. 用户可以看到磁盘 IOPS 和读写速度实时折线图
-  2. 用户可以看到网络接口上下行速率实时折线图
-  3. 用户可以看到 CPU/内存的近 1 小时趋势折线图（ECharts 滑动窗口，300 点上限）
-  4. 所有图表组件适配夏日海滩风主题配色（海洋蓝主调 + 琥珀色强调）
-  5. ECharts 实例在组件卸载时正确 dispose，通过 markRaw 避免响应式代理，无内存泄漏
-  6. Vue 组件逻辑（composable、图表数据处理）有单元测试覆盖
-**Plans**: 1 plan
-Plans:
-- [x] 33-01-PLAN.md — 完整图表组件（磁盘 IO/网络实时折线图 + CPU/内存趋势图）+ TDD + 页面集成
-**Status**: ✅ Completed 2026-05-10
-**UI hint**: yes
-
-### Phase 34: 安全加固 + 打磨
-**Goal**: 硬件监控 API 权限控制、页面加载/异常/断连状态处理
-**Depends on**: Phase 32（状态处理在页面基础上打磨）
-**Requirements**: HWM-21, HWM-23, HWM-24
-**Success Criteria** (what must be TRUE):
-  1. 非 ADMIN 角色用户无法访问硬件监控 API 端点，返回 403 错误
-  2. 页面加载时显示加载骨架态，数据为空时显示空状态提示，请求/连接失败时显示错误信息
-  3. SSE 断线重连时页面顶部显示连接状态提示（"正在重连..."），恢复连接后自动消失
-  4. 用户离开监控页面时 SSE 连接正确关闭，无资源泄漏
-**Plans**: 1 plan
-Plans:
-- [x] 34-01-PLAN.md — JWT 角色声明 + SecurityConfig 权限 + 前端骨架/错误/断连状态
-**Status**: ✅ Completed 2026-05-10
-**UI hint**: yes
+</details>
 
 ---
 
@@ -428,4 +369,4 @@ Plans:
 
 ---
 
-*路线图更新: 2026-05-10 — Phase 32 规划完成 (3 plans)*
+*路线图更新: 2026-05-10 — v1.8 shipped (Phases 31-34), archived to milestones/*

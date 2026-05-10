@@ -1,9 +1,9 @@
 ---
 phase: 31
 slug: 后端采集服务-REST-API
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: approved
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-05-10
 ---
 
@@ -66,6 +66,6 @@ All phase behaviors have automated verification.
 - [x] Wave 0 covers all MISSING references
 - [x] No watch-mode flags
 - [x] Feedback latency < 120s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** approved (2026-05-10) — all 6 backend test suites pass, 13 frontend hardware tests pass, automated commands verified
