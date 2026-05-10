@@ -37,23 +37,52 @@ public class JwtTokenProvider {
     }
 
     /**
-     * 生成 Access Token。
+     * 生成 Access Token（默认角色 user）。
      *
      * @param userId   用户 ID
      * @param username 用户名
      * @return Access Token 字符串
      */
     public String generateToken(Long userId, String username) {
+        return generateToken(userId, username, "user");
+    }
+
+    /**
+     * 生成 Access Token。
+     *
+     * @param userId   用户 ID
+     * @param username 用户名
+     * @param role     用户角色代码（如 admin、user）
+     * @return Access Token 字符串
+     */
+    public String generateToken(Long userId, String username, String role) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpiration);
 
         return Jwts.builder()
             .subject(String.valueOf(userId))
             .claim("username", username)
+            .claim("role", role)
             .issuedAt(now)
             .expiration(expiryDate)
             .signWith(getSigningKey())
             .compact();
+    }
+
+    /**
+     * 从 Token 中解析角色。
+     *
+     * @param token JWT Token 字符串
+     * @return 角色代码
+     */
+    public String getRoleFromToken(String token) {
+        Claims claims = Jwts.parser()
+            .verifyWith(getSigningKey())
+            .build()
+            .parseSignedClaims(token)
+            .getPayload();
+        String role = claims.get("role", String.class);
+        return role != null ? role : "user";
     }
 
     /**

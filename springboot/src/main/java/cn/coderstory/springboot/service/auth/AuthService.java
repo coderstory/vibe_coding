@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import cn.coderstory.springboot.entity.role.Role;
+import cn.coderstory.springboot.mapper.role.RoleMapper;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +33,7 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final AuditService auditService;
+    private final RoleMapper roleMapper;
 
     /**
      * 用户登录。
@@ -57,7 +61,8 @@ public class AuthService {
             throw new RuntimeException("用户已被禁用");
         }
 
-        String token = jwtTokenProvider.generateToken(user.getId(), user.getUsername());
+        String roleCode = resolveRoleCode(user.getRoleId());
+        String token = jwtTokenProvider.generateToken(user.getId(), user.getUsername(), roleCode);
         String refreshToken = jwtTokenProvider.generateRefreshToken(user.getId(), user.getUsername());
 
         // 记录登录审计日志
@@ -110,7 +115,8 @@ public class AuthService {
         }
 
         // 生成新的访问令牌和刷新令牌
-        String newToken = jwtTokenProvider.generateToken(userId, username);
+        String roleCode = resolveRoleCode(user.getRoleId());
+        String newToken = jwtTokenProvider.generateToken(userId, username, roleCode);
         String newRefreshToken = jwtTokenProvider.generateRefreshToken(userId, username);
 
         Map<String, Object> data = new HashMap<>();
@@ -145,5 +151,19 @@ public class AuthService {
      */
     public User getCurrentUser(Long userId) {
         return userMapper.selectById(userId);
+    }
+
+    /**
+     * 根据角色 ID 解析角色代码。
+     * <p>
+     * 查询角色表获取 roleCode，查不到时默认返回 "user"。
+     *
+     * @param roleId 角色 ID
+     * @return 角色代码
+     */
+    private String resolveRoleCode(Long roleId) {
+        if (roleId == null) return "user";
+        Role role = roleMapper.selectById(roleId);
+        return role != null ? role.getRoleCode() : "user";
     }
 }
