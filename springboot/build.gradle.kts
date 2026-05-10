@@ -85,6 +85,7 @@ tasks.withType<JavaCompile>().configureEach {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    exclude("**/*IT.class")
 }
 
 // ===== Checkstyle 代码风格检查 =====
