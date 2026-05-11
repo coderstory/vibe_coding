@@ -44,7 +44,7 @@ export function useHardwareTrend(
     error.value = null
     try {
       const res = await fetchFn(metric, range)
-      data.value = res.data.data || []
+      data.value = res.data || []
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : '请求失败'
     } finally {

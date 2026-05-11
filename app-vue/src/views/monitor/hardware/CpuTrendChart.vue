@@ -31,7 +31,7 @@ async function loadTrend() {
   error.value = null
   try {
     const res = await fetchTrend('cpu', 360)
-    trendData.value = res.data.data || []
+    trendData.value = res.data || []
   } catch (e: unknown) {
     error.value = e instanceof Error ? e.message : '获取趋势数据失败'
   } finally {
