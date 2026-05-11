@@ -19,7 +19,7 @@ export interface UseHardwareMetricsOptions {
 export function useHardwareMetrics(options: UseHardwareMetricsOptions = {}) {
   const {
     createEventSource = (url: string) => new EventSource(url),
-    url = '/api/monitor/hardware/subscribe'
+    url = `/api/monitor/hardware/subscribe?token=${localStorage.getItem('token') || ''}`
   } = options
 
   const connected = ref(false)
