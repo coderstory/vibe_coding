@@ -47,11 +47,12 @@ public class MonitoringSchedulerConfig {
      * 创建 OSHI FFM 入口 SystemInfo 实例。
      * <p>
      * 该实例封装了 FFM（Foreign Function & Memory）API 调用，用于采集硬件指标。
-     * destroyMethod = "close" 确保应用关闭时释放原生资源。
+     * oshi.ffm.SystemInfo 不实现 AutoCloseable，使用空 destroyMethod 避免
+     * Spring Boot 7.x 验证异常。
      *
      * @return OSHI SystemInfo 实例
      */
-    @Bean(destroyMethod = "close")
+    @Bean(destroyMethod = "")
     public SystemInfo systemInfo() {
         return new SystemInfo();
     }
