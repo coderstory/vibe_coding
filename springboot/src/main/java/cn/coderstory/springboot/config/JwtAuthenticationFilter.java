@@ -57,7 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             request.setAttribute("username", username);
 
             String role = jwtTokenProvider.getRoleFromToken(token);
-            String authority = "admin".equals(role) ? "ROLE_ADMIN" : "ROLE_USER";
+            String authority = "ADMIN".equalsIgnoreCase(role) ? "ROLE_ADMIN" : "ROLE_USER";
 
             UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(
@@ -86,11 +86,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             path.startsWith("/api/auth/register");
     }
 
-    // 从请求头中提取 Bearer Token
+    // 从请求头或 SSE query param 中提取 Bearer Token
     private String getTokenFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
+        }
+        // EventSource 不支持自定义 header，token 通过 query 参数传递
+        String queryToken = request.getParameter("token");
+        if (queryToken != null && !queryToken.isEmpty()) {
+            return queryToken;
         }
         return null;
     }
